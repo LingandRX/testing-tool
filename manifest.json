@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Floating Sidebar with Toggle Button",
+  "version": "1.1",
+  "description": "带有可折叠隐藏按钮的浮动侧边栏",
+  "permissions": ["activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "打开侧边栏"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["sidepanel/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
