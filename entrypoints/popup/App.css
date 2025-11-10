@@ -1,0 +1,79 @@
+/* 隐藏页面滚动条 */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  scrollbar-gutter: stable;
+}
+
+/* 隐藏body滚动条但允许滚动 */
+body {
+  overflow: auto;
+}
+
+:root {
+  /* 统一圆角变量 */
+  --radius: 8px;
+  /* 统一背景颜色变量 */
+  --bg-color: #fafafa;
+  /* 统一文字颜色变量 */
+  --text-color: #333333;
+  /* 统一按钮颜色变量 */
+  --btn-bg: #e0e0e0;
+  /* 统一按钮文字颜色变量 */
+  --btn-text: #333333;
+  --border: 1px solid #e0e0e0;
+}
+
+.app {
+  width: 400px;
+  min-height: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 导航容器 */
+.nav-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+/* 导航按钮 */
+.nav-button {
+  padding: 8px 16px;
+  border: 1px solid var(--btn-bg);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--btn-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.nav-button:hover {
+  background: var(--btn-bg);
+}
+
+.nav-button.active {
+  background: var(--btn-bg);
+  font-weight: 500;
+}
