@@ -82,4 +82,17 @@
       iframe.style.transform = visible ? 'translateX(0)' : 'translateX(100%)';
     }
   });
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'copyText') {
+      navigator.clipboard
+        .writeText(message.data)
+        .then(() => sendResponse({ success: true }))
+        .catch((err) => {
+          console.error('❌ 复制失败：', err);
+          sendResponse({ success: false, error: err });
+        });
+      return true;
+    }
+  });
 })();
