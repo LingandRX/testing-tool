@@ -26,7 +26,7 @@
     zIndex: '2147483647',
     boxShadow: '-4px 0 8px rgba(0,0,0,0.15)',
     backgroundColor: 'white',
-    transform: 'translateX(0)',
+    transform: 'translateX(100%)', // 默认关闭状态
     transition: 'transform 0.3s ease',
   });
 
@@ -65,7 +65,7 @@
   document.body.appendChild(toggleBtn);
 
   // 折叠 / 展开逻辑
-  let visible = true;
+  let visible = false; // 默认关闭状态
   toggleBtn.addEventListener('click', () => {
     visible = !visible;
     iframe.style.transform = visible ? 'translateX(0)' : 'translateX(100%)';
