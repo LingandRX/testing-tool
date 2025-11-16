@@ -11,9 +11,9 @@
     <div id="app">
       <!-- 导航栏 -->
       <nav class="navbar">
-        <button id="nav-timestamp" class="nav-button active">时间戳转换</button>
-        <button id="nav-other" class="nav-button">其他工具</button>
-        <button id="close" class="close-button">X</button>
+        <button id="nav-timestamp-btn" class="nav-button active">时间戳转换</button>
+        <button id="nav-other-tools-btn" class="nav-button">其他工具</button>
+        <button id="close-panel-btn" class="close-button">X</button>
       </nav>
 
       <!-- 页面内容容器 -->
@@ -24,12 +24,12 @@
           <div>
             <h2>当前时间戳</h2>
             <p>
-              <a href="javascript:;" id="current-timestamp">1762873747965</a>
-              <span id="timestamp-unit">毫秒</span>
-              <button id="toggle-timestamp-btn">切换单位</button>
+              <a href="javascript:;" id="current-timestamp-value">1762873747965</a>
+              <span id="current-timestamp-unit">毫秒</span>
+              <button id="toggle-unit-btn">切换单位</button>
               <button id="copy-timestamp-btn">复制</button>
-              <button id="stop-timestamp-btn">停止</button>
-              <button id="start-timestamp-btn" style="display: none">开始</button>
+              <button id="stop-timer-btn">停止</button>
+              <button id="start-timer-btn" style="display: none">开始</button>
             </p>
           </div>
 
@@ -40,24 +40,24 @@
               <div class="input-group">
                 <input
                   type="text"
-                  id="input-timestamp"
+                  id="timestamp-input"
                   placeholder="请输入时间戳"
                   class="input-text"
                 />
-                <select class="select-box">
+                <select id="timestamp-input-unit-select" class="select-box">
                   <option value="milliseconds">毫秒(ms)</option>
                   <option value="seconds">秒(s)</option>
                 </select>
               </div>
 
               <div class="input-group">
-                <button id="convert-timestamp-btn" class="convert-button">转换</button>
+                <button id="convert-timestamp-to-date-btn" class="convert-button">转换</button>
               </div>
 
               <div class="input-group">
                 <input
                   type="text"
-                  id="timestamp-input-result"
+                  id="timestamp-conversion-result"
                   placeholder="转换结果"
                   class="input-text"
                 />
@@ -75,7 +75,7 @@
               <div class="input-group">
                 <input
                   type="text"
-                  id="input-datetime"
+                  id="datetime-input"
                   placeholder="输入日期时间"
                   class="input-text"
                 />
@@ -85,17 +85,17 @@
               </div>
 
               <div class="input-group">
-                <button id="convert-datetime-btn" class="convert-button">转换</button>
+                <button id="convert-date-to-timestamp-btn" class="convert-button">转换</button>
               </div>
 
               <div class="input-group">
                 <input
                   type="text"
-                  id="datetime-input-result"
+                  id="date-conversion-result"
                   placeholder="转换结果"
                   class="input-text"
                 />
-                <select class="select-box">
+                <select id="date-result-unit-select" class="select-box">
                   <option value="milliseconds">毫秒(ms)</option>
                   <option value="seconds">秒(s)</option>
                 </select>
@@ -105,13 +105,13 @@
         </div>
 
         <!-- 其他工具页面 -->
-        <div id="page-other" class="page">
+        <div id="page-other-tools" class="page">
           <h2>其他工具页面</h2>
           <p>这里可以放置其他工具的内容。</p>
         </div>
       </div>
     </div>
 
-    <script src="index.js"></script>
+    <script src="../dist/sidepanel.bundle.js"></script>
   </body>
 </html>

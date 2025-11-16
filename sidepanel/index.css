@@ -1,4 +1,10 @@
 /* sidepanel/style.css */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .navbar {
   display: flex;
   background-color: #f8f9fa;
@@ -13,7 +19,7 @@
   border: none;
   cursor: pointer;
   text-align: center;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
 .nav-button:hover {
@@ -23,6 +29,8 @@
 .nav-button.active {
   background-color: #007bff;
   color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .close-button {
@@ -33,6 +41,12 @@
   border-radius: 0.25rem;
   cursor: pointer;
   margin-left: auto;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
 }
 
 .datetime-box {
@@ -40,49 +54,44 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-@media screen and (max-width: 768px) {
-  .datetime-box {
-    flex-direction: column;
-    align-items: stretch;
-  }
+  transition: all 0.3s ease;
 }
 
 .input-group {
   display: flex;
   gap: 1rem;
   align-items: center;
-  margin: 0.5rem 0;
-  min-width: 200px;
-}
-
-@media screen and (max-width: 768px) {
-  .input-group {
-    min-width: unset;
-    width: 100%;
-  }
+  transition: all 0.3s ease;
 }
 
 .input-text {
   width: 200px;
   padding: 0.5rem;
-  margin: 0.5rem 0;
   box-sizing: border-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: all 0.3s ease;
 }
 
-@media screen and (max-width: 768px) {
-  .input-text {
-    width: 100%;
-    flex: 1;
-  }
+.input-text:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
 }
 
 .select-box {
-  width: 150px;
+  min-width: 150px;
   padding: 0.5rem;
-  margin: 0.5rem 0;
   box-sizing: border-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.select-box:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
 }
 
 .convert-button {
@@ -94,24 +103,78 @@
   cursor: pointer;
   height: 2rem;
   width: 4rem;
-  margin: 0.5rem 0;
   align-self: flex-start;
+  transition: all 0.3s ease;
 }
 
-@media screen and (max-width: 768px) {
-  .convert-button {
-    width: 100%;
-  }
+.convert-button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .content {
   padding: 1rem;
+  position: relative;
+  flex: 1;
+  overflow: hidden;
 }
 
+/* 页面切换动画 */
 .page {
   display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .page.active {
   display: block;
+  position: relative;
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* 按钮点击效果 */
+.button:active, .convert-button:active, .nav-button:active, .close-button:active {
+  transform: scale(0.95);
+}
+
+/* 输入框动画 */
+.input-text, .select-box {
+  transition: all 0.2s ease-in-out;
+}
+
+.input-text:hover, .select-box:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 结果显示动画 */
+#timestamp-conversion-result, #date-conversion-result, #current-timestamp-value {
+  transition: all 0.3s ease;
+}
+
+#timestamp-conversion-result:focus, #date-conversion-result:focus, #current-timestamp-value:focus {
+  transform: scale(1.02);
+}
+
+@media screen and (max-width: 900px) {
+  .input-group {
+    width: 100%;
+  }
+
+  .input-text {
+    width: 100%;
+  }
+  
+  .page {
+    padding: 0.5rem;
+  }
 }
