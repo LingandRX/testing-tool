@@ -19,9 +19,14 @@ export function updateTimestamp(showMilliseconds = true) {
  * 转换时间戳为日期格式
  * @param {string} timestamp - 输入的时间戳
  * @param {boolean} isSeconds - 是否为秒格式
+ * @param {string} timeZone - 时区，默认为本地时区
  * @returns {string} 格式化后的日期字符串
  */
-export function convertTimestampToDate(timestamp, isSeconds) {
+export function convertTimestampToDate(
+  timestamp,
+  isSeconds,
+  timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+) {
   // 转换为数字
   let timestampNum = Number(timestamp);
 
@@ -43,22 +48,34 @@ export function convertTimestampToDate(timestamp, isSeconds) {
     return '无效的日期';
   }
 
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const seconds = date.getSeconds();
+  // 使用Intl.DateTimeFormat来根据时区格式化日期
+  const formatter = new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZone: timeZone,
+  });
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return formatter.format(date);
 }
 
 /**
  * 转换日期格式为时间戳
  * @param {string} date - 输入的日期字符串
+ * @param {string} timeZone - 时区，默认为本地时区
  * @returns {number|string} 时间戳或错误信息
  */
-export function convertDateToTimestamp(date) {
-  const timestamp = Date.parse(date);
-  return isNaN(timestamp) ? '无效的日期' : timestamp;
+export function convertDateToTimestamp(
+  date,
+  timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+) {
+  return new Date(
+    Intl.DateTimeFormat('en-US', {
+      timeZone: timeZone,
+      hour12: false,
+    }).format(date)
+  ).getTime();
 }

@@ -12,7 +12,9 @@ import {
   handleConvertTimestamp, 
   handleConvertDateToTimestamp,
   handleCopyTimestamp,
-  handleClosePanel
+  handleClosePanel,
+  handleTimezoneResult,
+  handleTimezoneInput
 } from './modules/eventHandlers.js';
 import { addEventListenerById } from './utils/domUtils.js';
 
@@ -43,3 +45,7 @@ addEventListenerById('convert-date-to-timestamp-btn', 'click', handleConvertDate
 addEventListenerById('copy-timestamp-btn', 'click', handleCopyTimestamp);
 // 绑定关闭面板按钮事件
 addEventListenerById('close-panel-btn', 'click', handleClosePanel);
+// 绑定切换时区事件
+addEventListenerById('timezone-result', 'change', handleTimezoneResult)
+// 绑定输入时区事件
+addEventListenerById('timezone-input', 'change', handleTimezoneInput)
