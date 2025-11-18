@@ -64,7 +64,7 @@ export function convertTimestampToDate(
 
 /**
  * 转换日期格式为时间戳
- * @param {string} date - 输入的日期字符串
+ * @param {string|Date} date - 输入的日期字符串或Date对象
  * @param {string} timeZone - 时区，默认为本地时区
  * @returns {number|string} 时间戳或错误信息
  */
@@ -72,10 +72,45 @@ export function convertDateToTimestamp(
   date,
   timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 ) {
-  return new Date(
-    Intl.DateTimeFormat('en-US', {
-      timeZone: timeZone,
-      hour12: false,
-    }).format(date)
-  ).getTime();
+  try {
+    // 创建日期对象
+    const dateObj = new Date(date);
+
+    // 检查日期是否有效
+    if (isNaN(dateObj.getTime())) {
+      return '无效的日期';
+    }
+
+    // 如果提供了时区，则需要特殊处理
+    if (timeZone) {
+      // 获取给定时区相对于UTC的时间差（毫秒）
+      const utc = dateObj.getTime() + dateObj.getTimezoneOffset() * 60000;
+
+      // 计算目标时区相对于UTC的偏移量
+      const targetOffset = getTimeZoneOffset(timeZone);
+
+      // 返回目标时区对应的时间戳
+      const targetTimestamp = utc + targetOffset;
+      return targetTimestamp;
+    } else {
+      // 没有时区参数，直接返回时间戳
+      const timestamp = dateObj.getTime();
+      console.log('timestamp: ', timestamp);
+      return timestamp;
+    }
+  } catch (error) {
+    return '日期转换错误: ' + error.message;
+  }
+}
+
+/**
+ * 获取指定时区相对于UTC的偏移量（毫秒）
+ * @param {string} timeZone - 时区名称
+ * @returns {number} 偏移量（毫秒）
+ */
+function getTimeZoneOffset(timeZone) {
+  const now = new Date();
+  const utc = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+  const target = new Date(now.toLocaleString('en-US', { timeZone: timeZone }));
+  return target.getTime() - utc.getTime();
 }

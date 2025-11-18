@@ -163,8 +163,6 @@ export function handleConvertDateToTimestamp() {
   // 转换为时间戳
   const timestamp = convertDateToTimestamp(date, selectedTimezone);
 
-  console.log('转换后的时间戳：', timestamp);
-
   if (isNaN(timestamp)) {
     dateInputResult.value = '无效的日期字符串';
     dateInputResult.style.borderColor = '#dc3545';
