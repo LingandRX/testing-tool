@@ -233,13 +233,10 @@ export function handleCopyTimestamp() {
   copyTimestampBtn.style.transform = 'scale(1.02)';
   setTimeout(() => {
     copyTimestampBtn.style.transform = 'scale(1)';
-  }, 300);
-
-  setTimeout(() => {
     copyTimestampBtn.textContent = '复制';
     copyTimestampBtn.style.color = '';
     copyTimestampBtn.style.fontWeight = '';
-  }, 1000);
+  }, 300);
 
   // 检查扩展上下文是否仍然有效
   if (chrome.runtime && chrome.runtime.sendMessage) {
