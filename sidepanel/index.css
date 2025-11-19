@@ -30,7 +30,7 @@
   background-color: #007bff;
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .close-button {
@@ -47,6 +47,36 @@
 .close-button:hover {
   background-color: #c82333;
   transform: scale(1.05);
+}
+
+#current-timestamp {
+  p a {
+    box-sizing: border-box;
+    color: #2b2b2b;
+    font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
+  }
+  
+  button {
+    padding: 0.5rem 1rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    height: 2rem;
+    align-self: flex-start;
+    transition: all 0.3s ease;
+  }
+
+  button:active {
+    transform: scale(0.95);
+  }
+
+  button:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
 }
 
 .datetime-box {
@@ -110,7 +140,7 @@
 .convert-button:hover {
   background-color: #218838;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .content {
@@ -142,26 +172,35 @@
 }
 
 /* 按钮点击效果 */
-.button:active, .convert-button:active, .nav-button:active, .close-button:active {
+.button:active,
+.convert-button:active,
+.nav-button:active,
+.close-button:active {
   transform: scale(0.95);
 }
 
 /* 输入框动画 */
-.input-text, .select-box {
+.input-text,
+.select-box {
   transition: all 0.2s ease-in-out;
 }
 
-.input-text:hover, .select-box:hover {
+.input-text:hover,
+.select-box:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* 结果显示动画 */
-#timestamp-conversion-result, #date-conversion-result, #current-timestamp-value {
+#timestamp-conversion-result,
+#date-conversion-result,
+#current-timestamp-value {
   transition: all 0.3s ease;
 }
 
-#timestamp-conversion-result:focus, #date-conversion-result:focus, #current-timestamp-value:focus {
+#timestamp-conversion-result:focus,
+#date-conversion-result:focus,
+#current-timestamp-value:focus {
   transform: scale(1.02);
 }
 
@@ -173,7 +212,7 @@
   .input-text {
     width: 100%;
   }
-  
+
   .page {
     padding: 0.5rem;
   }

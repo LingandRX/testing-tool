@@ -21,16 +21,18 @@
         <!-- 时间戳工具页面 -->
         <div id="page-timestamp" class="page active">
           <h2>时间戳工具</h2>
-          <div>
+          <div id="current-timestamp">
             <h2>当前时间戳</h2>
             <p>
               <a href="javascript:;" id="current-timestamp-value">1762873747965</a>
               <span id="current-timestamp-unit">毫秒</span>
+            </p>
+            <div>
               <button id="toggle-unit-btn">切换单位</button>
               <button id="copy-timestamp-btn">复制</button>
-              <button id="stop-timer-btn">停止</button>
+              <button id="stop-timer-btn" style="background-color: red;">停止</button>
               <button id="start-timer-btn" style="display: none">开始</button>
-            </p>
+            </div>
           </div>
 
           <!-- 时间戳转日期时间 -->
@@ -61,8 +63,7 @@
                   placeholder="转换结果"
                   class="input-text"
                 />
-                <select class="select-box" id="timezone-result">
-                </select>
+                <select class="select-box" id="timezone-result"></select>
               </div>
             </div>
           </div>
@@ -78,8 +79,7 @@
                   placeholder="输入日期时间"
                   class="input-text"
                 />
-                <select class="select-box" id="timezone-input">
-                </select>
+                <select class="select-box" id="timezone-input"></select>
               </div>
 
               <div class="input-group">

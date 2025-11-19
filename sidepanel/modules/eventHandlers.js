@@ -10,7 +10,26 @@ let showMilliseconds = true;
 // 定义一个全局变量来保存计时器
 let timestampInterval;
 // 定义时区列表
-const timeZoneList = Intl.supportedValuesOf('timeZone');
+const timeZoneList = [
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'America/Anchorage',
+  'America/Honolulu',
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Berlin',
+  'Europe/Moscow',
+  'Asia/Tokyo',
+  'Asia/Shanghai',
+  'Asia/Hong_Kong',
+  'Asia/Singapore',
+  'Asia/Dubai',
+  'Asia/Kolkata',
+  'Australia/Sydney',
+  'Pacific/Auckland',
+];
 // 获取本地时区
 const localTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -38,9 +57,10 @@ export function initTimeZoneList() {
     if (i === localTimeZoneIndex) {
       timezoneResultSelect.add(new Option(timeZoneList[i], i, true, true));
       timezoneInputSelect.add(new Option(timeZoneList[i], i, true, true));
+    } else {
+      timezoneResultSelect.add(new Option(timeZoneList[i], i));
+      timezoneInputSelect.add(new Option(timeZoneList[i], i));
     }
-    timezoneResultSelect.add(new Option(timeZoneList[i], i));
-    timezoneInputSelect.add(new Option(timeZoneList[i], i));
   }
 }
 
@@ -56,8 +76,19 @@ export function initTimestampAndDate() {
  * 切换单位按钮事件处理器
  */
 export function handleToggleUnit() {
+  const currentTimestampUnit = getElementById('current-timestamp-unit');
+  const toggleUnitBtn = getElementById('toggle-unit-btn');
+
   showMilliseconds = !showMilliseconds;
+  currentTimestampUnit.textContent = showMilliseconds ? '毫秒' : '秒';
   updateTimestamp(showMilliseconds);
+
+  // 添加闪烁动画效果
+  toggleUnitBtn.style.transition = 'all 0.3s';
+  toggleUnitBtn.style.transform = 'scale(1.02)';
+  setTimeout(() => {
+    toggleUnitBtn.style.transform = 'scale(1)';
+  }, 300);
 }
 
 /**
@@ -191,18 +222,23 @@ export function handleConvertDateToTimestamp() {
 export function handleCopyTimestamp() {
   // 获取时间戳文本
   const currentTimestamp = getElementById('current-timestamp-value');
+  const copyTimestampBtn = getElementById('copy-timestamp-btn');
   const timestampText = currentTimestamp.textContent;
 
-  // 添加复制反馈动画
-  const originalText = currentTimestamp.textContent;
-  currentTimestamp.textContent = '已复制!';
-  currentTimestamp.style.color = '#28a745';
-  currentTimestamp.style.fontWeight = 'bold';
+  copyTimestampBtn.textContent = '已复制';
+  copyTimestampBtn.style.fontWeight = 'bold';
+
+  // 添加闪烁动画效果
+  copyTimestampBtn.style.transition = 'all 0.3s';
+  copyTimestampBtn.style.transform = 'scale(1.02)';
+  setTimeout(() => {
+    copyTimestampBtn.style.transform = 'scale(1)';
+  }, 300);
 
   setTimeout(() => {
-    currentTimestamp.textContent = originalText;
-    currentTimestamp.style.color = '';
-    currentTimestamp.style.fontWeight = '';
+    copyTimestampBtn.textContent = '复制';
+    copyTimestampBtn.style.color = '';
+    copyTimestampBtn.style.fontWeight = '';
   }, 1000);
 
   // 检查扩展上下文是否仍然有效

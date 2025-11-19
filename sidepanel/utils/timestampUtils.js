@@ -3,16 +3,13 @@
  */
 
 /**
- * 更新时间戳显示
+ * 更新时间戳
  * @param {boolean} showMilliseconds - 是否显示毫秒
  */
 export function updateTimestamp(showMilliseconds = true) {
   const currentTimestamp = document.getElementById('current-timestamp-value');
-  const currentTimestampUnit = document.getElementById('current-timestamp-unit');
   const timestamp = Date.now();
-  const unit = showMilliseconds ? '毫秒' : '秒';
   currentTimestamp.textContent = showMilliseconds ? timestamp : Math.floor(timestamp / 1000);
-  currentTimestampUnit.textContent = unit;
 }
 
 /**
