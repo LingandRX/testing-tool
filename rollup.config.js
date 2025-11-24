@@ -6,9 +6,9 @@ import livereload from 'rollup-plugin-livereload';
 import serve from 'rollup-plugin-serve';
 
 export default defineConfig({
-  input: 'sidepanel/index.js',
+  input: 'sidepanel/js/index.js',
   output: {
-    file: 'dist/sidepanel.bundle.js',
+    file: 'dist/bundle.js',
     format: 'iife',
   },
   plugins: [
@@ -17,20 +17,20 @@ export default defineConfig({
     json(),
     livereload({
       watch: ['dist', 'sidepanel'],
-      verbose: false
+      verbose: false,
     }),
     serve({
       open: true,
       port: 8082,
       contentBase: ['.', 'sidepanel'],
       headers: {
-        'Access-Control-Allow-Origin': '*'
-      }
+        'Access-Control-Allow-Origin': '*',
+      },
     }),
   ],
   watch: {
     include: ['sidepanel/**/*'],
     exclude: ['node_modules/**/*'],
-    clearScreen: false
-  }
+    clearScreen: false,
+  },
 });

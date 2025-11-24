@@ -1,32 +1,16 @@
-// document.getElementById('close').addEventListener('click', () => {
-//   window.parent.postMessage({ action: 'indexind' }, '*');
-// });
-
-// sidepanel/index.js
-import { switchPage } from './utils/domUtils.js';
-import { 
-  initTimestampDisplay, 
-  handleToggleUnit, 
-  handleStopTimer, 
-  handleStartTimer, 
-  handleConvertTimestamp, 
+import {
+  initTimestampDisplay,
+  handleToggleUnit,
+  handleStopTimer,
+  handleStartTimer,
+  handleConvertTimestamp,
   handleConvertDateToTimestamp,
   handleCopyTimestamp,
   handleClosePanel,
   handleTimezoneResult,
-  handleTimezoneInput
-} from './modules/eventHandlers.js';
-import { addEventListenerById } from './utils/domUtils.js';
-
-// 页面切换逻辑
-addEventListenerById('nav-timestamp-btn', 'click', () => {
-  switchPage('timestamp');
-});
-
-// 计时器页面切换
-addEventListenerById('nav-other-tools-btn', 'click', () => {
-  switchPage('other-tools');
-});
+  handleTimezoneInput,
+} from '../modules/eventHandlers.js';
+import { addEventListenerById } from '../utils/domUtils.js';
 
 // 初始化时间戳显示
 initTimestampDisplay();
@@ -46,6 +30,6 @@ addEventListenerById('copy-timestamp-btn', 'click', handleCopyTimestamp);
 // 绑定关闭面板按钮事件
 addEventListenerById('close-panel-btn', 'click', handleClosePanel);
 // 绑定切换时区事件
-addEventListenerById('timezone-result', 'change', handleTimezoneResult)
+addEventListenerById('timezone-result', 'change', handleTimezoneResult);
 // 绑定输入时区事件
-addEventListenerById('timezone-input', 'change', handleTimezoneInput)
+addEventListenerById('timezone-input', 'change', handleTimezoneInput);

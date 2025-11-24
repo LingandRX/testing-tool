@@ -227,12 +227,7 @@ export function handleCopyTimestamp() {
 
   copyTimestampBtn.textContent = '已复制';
   copyTimestampBtn.style.fontWeight = 'bold';
-
-  // 添加闪烁动画效果
-  copyTimestampBtn.style.transition = 'all 0.3s';
-  copyTimestampBtn.style.transform = 'scale(1.02)';
   setTimeout(() => {
-    copyTimestampBtn.style.transform = 'scale(1)';
     copyTimestampBtn.textContent = '复制';
     copyTimestampBtn.style.color = '';
     copyTimestampBtn.style.fontWeight = '';
