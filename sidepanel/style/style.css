@@ -53,9 +53,10 @@
   p a {
     box-sizing: border-box;
     color: #2b2b2b;
-    font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New,
+      monospace;
   }
-  
+
   button {
     padding: 0.5rem 1rem;
     background-color: #28a745;
@@ -148,27 +149,6 @@
   position: relative;
   flex: 1;
   overflow: hidden;
-}
-
-/* 页面切换动画 */
-.page {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 1rem;
-  opacity: 0;
-  transform: translateX(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.page.active {
-  display: block;
-  position: relative;
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* 按钮点击效果 */

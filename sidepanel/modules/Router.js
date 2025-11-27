@@ -1,12 +1,20 @@
-import {
-  RouteUtils,
-  addClass,
-  removeClass,
-  hasClass,
-  getParamsUrl,
-  closure,
-  genKey,
-} from '../utils/routeUtils.js';
+import { getParamsUrl, closure, genKey } from '../utils/routeUtils.js';
+
+import { addClass, removeClass, hasClass } from '../utils/domUtils.js';
+// var config = {
+//     routerViewId: '#routerView', // 路由切换的挂载点 id
+//     stackPages: true, // 多级页面缓存
+//     animationName: "slide", // 多级页面缓存
+//     routes: [
+//         // {
+//         //   path: "/home",
+//         //   name: "home",
+//         //   callback: function(transition) {
+//         //       home()
+//         //   }
+//         // }
+//     ]
+// }
 class Router {
   constructor() {
     // 路由表
@@ -32,14 +40,23 @@ class Router {
   }
 
   init(config) {
-    this.routerMap = config ? config.routers : this.routerMap;
+    this.routerMap = config ? config.routes : this.routerMap;
     this.routerViewId = config ? config.routerViewId : this.routerViewId;
     this.stackPages = config ? config.stackPages : this.stackPages;
 
+    const name = document.querySelector('#app').getAttribute('data-animationName');
+    if (name) {
+      this.animationName = name;
+    }
+    this.animationName = config ? config.animationName : this.animationName;
+
+    this.map();
+
     if (!this.routerMap.length) {
-      let selector = this.routerViewId + '.page';
-      let pages = document.querySelectorAll(selector);
+      // 找到routerViewId 节点下的所有page 节点
+      const pages = document.querySelectorAll(this.routerViewId + ' .page');
       for (let i = 0; i < pages.length; i++) {
+        // 遍历所有的page节点
         let page = pages[i];
         let hash = page.getAttribute('hash');
         let name = hash.substring(1);
@@ -60,13 +77,13 @@ class Router {
       }
     };
 
-    window.addEventListener(
-      'load',
-      function (event) {
-        this.historyChange(event);
-      },
-      false
-    );
+    window.addEventListener('load', (event) => {
+      this.historyChange(event);
+    });
+
+    window.addEventListener('hashchange', (event) => {
+      this.historyChange(event);
+    });
   }
 
   /**
@@ -74,29 +91,41 @@ class Router {
    * @param {*} event
    */
   historyChange(event) {
+    // {path, query, params}
     const currentHash = getParamsUrl();
+    // router-#app-history
     const nameString = 'router-' + this.routerViewId + '-history';
+
     this.history = window.sessionStorage[nameString]
       ? JSON.parse(window.sessionStorage[nameString])
       : [];
 
-    let back = false,
-      refresh = false,
-      forward = false,
-      index = 0,
-      len = this.history.length;
+    // 返回上一级
+    let back = false;
+    // 刷新页面
+    let refresh = false;
+    // 前进上一级
+    let forward = false;
+    // 获取当前路由的索引
+    let index = 0;
 
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < this.history.length; i++) {
       let h = this.history[i];
+
+      // 判断是否是当前路由
       if (h.hash === currentHash.path && h.key === currentHash.query.key) {
+        // 获取当前路由的索引
         index = i;
-        if (i === len - 1) {
+        // 判断是否是刷新页面
+        if (i === this.history.length - 1) {
           refresh = true;
         } else {
+          // 判断是否是返回上一级
           back = true;
         }
         break;
       } else {
+        // 判断是否是前进
         forward = true;
       }
     }
@@ -124,18 +153,22 @@ class Router {
     this.urlChange();
   }
 
+  /**
+   * 更改页面
+   * @param {*} currentHash
+   */
   changeView(currentHash) {
-    const pages = document.querySelectorAll('.page');
+    const pages = document.querySelectorAll(' .page');
     const previousPage = document.querySelector('.' + this.routerViewId + ' .page.active');
     let currentPage = null;
-    let currentHash = null;
+    let currHash = null;
 
     for (let i = 0; i < pages.length; i++) {
       let page = pages[i];
       let hash = page.getAttribute('hash');
       page.setAttribute('class', 'page');
       if (hash === currentHash.path) {
-        currentHash = hash;
+        currHash = hash;
         currentPage = page;
       }
     }
@@ -167,12 +200,15 @@ class Router {
         removeClass(currentPage, 'current');
       }, 300);
       currentPage.scrollTop = 0;
-      this.routes[currentHash].callback ? this.routes[currentHash].callback() : null;
+      this.routes[currHash].callback ? this.routes[currHash].callback() : null;
     }
 
     this.afterFun ? this.afterFun(currentHash) : null;
   }
 
+  /**
+   * url改变
+   */
   urlChange() {
     const currentHash = getParamsUrl();
     if (this.routes[currentHash.path]) {
@@ -194,6 +230,9 @@ class Router {
     }
   }
 
+  /**
+   * 映射路由
+   */
   map() {
     for (let i = 0; i < this.routerMap.length; i++) {
       let route = this.routerMap[i];
@@ -204,26 +243,42 @@ class Router {
       }
 
       let newPath = route.path;
-      let path = newPath.repalce(/\s+/g, '');
+      let path = newPath.replace(/\s+/g, '');
       this.routes[path] = {
         callback: route.callback,
       };
     }
   }
 
+  /**
+   *  切换页面前的hook
+   * @param {*} callback hook执行函数
+   */
+
   beforeEach(callback) {
     if (Object.prototype.toString.call(callback) === '[object Function]') {
+      // 判断callback是否为函数
       this.beforeFun = callback;
     } else {
+      // 抛出错误
       console.trace('beforeEach callback must be a function');
     }
   }
 
+  /**
+   *  切换页面后的hook
+   * @param {*} callback hook执行函数
+   */
+
   afterEach(callback) {
     if (Object.prototype.toString.call(callback) === '[object Function]') {
+      // 判断callback是否为函数
       this.afterFun = callback;
     } else {
+      // 抛出错误
       console.trace('afterEach callback must be a function');
     }
   }
 }
+
+export { Router };

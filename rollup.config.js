@@ -5,32 +5,41 @@ import json from '@rollup/plugin-json';
 import livereload from 'rollup-plugin-livereload';
 import serve from 'rollup-plugin-serve';
 
-export default defineConfig({
-  input: 'sidepanel/js/index.js',
-  output: {
-    file: 'dist/bundle.js',
-    format: 'iife',
+const basePlugins = [resolve(), commonjs(), json()];
+
+const devPlugins = [
+  livereload({
+    watch: ['dist', 'sidepanel'],
+    verbose: false,
+  }),
+  serve({
+    open: true,
+    port: 8082,
+    contentBase: ['.', 'sidepanel'],
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  }),
+];
+
+export default defineConfig([
+  {
+    input: 'sidepanel/js/index.js',
+    output: {
+      file: 'dist/index.js',
+      format: 'iife',
+      name: 'MainPage',
+    },
+    plugins: [...basePlugins, ...devPlugins],
   },
-  plugins: [
-    resolve(),
-    commonjs(),
-    json(),
-    livereload({
-      watch: ['dist', 'sidepanel'],
-      verbose: false,
-    }),
-    serve({
-      open: true,
-      port: 8082,
-      contentBase: ['.', 'sidepanel'],
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-    }),
-  ],
-  watch: {
-    include: ['sidepanel/**/*'],
-    exclude: ['node_modules/**/*'],
-    clearScreen: false,
+
+  {
+    input: 'sidepanel/js/timestamp.js',
+    output: {
+      file: 'dist/timestamp.js',
+      format: 'iife',
+      name: 'TimestampPage',
+    },
+    plugins: [...basePlugins, ...devPlugins],
   },
-});
+]);
