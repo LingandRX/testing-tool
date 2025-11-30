@@ -1,283 +1,178 @@
 import { getParamsUrl, closure, genKey } from '../utils/routeUtils.js';
+import { addClass, removeClass } from '../utils/domUtils.js';
+import { loadScript } from '../utils/scriptLoader.js';
 
-import { addClass, removeClass, hasClass } from '../utils/domUtils.js';
-// var config = {
-//     routerViewId: '#routerView', // 路由切换的挂载点 id
-//     stackPages: true, // 多级页面缓存
-//     animationName: "slide", // 多级页面缓存
-//     routes: [
-//         // {
-//         //   path: "/home",
-//         //   name: "home",
-//         //   callback: function(transition) {
-//         //       home()
-//         //   }
-//         // }
-//     ]
-// }
 class Router {
   constructor() {
-    // 路由表
     this.routes = {};
-    // 路由跳转前执行
     this.beforeFun = null;
-    // 路由跳转后执行
     this.afterFun = null;
-    // 路由挂载点
     this.routerViewId = 'router-view';
-    // 路由重定向hash
     this.redirectRoute = null;
-    // 多级页面缓存
     this.stackPages = true;
-    // 路由遍历
     this.routerMap = [];
-    // 路由状态
     this.historyFlag = '';
-    // 路由历史
     this.history = [];
-    // 动画名称
-    this.animationName = 'fade';
-  }
-
-  init(config) {
-    this.routerMap = config ? config.routes : this.routerMap;
-    this.routerViewId = config ? config.routerViewId : this.routerViewId;
-    this.stackPages = config ? config.stackPages : this.stackPages;
-
-    const name = document.querySelector('#app').getAttribute('data-animationName');
-    if (name) {
-      this.animationName = name;
-    }
-    this.animationName = config ? config.animationName : this.animationName;
-
-    this.map();
-
-    if (!this.routerMap.length) {
-      // 找到routerViewId 节点下的所有page 节点
-      const pages = document.querySelectorAll(this.routerViewId + ' .page');
-      for (let i = 0; i < pages.length; i++) {
-        // 遍历所有的page节点
-        let page = pages[i];
-        let hash = page.getAttribute('hash');
-        let name = hash.substring(1);
-        this.routerMap.push({
-          name: name,
-          path: hash,
-          callback: closure(name),
-        });
-      }
-    }
-
-    window.linkTo = (path) => {
-      console.log('path', path);
-      if (path.indexOf('?') !== -1) {
-        window.location.hash = path + '&key=' + genKey();
-      } else {
-        window.location.hash = path + '?key=' + genKey();
-      }
-    };
-
-    window.addEventListener('load', (event) => {
-      this.historyChange(event);
-    });
-
-    window.addEventListener('hashchange', (event) => {
-      this.historyChange(event);
-    });
   }
 
   /**
-   * 路由历史纪录变化
-   * @param {*} event
+   * 初始化路由
+   */
+  init(config) {
+    this.routerMap = config?.routes || this.routerMap;
+    this.routerViewId = config?.routerViewId || this.routerViewId;
+    this.stackPages = config?.stackPages ?? this.stackPages;
+
+    // 映射路由表
+    this.map();
+
+    window.linkTo = (path) => {
+      if (path.includes('?')) {
+        location.hash = `${path}&key=${genKey()}`;
+      } else {
+        location.hash = `${path}?key=${genKey()}`;
+      }
+    };
+
+    window.addEventListener('load', (e) => {
+      this.historyChange(e);
+      this.updateActiveButton(e);
+    });
+    window.addEventListener('hashchange', (e) => {
+      this.historyChange(e);
+      this.updateActiveButton(e);
+    });
+  }
+
+  async loadPage(route) {
+    console.log('加载页面：', route);
+    const html = await fetch(route.html).then((r) => r.text());
+    document.getElementById(this.routerViewId).innerHTML = html;
+
+    const initName = route.name + 'Init';
+    await loadScript(route.script, initName);
+
+    if (window[initName] && route.script) {
+      await window[initName]();
+    }
+  }
+
+  /**
+   * 加载 HTML 文件
+   */
+  async loadHTML(htmlPath) {
+    try {
+      const resp = await fetch(htmlPath);
+      if (!resp.ok) throw new Error(`HTML 加载失败: ${resp.status}`);
+      return await resp.text();
+    } catch (err) {
+      return `<h2>页面加载失败：${err.message}</h2>`;
+    }
+  }
+
+  /**
+   * 处理路由历史变化
    */
   historyChange(event) {
-    // {path, query, params}
-    const currentHash = getParamsUrl();
-    // router-#app-history
-    const nameString = 'router-' + this.routerViewId + '-history';
-
-    this.history = window.sessionStorage[nameString]
-      ? JSON.parse(window.sessionStorage[nameString])
-      : [];
-
-    // 返回上一级
-    let back = false;
-    // 刷新页面
-    let refresh = false;
-    // 前进上一级
-    let forward = false;
-    // 获取当前路由的索引
-    let index = 0;
-
-    for (let i = 0; i < this.history.length; i++) {
-      let h = this.history[i];
-
-      // 判断是否是当前路由
-      if (h.hash === currentHash.path && h.key === currentHash.query.key) {
-        // 获取当前路由的索引
-        index = i;
-        // 判断是否是刷新页面
-        if (i === this.history.length - 1) {
-          refresh = true;
-        } else {
-          // 判断是否是返回上一级
-          back = true;
-        }
-        break;
-      } else {
-        // 判断是否是前进
-        forward = true;
-      }
-    }
-
-    if (back) {
-      this.historyFlag = 'back';
-      this.history.length = index + 1;
-    } else if (refresh) {
-      this.historyFlag = 'refresh';
-    } else {
-      this.historyFlag = 'forward';
-      this.history.push({
-        key: currentHash.query.key,
-        hash: currentHash.path,
-        query: currentHash.query,
-      });
-    }
-
-    console.log('historyFlag', this.historyFlag);
-
-    if (!this.stackPages) {
-      this.historyFlag = 'forward';
-    }
-    window.sessionStorage[nameString] = JSON.stringify(this.history);
+    const { path, query } = getParamsUrl();
+    console.log('路由变化page{}, query{}', path, query);
     this.urlChange();
   }
 
   /**
-   * 更改页面
-   * @param {*} currentHash
-   */
-  changeView(currentHash) {
-    const pages = document.querySelectorAll(' .page');
-    const previousPage = document.querySelector('.' + this.routerViewId + ' .page.active');
-    let currentPage = null;
-    let currHash = null;
-
-    for (let i = 0; i < pages.length; i++) {
-      let page = pages[i];
-      let hash = page.getAttribute('hash');
-      page.setAttribute('class', 'page');
-      if (hash === currentHash.path) {
-        currHash = hash;
-        currentPage = page;
-      }
-    }
-
-    const enterName = 'enter-' + this.animationName;
-    const leaveName = 'leave-' + this.animationName;
-
-    if (this.historyFlag === 'back') {
-      addClass(currentPage, 'current');
-      if (previousPage) {
-        addClass(previousPage, leaveName);
-      }
-
-      setTimeout(() => {
-        if (previousPage) {
-          removeClass(previousPage, leaveName);
-        }
-      }, 300);
-    } else if (this.historyFlag === 'forward' || this.historyFlag === 'refresh') {
-      if (previousPage) {
-        addClass(previousPage, leaveName);
-      }
-      addClass(currentPage, enterName);
-      setTimeout(() => {
-        if (previousPage) {
-          removeClass(previousPage, leaveName);
-        }
-        addClass(currentPage, enterName);
-        removeClass(currentPage, 'current');
-      }, 300);
-      currentPage.scrollTop = 0;
-      this.routes[currHash].callback ? this.routes[currHash].callback() : null;
-    }
-
-    this.afterFun ? this.afterFun(currentHash) : null;
-  }
-
-  /**
-   * url改变
+   * 路由解析与渲染
    */
   urlChange() {
     const currentHash = getParamsUrl();
-    if (this.routes[currentHash.path]) {
-      if (this.beforeFun) {
-        this.beforeFun({
-          to: {
-            path: currentHash.path,
-            query: currentHash.query,
-          },
-          next: () => {
-            this.changeView(currentHash);
-          },
-        });
-      } else {
-        this.changeView(currentHash);
-      }
-    } else {
+    const { path, query } = currentHash;
+
+    if (!this.routes[path]) {
       location.hash = this.redirectRoute;
+      return;
+    }
+
+    const next = () => this.changeView(currentHash);
+
+    if (this.beforeFun) {
+      this.beforeFun({ to: { path, query }, next });
+    } else {
+      next();
     }
   }
 
   /**
-   * 映射路由
+   * 渲染页面
+   */
+  async changeView(currentHash) {
+    const { path } = currentHash;
+    const route = await this.routes[path];
+    const mountEl = document.getElementById(this.routerViewId);
+
+    if (!mountEl) {
+      console.error('挂载点不存在:', this.routerViewId);
+      return;
+    }
+
+    console.log('路由：', route);
+    this.loadPage(route);
+
+    // 执行 after 钩子
+    if (this.afterFun) this.afterFun(currentHash);
+  }
+
+  /**
+   * 构建路由映射
    */
   map() {
-    for (let i = 0; i < this.routerMap.length; i++) {
-      let route = this.routerMap[i];
-      if (route.name === 'redirect') {
-        this.redirectRoute = route.path;
-      } else {
+    for (let r of this.routerMap) {
+      if (r.name === 'redirect') {
+        this.redirectRoute = r.path;
+      } else if (!this.redirectRoute) {
         this.redirectRoute = this.routerMap[0].path;
       }
 
-      let newPath = route.path;
-      let path = newPath.replace(/\s+/g, '');
-      this.routes[path] = {
-        callback: route.callback,
+      this.routes[r.path] = {
+        name: r.name,
+        html: r.html,
+        script: r.script,
       };
     }
   }
 
   /**
-   *  切换页面前的hook
-   * @param {*} callback hook执行函数
+   * before 钩子
    */
-
   beforeEach(callback) {
-    if (Object.prototype.toString.call(callback) === '[object Function]') {
-      // 判断callback是否为函数
+    if (typeof callback === 'function') {
       this.beforeFun = callback;
     } else {
-      // 抛出错误
-      console.trace('beforeEach callback must be a function');
+      console.trace('beforeEach 必须是函数');
     }
   }
 
   /**
-   *  切换页面后的hook
-   * @param {*} callback hook执行函数
+   * after 钩子
    */
-
   afterEach(callback) {
-    if (Object.prototype.toString.call(callback) === '[object Function]') {
-      // 判断callback是否为函数
+    if (typeof callback === 'function') {
       this.afterFun = callback;
     } else {
-      // 抛出错误
-      console.trace('afterEach callback must be a function');
+      console.trace('afterEach 必须是函数');
     }
+  }
+
+  updateActiveButton(event) {
+    const currentRoute = location.hash.replace('#', '') || '/home';
+
+    document.querySelectorAll('[data-route]').forEach((btn) => {
+      const route = btn.getAttribute('data-route');
+      if (route === currentRoute) {
+        console.log('当前路由：', route);
+        addClass(btn, 'active');
+      } else {
+        removeClass(btn, 'active');
+      }
+    });
   }
 }
 

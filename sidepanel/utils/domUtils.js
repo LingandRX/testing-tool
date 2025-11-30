@@ -98,9 +98,18 @@ export function hasClass(elem, cls) {
  * @param {*} cls
  */
 export function addClass(elem, cls) {
-  if (!hasClass(elem, cls)) {
-    elem.className = elem.className === '' ? cls : elem.className + ' ' + cls;
-  }
+  if (!elem || !cls) return;
+
+  // 统一空白字符（避免 \n \t 等导致匹配问题）
+  let current = elem.className.replace(/[\t\r\n]/g, ' ').trim();
+
+  // 已存在则忽略
+  const classes = current.split(/\s+/);
+  if (classes.includes(cls)) return;
+
+  // 添加并规整
+  classes.push(cls);
+  elem.className = classes.join(' ').trim();
 }
 
 /**
@@ -109,13 +118,22 @@ export function addClass(elem, cls) {
  * @param {*} cls
  */
 export function removeClass(elem, cls) {
-  if (hasClass(elem, cls)) {
-    let newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' ';
-    // 删除指定类名
-    while (newClass.indexOf(' ' + cls + ' ') >= 0) {
-      newClass = newClass.replace(' ' + cls + ' ', ' ');
-    }
-    // 重新赋值
-    elem.className = newClass.replace(/^\s+|\s+$/);
+  if (!elem || !cls) return;
+
+  // 使用 classList 优先（更安全）
+  if (elem.classList) {
+    elem.classList.remove(cls);
+    return;
   }
+
+  // 传统写法的修复版本
+  let klass = ' ' + elem.className.replace(/[\t\r\n]/g, ' ') + ' ';
+
+  // 持续删除目标 class
+  while (klass.indexOf(' ' + cls + ' ') !== -1) {
+    klass = klass.replace(' ' + cls + ' ', ' ');
+  }
+
+  // 过滤多余空格
+  elem.className = klass.trim().replace(/\s+/g, ' ');
 }
