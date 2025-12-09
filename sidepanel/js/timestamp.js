@@ -14,7 +14,6 @@ import { addEventListenerById } from '../utils/domUtils.js';
 
 (function (global) {
   global.timestampInit = async function () {
-    console.log('timestamp init');
     // 初始化时间戳显示
     initTimestampDisplay();
 

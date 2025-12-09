@@ -1,10 +1,17 @@
-console.log('Before creating router');
+import { ScriptManager } from '../utils/scriptManager.js';
+import { TimerManager } from '../utils/timerManager.js';
+import { EventManager } from '../utils/eventManager.js';
 import { Router } from '../modules/Router.js';
 
 const config = {
   routerViewId: 'app',
   stackPages: false,
   routes: [
+    {
+      path: '/',
+      name: 'redirect',
+      html: 'pages/timestamp.html',
+    },
     {
       path: '/home',
       name: 'timestamp',
@@ -15,23 +22,23 @@ const config = {
       path: '/todo',
       name: 'todo',
       html: 'pages/todolist.html',
-      script: '',
     },
   ],
 };
 
+window.scriptManager = new ScriptManager();
+window.timerManager = new TimerManager();
+window.eventManager = new EventManager();
+
 const router = new Router();
-console.log('Router created:', router);
 router.init(config);
-console.log('Router initialized');
 
-document.addEventListener('click', (event) => {
-  const btn = event.target.closest('[data-route]');
+// click delegation
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-route]');
   if (!btn) return;
-
-  const path = btn.getAttribute('data-route');
-  if (!path) return;
-
-  // 触发 hash 路由跳转
-  window.location.hash = path;
+  const p = btn.getAttribute('data-route');
+  location.hash = p;
+  // update active styling
+  document.querySelectorAll('[data-route]').forEach((b) => b.classList.toggle('active', b === btn));
 });
