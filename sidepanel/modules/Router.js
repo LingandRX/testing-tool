@@ -87,6 +87,7 @@ class Router {
         }
       }
 
+      console.log('当前组件：', route.script);
       if (route.script) {
         await this.scriptManager.loadScript({
           path: route.script,
@@ -96,6 +97,7 @@ class Router {
         });
       }
 
+      console.log('当前组件：', route.name);
       await this.scriptManager.runInit(route.name);
 
       this.currentRoute = route;

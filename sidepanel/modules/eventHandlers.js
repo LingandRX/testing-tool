@@ -3,85 +3,24 @@ import {
   convertTimestampToDate,
   convertDateToTimestamp,
 } from '../utils/timestampUtils.js';
-import { getElementById } from '../utils/domUtils.js';
 
-// 定义一个全局变量来保存是否显示毫秒
-let showMilliseconds = true;
-// 定义一个全局变量来保存计时器
-let timestampInterval;
-// 定义时区列表
-const timeZoneList = [
-  'America/New_York',
-  'America/Chicago',
-  'America/Denver',
-  'America/Los_Angeles',
-  'America/Anchorage',
-  'America/Honolulu',
-  'Europe/London',
-  'Europe/Paris',
-  'Europe/Berlin',
-  'Europe/Moscow',
-  'Asia/Tokyo',
-  'Asia/Shanghai',
-  'Asia/Hong_Kong',
-  'Asia/Singapore',
-  'Asia/Dubai',
-  'Asia/Kolkata',
-  'Australia/Sydney',
-  'Pacific/Auckland',
-];
-// 获取本地时区
-const localTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-/**
- * 初始化时间戳显示
- */
-export function initTimestampDisplay() {
-  updateTimestamp(showMilliseconds); // 初始化时更新一次时间戳
-  timestampInterval = setInterval(() => updateTimestamp(showMilliseconds), 100);
-  initTimeZoneList();
-  initTimestampAndDate();
-}
-
-/**
- * 初始化时区列表
- */
-export function initTimeZoneList() {
-  const timezoneResultSelect = getElementById('timezone-result');
-  const timezoneInputSelect = getElementById('timezone-input');
-
-  // 获取本地时区在列表中的索引
-  const localTimeZoneIndex = timeZoneList.indexOf(localTimeZone);
-
-  for (let i = 0; i < timeZoneList.length; i++) {
-    if (i === localTimeZoneIndex) {
-      timezoneResultSelect.add(new Option(timeZoneList[i], i, true, true));
-      timezoneInputSelect.add(new Option(timeZoneList[i], i, true, true));
-    } else {
-      timezoneResultSelect.add(new Option(timeZoneList[i], i));
-      timezoneInputSelect.add(new Option(timeZoneList[i], i));
-    }
-  }
-}
-
-export function initTimestampAndDate() {
-  const timestampInput = getElementById('timestamp-input');
-  const dateInput = getElementById('datetime-input');
-
-  timestampInput.value = Date.now();
-  dateInput.value = new Date().toLocaleString('sv-SE'); // 使用适合<input type="datetime-local">的格式
-}
+import { timeZoneList } from '../js/const/timezone.js';
 
 /**
  * 切换单位按钮事件处理器
  */
-export function handleToggleUnit() {
-  const currentTimestampUnit = getElementById('current-timestamp-unit');
-  const toggleUnitBtn = getElementById('toggle-unit-btn');
+export function handleToggleUnit(showMilliseconds) {
+  const currentTimestampUnit = document.getElementById('current-timestamp-unit');
+  const toggleUnitBtn = document.getElementById('toggle-unit-btn');
 
+  // 更新showMilliseconds
   showMilliseconds = !showMilliseconds;
+
+  // 更新时间戳显示
   currentTimestampUnit.textContent = showMilliseconds ? '毫秒' : '秒';
-  updateTimestamp(showMilliseconds);
+  const currentTimestamp = document.getElementById('current-timestamp-value');
+  const timestamp = Date.now();
+  currentTimestamp.textContent = showMilliseconds ? timestamp : Math.floor(timestamp / 1000);
 
   // 添加闪烁动画效果
   toggleUnitBtn.style.transition = 'all 0.3s';
@@ -89,15 +28,23 @@ export function handleToggleUnit() {
   setTimeout(() => {
     toggleUnitBtn.style.transform = 'scale(1)';
   }, 300);
+
+  // 返回更新的showMilliseconds
+  return showMilliseconds;
 }
 
 /**
  * 停止计时器事件处理器
  */
-export function handleStopTimer() {
-  clearInterval(timestampInterval);
-  const stopTimestampBtn = getElementById('stop-timer-btn');
-  const startTimestampBtn = getElementById('start-timer-btn');
+export function handleStopTimer(timestampInterval) {
+  console.log('停止计时器');
+  if (timestampInterval) {
+    clearInterval(timestampInterval);
+    window.timerManager.clearInterval(timestampInterval);
+  }
+
+  const stopTimestampBtn = document.getElementById('stop-timer-btn');
+  const startTimestampBtn = document.getElementById('start-timer-btn');
   stopTimestampBtn.style.display = 'none';
   startTimestampBtn.style.display = 'inline-block';
 }
@@ -105,27 +52,40 @@ export function handleStopTimer() {
 /**
  * 开始计时器事件处理器
  */
-export function handleStartTimer() {
-  const startTimestampBtn = getElementById('start-timer-btn');
-  const stopTimestampBtn = getElementById('stop-timer-btn');
-  timestampInterval = setInterval(() => updateTimestamp(showMilliseconds), 100);
+export function handleStartTimer(timestampInterval, showMilliseconds) {
+  const startTimestampBtn = document.getElementById('start-timer-btn');
+  const stopTimestampBtn = document.getElementById('stop-timer-btn');
+  const currentTimestampValue = document.getElementById('current-timestamp-value');
+
+  // 添加计时器
+  if (timestampInterval) {
+    window.timerManager.clearInterval(timestampInterval);
+  }
+  timestampInterval = setInterval(
+    () => updateTimestamp(currentTimestampValue, showMilliseconds),
+    100
+  );
+  window.timerManager.setInterval(timestampInterval);
+
+  // 切换按钮样式
   startTimestampBtn.style.display = 'none';
   stopTimestampBtn.style.display = 'inline-block';
+
+  return timestampInterval;
 }
 
 /**
  * 时间戳转换事件处理器
  */
 export function handleConvertTimestamp() {
-  const inputTimestamp = getElementById('timestamp-input');
-  const timestampInputResult = getElementById('timestamp-conversion-result');
+  const inputTimestamp = document.getElementById('timestamp-input');
+  const timestampInputResult = document.getElementById('timestamp-conversion-result');
   const timestampUnitSelect = document.querySelector(
     '#page-timestamp #timestamp-input-unit-select'
   );
-  const timezoneResultSelect = getElementById('timezone-result'); // 获取时区选择器
+  const timezoneResultSelect = document.getElementById('timezone-result'); // 获取时区选择器
 
   const timestamp = inputTimestamp.value.trim();
-  console.log('输入时间戳：', timestamp);
 
   if (!timestamp) {
     timestampInputResult.value = '请输入时间戳';
@@ -167,10 +127,10 @@ export function handleConvertTimestamp() {
  * 日期转换事件处理器
  */
 export function handleConvertDateToTimestamp() {
-  const inputDate = getElementById('datetime-input');
-  const dateInputResult = getElementById('date-conversion-result');
+  const inputDate = document.getElementById('datetime-input');
+  const dateInputResult = document.getElementById('date-conversion-result');
   const timestampUnitSelect = document.querySelector('#page-timestamp #date-result-unit-select');
-  const timezoneInputSelect = getElementById('timezone-input'); // 获取时区选择器
+  const timezoneInputSelect = document.getElementById('timezone-input'); // 获取时区选择器
 
   const dateStr = inputDate.value.trim();
   console.log('输入日期字符串：', dateStr);
@@ -221,8 +181,8 @@ export function handleConvertDateToTimestamp() {
  */
 export function handleCopyTimestamp() {
   // 获取时间戳文本
-  const currentTimestamp = getElementById('current-timestamp-value');
-  const copyTimestampBtn = getElementById('copy-timestamp-btn');
+  const currentTimestamp = document.getElementById('current-timestamp-value');
+  const copyTimestampBtn = document.getElementById('copy-timestamp-btn');
   const timestampText = currentTimestamp.textContent;
 
   copyTimestampBtn.textContent = '已复制';
@@ -259,12 +219,12 @@ export function handleClosePanel() {
  * 时间区域选择事件处理器
  */
 export function handleTimezoneResult() {
-  const timezoneResult = getElementById('timezone-result');
+  const timezoneResult = document.getElementById('timezone-result');
   console.log(timeZoneList[timezoneResult.value]);
 
   // 获取当前时间戳输入框的值
-  const inputTimestamp = getElementById('timestamp-input').value.trim();
-  const timestampInputResult = getElementById('timestamp-conversion-result');
+  const inputTimestamp = document.getElementById('timestamp-input').value.trim();
+  const timestampInputResult = document.getElementById('timestamp-conversion-result');
   const timestampUnitSelect = document.querySelector(
     '#page-timestamp #timestamp-input-unit-select'
   );
@@ -283,13 +243,13 @@ export function handleTimezoneResult() {
  * 该函数获取时区输入元素的值，并在控制台输出对应的时区信息
  */
 export function handleTimezoneInput() {
-  const timezoneInput = getElementById('timezone-input');
+  const timezoneInput = document.getElementById('timezone-input');
   const selectedTimezone = timeZoneList[timezoneInput.value];
   console.log('选择的时区：', selectedTimezone);
 
   // 获取当前日期输入框的值
-  const inputDate = getElementById('datetime-input').value.trim();
-  const dateInputResult = getElementById('date-conversion-result');
+  const inputDate = document.getElementById('datetime-input').value.trim();
+  const dateInputResult = document.getElementById('date-conversion-result');
   const timestampUnitSelect = document.querySelector('#page-timestamp #date-result-unit-select');
 
   // 如果有输入日期，则重新计算结果

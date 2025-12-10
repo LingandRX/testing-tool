@@ -6,7 +6,8 @@ export class ScriptManager {
   }
 
   async loadScript({ path, name, isModule = false, deps = [] }) {
-    // 卸载现脚本
+    console.log('loadScript');
+    console.log({ path, name, isModule, deps })
     await this.unloadScript();
 
     for (const dep of deps) {
@@ -43,6 +44,7 @@ export class ScriptManager {
   }
 
   async unloadScript() {
+    console.log('unloadScript');
     try {
       if (this.currentName && window[this.currentName]) {
         const mod = window[this.currentName];

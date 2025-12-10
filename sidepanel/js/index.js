@@ -26,8 +26,11 @@ const config = {
   ],
 };
 
+// 注入脚本管理器
 window.scriptManager = new ScriptManager();
+// 注入定时器管理器
 window.timerManager = new TimerManager();
+// 注入事件管理器
 window.eventManager = new EventManager();
 
 const router = new Router();
