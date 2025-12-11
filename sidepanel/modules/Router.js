@@ -1,7 +1,3 @@
-import { TimerManager } from '../utils/timerManager.js';
-import { EventManager } from '../utils/eventManager.js';
-import { ScriptManager } from '../utils/scriptManager.js';
-
 class Router {
   constructor() {
     this.routes = {};
@@ -11,11 +7,11 @@ class Router {
     this.redirectRoute = null;
     this.stackPages = true;
     this.routerMap = [];
-    this.historyFlag = '';
-    this.history = [];
+
     this.scriptManager = window.scriptManager;
-    this.eventManager = window.eventManager;
-    this.timerManager = window.timerManager;
+
+    // 页面实例
+    this.currentinstance = null;
   }
 
   /**
@@ -31,7 +27,7 @@ class Router {
     // 监听路由变化
     window.addEventListener('hashchange', () => this.urlChange());
     window.addEventListener('load', () => this.urlChange());
-    window.lintTo = (path) => this.naviage(path);
+    window.lintTo = (path) => this.navigate(path);
   }
 
   map() {
@@ -41,7 +37,7 @@ class Router {
     }
 
     for (const r of this.routerMap) {
-      if (r.name == 'redirect') this.redirectRoute = r.path;
+      if (r.name === 'redirect') this.redirectRoute = r.path;
       this.routes[r.path] = r;
     }
   }
@@ -49,7 +45,7 @@ class Router {
   /**
    * 导航
    */
-  naviage(path) {
+  navigate(path) {
     window.location.hash = path;
   }
 
@@ -67,27 +63,26 @@ class Router {
     }
 
     const doChange = async () => {
-      this.timerManager.cleanAll();
-      this.eventManager.removeAll();
+      if (this.currentinstance && typeof this.currentinstance.destroy === 'function') {
+        console.log(`销毁旧组件${this.currentRoute.name}`);
+        this.currentinstance.destroy();
+        this.currentinstance = null;
+      }
 
       const mount = document.getElementById(this.routerViewId);
       if (!mount) {
         console.error('挂载点不存在:', this.routerViewId);
         return;
       }
-
       if (!this.stackPages) mount.innerHTML = '';
-
       if (route.html) {
         try {
-          const html = await fetch(route.html).then((r) => r.text());
-          mount.innerHTML = html;
+          mount.innerHTML = await fetch(route.html).then((r) => r.text());
         } catch (e) {
           mount.innerHTML = `<h2>页面加载失败：${e.message}</h2>`;
         }
       }
 
-      console.log('当前组件：', route.script);
       if (route.script) {
         await this.scriptManager.loadScript({
           path: route.script,
@@ -97,17 +92,23 @@ class Router {
         });
       }
 
-      console.log('当前组件：', route.name);
-      await this.scriptManager.runInit(route.name);
+      const newInstance = await this.scriptManager.getComponentInstance(route.name);
+      console.log(`newInstance${newInstance}`);
+      if (newInstance) {
+        this.currentinstance = newInstance;
+        if (typeof newInstance.init === 'function') {
+          newInstance.init();
+        }
+      }
 
       this.currentRoute = route;
       if (this.afterFun) this.afterFun(route);
     };
 
     if (this.beforeFun) {
-      this.beforeFun({ to: route, next: doChange });
+      this.beforeFun({to: route, next: doChange});
     } else {
-      doChange();
+      doChange().then(r => console.log(r));
     }
   }
 
@@ -134,4 +135,4 @@ class Router {
   }
 }
 
-export { Router };
+export {Router};

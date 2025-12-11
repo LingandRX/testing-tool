@@ -1,4 +1,4 @@
-import { defineConfig } from 'rollup';
+import {defineConfig} from 'rollup';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
@@ -14,7 +14,7 @@ const devPlugins = [
   }),
   serve({
     open: true,
-    port: 8082,
+    port: 3000,
     contentBase: ['.', 'sidepanel'],
     headers: {
       'Access-Control-Allow-Origin': '*',

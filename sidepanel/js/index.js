@@ -1,7 +1,7 @@
-import { ScriptManager } from '../utils/scriptManager.js';
-import { TimerManager } from '../utils/timerManager.js';
-import { EventManager } from '../utils/eventManager.js';
-import { Router } from '../modules/Router.js';
+import {ScriptManager} from './utils/scriptManager.js';
+import {TimerManager} from './utils/timerManager.js';
+import {EventManager} from './utils/eventManager.js';
+import {Router} from '../modules/Router.js';
 
 const config = {
   routerViewId: 'app',
@@ -9,8 +9,9 @@ const config = {
   routes: [
     {
       path: '/',
-      name: 'redirect',
+      name: 'timestamp',
       html: 'pages/timestamp.html',
+      script: '../dist/timestamp.js',
     },
     {
       path: '/home',

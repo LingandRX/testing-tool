@@ -1,10 +1,6 @@
-import {
-  updateTimestamp,
-  convertTimestampToDate,
-  convertDateToTimestamp,
-} from '../utils/timestampUtils.js';
+import {convertDateToTimestamp, convertTimestampToDate, updateTimestamp,} from '../js/utils/timestampUtils.js';
 
-import { timeZoneList } from '../js/const/timezone.js';
+import {timeZoneList} from '../js/const/timezone.js';
 
 /**
  * 切换单位按钮事件处理器

@@ -25,7 +25,6 @@ export class TimerManager {
    * @returns
    */
   setInterval(fn, delay, ...args) {
-    console.log('setInterval in TimerManager');
     const id = window.setInterval(fn, delay, ...args);
     this.timers.push(id);
     return id;
