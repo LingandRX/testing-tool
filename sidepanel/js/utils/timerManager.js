@@ -45,6 +45,7 @@ export class TimerManager {
   }
 
   cleanAll() {
+    console.log('cleanAll time or interval');
     this.timers.forEach((timerId) => {
       window.clearTimeout(timerId);
       window.clearInterval(timerId);

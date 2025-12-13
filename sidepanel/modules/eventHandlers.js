@@ -53,6 +53,8 @@ export function handleStartTimer(timestampInterval, showMilliseconds) {
   const stopTimestampBtn = document.getElementById('stop-timer-btn');
   const currentTimestampValue = document.getElementById('current-timestamp-value');
 
+  console.log('开始计时器');
+  console.log(`timestampInterval:${timestampInterval}`);
   // 添加计时器
   if (timestampInterval) {
     window.timerManager.clearInterval(timestampInterval);

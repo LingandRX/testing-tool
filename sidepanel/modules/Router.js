@@ -4,7 +4,7 @@ class Router {
     this.beforeFun = null;
     this.afterFun = null;
     this.routerViewId = 'app';
-    this.redirectRoute = null;
+    this.redirectRoute = '/';
     this.stackPages = true;
     this.routerMap = [];
 
@@ -22,6 +22,7 @@ class Router {
     this.routerMap = config?.routes || this.routerMap;
     this.routerViewId = config?.routerViewId || this.routerViewId;
     this.stackPages = config?.stackPages ?? this.stackPages;
+    this.redirectRoute = config?.redirectRoute || this.redirectRoute;
     this.map();
 
     // 监听路由变化
@@ -54,10 +55,10 @@ class Router {
    */
   urlChange() {
     const path = location.hash.replace('#', '') || this.redirectRoute;
-    console.log('当前路由：', path);
     const route = this.routes[path];
 
     if (!route) {
+      // 当前路由不存在时，返回到设置的重定向页面
       location.hash = this.redirectRoute;
       return;
     }
@@ -93,7 +94,7 @@ class Router {
       }
 
       const newInstance = await this.scriptManager.getComponentInstance(route.name);
-      console.log(`newInstance${newInstance}`);
+      console.log(newInstance);
       if (newInstance) {
         this.currentinstance = newInstance;
         if (typeof newInstance.init === 'function') {
@@ -106,9 +107,9 @@ class Router {
     };
 
     if (this.beforeFun) {
-      this.beforeFun({to: route, next: doChange});
+      this.beforeFun({ to: route, next: doChange });
     } else {
-      doChange().then(r => console.log(r));
+      doChange().then(r => r);
     }
   }
 
@@ -135,4 +136,4 @@ class Router {
   }
 }
 
-export {Router};
+export { Router };

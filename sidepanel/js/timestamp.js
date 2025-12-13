@@ -11,8 +11,7 @@ import {
 } from '../modules/eventHandlers.js';
 import {updateTimestamp} from './utils/timestampUtils.js';
 import {timeZoneList} from './const/timezone.js';
-
-const BaseComponent = window.BaseComponent;
+import {BaseComponent} from './components/BaseComponet.js';
 
 // 获取本地时区
 const localTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -20,7 +19,6 @@ const localTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
 class Timestamp extends BaseComponent {
   constructor() {
     super();
-    this.init();
     // 定义一个全局变量来保存是否显示毫秒
     this.showMilliseconds = true;
     // 定义一个全局变量来保存计时器
@@ -33,14 +31,13 @@ class Timestamp extends BaseComponent {
     // 初始化时更新一次时间戳
     updateTimestamp(currentTimestampValue, this.showMilliseconds);
 
-    this.setInterval(() => updateTimestamp(currentTimestampValue, this.showMilliseconds), 100);
+    this.timestampInterval = this.setInterval(() =>
+        updateTimestamp(currentTimestampValue, this.showMilliseconds),
+      100);
 
     const timezoneResultSelect = document.getElementById('timezone-result');
     const timezoneInputSelect = document.getElementById('timezone-input');
-
-    // 获取本地时区在列表中的索引
     const localTimeZoneIndex = timeZoneList.indexOf(localTimeZone);
-
     for (let i = 0; i < timeZoneList.length; i++) {
       if (i === localTimeZoneIndex) {
         // 默认选中本地时区
@@ -68,13 +65,14 @@ class Timestamp extends BaseComponent {
       'click',
       () => (this.showMilliseconds = handleToggleUnit(this.showMilliseconds))
     );
-
     // 绑定计时器相关按钮事件
     this.bindEvent('stop-timer-btn', 'click', () => handleStopTimer(this.timestampInterval));
+    // 绑定开始计时器事件
     this.bindEvent(
       'start-timer-btn',
       'click',
-      () => (this.timestampInterval = handleStartTimer(this.timestampInterval, this.showMilliseconds))
+      () =>
+        (this.timestampInterval = handleStartTimer(this.timestampInterval, this.showMilliseconds))
     );
     // 绑定时间戳转换按钮事件
     this.bindEvent('convert-timestamp-to-date-btn', 'click', handleConvertTimestamp);

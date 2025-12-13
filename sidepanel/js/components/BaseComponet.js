@@ -12,8 +12,6 @@ export class BaseComponent {
    * @param {Function} handler 回调函数
    */
   bindEvent(target, type, handler) {
-
-    console.log('Bind 1111;')
     // 获取目标元素
     const ele = typeof target === 'string' ? document.getElementById(target) : target;
 
@@ -33,7 +31,7 @@ export class BaseComponent {
    * @param {number} ms 定时器间隔时间（毫秒）
    */
   setInterval(fn, ms) {
-    this._timerManager.setInterval(fn, ms);
+    return this._timerManager.setInterval(fn, ms);
   }
 
   /**
@@ -42,7 +40,7 @@ export class BaseComponent {
    * @param {number} ms 定时器间隔时间（毫秒）
    */
   setTimeout(fn, ms) {
-    this._timerManager.setTimeout(fn, ms);
+    return this._timerManager.setTimeout(fn, ms);
   }
 
   /**

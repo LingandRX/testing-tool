@@ -6,6 +6,7 @@ import {Router} from '../modules/Router.js';
 const config = {
   routerViewId: 'app',
   stackPages: false,
+  redirectRoute: '/',
   routes: [
     {
       path: '/',
