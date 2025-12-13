@@ -84,13 +84,20 @@ class Router {
         }
       }
 
+      console.log('加载组件', route.name);
+      console.log(route.script);
       if (route.script) {
-        await this.scriptManager.loadScript({
+        const tmp = await this.scriptManager.loadScript({
           path: route.script,
           name: route.name,
           isModule: route.isModule,
           deps: route.deps,
         });
+
+        console.log(tmp);
+        if (tmp) {
+          console.log('加载组件成功', route.name);
+        }
       }
 
       const newInstance = await this.scriptManager.getComponentInstance(route.name);

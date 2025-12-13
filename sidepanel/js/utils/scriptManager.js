@@ -10,16 +10,16 @@ export class ScriptManager {
     console.log('loadScript', name);
     if (this._loadedClasses.has(name)) {
       console.log(`Component ${name} loaded from cache`);
-      return this._loadedClasses.get(name);
     }
 
+    console.log('deps', deps);
     for (const dep of deps) {
       await this._appendScript({path: dep, isModule: false});
     }
 
     let componentReference = null;
 
-    console.log(isModule);
+    console.log(`isModule:${isModule}`);
     if (isModule) {
       const module = await import(path);
       this.currentModule = module;
