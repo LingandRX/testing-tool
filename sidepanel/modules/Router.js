@@ -28,7 +28,7 @@ class Router {
     // 监听路由变化
     window.addEventListener('hashchange', () => this.urlChange());
     window.addEventListener('load', () => this.urlChange());
-    window.lintTo = (path) => this.navigate(path);
+    window.linkTo = (path) => this.navigate(path);
   }
 
   map() {

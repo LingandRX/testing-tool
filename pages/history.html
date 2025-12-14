@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+            sans-serif;
+        }
+
+        body {
+            height: 100%;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        h1 {
+            color: #343a40;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        p {
+            color: #6c757d;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .history-item {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4dabf7;
+        }
+
+        .history-time {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .history-action {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        button {
+            background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(77, 171, 247, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>历史记录</h1>
+    <p>最近的操作记录</p>
+
+    <div id="history-list">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <div style="margin-top: 20px; display: flex; gap: 10px">
+        <button id="clear-history">清空历史</button>
+        <button id="refresh-history">刷新记录</button>
+    </div>
+</div>
+
+<script src="./js/history.js" type="module"></script>
+</body>
+</html>

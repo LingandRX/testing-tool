@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+            sans-serif;
+        }
+
+        body {
+            height: 100%;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        h1 {
+            color: #343a40;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        h2 {
+            color: #495057;
+            margin: 15px 0 10px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        p {
+            color: #6c757d;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: '';
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #4dabf7;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        button {
+            background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(77, 171, 247, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            background-color: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>设置</h1>
+
+    <div class="setting-item">
+        <div>
+            <h2>深色模式</h2>
+            <p>启用深色主题界面</p>
+        </div>
+        <label class="toggle">
+            <input id="dark-mode" type="checkbox"/>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
+    <div class="setting-item">
+        <div>
+            <h2>自动保存</h2>
+            <p>自动保存您的更改</p>
+        </div>
+        <label class="toggle">
+            <input id="auto-save" type="checkbox"/>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
+    <div class="setting-item">
+        <div>
+            <h2>显示通知</h2>
+            <p>重要操作时显示通知</p>
+        </div>
+        <label class="toggle">
+            <input id="show-notifications" type="checkbox"/>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
+    <div class="setting-item">
+        <div>
+            <h2>数据同步</h2>
+            <p>跨设备同步您的数据</p>
+        </div>
+        <label class="toggle">
+            <input id="data-sync" type="checkbox"/>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
+    <div class="setting-item">
+        <div>
+            <h2>字体大小</h2>
+            <p>设置界面字体大小</p>
+        </div>
+        <select id="font-size">
+            <option value="small">小</option>
+            <option selected value="medium">中</option>
+            <option value="large">大</option>
+            <option value="x-large">特大</option>
+        </select>
+    </div>
+
+    <div class="setting-item">
+        <div>
+            <h2>界面语言</h2>
+            <p>设置扩展显示语言</p>
+        </div>
+        <select id="language">
+            <option selected value="zh-CN">简体中文</option>
+            <option value="zh-TW">繁体中文</option>
+            <option value="en-US">English</option>
+            <option value="ja-JP">日本語</option>
+        </select>
+    </div>
+
+    <div style="margin-top: 25px; display: flex; gap: 10px">
+        <button id="save-settings">保存设置</button>
+        <button
+                id="reset-settings"
+                style="background: linear-gradient(135deg, #868e96 0%, #495057 100%)"
+        >
+            重置设置
+        </button>
+    </div>
+</div>
+
+<script src="./js/settings.js" type="module"></script>
+</body>
+</html>
