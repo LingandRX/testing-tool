@@ -45,11 +45,19 @@ export class TimerManager {
   }
 
   cleanAll() {
-    console.log('cleanAll time or interval');
-    this.timers.forEach((timerId) => {
-      window.clearTimeout(timerId);
-      window.clearInterval(timerId);
+    return new Promise((resolve, reject) => {
+      this.timers.onload = () => {
+        this.timers.forEach((timerId) => {
+          window.clearTimeout(timerId);
+          window.clearInterval(timerId);
+        });
+        resolve();
+      };
+      this.timers.onerror = () => {
+        console.log('unload timer error');
+        reject();
+      }
+      this.timers = [];
     });
-    this.timers = [];
   }
 }

@@ -51,13 +51,12 @@ export class ScriptManager {
       };
       s.onerror = () => {
         reject(new Error(`Failed to load script: ${path}`));
-      }
+      };
       document.body.appendChild(s);
     });
   }
 
   async unloadScript() {
-    console.log('unloadScript');
     if (this.currentScriptEl) {
       try {
         this.currentScriptEl.remove();

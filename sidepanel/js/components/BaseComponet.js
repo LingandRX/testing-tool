@@ -58,9 +58,9 @@ export class BaseComponent {
    * 销毁组件
    */
   destroy() {
-    this._eventManager.removeAll();
-    this._timerManager.cleanAll();
-    this._scriptManager.unloadScript().then(r => console.log(r));
+    this._eventManager.removeAll().then(() => console.log('clean event successful'));
+    this._timerManager.cleanAll().then(() => console.log('clean timer successful'));
+    this._scriptManager.unloadScript().then(r => console.log('unload script successful'));
     console.log('destroy success');
   }
 }

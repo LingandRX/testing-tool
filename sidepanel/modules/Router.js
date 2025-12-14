@@ -85,20 +85,17 @@ class Router {
       }
 
       console.log('加载组件', route.name);
-      console.log(route.script);
-      if (route.script) {
-        const tmp = await this.scriptManager.loadScript({
-          path: route.script,
-          name: route.name,
-          isModule: route.isModule,
-          deps: route.deps,
-        });
 
-        console.log(tmp);
-        if (tmp) {
-          console.log('加载组件成功', route.name);
-        }
+      if (!route.script) {
+        return;
       }
+
+      await this.scriptManager.loadScript({
+        path: route.script,
+        name: route.name,
+        isModule: route.isModule,
+        deps: route.deps,
+      });
 
       const newInstance = await this.scriptManager.getComponentInstance(route.name);
       console.log(newInstance);
@@ -114,7 +111,7 @@ class Router {
     };
 
     if (this.beforeFun) {
-      this.beforeFun({ to: route, next: doChange });
+      this.beforeFun({to: route, next: doChange});
     } else {
       doChange().then(r => r);
     }
@@ -143,4 +140,4 @@ class Router {
   }
 }
 
-export { Router };
+export {Router};
