@@ -92,39 +92,33 @@
 <body>
 <div class="card">
     <h1>欢迎使用页面切换 Demo</h1>
-    <p>这是一个展示Chrome扩展中页面切换功能的示例应用。使用独立HTML文件实现页面分离。</p>
-    <p>点击上方的导航按钮可以切换到不同的页面。</p>
+    <p id="current-date">当前时间: 加载中...</p>
+    <p>这是一个展示Chrome扩展中页面切换功能的示例应用。</p>
 
     <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value" id="usage-count">0</div>
-            <div class="stat-label">使用次数</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="page-switches">0</div>
-            <div class="stat-label">页面切换</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="history-count">0</div>
-            <div class="stat-label">历史记录</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="settings-count">0</div>
-            <div class="stat-label">设置项</div>
-        </div>
+        <!-- ... 现有统计卡片 ... -->
     </div>
 
-    <div style="margin-top: 20px">
+    <div style="margin-top: 20px;">
         <button id="test-action">执行测试操作</button>
-        <button
-                id="quick-settings"
-                style="margin-left: 10px; background: linear-gradient(135deg, #868e96 0%, #495057 100%)"
-        >
-            快速设置
+        <button id="quick-settings" style="margin-left: 10px;">快速设置</button>
+        <button id="sync-data"
+                style="margin-left: 10px; background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);">
+            同步数据
         </button>
+    </div>
+
+    <!-- 共享模块功能演示 -->
+    <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <h3>共享模块功能演示</h3>
+        <div>
+            <button id="demo-debounce">防抖演示（点击多次）</button>
+            <button id="demo-format" style="margin-left: 10px;">格式化日期</button>
+        </div>
+        <div id="demo-output" style="margin-top: 10px; font-size: 12px; color: #495057;"></div>
     </div>
 </div>
 
-<script src="./js/home.js" type="module"></script>
+<script type="module" src="js/home.js"></script>
 </body>
 </html>

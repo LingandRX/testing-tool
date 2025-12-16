@@ -9,7 +9,7 @@ class ModuleManager {
       settings: {loaded: false, controller: null},
       history: {loaded: false, controller: null},
       about: {loaded: false, controller: null},
-      timestamptool: {loaded: false, controller: null},
+      timestamp: {loaded: false, controller: null},
     };
   }
 

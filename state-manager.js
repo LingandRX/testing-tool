@@ -148,7 +148,7 @@ class StateManager {
       settings: '设置',
       history: '历史记录',
       about: '关于',
-      'timestamptool': '时间戳转换工具',
+      timestamp: '时间戳转换工具',
     };
 
     return pageNames[pageId] || pageId;

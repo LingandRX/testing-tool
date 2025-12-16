@@ -1,128 +1,62 @@
 /**
- * 首页模块
+ * 使用工厂创建首页模块
  */
-export default async function initHomePage({
-  stateManager,
-  showNotification,
-  iframeWindow,
-  iframeDocument,
-  state,
-}) {
-  console.log('初始化首页模块');
+import { createPageModule } from '../../libs/page-module-factory.js';
 
-  // 等待iframe DOM完全加载
-  await waitForDOMReady(iframeDocument);
+export default createPageModule({
+  pageName: 'home',
 
-  // 安全地更新UI
-  safeUpdateUI(() => {
-    updateStats(state.stats, iframeDocument);
-  });
+  onInit: async (controller, state) => {
+    console.log('初始化首页（工厂模式）');
 
-  // 绑定事件
-  const cleanupFunctions = bindEvents(stateManager, showNotification,
-      iframeDocument);
+    const { sharedModules, updateText, bindEvent } = controller;
+    const utils = sharedModules?.utils;
 
-  // 返回控制器对象
-  return {
-    destroy: () => {
-      console.log('清理首页资源');
-      cleanupFunctions.forEach((cleanup) => cleanup());
-    },
+    // 更新时间
+    if (utils) {
+      updateText('current-date', `当前时间: ${utils.formatDate(new Date(), 'YYYY年MM月DD日 HH:mm')}`);
+    }
 
-    updateState: (newState) => {
-      safeUpdateUI(() => {
-        updateStats(newState.stats, iframeDocument);
-      });
-    },
-  };
-}
+    // 更新统计
+    updateText('usage-count', state.stats.usageCount);
+    updateText('page-switches', state.stats.pageSwitches);
+    updateText('history-count', state.stats.historyCount);
+    updateText('settings-count', state.stats.settingsCount);
 
-/**
- * 等待DOM准备就绪
- */
-function waitForDOMReady(document) {
-  return new Promise((resolve) => {
-    if (document.readyState === 'complete' || document.readyState ===
-        'interactive') {
-      // 额外等待一下确保所有元素都已渲染
-      setTimeout(resolve, 100);
-    } else {
-      document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(resolve, 100);
+    // 绑定事件
+    bindEvent('#test-action', 'click', () => {
+      controller.stateManager.addHistory('执行了测试操作');
+      controller.showNotification('测试操作已执行');
+      controller.stateManager.incrementUsage();
+    });
+
+    bindEvent('#quick-settings', 'click', () => {
+      controller.stateManager.navigateTo('settings');
+    });
+
+    // 演示共享模块功能
+    if (utils) {
+      bindEvent('#demo-debounce', 'click', utils.debounce(() => {
+        controller.emit('demoClicked', { time: new Date() });
+        updateText('demo-output', `防抖演示: ${utils.formatDate(new Date(), 'HH:mm:ss')}`);
+      }, 1000));
+
+      bindEvent('#demo-format', 'click', () => {
+        updateText('demo-output', `格式化结果: ${utils.formatDate(new Date(), 'YYYY年MM月DD日 dddd HH:mm:ss')}`);
       });
     }
-  });
-}
+  },
 
-/**
- * 安全更新UI（带错误处理）
- */
-function safeUpdateUI(callback) {
-  try {
-    callback();
-  } catch (error) {
-    console.error('更新UI失败:', error);
+  onStateUpdate: (controller, newState) => {
+    const { updateText } = controller;
+
+    updateText('usage-count', newState.stats.usageCount);
+    updateText('page-switches', newState.stats.pageSwitches);
+    updateText('history-count', newState.stats.historyCount);
+    updateText('settings-count', newState.stats.settingsCount);
+  },
+
+  onDestroy: (controller) => {
+    console.log('清理首页（工厂模式）');
   }
-}
-
-/**
- * 更新统计数据
- */
-function updateStats(stats, document) {
-  const elements = {
-    'usage-count': stats.usageCount,
-    'page-switches': stats.pageSwitches,
-    'history-count': stats.historyCount,
-    'settings-count': stats.settingsCount,
-  };
-
-  Object.entries(elements).forEach(([id, value]) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.textContent = value;
-    } else {
-      console.warn(`元素 #${id} 未找到`);
-    }
-  });
-}
-
-/**
- * 绑定事件
- */
-function bindEvents(stateManager, showNotification, document) {
-  const cleanupFunctions = [];
-
-  // 测试操作按钮
-  const testButton = document.getElementById('test-action');
-  if (testButton) {
-    const testHandler = () => {
-      stateManager.addHistory('执行了测试操作');
-      showNotification('测试操作已执行');
-      stateManager.incrementUsage();
-    };
-
-    testButton.addEventListener('click', testHandler);
-    cleanupFunctions.push(() => {
-      testButton.removeEventListener('click', testHandler);
-    });
-  } else {
-    console.warn('未找到测试操作按钮');
-  }
-
-  // 快速设置按钮
-  const quickSettingsButton = document.getElementById('quick-settings');
-  if (quickSettingsButton) {
-    const quickSettingsHandler = () => {
-      stateManager.navigateTo('settings');
-    };
-
-    quickSettingsButton.addEventListener('click', quickSettingsHandler);
-    cleanupFunctions.push(() => {
-      quickSettingsButton.removeEventListener('click', quickSettingsHandler);
-    });
-  } else {
-    console.warn('未找到快速设置按钮');
-  }
-
-  return cleanupFunctions;
-}
+});

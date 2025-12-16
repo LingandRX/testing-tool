@@ -100,53 +100,148 @@ class App {
   async setupIframe(pageName) {
     const container = document.getElementById('content-container');
 
-    // 移除所有现有的iframe
+    // 清理之前的 observer
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
+
+    clearTimeout(this.retryTimer);
+
+    // 隐藏所有 iframe
     const existingIframes = container.querySelectorAll('.page-iframe');
-    existingIframes.forEach((iframe) => {
+    existingIframes.forEach(iframe => {
       iframe.style.display = 'none';
     });
 
-    // 检查是否已存在该页面的iframe
+    // 检查是否已存在该页面的 iframe
     let iframe = container.querySelector(`iframe[data-page="${pageName}"]`);
 
     if (!iframe) {
+      // 创建新的 iframe
       iframe = document.createElement('iframe');
       iframe.className = 'page-iframe';
       iframe.setAttribute('data-page', pageName);
-      iframe.src = chrome.runtime.getURL(`pages/${pageName}.html`);
+      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+
+      // 设置样式
+      iframe.style.cssText = `
+      width: 100%;
+      height: 100%;
+      border: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    `;
+
+      // 添加加载事件监听
+      iframe.addEventListener('load', () => {
+        console.log(`iframe ${pageName} load 事件触发`);
+
+        // 确保 iframe 完全加载
+        setTimeout(() => {
+          if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+            console.log(`iframe ${pageName} 完全加载`);
+            iframe.style.opacity = '1';
+          }
+        }, 100);
+      });
+
+      iframe.addEventListener('error', (error) => {
+        console.error(`iframe ${pageName} 加载错误:`, error);
+      });
+
+      // 设置 src
+      const pageUrl = chrome.runtime.getURL(`pages/${pageName}.html`);
+      console.log(`加载页面: ${pageUrl}`);
+      iframe.src = pageUrl;
+
       container.appendChild(iframe);
 
-      // 添加加载完成的监听器
-      iframe.addEventListener('load', () => {
-        console.log(`iframe ${pageName} 加载完成`);
-      });
+      // 等待 iframe 创建完成
+      await new Promise(resolve => setTimeout(resolve, 50));
     } else {
+      // 显示已存在的 iframe
       iframe.style.display = 'block';
+      iframe.style.opacity = '1';
     }
 
     this.currentIframe = iframe;
+
+    // 如果 iframe 已经加载完成，直接触发加载逻辑
+    if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+      console.log(`iframe ${pageName} 已缓存，直接使用`);
+    }
   }
 
+  /**
+   * 等待 iframe DOM 完全加载
+   * @param {string} pageName - 页面名称
+   * @returns {Promise} 加载完成的 Promise
+   */
   waitForIframeDOM(pageName) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      const timeout = 10000; // 10秒超时
+      const startTime = Date.now();
+
       const checkDOM = () => {
+        // 检查超时
+        if (Date.now() - startTime > timeout) {
+          console.error(`等待 ${pageName} DOM 超时`);
+          reject(new Error(`加载页面 ${pageName} 超时`));
+          return;
+        }
+
+        // 检查 iframe 是否存在
+        if (!this.currentIframe || !this.currentIframe.contentDocument) {
+          console.log(`等待 ${pageName} iframe 文档...`);
+          setTimeout(checkDOM, 100);
+          return;
+        }
+
         const iframeDoc = this.currentIframe.contentDocument;
 
-        if (iframeDoc && iframeDoc.readyState === 'complete') {
-          // 检查关键元素是否存在
-          const testElements = this.getTestElementsForPage(pageName);
-          const allExist = testElements.every(
-              (selector) => iframeDoc.querySelector(selector));
+        // 检查文档状态
+        if (iframeDoc.readyState !== 'complete' && iframeDoc.readyState !== 'interactive') {
+          console.log(`等待 ${pageName} 文档状态: ${iframeDoc.readyState}`);
+          setTimeout(checkDOM, 100);
+          return;
+        }
 
-          if (allExist) {
-            console.log(`页面 ${pageName} DOM 已完全加载`);
-            resolve();
-          } else {
-            console.log(`等待页面 ${pageName} DOM 元素...`);
-            setTimeout(checkDOM, 50);
+        // 检查关键元素
+        const requiredElements = this.getRequiredElementsForPage(pageName);
+        const missingElements = [];
+
+        requiredElements.forEach(selector => {
+          const element = iframeDoc.querySelector(selector);
+          if (!element) {
+            missingElements.push(selector);
           }
+        });
+
+        if (missingElements.length === 0) {
+          console.log(`页面 ${pageName} DOM 已完全加载`);
+
+          // 额外等待 100ms 确保 CSS 和脚本已执行
+          setTimeout(resolve, 100);
         } else {
-          setTimeout(checkDOM, 50);
+          console.log(`等待页面 ${pageName} DOM 元素... 缺失:`, missingElements);
+
+          // 使用 MutationObserver 监听 DOM 变化
+          if (!this.observer) {
+            this.observer = new MutationObserver(() => {
+              clearTimeout(this.retryTimer);
+              this.retryTimer = setTimeout(checkDOM, 50);
+            });
+
+            this.observer.observe(iframeDoc.body, {
+              childList: true,
+              subtree: true
+            });
+          }
+
+          // 设置重试定时器
+          clearTimeout(this.retryTimer);
+          this.retryTimer = setTimeout(checkDOM, 100);
         }
       };
 
@@ -154,16 +249,20 @@ class App {
     });
   }
 
-  getTestElementsForPage(pageName) {
-    const testSelectors = {
-      home: ['#usage-count', '#test-action'],
-      settings: ['#dark-mode', '#save-settings'],
-      history: ['#history-list', '#clear-history'],
-      about: ['#visit-website'],
-      timestamptool: ['#current-timestamp-value'],
+  /**
+   * 获取页面必需的元素选择器
+   */
+  getRequiredElementsForPage(pageName) {
+    const selectors = {
+      'home': ['#current-date'],
+      'settings': ['#dark-mode', '#save-settings'],
+      'history': ['#history-list', '#clear-history'],
+      'about': ['#visit-website']
     };
 
-    return testSelectors[pageName] || [];
+    // 默认返回基础选择器，确保页面有内容
+    const defaultSelectors = ['body', 'h1'];
+    return [...(selectors[pageName] || []), ...defaultSelectors];
   }
 
   async loadPageModule(pageName, state) {
@@ -223,11 +322,10 @@ class App {
 
     container.appendChild(errorOverlay);
 
-    errorOverlay.querySelector('#retry-loading').
-        addEventListener('click', () => {
-          errorOverlay.remove();
-          this.stateManager.navigateTo(this.currentPage);
-        });
+    errorOverlay.querySelector('#retry-loading').addEventListener('click', () => {
+      errorOverlay.remove();
+      this.stateManager.navigateTo(this.currentPage);
+    });
   }
 
   showNotification(message) {

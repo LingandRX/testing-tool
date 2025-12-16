@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "页面切换 Demo",
   "version": "1.0.0",
-  "description": "使用状态管理实现页面切换的Chrome扩展",
+  "description": "使用共享上下文解决模块引用问题",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -11,9 +11,7 @@
       "128": "icons/icon.png"
     }
   },
-  "permissions": [
-    "storage"
-  ],
+  "permissions": ["storage"],
   "icons": {
     "16": "icons/icon.png",
     "48": "icons/icon.png",
@@ -21,9 +19,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [
-        "pages/*.js"
-      ],
+      "resources": ["pages/*.html", "pages/*.js", "libs/*.js"],
       "matches": ["<all_urls>"]
     }
   ]
