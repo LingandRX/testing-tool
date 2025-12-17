@@ -1,23 +1,36 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import {useState, useEffect, useRef} from 'react';
+import {Link} from 'react-router-dom';
 
 const TimestampPage = () => {
-  let showMilliseconds = true;
-
+  const [currentTimestamp, setCurrentTimestamp] = useState(Math.floor(Date.now()));
+  const [showMilliseconds, setShowMilliseconds] = useState(true);
+  const [isRunningTimestamp, setIsRunningTimestamp] = useState(true);
+  const intervalRef = useRef(null);
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      const timestamp = Math.floor(Date.now() / 1000);
-      document.getElementById('current-timestamp-value').textContent = timestamp;
-    }, 100);
+    if (isRunningTimestamp) {
+      intervalRef.current = setInterval(() => {
+        setCurrentTimestamp(Math.floor(Date.now()));
+      }, 100);
+    }
 
-    return () => clearInterval(intervalId);
-  }, []);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    }
+  }, [isRunningTimestamp]);
 
   function handleChangeUnit() {
-    showMilliseconds = !showMilliseconds;
-    document.querySelector('#current-timestamp-unit').textContent = showMilliseconds
-      ? '毫秒'
-      : '秒';
+    setShowMilliseconds(!showMilliseconds);
+  }
+
+  function handleChangeTimestampRunning(status) {
+    setIsRunningTimestamp(status);
+    if (!status) {
+      console.log('停止时间戳')
+    } else {
+      console.log('开始时间戳')
+    }
   }
 
   return (
@@ -29,22 +42,14 @@ const TimestampPage = () => {
       <div id="current-timestamp">
         <h2>当前时间戳</h2>
         <p>
-          <span id="current-timestamp-value">1762873747965</span>
-          <span id="current-timestamp-unit">毫秒</span>
+          <span id="current-timestamp-value">{Math.floor(currentTimestamp / (showMilliseconds ? 1 : 1000))}</span>
+          <span id="current-timestamp-unit">{showMilliseconds ? '毫秒' : '秒'}</span>
         </p>
         <div>
-          <button id="toggle-unit-btn" className="action-btn" onClick={handleChangeUnit}>
-            切换单位
-          </button>
-          <button id="copy-timestamp-btn" className="action-btn">
-            复制
-          </button>
-          <button id="stop-timer-btn" className="action-btn">
-            停止
-          </button>
-          <button id="start-timer-btn" className="action-btn">
-            开始
-          </button>
+          <button className="action-btn" onClick={handleChangeUnit}>切换单位</button>
+          <button className="action-btn">复制</button>
+          <button className="action-btn" onClick={() => handleChangeTimestampRunning(false)}>停止</button>
+          <button className="action-btn" onClick={() => handleChangeTimestampRunning(true)}>开始</button>
         </div>
       </div>
 
@@ -52,7 +57,7 @@ const TimestampPage = () => {
         <h2>时间戳转日期时间</h2>
         <div class="datetime-box">
           <div class="input-group">
-            <input type="text" id="timestamp-input" placeholder="请输入时间戳" class="input-text" />
+            <input type="text" id="timestamp-input" placeholder="请输入时间戳" class="input-text"/>
             <select id="timestamp-input-unit-select" class="select-box">
               <option value="milliseconds">毫秒(ms)</option>
               <option value="seconds">秒(s)</option>
@@ -81,7 +86,7 @@ const TimestampPage = () => {
         <h2>日期时间转时间戳</h2>
         <div class="datetime-box">
           <div class="input-group">
-            <input type="text" id="datetime-input" placeholder="输入日期时间" class="input-text" />
+            <input type="text" id="datetime-input" placeholder="输入日期时间" class="input-text"/>
             <select class="select-box" id="timezone-input"></select>
           </div>
 
