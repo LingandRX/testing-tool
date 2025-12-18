@@ -1,19 +1,24 @@
-{  
-  "manifest_version": 3,  
-  "name": "React Router Chrome Extension",  
-  "version": "1.0",  
-  "description": "A Chrome Extension with React Router: User List + Actions Pages",  
-  "permissions": ["storage"],  
-  "icons": {  
-    "16": "favicon.ico",  
+{
+  "manifest_version": 3,
+  "name": "React Router Chrome Extension",
+  "version": "1.0",
+  "description": "A Chrome Extension with React Router: User List + Actions Pages",
+  "permissions": [
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "favicon.ico",
     "48": "favicon.ico",
     "128": "favicon.ico"
-  },  
-  "action": {  
-    "default_popup": "index.html" 
   },
-  "options_ui": {  
-    "page": "index.html",  
-    "open_in_tab": true 
-  }  
+  "action": {
+    "default_popup": "index.html"
+  },
+  "options_ui": {
+    "page": "index.html",
+    "open_in_tab": true
+  }
 }  
