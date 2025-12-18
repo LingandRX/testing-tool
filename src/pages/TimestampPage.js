@@ -1,55 +1,48 @@
-import {useState, useEffect, useRef, useCallback, useMemo} from 'react';
+import {useState, useEffect} from 'react';
 import CopyButton from "../components/CopyButton";
-
-function formatDate(value) {
-  return (new Intl.DateTimeFormat('zh-CN', {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-  })).format(value);
-}
+import {formatDate} from "../utils/timeUtils";
 
 const TimestampPage = () => {
   const [currentTimestamp, setCurrentTimestamp] = useState(Math.floor(Date.now()));
   const [showMilliseconds, setShowMilliseconds] = useState(true);
   const [isRunningTimestamp, setIsRunningTimestamp] = useState(true);
-  const intervalRef = useRef(null);
   const [timestampValue, setTimestampValue] = useState(Date.now());
   const [dateValue, setDateValue] = useState(formatDate(Date.now()));
   const [timestampResult, setTimestampResult] = useState('');
   const [dateResult, setDateResult] = useState('');
   
+  // 定时更新时间戳
   useEffect(() => {
+    let timerId = null;
+    
     if (isRunningTimestamp) {
-      intervalRef.current = setInterval(() => {
+      timerId = setInterval(() => {
         setCurrentTimestamp(Math.floor(Date.now()));
       }, 1000);
     }
     
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
       }
     }
   }, [isRunningTimestamp]);
   
-  function handleChangeUnit() {
-    setShowMilliseconds(!showMilliseconds);
+  function toggleUnit() {
+    setShowMilliseconds(prev => !prev);
   }
   
-  const handleToggleTimestampRunning = useCallback(() => {
-    const newStatus = !isRunningTimestamp;
-    setIsRunningTimestamp(newStatus);
-    console.log(newStatus ? '开始时间戳' : '停止时间戳');
-  }, [isRunningTimestamp]);
-  useMemo(() => ({
-    backgroundColor: isRunningTimestamp ? 'red' : 'green'
-  }), [isRunningTimestamp]);
+  function toggleTimestamp() {
+    setIsRunningTimestamp((prev => !prev));
+  }
   
   function handleConvertTimestampToDate() {
+    if (!timestampValue) {
+      setTimestampResult('请输入时间戳');
+      return;
+    }
+    
     setTimestampResult(formatDate(new Date(Number(timestampValue))));
   }
   
@@ -71,17 +64,27 @@ const TimestampPage = () => {
   
   return (
     <div>
-      <div id="current-timestamp">
+      <div>
         <h2>当前时间戳</h2>
         <p>
-          <span id="current-timestamp-value">{Math.floor(currentTimestamp / (showMilliseconds ? 1 : 1000))}</span>
-          <span id="current-timestamp-unit">{showMilliseconds ? '毫秒' : '秒'}</span>
+          <span>{Math.floor(currentTimestamp / (showMilliseconds ? 1 : 1000))}</span>
+          <span>{showMilliseconds ? '毫秒' : '秒'}</span>
         </p>
         <div>
-          <button className="action-btn" onClick={handleChangeUnit}>切换单位</button>
+          <button type="button"
+                  className="action-btn"
+                  onClick={toggleUnit}
+                  aria-label={showMilliseconds ? '切换为秒' : '切换为毫秒'}
+          >
+            切换单位
+          </button>
           <CopyButton text={currentTimestamp.toString()} buttonText='复制'></CopyButton>
-          <button className={isRunningTimestamp ? 'stop-btn' : 'action-btn'}
-                  onClick={handleToggleTimestampRunning}>
+          <button
+            type="button" // 明确指定类型，防止在 Form 中意外触发提交
+            className={`btn ${isRunningTimestamp ? 'stop-btn' : 'action-btn'}`}
+            onClick={toggleTimestamp}
+            aria-label={isRunningTimestamp ? '停止时间戳更新' : '开始时间戳更新'}
+          >
             {isRunningTimestamp ? '停止' : '开始'}
           </button>
         </div>
@@ -89,32 +92,35 @@ const TimestampPage = () => {
       
       <div>
         <h2>时间戳转日期时间</h2>
-        <div className="datetime-box">
-          <div className="input-group">
-            <input type="text" id="timestamp-input" placeholder="请输入时间戳" className="input-text"
-                   value={timestampValue} onChange={(e) => setTimestampValue(e.target.value)}/>
-            <select id="timestamp-input-unit-select" className="select-box">
-              <option value="milliseconds">毫秒(ms)</option>
-              <option value="seconds">秒(s)</option>
-            </select>
+        <div>
+          <div>
+            <input
+              type="text"
+              placeholder="请输入时间戳"
+              value={timestampValue}
+              onChange={(e) => setTimestampValue(Number(e.target.value))}/>
+            <label aria-label={'选择时间戳单位'}>
+              <select name='时间戳单位' defaultChecked='milliseconds'>
+                <option value="milliseconds">毫秒(ms)</option>
+                <option value="seconds">秒(s)</option>
+              </select>
+            </label>
           </div>
           
-          <div className="input-group">
-            <button id="convert-timestamp-to-date-btn" className="action-btn" onClick={handleConvertTimestampToDate}>
+          <div>
+            <button className={'action-btn'} onClick={handleConvertTimestampToDate}>
               转换
             </button>
           </div>
           
-          <div className="input-group">
+          <div>
             <input
               type="text"
-              id="timestamp-conversion-result"
               placeholder="转换结果"
-              className="input-text"
               value={timestampResult}
               readOnly
             />
-            <select className="select-box" id="timezone-result"></select>
+            <select></select>
           </div>
         </div>
       </div>
