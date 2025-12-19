@@ -16,11 +16,12 @@ export function DatetimeToTimestamp() {
   return (<div>
     <h2>日期时间转时间戳</h2>
     <div>
-      <div>
+      <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
         <input
           type="text"
           placeholder="输入日期时间"
           value={dateValue}
+          style={{minWidth: '200px'}}
           onChange={(e) => setDateValue(e.target.value)}/>
         <select
           value={selectedZone}
@@ -39,11 +40,12 @@ export function DatetimeToTimestamp() {
         </button>
       </div>
       
-      <div>
+      <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
         <input
           type="text"
           placeholder="转换结果"
           value={result}
+          style={{minWidth: '200px'}}
           readOnly
         />
         <select
@@ -56,5 +58,6 @@ export function DatetimeToTimestamp() {
         </select>
       </div>
     </div>
-  </div>)
+  </div>);
+  
 }
