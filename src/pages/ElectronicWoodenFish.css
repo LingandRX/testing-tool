@@ -1,64 +1,154 @@
+/* CSS 变量定义 */
+:root {
+    --dzmy-bg-color: black;
+    --dzmy-text-color: #ffffff;
+    --dzmy-accent-color: #fadb14;
+    --dzmy-container-height: 500px;
+    --dzmy-img-width: 160px;
+    --dzmy-img-height: 120px;
+    --dzmy-animation-duration: 0.12s;
+    --dzmy-float-duration: 0.5s;
+}
+
+/* 主容器 */
 .dzmy-bg {
-    background-color: black;
+    background-color: var(--dzmy-bg-color);
     width: 100%;
-    height: 500px;
+    min-height: var(--dzmy-container-height);
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     position: relative;
 }
 
+/* 计数显示 */
 .dzmy-count {
     position: absolute;
     top: 10px;
     left: 10px;
-    color: #ffffff;
+    color: var(--dzmy-text-color);
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 10;
 }
 
+/* 木鱼图像 */
 .dzmy-img {
-    width: 160px;
-    height: 120px;
+    width: var(--dzmy-img-width);
+    height: var(--dzmy-img-height);
+    max-width: 100%;
+    max-height: 100%;
     cursor: pointer;
-    transition: transform 0.12s ease;
+    transition: transform var(--dzmy-animation-duration) ease;
     transform: scale(1);
+    will-change: transform;
+    touch-action: manipulation;
+    user-select: none;
+    object-fit: contain;
 }
 
+/* 木鱼点击激活状态 */
 .dzmy-img.active {
     transform: scale(0.92);
 }
 
+/* 木鱼和提示容器 */
 .dzmy-box {
     text-align: center;
     position: relative;
+    z-index: 5;
 }
 
+/* 浮动提示容器 */
 .tips {
     position: absolute;
     top: -50px;
     width: 100%;
     text-align: center;
     pointer-events: none;
+    z-index: 20;
+    overflow: visible;
 }
 
+/* 单个浮动提示项 */
 .tip-item {
     position: absolute;
     width: 100%;
-    animation: floatUp 0.5s ease-out forwards;
-    color: #fadb14;
+    animation: floatUp var(--dzmy-float-duration) ease-out forwards;
+    color: var(--dzmy-accent-color);
     font-weight: bold;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    font-size: 24px;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
+/* 浮动动画 */
 @keyframes floatUp {
     0% {
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0);
         opacity: 1;
     }
     100% {
-        transform: translateY(-50px);
+        transform: translate3d(0, -50px, 0);
         opacity: 0;
     }
 }
 
+/* 控制区域 */
 .dzmy-controls {
     margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* 控制区域内的输入框 */
+.dzmy-controls input {
+    width: auto;
+    min-width: 120px;
+    margin-bottom: 0;
+    flex: 1;
+    max-width: 200px;
+}
+
+/* 控制区域内的按钮 */
+.dzmy-controls .action-btn {
+    margin-right: 0;
+    opacity: 1;
+    flex-shrink: 0;
+}
+.dzmy-controls .action-btn:hover {
+    opacity: 0.9;
+}
+.dzmy-controls .action-btn:active {
+    opacity: 0.8;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    :root {
+        --dzmy-container-height: 300px;
+        --dzmy-img-width: 120px;
+        --dzmy-img-height: 90px;
+    }
+    .dzmy-count {
+        font-size: 14px;
+    }
+    .tip-item {
+        font-size: 18px;
+    }
+    .dzmy-controls {
+        flex-wrap: wrap;
+    }
+    .dzmy-controls input {
+        min-width: 100px;
+        max-width: 150px;
+    }
 }
