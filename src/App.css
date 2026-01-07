@@ -1,3 +1,14 @@
+/* 隐藏页面滚动条 */
+html {
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
 .app {
     max-width: 800px;
     margin: 0 auto;
@@ -7,6 +18,7 @@
     min-width: 320px;
     height: 100vh;
     box-sizing: border-box;
+    overflow: auto;
 }
 
 .nav {
@@ -282,6 +294,28 @@
     .nav-collapse-count {
         display: none;
     }
+}
+
+/* 隐藏滚动条样式 */
+/* WebKit浏览器 (Chrome, Safari, Edge) */
+.app::-webkit-scrollbar,
+.nav-collapse-content.show::-webkit-scrollbar,
+.timestamp-display::-webkit-scrollbar {
+    display: none;
+}
+
+/* Firefox */
+.app,
+.nav-collapse-content.show,
+.timestamp-display {
+    scrollbar-width: none;
+}
+
+/* IE/Edge 10+ */
+.app,
+.nav-collapse-content.show,
+.timestamp-display {
+    -ms-overflow-style: none;
 }
 
 /* 超小屏幕适配 - 修复边框遮挡问题 */
