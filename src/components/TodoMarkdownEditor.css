@@ -42,7 +42,7 @@
     padding: 6px 12px;
     background-color: #fff;
     border: 1px solid #ced4da;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 0.85rem;
     font-weight: 600;
     color: #495057;
@@ -65,7 +65,7 @@
 .action-button {
     padding: 8px 16px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
@@ -219,7 +219,7 @@
     margin: 0;
     font-size: 85%;
     background-color: rgba(27, 31, 35, 0.05);
-    border-radius: 3px;
+    border-radius: 8px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
@@ -229,14 +229,14 @@
     font-size: 85%;
     line-height: 1.45;
     background-color: #f6f8fa;
-    border-radius: 6px;
+    border-radius: 8px;
     margin: 0 0 1em 0;
 }
 
 .markdown-preview pre code {
     padding: 0;
     background-color: transparent;
-    border-radius: 0;
+    border-radius: 8px;
 }
 
 .markdown-preview blockquote {
@@ -296,12 +296,12 @@
 
 .markdown-preview::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 .markdown-preview::-webkit-scrollbar-thumb {
     background: #c1c1c1;
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 .markdown-preview::-webkit-scrollbar-thumb:hover {

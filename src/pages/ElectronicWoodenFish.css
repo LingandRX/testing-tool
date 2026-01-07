@@ -19,6 +19,7 @@
     flex-direction: column;
     justify-content: space-evenly;
     position: relative;
+    border-radius: 8px;
 }
 
 /* 计数显示 */
@@ -123,9 +124,11 @@
     opacity: 1;
     flex-shrink: 0;
 }
+
 .dzmy-controls .action-btn:hover {
     opacity: 0.9;
 }
+
 .dzmy-controls .action-btn:active {
     opacity: 0.8;
     box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
@@ -138,15 +141,19 @@
         --dzmy-img-width: 120px;
         --dzmy-img-height: 90px;
     }
+
     .dzmy-count {
         font-size: 14px;
     }
+
     .tip-item {
         font-size: 18px;
     }
+
     .dzmy-controls {
         flex-wrap: wrap;
     }
+
     .dzmy-controls input {
         min-width: 100px;
         max-width: 150px;
