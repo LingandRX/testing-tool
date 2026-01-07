@@ -84,6 +84,7 @@
     transform: translateY(-10px);
     transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, border-color 0.3s ease;
     display: none;
+    border-block: 0;
 }
 
 .nav-collapse-item:hover .nav-collapse-content,
@@ -101,6 +102,7 @@
     width: 100%;
     text-align: left;
     box-sizing: border-box;
+    border-block: 0;
 }
 
 .nav-collapse-content .nav-link:last-child {
@@ -237,13 +239,12 @@
         left: 0;
         right: 0;
         background: white;
-        border-top: 1px solid #e5e5e5;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         z-index: 999;
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s ease;
-        border-block: 0;
+        border: 0;
     }
 
     .nav-collapse-content.show {
