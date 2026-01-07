@@ -1,12 +1,14 @@
 /* 隐藏页面滚动条 */
-html {
-    overflow: hidden;
-}
-
-body {
+html, body {
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+/* 隐藏body滚动条但允许滚动 */
+body {
+    overflow: auto;
 }
 
 .app {
@@ -16,9 +18,8 @@ body {
     font-family: Arial, sans-serif;
     width: 100%;
     min-width: 320px;
-    height: 100vh;
+    min-height: 100%;
     box-sizing: border-box;
-    overflow: auto;
 }
 
 .nav {
@@ -260,7 +261,7 @@ body {
     }
 
     .nav-collapse-content.show {
-        max-height: calc(100vh - 48px);
+        max-height: calc(100% - 48px);
         overflow-y: auto;
     }
 
@@ -298,6 +299,7 @@ body {
 
 /* 隐藏滚动条样式 */
 /* WebKit浏览器 (Chrome, Safari, Edge) */
+body::-webkit-scrollbar,
 .app::-webkit-scrollbar,
 .nav-collapse-content.show::-webkit-scrollbar,
 .timestamp-display::-webkit-scrollbar {
@@ -305,6 +307,7 @@ body {
 }
 
 /* Firefox */
+body,
 .app,
 .nav-collapse-content.show,
 .timestamp-display {
@@ -312,6 +315,7 @@ body {
 }
 
 /* IE/Edge 10+ */
+body,
 .app,
 .nav-collapse-content.show,
 .timestamp-display {
