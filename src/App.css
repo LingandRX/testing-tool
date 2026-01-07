@@ -76,7 +76,6 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     min-width: 120px;
-    z-index: 1000;
     margin-top: 8px;
     flex-direction: column;
     gap: 0;
@@ -170,6 +169,8 @@
         right: 0;
         margin-top: 0;
         border-radius: 8px;
+        border-left: none;
+        border-right: none;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         max-height: 0;
         overflow: hidden;
@@ -178,8 +179,7 @@
         visibility: visible; /* 覆盖默认的visibility: hidden */
         transform: none; /* 覆盖默认的transform */
         display: block; /* 覆盖默认的display: none，使用block而不是flex */
-        /* 移除边框，避免横线显示 */
-        border-style: none;
+        border: none; /* 移除边框，避免横线显示 */
     }
 
     .nav-collapse-content.show {
@@ -244,6 +244,7 @@
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s ease;
+        border-block: 0px;
     }
 
     .nav-collapse-content.show {
@@ -298,7 +299,6 @@
         right: 0;
         height: 1px;
         background-color: #e5e5e5;
-        z-index: 1001; /* 确保边框在导航栏上方，但在展开菜单下方 */
     }
 
     /* 当菜单展开时，允许换行并显示所有可见项 */
