@@ -169,8 +169,6 @@
         right: 0;
         margin-top: 0;
         border-radius: 8px;
-        border-left: none;
-        border-right: none;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         max-height: 0;
         overflow: hidden;
@@ -179,7 +177,8 @@
         visibility: visible; /* 覆盖默认的visibility: hidden */
         transform: none; /* 覆盖默认的transform */
         display: block; /* 覆盖默认的display: none，使用block而不是flex */
-        border: none; /* 移除边框，避免横线显示 */
+        /* 移除边框，避免横线显示 */
+        border-style: none;
     }
 
     .nav-collapse-content.show {
@@ -244,7 +243,7 @@
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s ease;
-        border-block: 0px;
+        border-block: 0;
     }
 
     .nav-collapse-content.show {
