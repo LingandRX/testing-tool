@@ -1,63 +1,198 @@
 import {formatWithDate, formatWithZone, TimezoneOptions} from "../utils/timeUtils";
-import {useMemo, useState} from "react";
+import {useState, useCallback} from "react";
+
+/**
+ * 日期时间转时间戳组件
+ *
+ * 功能特性：
+ * 1. 将日期时间字符串转换为时间戳
+ * 2. 支持多种时区选择
+ * 3. 支持毫秒和秒单位切换
+ * 4. 提供输入验证和错误提示
+ * 5. 实时单位转换
+ *
+ * @component
+ * @example
+ * ```jsx
+ * <DatetimeToTimestamp />
+ * ```
+ *
+ * @returns {JSX.Element} 日期时间转时间戳组件
+ */
+
+// 常用时区列表
+const TIME_ZONE_LIST = [
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'America/Anchorage',
+  'America/Honolulu',
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Berlin',
+  'Europe/Moscow',
+  'Asia/Tokyo',
+  'Asia/Shanghai',
+  'Asia/Hong_Kong',
+  'Asia/Singapore',
+  'Asia/Dubai',
+  'Asia/Kolkata',
+  'Australia/Sydney',
+  'Pacific/Auckland',
+];
+
+// 时间戳单位选项
+const TIMESTAMP_UNITS = [
+  {value: 'milliseconds', label: '毫秒(ms)'},
+  {value: 'seconds', label: '秒(s)'},
+];
 
 export function DatetimeToTimestamp() {
+  /** @type {[string, function]} 输入的日期时间字符串 */
   const [dateValue, setDateValue] = useState(() => formatWithZone(Date.now()));
+  
+  /** @type {[string, function]} 选择的时区 */
   const [selectedZone, setSelectedZone] = useState('Asia/Shanghai');
+  
+  /** @type {[string, function]} 转换结果 */
   const [result, setResult] = useState('');
+  
+  /** @type {[string, function]} 时间戳单位 ('milliseconds' | 'seconds') */
   const [unit, setUnit] = useState('milliseconds');
-  const timeZoneList = useMemo(() => ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'America/Anchorage', 'America/Honolulu', 'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Moscow', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Hong_Kong', 'Asia/Singapore', 'Asia/Dubai', 'Asia/Kolkata', 'Australia/Sydney', 'Pacific/Auckland',], []);
   
-  const handleConvertDatetimeToTimestamp = () => {
-    const timestamp = unit === 'milliseconds' ? formatWithDate(dateValue, selectedZone) : Math.floor(formatWithDate(dateValue, selectedZone) / 1000);
-    setResult(timestamp);
-  };
+  /** @type {[string, function]} 错误信息 */
+  const [error, setError] = useState('');
   
-  return (<div>
-    <h2>日期时间转时间戳</h2>
-    <div>
-      <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-        <input
-          type="text"
-          placeholder="输入日期时间"
-          value={dateValue}
-          style={{minWidth: '200px'}}
-          onChange={(e) => setDateValue(e.target.value)}/>
-        <select
-          value={selectedZone}
-          onChange={(e) => setSelectedZone(e.target.value)}
-        >
-          <TimezoneOptions zones={timeZoneList}/>
-        </select>
-      </div>
+  /**
+   * 转换日期时间为时间戳
+   * @type {function(): void}
+   */
+  const handleConvertDatetimeToTimestamp = useCallback(() => {
+    try {
+      setError('');
+      const timestamp = formatWithDate(dateValue, selectedZone);
       
-      <div style={{marginBottom: '20px'}}>
-        <button
-          className={'action-btn'}
-          onClick={handleConvertDatetimeToTimestamp}
-        >
-          转换
-        </button>
-      </div>
+      if (isNaN(timestamp)) {
+        setError('无效的日期时间格式');
+        setResult('');
+        return;
+      }
       
-      <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-        <input
-          type="text"
-          placeholder="转换结果"
-          value={result}
-          style={{minWidth: '200px'}}
-          readOnly
-        />
-        <select
-          value={unit}
-          aria-label='选择时间戳单位'
-          onChange={(e) => setUnit(e.target.value)}
-        >
-          <option value="milliseconds">毫秒(ms)</option>
-          <option value="seconds">秒(s)</option>
-        </select>
+      const finalResult = unit === 'milliseconds'
+        ? timestamp
+        : Math.floor(timestamp / 1000);
+      
+      setResult(finalResult.toString());
+    } catch (err) {
+      setError('转换失败，请检查输入格式');
+      setResult('');
+    }
+  }, [dateValue, selectedZone, unit]);
+  
+  /**
+   * 处理日期时间输入变化
+   * @type {function(React.ChangeEvent<HTMLInputElement>): void}
+   */
+  const handleDateChange = useCallback((e) => {
+    setDateValue(e.target.value);
+    setError(''); // 清除错误信息
+  }, []);
+  
+  /**
+   * 处理时区选择变化
+   * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
+   */
+  const handleZoneChange = useCallback((e) => {
+    setSelectedZone(e.target.value);
+  }, []);
+  
+  /**
+   * 处理时间戳单位变化
+   * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
+   */
+  const handleUnitChange = useCallback((e) => {
+    const newUnit = e.target.value;
+    setUnit(newUnit);
+    
+    // 如果已有结果，重新计算
+    if (result) {
+      const currentResult = parseInt(result, 10);
+      if (!isNaN(currentResult)) {
+        const newResult = newUnit === 'milliseconds'
+          ? currentResult * 1000
+          : Math.floor(currentResult / 1000);
+        setResult(newResult.toString());
+      }
+    }
+  }, [result]);
+  
+  return (
+    <div className="datetime-converter">
+      <h2 className="converter-title">日期时间转时间戳</h2>
+      
+      <div className="converter-form">
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder="输入日期时间 (如: 2024-01-01 12:00:00)"
+            value={dateValue}
+            className="datetime-input"
+            onChange={handleDateChange}
+            aria-label="输入要转换的日期时间"
+            title="支持格式: YYYY-MM-DD HH:mm:ss"
+          />
+          <select
+            value={selectedZone}
+            className="timezone-select"
+            onChange={handleZoneChange}
+            aria-label="选择时区"
+          >
+            <TimezoneOptions zones={TIME_ZONE_LIST}/>
+          </select>
+        </div>
+        
+        {error && (
+          <div className="error-message" role="alert">
+            ⚠️ {error}
+          </div>
+        )}
+        
+        <div className="action-group">
+          <button
+            className="converter-btn action-btn"
+            onClick={handleConvertDatetimeToTimestamp}
+            aria-label="转换日期时间为时间戳"
+          >
+            转换
+          </button>
+        </div>
+        
+        <div className="result-group">
+          <input
+            type="text"
+            placeholder="转换结果"
+            value={result}
+            className="result-input"
+            readOnly
+            aria-label="转换结果"
+          />
+          <select
+            value={unit}
+            className="unit-select"
+            onChange={handleUnitChange}
+            aria-label="选择时间戳单位"
+          >
+            {TIMESTAMP_UNITS.map(({value, label}) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+      
       </div>
     </div>
-  </div>);
+  );
   
 }

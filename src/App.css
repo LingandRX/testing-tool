@@ -3,8 +3,10 @@
     margin: 0 auto;
     padding: 20px;
     font-family: Arial, sans-serif;
-    width: 350px;
+    width: 100%;
+    min-width: 320px;
     height: 100vh;
+    box-sizing: border-box;
 }
 
 .nav {
@@ -131,4 +133,362 @@ select {
     margin-bottom: 20px;
     box-sizing: border-box;
     font-size: 14px;
+}
+
+/* 时间戳组件样式 */
+.timestamp-container {
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+}
+
+.timestamp-title {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.timestamp-display {
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 横向居中 */
+    gap: 10px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 80px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.timestamp-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #3498db;
+    font-family: 'Courier New', monospace;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.timestamp-unit {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+.timestamp-controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.timestamp-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    min-width: 120px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* 确保 CopyButton 也使用相同的样式 */
+.timestamp-controls .action-btn,
+.timestamp-controls .stop-btn {
+    min-width: 120px;
+    height: 44px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.timestamp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.timestamp-btn:active {
+    transform: translateY(0);
+}
+
+.timestamp-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    border: 1px solid #e0e0e0;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.status-indicator.running {
+    color: #27ae60;
+}
+
+.status-indicator.stopped {
+    color: #e74c3c;
+}
+
+.unit-indicator {
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .timestamp-container {
+        padding: 15px;
+    }
+
+    .timestamp-display {
+        padding: 12px;
+        min-height: 70px;
+        align-items: center; /* 垂直居中 */
+        justify-content: center; /* 横向居中 */
+    }
+
+    .timestamp-value {
+        font-size: 1.8rem;
+        line-height: 1.1;
+    }
+
+    .timestamp-unit {
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .timestamp-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .timestamp-btn,
+    .timestamp-controls .action-btn,
+    .timestamp-controls .stop-btn {
+        width: 100%;
+        max-width: 200px;
+        min-width: auto;
+        height: 44px;
+    }
+
+    .timestamp-status {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+}
+
+/* 超小屏幕适配 */
+@media (max-width: 360px) {
+    .timestamp-value {
+        font-size: 1.5rem;
+    }
+
+    .timestamp-display {
+        padding: 10px;
+        align-items: center; /* 垂直居中 */
+        justify-content: center; /* 横向居中 */
+    }
+}
+
+/* 日期时间转换器样式 */
+.datetime-converter {
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+}
+
+.converter-title {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.converter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-group,
+.result-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.datetime-input,
+.result-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: 'Courier New', monospace;
+    background: white;
+    transition: border-color 0.2s ease;
+    width: auto !important;
+    margin-bottom: 0 !important;
+}
+
+.datetime-input:focus,
+.result-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.timezone-select,
+.unit-select {
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
+    min-width: 180px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    width: auto !important;
+    margin-bottom: 0 !important;
+}
+
+.timezone-select:focus,
+.unit-select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.action-group {
+    display: flex;
+    justify-content: center;
+}
+
+.converter-btn {
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 1rem;
+    min-width: 120px;
+}
+
+.error-message {
+    padding: 10px 14px;
+    background: #ffeaea;
+    border: 1px solid #ffcccc;
+    border-radius: 6px;
+    color: #d32f2f;
+    font-size: 0.9rem;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.result-info {
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.result-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.result-value {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: #3498db;
+    margin: 0 4px;
+}
+
+.result-unit {
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .input-group,
+    .result-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .timezone-select,
+    .unit-select {
+        min-width: auto;
+        width: 100% !important;
+    }
+
+    .datetime-converter {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .converter-title {
+        font-size: 1.3rem;
+    }
+
+    .datetime-input,
+    .result-input,
+    .timezone-select,
+    .unit-select {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .converter-btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
 }
