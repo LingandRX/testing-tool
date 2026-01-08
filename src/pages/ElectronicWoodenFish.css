@@ -1,36 +1,79 @@
 /* CSS 变量定义 */
 :root {
-    --dzmy-bg-color: black;
+    --dzmy-bg-color: #0a0a0a;
+    --dzmy-bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
     --dzmy-text-color: #ffffff;
-    --dzmy-accent-color: #fadb14;
+    --dzmy-accent-color: #ffd700;
+    --dzmy-accent-glow: 0 0 20px rgba(255, 215, 0, 0.3);
     --dzmy-container-height: 500px;
     --dzmy-img-width: 160px;
     --dzmy-img-height: 120px;
     --dzmy-animation-duration: 0.12s;
     --dzmy-float-duration: 0.5s;
+    --dzmy-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --dzmy-border-radius: 8px;
+    --dzmy-controls-bg: rgba(255, 255, 255, 0.05);
+    --dzmy-controls-border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* 主容器 */
 .dzmy-bg {
-    background-color: var(--dzmy-bg-color);
-    width: 100%;
+    background: var(--dzmy-bg-gradient);
     min-height: var(--dzmy-container-height);
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: center;
+    align-items: center;
     position: relative;
-    border-radius: 8px;
+    border-radius: var(--dzmy-border-radius);
+    box-shadow: var(--dzmy-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    padding: 20px;
+}
+
+/* 添加装饰性背景元素 */
+.dzmy-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+}
+
+.dzmy-bg::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
 }
 
 /* 计数显示 */
 .dzmy-count {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    color: var(--dzmy-text-color);
-    font-size: 18px;
-    font-weight: bold;
+    top: 20px;
+    left: 20px;
+    color: var(--dzmy-accent-color);
+    font-size: 20px;
+    font-weight: 700;
     z-index: 10;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 16px;
+    border-radius: var(--dzmy-border-radius);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    box-shadow: var(--dzmy-accent-glow);
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+
+.dzmy-count:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
 }
 
 /* 木鱼图像 */
@@ -40,17 +83,60 @@
     max-width: 100%;
     max-height: 100%;
     cursor: pointer;
-    transition: transform var(--dzmy-animation-duration) ease;
+    transition: all var(--dzmy-animation-duration) ease;
     transform: scale(1);
     will-change: transform;
     touch-action: manipulation;
     user-select: none;
     object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+    position: relative;
+    z-index: 5;
+}
+
+.dzmy-img:hover {
+    filter: drop-shadow(0 6px 20px rgba(255, 215, 0, 0.3));
 }
 
 /* 木鱼点击激活状态 */
 .dzmy-img.active {
     transform: scale(0.92);
+    filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.5));
+}
+
+/* 添加点击涟漪效果 */
+.dzmy-img::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: var(--dzmy-border-radius);
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.dzmy-img.active::after {
+    width: 200px;
+    height: 200px;
+    opacity: 1;
+    animation: ripple 0.3s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.5;
+    }
+    100% {
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+    }
 }
 
 /* 木鱼和提示容器 */
@@ -77,45 +163,89 @@
     width: 100%;
     animation: floatUp var(--dzmy-float-duration) ease-out forwards;
     color: var(--dzmy-accent-color);
-    font-weight: bold;
+    font-weight: 800;
     will-change: transform, opacity;
     transform: translateZ(0);
-    font-size: 24px;
-    text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    font-size: 28px;
+    text-shadow:
+        0 0 10px rgba(255, 215, 0, 0.8),
+        0 0 20px rgba(255, 215, 0, 0.4),
+        0 0 30px rgba(255, 215, 0, 0.2);
+    letter-spacing: 1px;
+    pointer-events: none;
+    opacity: 0;
+    animation-delay: 0.1s;
 }
 
 /* 浮动动画 */
 @keyframes floatUp {
     0% {
-        transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0) scale(0.8);
+        opacity: 0;
+    }
+    20% {
+        transform: translate3d(0, -10px, 0) scale(1.1);
         opacity: 1;
     }
     100% {
-        transform: translate3d(0, -50px, 0);
+        transform: translate3d(0, -80px, 0) scale(0.9);
         opacity: 0;
     }
 }
 
 /* 控制区域 */
 .dzmy-controls {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     display: flex;
-    gap: 10px;
+    gap: 16px;
     justify-content: center;
     align-items: center;
-    padding: 10px;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    margin-top: 10px;
+    padding: 16px 24px;
+    background: var(--dzmy-controls-bg);
+    border-radius: var(--dzmy-border-radius);
+    margin-top: 20px;
+    border: var(--dzmy-controls-border);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.dzmy-controls:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
 }
 
 /* 控制区域内的输入框 */
 .dzmy-controls input {
     width: auto;
-    min-width: 120px;
+    min-width: 140px;
     margin-bottom: 0;
     flex: 1;
-    max-width: 200px;
+    max-width: 240px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--dzmy-border-radius);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--dzmy-text-color);
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.dzmy-controls input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.dzmy-controls input:focus {
+    border-color: var(--dzmy-accent-color);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.dzmy-controls input:hover {
+    border-color: rgba(255, 215, 0, 0.3);
 }
 
 /* 控制区域内的按钮 */
@@ -123,27 +253,133 @@
     margin-right: 0;
     opacity: 1;
     flex-shrink: 0;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: var(--dzmy-border-radius);
+    background: linear-gradient(135deg, #f32152 0%, #ff0000 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    box-shadow: 0 4px 12px rgba(243, 33, 82, 0.3);
 }
 
 .dzmy-controls .action-btn:hover {
-    opacity: 0.9;
+    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(243, 33, 82, 0.4);
 }
 
 .dzmy-controls .action-btn:active {
-    opacity: 0.8;
-    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+    opacity: 0.9;
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(243, 33, 82, 0.3);
+}
+
+.dzmy-controls .action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(243, 33, 82, 0.2);
 }
 
 /* 响应式设计 */
+
+/* 平板设备 */
 @media (max-width: 768px) {
     :root {
-        --dzmy-container-height: 300px;
+        --dzmy-container-height: 400px;
+        --dzmy-img-width: 140px;
+        --dzmy-img-height: 105px;
+        --dzmy-border-radius: var(--dzmy-border-radius);
+    }
+
+    .dzmy-count {
+        font-size: 16px;
+        top: 16px;
+        left: 16px;
+        padding: 6px 12px;
+    }
+
+    .tip-item {
+        font-size: 22px;
+    }
+
+    .dzmy-controls {
+        padding: 14px 20px;
+        gap: 12px;
+    }
+
+    .dzmy-controls input {
+        min-width: 120px;
+        max-width: 180px;
+        padding: 10px 14px;
+        font-size: 15px;
+    }
+
+    .dzmy-controls .action-btn {
+        padding: 10px 20px;
+        font-size: 15px;
+        min-width: 90px;
+    }
+}
+
+/* 大手机设备 */
+@media (max-width: 480px) {
+    :root {
+        --dzmy-container-height: 350px;
         --dzmy-img-width: 120px;
         --dzmy-img-height: 90px;
+        --dzmy-border-radius: 8px;
     }
 
     .dzmy-count {
         font-size: 14px;
+        top: 12px;
+        left: 12px;
+        padding: 5px 10px;
+    }
+
+    .tip-item {
+        font-size: 20px;
+    }
+
+    .dzmy-controls {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px 16px;
+        gap: 10px;
+    }
+
+    .dzmy-controls input {
+        min-width: 100%;
+        max-width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .dzmy-controls .action-btn {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 14px;
+        min-width: auto;
+    }
+}
+
+/* 小手机设备 */
+@media (max-width: 360px) {
+    :root {
+        --dzmy-container-height: 300px;
+        --dzmy-img-width: 100px;
+        --dzmy-img-height: 75px;
+        --dzmy-border-radius: 8px;
+    }
+
+    .dzmy-count {
+        font-size: 12px;
+        top: 10px;
+        left: 10px;
+        padding: 4px 8px;
     }
 
     .tip-item {
@@ -151,11 +387,58 @@
     }
 
     .dzmy-controls {
-        flex-wrap: wrap;
+        padding: 10px 12px;
+        gap: 8px;
     }
 
     .dzmy-controls input {
-        min-width: 100px;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .dzmy-controls .action-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+/* 超小手机设备 */
+@media (max-width: 320px) {
+    :root {
+        --dzmy-container-height: 280px;
+        --dzmy-img-width: 90px;
+        --dzmy-img-height: 68px;
+    }
+
+    .dzmy-count {
+        font-size: 11px;
+    }
+
+    .tip-item {
+        font-size: 16px;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+    :root {
+        --dzmy-container-height: 250px;
+        --dzmy-img-width: 100px;
+        --dzmy-img-height: 75px;
+    }
+
+    .dzmy-controls {
+        flex-direction: row;
+        padding: 8px 12px;
+    }
+
+    .dzmy-controls input {
+        min-width: 120px;
         max-width: 150px;
+    }
+
+    .dzmy-controls .action-btn {
+        min-width: 80px;
+        padding: 6px 12px;
     }
 }

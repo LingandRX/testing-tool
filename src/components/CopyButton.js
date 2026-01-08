@@ -67,7 +67,7 @@ const CopyButton = ({
         transition: 'all 0.3s ease',
         padding: '8px 16px',
         border: 'none',
-        borderRadius: '4px',
+        borderRadius: '8px',
         cursor: 'pointer'
       }}
     >
