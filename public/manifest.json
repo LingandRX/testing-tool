@@ -4,7 +4,8 @@
   "version": "1.0",
   "description": "A Chrome Extension with React Router: User List + Actions Pages",
   "permissions": [
-    "storage"
+    "storage",
+    "clipboardWrite"
   ],
   "background": {
     "service_worker": "background.js"
