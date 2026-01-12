@@ -1,111 +1,162 @@
-import React, {useEffect} from 'react';
-import {db} from '../utils/db';
-import {useLiveQuery} from 'dexie-react-hooks';
-
-// 样式简单写一下，实际可以用 styled-components 或 css modules
-const styles = {
-  container: {padding: '20px', fontFamily: 'sans-serif', maxWidth: '600px', margin: '0 auto'},
-  uploadBox: {
-    border: '2px dashed #aaa',
-    padding: '40px',
-    textAlign: 'center',
-    background: '#f9f9f9',
-    marginBottom: '20px',
-    borderRadius: '8px'
-  },
-  grid: {display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px'},
-  card: {border: '1px solid #eee', borderRadius: '8px', overflow: 'hidden', position: 'relative'},
-  img: {width: '100%', height: '120px', objectFit: 'cover', display: 'block'},
-  delBtn: {
-    position: 'absolute',
-    top: '5px',
-    right: '5px',
-    background: 'red',
-    color: 'white',
-    border: 'none',
-    cursor: 'pointer',
-    padding: '2px 8px',
-    borderRadius: '4px'
-  }
-};
+import React, { useState, useEffect, useMemo } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { format } from 'date-fns';
+import "./TestPage.css";
 
 const TestPage = () => {
-  const images = useLiveQuery(() => db.images.orderBy('created').reverse().toArray());
-  
-  // --- FIX 2: 修复重复粘贴问题 ---
+  // 待办列表数据: { id, content, createdAt }
+  const [todos, setTodos] = useState(() => {
+    // 从 localStorage 初始化，保证刷新不丢失
+    const saved = localStorage.getItem('markdown-todos');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // UI 状态
+  const [isInputVisible, setIsInputVisible] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [editingId, setEditingId] = useState(null); // 当前正在编辑的 ID，null 表示新增
+
+  // 持久化存储
   useEffect(() => {
-    const handlePaste = async (event) => {
-      // 1. 获取剪贴板数据
-      const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-      
-      // 2. 找到第一个图片文件 (防止一次粘贴循环出多个格式)
-      let foundImage = false;
-      
-      for (let item of items) {
-        if (!foundImage && item.kind === 'file' && item.type.includes('image/')) {
-          const blob = item.getAsFile();
-          foundImage = true; // 标记已找到，避免重复处理
-          
-          // 3. 阻止默认行为（防止浏览器把图片直接贴到页面上）
-          event.preventDefault();
-          
-          await db.images.add({
-            blob: blob,
-            created: new Date(),
-            source: 'Paste'
-          });
-          
-          console.log('图片已添加');
-        }
-      }
-    };
-    
-    // 添加监听
-    window.addEventListener('paste', handlePaste);
-    
-    // ★★★ 关键：必须返回一个清理函数，组件刷新时移除旧的监听器 ★★★
-    return () => {
-      window.removeEventListener('paste', handlePaste);
-    };
-  }, []); // ★★★ 关键：依赖数组必须为空 []，保证只在挂载时绑定一次
-  
-  
-  // --- FIX 1: 修复删除变增加的问题 ---
-  const handleDelete = async (event, id) => {
-    // ★★★ 关键：阻止事件冒泡，防止触发父级的点击或粘贴逻辑
-    event.stopPropagation();
-    
-    try {
-      await db.images.delete(id);
-      console.log('删除成功 ID:', id);
-    } catch (error) {
-      console.error('删除失败:', error);
+    localStorage.setItem('markdown-todos', JSON.stringify(todos));
+  }, [todos]);
+
+  // --- 核心逻辑：数据处理 ---
+
+  // 1. 处理提交
+  const handleSubmit = () => {
+    if (!inputValue.trim()) return;
+
+    if (editingId) {
+      // 编辑模式
+      setTodos(prev => prev.map(item => 
+        item.id === editingId ? { ...item, content: inputValue } : item
+      ));
+    } else {
+      // 新增模式
+      const newTodo = {
+        id: Date.now(),
+        content: inputValue,
+        createdAt: Date.now(),
+      };
+      setTodos(prev => [...prev, newTodo]);
     }
+
+    // 重置并关闭
+    setInputValue('');
+    setEditingId(null);
+    setIsInputVisible(false);
   };
-  
+
+  // 2. 处理点击待办（进入编辑）
+  const handleEditClick = (todo) => {
+    setInputValue(todo.content);
+    setEditingId(todo.id);
+    setIsInputVisible(true);
+  };
+
+  // 3. 处理取消/关闭
+  const handleCancel = () => {
+    setIsInputVisible(false);
+    setInputValue('');
+    setEditingId(null);
+  };
+
+  // 4. 数据分组与排序 (核心需求 4)
+  const groupedTodos = useMemo(() => {
+    const groups = {};
+
+    todos.forEach(todo => {
+      // 第一层 Key: 日期 (例如 2023-10-27)
+      const dateKey = format(todo.createdAt, 'yyyy-MM-dd');
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(todo);
+    });
+
+    // 将对象转为数组以便排序渲染
+    const groupArray = Object.keys(groups).map(date => ({
+      date,
+      items: groups[date]
+    }));
+
+    // 第一层排序：按日期倒序
+    groupArray.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // 第二层排序：组内按添加时间倒序
+    groupArray.forEach(group => {
+      group.items.sort((a, b) => b.createdAt - a.createdAt);
+    });
+
+    return groupArray;
+  }, [todos]);
+
   return (
-    <div style={styles.container}>
-      <h2>React 图片采集器 (已修复)</h2>
-      <p>点击任意处粘贴 (Ctrl+V)</p>
-      
-      <div style={styles.grid}>
-        {images?.map((img) => (
-          <div key={img.id} style={styles.card}>
-            <img src={URL.createObjectURL(img.blob)} alt="screenshot" style={styles.img}/>
-            
-            {/* 传递 event 对象给 handleDelete */}
-            <button
-              style={styles.delBtn}
-              onClick={(e) => handleDelete(e, img.id)}
-            >
-              删除
+    <div className="app-container">
+      <header className="app-header">
+        <h2>Markdown Todo Tree</h2>
+        {/* 如果没打开输入框，显示添加按钮 */}
+        {!isInputVisible && (
+          <button className="btn-primary" onClick={() => setIsInputVisible(true)}>
+            + 新增待办
+          </button>
+        )}
+      </header>
+
+      {/* 输入区域 (Markdown) */}
+      {isInputVisible && (
+        <div className="input-area">
+          <textarea
+            className="markdown-input"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="支持 Markdown 语法，例如：# 标题 或 - 列表"
+            autoFocus
+          />
+          <div className="action-buttons">
+            <button className="btn-save" onClick={handleSubmit}>
+              {editingId ? "更新" : "保存"}
             </button>
-          
+            <button className="btn-cancel" onClick={handleCancel}>
+              取消
+            </button>
           </div>
+        </div>
+      )}
+
+      {/* 树状列表展示区域 */}
+      <div className="todo-tree">
+        {groupedTodos.length === 0 && <p className="empty-tip">暂无待办，点击上方添加</p>}
+
+        {groupedTodos.map((group) => (
+          // 使用 details/summary 原生标签实现折叠/展开
+          <details key={group.date} open className="date-group">
+            <summary className="date-header">
+              {group.date} <span className="count-badge">{group.items.length}</span>
+            </summary>
+
+            <div className="todo-list">
+              {group.items.map((todo) => (
+                <div
+                  key={todo.id}
+                  className="todo-item"
+                  onClick={() => handleEditClick(todo)}
+                  title="点击编辑"
+                >
+                  <div className="time-tag">{format(todo.createdAt, "HH:mm")}</div>
+                  <div className="markdown-content">
+                    {/* 预览渲染 */}
+                    <ReactMarkdown>{todo.content}</ReactMarkdown>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </details>
         ))}
       </div>
     </div>
   );
-}
+};
 
 export default TestPage;
