@@ -11,6 +11,20 @@ body {
     overflow: auto;
 }
 
+:root {
+    /* 统一圆角变量 */
+    --radius: 8px;
+    /* 统一背景颜色变量 */
+    --bg-color: #fafafa;
+    /* 统一文字颜色变量 */
+    --text-color: #333333;
+    /* 统一按钮颜色变量 */
+    --btn-bg: #e0e0e0;
+    /* 统一按钮文字颜色变量 */
+    --btn-text: #333333;
+    --border: 1px solid #e0e0e0;
+}
+
 .app {
     max-width: 800px;
     margin: 0 auto;
@@ -620,32 +634,25 @@ select {
 /* 时间戳组件样式 */
 .timestamp-container {
     padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-color);
     margin: 20px 0;
 }
 
-.timestamp-title {
-    color: #2c3e50;
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 600;
+.timestamp-container:hover {
+    box-shadow: 4px 4px 12px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
 }
 
+/* 时间戳显示区域 */
 .timestamp-display {
     display: flex;
     align-items: center; /* 垂直居中 */
     justify-content: center; /* 横向居中 */
     gap: 10px;
     margin-bottom: 25px;
-    padding: 15px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-height: 80px;
+    border-radius: var(--radius);
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
@@ -653,8 +660,8 @@ select {
 
 .timestamp-value {
     font-size: 2.5rem;
-    font-weight: 700;
-    color: #3498db;
+    font-weight: 600;
+    color: var(--text-color);
     font-family: 'Courier New', monospace;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     white-space: nowrap;
@@ -662,16 +669,15 @@ select {
 }
 
 .timestamp-unit {
-    font-size: 1.2rem;
-    color: #7f8c8d;
-    font-weight: 500;
+    font-size: 1rem;
+    color: var(--text-color);
+    font-weight: 400;
 }
 
 .timestamp-controls {
     display: flex;
     gap: 12px;
     justify-content: center;
-    margin-bottom: 20px;
     flex-wrap: wrap;
 }
 
@@ -842,11 +848,16 @@ select {
 /* 日期时间转换器样式 */
 .datetime-converter {
     padding: 20px;
-    border: 1px solid #e0e0e0;
+    border: var(--border);
     border-radius: 8px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: var(--bg-color);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     margin: 20px 0;
+}
+
+.datetime-converter:hover {
+    box-shadow: 4px 4px 12px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
 }
 
 .converter-title {
@@ -877,7 +888,7 @@ select {
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 0.95rem;
-    font-family: 'Courier New', monospace;
+    font-weight: 400;
     background: white;
     transition: border-color 0.2s ease;
     width: auto !important;

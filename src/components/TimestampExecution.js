@@ -29,7 +29,7 @@ export function TimestampExecution() {
   /** @type {[boolean, function]} 时间戳是否正在自动更新 */
   const [isRunningTimestamp, setIsRunningTimestamp] = useState(true);
   
-  /** @type {React.MutableRefObject<NodeJS.Timeout|null>} 定时器引用，用于清理 */
+  /** @type {React.RefObject<NodeJS.Timeout | null>} 定时器引用，用于清理 */
   const timerRef = useRef(null);
   
   /**
