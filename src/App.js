@@ -1,18 +1,14 @@
 import {HashRouter as Router, Routes, Route, NavLink} from 'react-router-dom';
 import {useState, useEffect} from 'react';
 import TimestampPage from './pages/TimestampPage';
-import ElectronicWoodenFishPage from "./pages/ElectronicWoodenFishPage";
-import TodoListPage from "./pages/TodoListPage";
+// import ElectronicWoodenFishPage from "./pages/ElectronicWoodenFishPage";
 import './App.css';
-import TestPage from "./pages/TestPage";
 
 // 导航项配置数组，便于后续添加
 // 为了测试折叠功能，我们添加更多导航项
 const navItems = [
   {path: '/', label: '时间戳', element: <TimestampPage/>},
-  {path: '/dzmy', label: '电子木鱼', element: <ElectronicWoodenFishPage/>},
-  {path: '/todo', label: '待办', element: <TodoListPage/>},
-  {path: '/test', label: '测试', element: <TestPage/>}
+  // {path: '/dzmy', label: '电子木鱼', element: <ElectronicWoodenFishPage/>},
 ];
 
 function App() {
