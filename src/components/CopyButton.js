@@ -17,6 +17,7 @@ const CopyButton = ({
   // 复制成功的处理
   const handleCopySuccess = useCallback(() => {
     setCopyStatus('success');
+    setBtnText('复制成功！');
     
     // 2秒后恢复
     setTimeout(() => {
