@@ -1,11 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "React Router Chrome Extension",
+  "name": "Testing Tools",
   "version": "1.0",
-  "description": "A Chrome Extension with React Router: User List + Actions Pages",
+  "description": "测试工具",
   "permissions": [
     "storage",
-    "clipboardWrite"
+    "clipboardWrite",
+    "activeTab",
+    "scripting",
+    "tabs"
   ],
   "background": {
     "service_worker": "background.js"

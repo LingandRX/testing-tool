@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@rrweb/all": "^2.0.0-alpha.18",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
@@ -16,6 +17,8 @@
     "react-router-dom": "^6.30.2",
     "react-scripts": "5.0.1",
     "remark-gfm": "^1.0.0",
+    "rrweb": "^2.0.0-alpha.4",
+    "rrweb-player": "^1.0.0-alpha.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -41,5 +44,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.36",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3"
   }
 }

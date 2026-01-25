@@ -2,6 +2,7 @@ import {HashRouter as Router, Routes, Route, NavLink} from 'react-router-dom';
 import {useState, useEffect} from 'react';
 import TimestampPage from './pages/TimestampPage';
 // import ElectronicWoodenFishPage from "./pages/ElectronicWoodenFishPage";
+import RecordeReplayPage from './pages/RecordeReplayPage';
 import './App.css';
 
 // 导航项配置数组，便于后续添加
@@ -9,6 +10,7 @@ import './App.css';
 const navItems = [
   {path: '/', label: '时间戳', element: <TimestampPage/>},
   // {path: '/dzmy', label: '电子木鱼', element: <ElectronicWoodenFishPage/>},
+  {path: '/recorde-replay', label: '录制与回放', element: <RecordeReplayPage/>},
 ];
 
 function App() {
