@@ -43,7 +43,7 @@ function App() {
   const collapsedNavItems = navItems.slice(visibleItems);
 
   return (
-    <Router>
+    <Router future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
       <div className="app">
         <nav className="nav">
           <div className="nav-content">

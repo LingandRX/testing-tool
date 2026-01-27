@@ -127,7 +127,7 @@ export function TimestampExecution() {
         </button>
         
         <CopyButton
-          text={currentTimestamp.toString()}
+          text={String(currentTimestamp)}
           buttonText="复制时间戳"
           aria-label="复制当前时间戳到剪贴板"
         />
