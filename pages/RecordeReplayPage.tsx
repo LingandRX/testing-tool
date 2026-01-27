@@ -2,7 +2,7 @@ import React from 'react';
 // import {sendRecordCommand} from '../services/bridge'
 // import {storage} from "../services/storage";
 import {useRecorder} from "../hooks/useRecorder";
-import {downloadHtml} from "../utils/recordUtils";
+import {downloadHtml} from '../utils/recordUtils';
 
 const RecordeReplayPage = () => {
   // const [isRecording, setIsRecording] = useState(false);
