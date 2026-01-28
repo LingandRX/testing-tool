@@ -1,7 +1,44 @@
 {
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
+    /* --- 原有配置保持 --- */
     "allowImportingTsExtensions": true,
-    "jsx": "react-jsx"
-  }
+    "jsx": "react-jsx",
+
+    /* --- 1. 严格类型检查 (关键) --- */
+    // 开启所有严格检查，包括 noImplicitAny。
+    // 这能帮你捕获 "timer" 隐式 any 等错误，强制你写出更高质量的代码。
+    "strict": true,
+
+    /* --- 2. 代码质量检查 --- */
+    // 声明了但没使用的变量报错（防止代码冗余）
+    "noUnusedLocals": true,
+    // 函数参数没使用报错
+    "noUnusedParameters": true,
+    // switch 语句没有 break 时报错
+    "noFallthroughCasesInSwitch": true,
+
+    /* --- 3. 路径与环境 --- */
+    // 设置基础目录，方便解析相对路径
+    "baseUrl": ".",
+    // 确保包含 DOM 类型（解决 setTimeout、document 等报错）
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    // 编译目标设置为最新，WXT 底层 Vite 会处理降级兼容
+    "target": "ESNext",
+
+    /* --- 4. 路径别名 (可选) --- */
+    // 如果你的 @/utils/... 爆红，可以手动添加这个映射。
+    // WXT 通常会自动处理，但在这里显式声明有助于 VS Code 智能提示。
+    "paths": {
+      "@/*": ["./entrypoints/*", "./components/*", "./utils/*", "./assets/*"]
+    }
+  },
+  // 确保包含你的源代码目录
+  "include": [
+    "entrypoints/**/*",
+    "components/**/*",
+    "utils/**/*",
+    "assets/**/*",
+    ".wxt/types/**/*.ts"
+  ]
 }

@@ -1,5 +1,4 @@
-import { useState, useCallback } from 'react';
-import { copyToClipboard } from '@/utils/chromeUtils';
+import { useEffect, useState, useCallback } from 'react';
 
 const CopyButton = ({
   text = '要复制的文本',
@@ -7,14 +6,13 @@ const CopyButton = ({
   className = 'action-btn',
   successMessage = '复制成功！',
   errorMessage = '复制失败，请手动复制。',
-  onCopyOverride = null,
 }) => {
   const [status, setStatus] = useState('idle'); // 'idle' | 'copying' | 'success' | 'error'
 
   useEffect(() => {
-    let timer;
+    let timer: number;
     if (status === 'success' || status === 'error') {
-      timer = setTimeout(() => {
+      timer = window.setTimeout(() => {
         setStatus('idle');
       }, 2000);
     }
@@ -30,29 +28,15 @@ const CopyButton = ({
 
     const safeText = String(text);
 
-    // 优先使用传入的复制函数
-    if (onCopyOverride) {
-      return await onCopyOverride(safeText);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(safeText);
+        return true;
+      } catch (err) {
+        console.error('使用 Clipboard API 复制失败:', err);
+        return false;
+      }
     }
-
-    const textArea = document.createElement("textarea");
-    textArea.value = safeText;
-    
-    // 确保元素存在但不可见，且不影响布局
-    textArea.style.position = "fixed";
-    textArea.style.left = "-9999px";
-    textArea.style.top = "0";
-    textArea.style.opacity = "0";
-    
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    
-    const successful = document.execCommand('copy');
-    document.body.removeChild(textArea);
-
-    // 使用通用的复制函数
-    return true;
   };
 
   const handleClick = useCallback(async () => {
@@ -65,35 +49,37 @@ const CopyButton = ({
       console.error('复制时出错:', error);
       setStatus('error');
     }
-  }, [text, onCopyOverride]);
+  }, [text]);
 
   // 根据状态计算当前显示的文本
-  const currentText = status === 'success' ? successMessage 
-                    : status === 'error' ? errorMessage 
-                    : buttonText;
+  const currentText =
+    status === 'success' ? successMessage : status === 'error' ? errorMessage : buttonText;
 
-  // 根据状态计算样式 (建议使用 CSS Module 或 Tailwind，这里为了演示保留内联)
-  const getBackgroundColor = () => {
-    switch (status) {
-      case 'success': return '#4CAF50';
-      case 'error': return '#f44336';
-      default: return '#4CAF50'; // 让 CSS 类控制默认颜色
+  // 动态样式：只在非默认状态下覆盖颜色，平时让 className 控制
+  const getStyle = () => {
+    const baseStyle = {
+      transition: 'all 0.3s ease',
+      cursor: 'pointer', // 确保有手型光标
+      // 这里去掉了 padding/border/radius 的硬编码，建议在 CSS 类中定义
+      // 除非你想强制覆盖
+    };
+
+    if (status === 'success') {
+      return { ...baseStyle, backgroundColor: '#4CAF50', color: 'white' };
     }
+    if (status === 'error') {
+      return { ...baseStyle, backgroundColor: '#f44336', color: 'white' };
+    }
+
+    return baseStyle;
   };
 
   return (
     <button
       onClick={handleClick}
       className={`${className} ${status} copy-button`}
-      style={{
-        backgroundColor: getBackgroundColor(),
-        color: status !== 'idle' ? 'white' : undefined,
-        transition: 'all 0.3s ease',
-        padding: '8px 16px',
-        border: 'none',
-        borderRadius: '8px',
-        cursor: 'pointer',
-      }}
+      style={getStyle()}
+      disabled={status === 'copying'}
     >
       {currentText}
     </button>

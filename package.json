@@ -4,6 +4,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ]
+  },
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
@@ -12,11 +17,10 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "prepare": "husky"
   },
   "dependencies": {
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
     "@rrweb/all": "^2.0.0-alpha.18",
     "@rrweb/rrweb-plugin-console-record": "^2.0.0-alpha.18",
     "@rrweb/rrweb-plugin-console-replay": "^2.0.0-alpha.18",
@@ -27,6 +31,8 @@
     "date-fns": "^4.1.0",
     "dexie": "^4.2.1",
     "dexie-react-hooks": "^4.2.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "react-markdown": "^6.0.3",
     "react-router-dom": "^6.30.2",
     "remark-gfm": "^1.0.0",
@@ -39,6 +45,9 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.1.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "wxt": "^0.20.6"
   }
