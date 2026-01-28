@@ -6,6 +6,7 @@ const CopyButton = ({
   className = 'action-btn',
   successMessage = '复制成功！',
   errorMessage = '复制失败，请手动复制。',
+  copyingMessage = '复制中...',
 }) => {
   const [status, setStatus] = useState('idle'); // 'idle' | 'copying' | 'success' | 'error'
 
@@ -53,25 +54,24 @@ const CopyButton = ({
 
   // 根据状态计算当前显示的文本
   const currentText =
-    status === 'success' ? successMessage : status === 'error' ? errorMessage : buttonText;
+    status === 'success'
+      ? successMessage
+      : status === 'error'
+        ? errorMessage
+        : status === 'copying'
+          ? copyingMessage
+          : buttonText;
 
   // 动态样式：只在非默认状态下覆盖颜色，平时让 className 控制
   const getStyle = () => {
-    const baseStyle = {
-      transition: 'all 0.3s ease',
-      cursor: 'pointer', // 确保有手型光标
-      // 这里去掉了 padding/border/radius 的硬编码，建议在 CSS 类中定义
-      // 除非你想强制覆盖
-    };
-
     if (status === 'success') {
-      return { ...baseStyle, backgroundColor: '#4CAF50', color: 'white' };
+      return { backgroundColor: '#4CAF50', color: 'white' };
     }
     if (status === 'error') {
-      return { ...baseStyle, backgroundColor: '#f44336', color: 'white' };
+      return { backgroundColor: '#f44336', color: 'white' };
     }
 
-    return baseStyle;
+    return {};
   };
 
   return (
@@ -79,7 +79,7 @@ const CopyButton = ({
       onClick={handleClick}
       className={`${className} ${status} copy-button`}
       style={getStyle()}
-      disabled={status === 'copying'}
+      disabled={status === 'success' || status === 'copying'}
     >
       {currentText}
     </button>

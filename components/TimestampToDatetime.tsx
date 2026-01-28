@@ -1,5 +1,5 @@
-import {useState, useCallback} from "react";
-import {formatWithZone, TimezoneOptions} from "../utils/timeUtils";
+import { useState, useCallback } from 'react';
+import { formatWithZone } from '../utils/timeUtils';
 
 /**
  * 时间戳转日期时间组件
@@ -43,26 +43,26 @@ const TIME_ZONE_LIST = [
 
 // 时间戳单位选项
 const TIMESTAMP_UNITS = [
-  {value: 'milliseconds', label: '毫秒(ms)'},
-  {value: 'seconds', label: '秒(s)'},
+  { value: 'milliseconds', label: '毫秒(ms)' },
+  { value: 'seconds', label: '秒(s)' },
 ];
 
 export function TimestampToDatetime() {
   /** @type {[string, function]} 输入的时间戳值 */
   const [timestampValue, setTimestampValue] = useState(Date.now());
-  
+
   /** @type {[string, function]} 转换结果 */
   const [timestampResult, setTimestampResult] = useState('');
-  
+
   /** @type {[string, function]} 时间戳单位 ('milliseconds' | 'seconds') */
   const [unit, setUnit] = useState('milliseconds');
-  
+
   /** @type {[string, function]} 选择的时区 */
   const [selectedZone, setSelectedZone] = useState('Asia/Shanghai');
-  
+
   /** @type {[string, function]} 错误信息 */
   const [error, setError] = useState('');
-  
+
   /**
    * 转换时间戳为日期时间
    * @type {function(): void}
@@ -70,20 +70,20 @@ export function TimestampToDatetime() {
   const handleConvertTimestampToDate = useCallback(() => {
     try {
       setError('');
-      
+
       if (!timestampValue) {
         setError('请输入时间戳');
         setTimestampResult('');
         return;
       }
-      
+
       const numericValue = Number(timestampValue);
       if (isNaN(numericValue)) {
         setError('无效的时间戳格式');
         setTimestampResult('');
         return;
       }
-      
+
       const result = formatWithZone(numericValue, selectedZone, unit);
       setTimestampResult(result);
     } catch (err) {
@@ -91,7 +91,7 @@ export function TimestampToDatetime() {
       setTimestampResult('');
     }
   }, [timestampValue, selectedZone, unit]);
-  
+
   /**
    * 处理时间戳输入变化
    * @type {function(React.ChangeEvent<HTMLInputElement>): void}
@@ -100,7 +100,7 @@ export function TimestampToDatetime() {
     setTimestampValue(e.target.value);
     setError(''); // 清除错误信息
   }, []);
-  
+
   /**
    * 处理时区选择变化
    * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
@@ -108,7 +108,7 @@ export function TimestampToDatetime() {
   const handleZoneChange = useCallback((e) => {
     setSelectedZone(e.target.value);
   }, []);
-  
+
   /**
    * 处理时间戳单位变化
    * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
@@ -116,11 +116,11 @@ export function TimestampToDatetime() {
   const handleUnitChange = useCallback((e) => {
     setUnit(e.target.value);
   }, []);
-  
+
   return (
     <div className="datetime-converter">
       <h2 className="converter-title">时间戳转日期时间</h2>
-      
+
       <div className="converter-form">
         <div className="input-group">
           <input
@@ -138,20 +138,20 @@ export function TimestampToDatetime() {
             onChange={handleUnitChange}
             aria-label="选择时间戳单位"
           >
-            {TIMESTAMP_UNITS.map(({value, label}) => (
+            {TIMESTAMP_UNITS.map(({ value, label }) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
           </select>
         </div>
-        
+
         {error && (
           <div className="error-message" role="alert">
             ⚠️ {error}
           </div>
         )}
-        
+
         <div className="action-group">
           <button
             className="converter-btn action-btn"
@@ -161,7 +161,7 @@ export function TimestampToDatetime() {
             转换
           </button>
         </div>
-        
+
         <div className="result-group">
           <input
             type="text"
@@ -177,10 +177,14 @@ export function TimestampToDatetime() {
             onChange={handleZoneChange}
             aria-label="选择时区"
           >
-            <TimezoneOptions zones={TIME_ZONE_LIST}/>
+            {TIME_ZONE_LIST.map((zone) => (
+              <option key={zone} value={zone}>
+                {zone}
+              </option>
+            ))}
           </select>
         </div>
       </div>
     </div>
-  )
+  );
 }

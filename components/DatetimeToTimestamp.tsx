@@ -1,5 +1,5 @@
-import {formatWithDate, formatWithZone, TimezoneOptions} from "../utils/timeUtils";
-import {useState, useCallback} from "react";
+import { formatWithDate, formatWithZone } from '../utils/timeUtils';
+import { useState, useCallback } from 'react';
 
 /**
  * 日期时间转时间戳组件
@@ -44,26 +44,26 @@ const TIME_ZONE_LIST = [
 
 // 时间戳单位选项
 const TIMESTAMP_UNITS = [
-  {value: 'milliseconds', label: '毫秒(ms)'},
-  {value: 'seconds', label: '秒(s)'},
+  { value: 'milliseconds', label: '毫秒(ms)' },
+  { value: 'seconds', label: '秒(s)' },
 ];
 
 export function DatetimeToTimestamp() {
   /** @type {[string, function]} 输入的日期时间字符串 */
-  const [dateValue, setDateValue] = useState(() => formatWithZone(Date.now()));
-  
+  const [dateValue, setDateValue] = useState(() => formatWithZone(Date.now(), 'Asia/Shanghai'));
+
   /** @type {[string, function]} 选择的时区 */
   const [selectedZone, setSelectedZone] = useState('Asia/Shanghai');
-  
+
   /** @type {[string, function]} 转换结果 */
   const [result, setResult] = useState('');
-  
+
   /** @type {[string, function]} 时间戳单位 ('milliseconds' | 'seconds') */
   const [unit, setUnit] = useState('milliseconds');
-  
+
   /** @type {[string, function]} 错误信息 */
   const [error, setError] = useState('');
-  
+
   /**
    * 转换日期时间为时间戳
    * @type {function(): void}
@@ -72,24 +72,22 @@ export function DatetimeToTimestamp() {
     try {
       setError('');
       const timestamp = formatWithDate(dateValue, selectedZone);
-      
+
       if (isNaN(timestamp)) {
         setError('无效的日期时间格式');
         setResult('');
         return;
       }
-      
-      const finalResult = unit === 'milliseconds'
-        ? timestamp
-        : Math.floor(timestamp / 1000);
-      
+
+      const finalResult = unit === 'milliseconds' ? timestamp : Math.floor(timestamp / 1000);
+
       setResult(finalResult.toString());
     } catch (err) {
       setError('转换失败，请检查输入格式');
       setResult('');
     }
   }, [dateValue, selectedZone, unit]);
-  
+
   /**
    * 处理日期时间输入变化
    * @type {function(React.ChangeEvent<HTMLInputElement>): void}
@@ -98,7 +96,7 @@ export function DatetimeToTimestamp() {
     setDateValue(e.target.value);
     setError(''); // 清除错误信息
   }, []);
-  
+
   /**
    * 处理时区选择变化
    * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
@@ -106,31 +104,33 @@ export function DatetimeToTimestamp() {
   const handleZoneChange = useCallback((e) => {
     setSelectedZone(e.target.value);
   }, []);
-  
+
   /**
    * 处理时间戳单位变化
    * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
    */
-  const handleUnitChange = useCallback((e) => {
-    const newUnit = e.target.value;
-    setUnit(newUnit);
-    
-    // 如果已有结果，重新计算
-    if (result) {
-      const currentResult = parseInt(result, 10);
-      if (!isNaN(currentResult)) {
-        const newResult = newUnit === 'milliseconds'
-          ? currentResult * 1000
-          : Math.floor(currentResult / 1000);
-        setResult(newResult.toString());
+  const handleUnitChange = useCallback(
+    (e) => {
+      const newUnit = e.target.value;
+      setUnit(newUnit);
+
+      // 如果已有结果，重新计算
+      if (result) {
+        const currentResult = parseInt(result, 10);
+        if (!isNaN(currentResult)) {
+          const newResult =
+            newUnit === 'milliseconds' ? currentResult * 1000 : Math.floor(currentResult / 1000);
+          setResult(newResult.toString());
+        }
       }
-    }
-  }, [result]);
-  
+    },
+    [result],
+  );
+
   return (
     <div className="datetime-converter">
       <h2 className="converter-title">日期时间转时间戳</h2>
-      
+
       <div className="converter-form">
         <div className="input-group">
           <input
@@ -148,16 +148,20 @@ export function DatetimeToTimestamp() {
             onChange={handleZoneChange}
             aria-label="选择时区"
           >
-            <TimezoneOptions zones={TIME_ZONE_LIST}/>
+            {TIME_ZONE_LIST.map((zone) => (
+              <option key={zone} value={zone}>
+                {zone}
+              </option>
+            ))}
           </select>
         </div>
-        
+
         {error && (
           <div className="error-message" role="alert">
             ⚠️ {error}
           </div>
         )}
-        
+
         <div className="action-group">
           <button
             className="converter-btn action-btn"
@@ -167,7 +171,7 @@ export function DatetimeToTimestamp() {
             转换
           </button>
         </div>
-        
+
         <div className="result-group">
           <input
             type="text"
@@ -183,16 +187,14 @@ export function DatetimeToTimestamp() {
             onChange={handleUnitChange}
             aria-label="选择时间戳单位"
           >
-            {TIMESTAMP_UNITS.map(({value, label}) => (
+            {TIMESTAMP_UNITS.map(({ value, label }) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
           </select>
         </div>
-      
       </div>
     </div>
   );
-  
 }
