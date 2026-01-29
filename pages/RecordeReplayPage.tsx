@@ -1,6 +1,3 @@
-import React from 'react';
-// import {sendRecordCommand} from '../services/bridge'
-// import {storage} from "../services/storage";
 import { useRecorder } from '../hooks/useRecorder';
 import { downloadHtml } from '../utils/recordUtils';
 
@@ -32,7 +29,7 @@ const RecordeReplayPage = () => {
       // setIsRecording(false);
       // await storage.remove('isRecording');
       stopRecord();
-      downloadHtml(getEvents());
+      // downloadHtml(getEvents());
       // console.log('events', getEvents());
     } catch (e) {
       console.error('Error stopping recording:', e);

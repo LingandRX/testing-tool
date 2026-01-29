@@ -1,13 +1,13 @@
 import { HashRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import TimestampPage from '../../pages/TimestampPage';
-// import {RecordeReplayPage} from '../../pages/RecordeReplayPage';
+import RecordeReplayPage from '../../pages/RecordeReplayPage';
 import './App.css';
 
 const navItems = [
   { path: '/', label: '时间戳', element: <TimestampPage /> },
   // {path: '/dzmy', label: '电子木鱼', element: <ElectronicWoodenFishPage/>},
-  // { path: '/recorde-replay', label: '录制与回放', element: <RecordeReplayPage /> },
+  { path: '/recorde-replay', label: '录制与回放', element: <RecordeReplayPage /> },
 ];
 
 function App() {
@@ -43,7 +43,7 @@ function App() {
   const collapsedNavItems = navItems.slice(visibleItems);
 
   return (
-    <Router future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="app">
         <nav className="nav">
           <div className="nav-content">
