@@ -49,31 +49,25 @@ const TIMESTAMP_UNITS = [
 ];
 
 export function DatetimeToTimestamp() {
-  /** @type {[string, function]} 输入的日期时间字符串 */
   const [dateValue, setDateValue] = useState(() => formatWithZone(Date.now(), 'Asia/Shanghai'));
 
-  /** @type {[string, function]} 选择的时区 */
   const [selectedZone, setSelectedZone] = useState('Asia/Shanghai');
 
-  /** @type {[string, function]} 转换结果 */
   const [result, setResult] = useState('');
 
-  /** @type {[string, function]} 时间戳单位 ('milliseconds' | 'seconds') */
   const [unit, setUnit] = useState('milliseconds');
 
-  /** @type {[string, function]} 错误信息 */
   const [error, setError] = useState('');
 
   /**
    * 转换日期时间为时间戳
-   * @type {function(): void}
    */
   const handleConvertDatetimeToTimestamp = useCallback(() => {
     try {
       setError('');
       const timestamp = formatWithDate(dateValue, selectedZone);
 
-      if (isNaN(timestamp)) {
+      if (typeof timestamp !== 'number' || isNaN(timestamp)) {
         setError('无效的日期时间格式');
         setResult('');
         return;
@@ -90,7 +84,6 @@ export function DatetimeToTimestamp() {
 
   /**
    * 处理日期时间输入变化
-   * @type {function(React.ChangeEvent<HTMLInputElement>): void}
    */
   const handleDateChange = useCallback((e) => {
     setDateValue(e.target.value);
@@ -99,7 +92,6 @@ export function DatetimeToTimestamp() {
 
   /**
    * 处理时区选择变化
-   * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
    */
   const handleZoneChange = useCallback((e) => {
     setSelectedZone(e.target.value);
@@ -107,7 +99,6 @@ export function DatetimeToTimestamp() {
 
   /**
    * 处理时间戳单位变化
-   * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
    */
   const handleUnitChange = useCallback(
     (e) => {
