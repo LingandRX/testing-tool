@@ -7,7 +7,15 @@ export default defineConfig({
     name: 'Testing Tools',
     version: '1.0',
     description: '测试工具',
-    permissions: ['storage', 'clipboardWrite', 'activeTab', 'scripting', 'tabs', 'offscreen'],
+    permissions: [
+      'storage',
+      'unlimitedStorage',
+      'clipboardWrite',
+      'activeTab',
+      'scripting',
+      'tabs',
+      'offscreen',
+    ],
     action: {
       default_title: 'Testing Tools',
     },

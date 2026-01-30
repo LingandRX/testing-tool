@@ -1,57 +1,77 @@
-import { useRecorder } from '../hooks/useRecorder';
-import { downloadHtml } from '../utils/recordUtils';
-
 const RecordeReplayPage = () => {
-  // const [isRecording, setIsRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
-  const { startRecord, stopRecord, getEvents, isRecording } = useRecorder();
-
-  const handleStart = async () => {
-    try {
-      // await sendRecordCommand("START_RECORD");
-      if (!isRecording) {
-        await startRecord();
-      } else {
-        stopRecord();
-      }
-      // await storage.set({isRecording: true, recordingStartTime: Date.now()});
-      // console.log('events', events);
-    } catch (e) {
-      console.error('Error starting recording:', e);
-    }
+  const getActiveTab = async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    return tab;
   };
 
-  const handleStop = async () => {
-    try {
-      // await sendRecordCommand("STOP_RECORD");
-      // const events =useRecorder().getEvents();
-      // console.log('events', events);
-      // setIsRecording(false);
-      // await storage.remove('isRecording');
-      stopRecord();
-      // downloadHtml(getEvents());
-      // console.log('events', getEvents());
-    } catch (e) {
-      console.error('Error stopping recording:', e);
-    }
+  useEffect(() => {
+    const checkStatus = async () => {
+      const tab = await getActiveTab();
+      if (tab?.id) {
+        try {
+          // 发送一个检查状态的命令（需要在 content script 增加对应的处理）
+          // 或者使用 storage 方案（推荐）
+          // 这里假设你用 sendMessage 检查
+          chrome.tabs.sendMessage(tab.id, { command: 'CHECK_STATUS' }, (response) => {
+            // 如果 content script 没加载，这里会报错，需要 catch
+            if (chrome.runtime.lastError) {
+              console.log('Content script not ready');
+              return;
+            }
+            if (response?.isRecording) {
+              setIsRecording(true);
+            }
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    checkStatus();
+  }, []);
+
+  const toggleRecording = async () => {
+    const tab = await getActiveTab();
+    if (!tab?.id) return;
+
+    // 2. 无论开始还是停止，都重新获取当前的 Tab ID
+    // 不要依赖 state 中的 tabId，因为 popup 关闭后 state 会丢
+    const nextState = !isRecording;
+    const command = nextState ? 'START_RECORD' : 'STOP_RECORD';
+
+    chrome.tabs.sendMessage(tab.id, { type: command }, (response) => {
+      // 处理 runtime.lastError 防止报错红字
+      if (chrome.runtime.lastError) {
+        console.error('通信失败:', chrome.runtime.lastError.message);
+        alert('请刷新当前网页后再试（Content Script 未注入）');
+        return;
+      }
+
+      console.log('Content回复:', response);
+      if (response?.status) {
+        // 只有收到确认回复后，才改变 UI 状态
+        setIsRecording(nextState);
+      }
+    });
+  };
+
+  const test = async () => {
+    await chrome.runtime.sendMessage({ type: 'test' }).then((response) => {
+      console.log('[popup] Response from background:', response);
+    });
   };
 
   return (
-    <div style={{ width: '300px', padding: '16px' }}>
-      <h3>RRWeb Recorder</h3>
-
-      {/* 3. 选择标签页逻辑：默认为当前页，如果需要跨页，需先列出 chrome.tabs.query */}
-
+    <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-        {!isRecording ? (
-          <button onClick={handleStart} className={'action-btn'}>
-            开始录制
-          </button>
-        ) : (
-          <button className={'action-btn stop-btn'} onClick={handleStop}>
-            停止录制
-          </button>
-        )}
+        <button className={`action-btn ${isRecording ? 'stop-btn' : ''}`} onClick={toggleRecording}>
+          {isRecording ? '停止录制' : '开始录制'}
+        </button>
+        <button className="action-btn" onClick={test}>
+          test
+        </button>
       </div>
     </div>
   );

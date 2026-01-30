@@ -1,28 +1,21 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { record } from 'rrweb';
 
 export const useRecorder = () => {
   // 存储停止录制函数
-  const stopFnRef = useRef();
+  const stopFnRef = useRef<(() => void) | null>(null);
   const [isRecording, setIsRecording] = useState(false);
 
-  const startRecord = async () => {
+  const startRecord = useCallback(async () => {
     if (isRecording) return;
 
-    await chrome.runtime.sendMessage({ type: 'CREATE_OFFSCREEN' });
-    setIsRecording(true);
+    try {
+      // await chrome.runtime.sendMessage({ type: 'CREATE_OFFSCREEN' });
+      setIsRecording(true);
 
-    // 启动录制
-    stopFnRef.current = record({
-      emit(event) {
-        // 存储数据
-        // eventRef.current.push(event);
-        chrome.runtime.sendMessage({ type: 'SAVE_EVENT', event });
-      },
-    });
-
-    console.log('[content] rrweb started');
-  };
+      console.log('[content] rrweb started');
+    } catch (error) {}
+  }, [isRecording]);
 
   const stopRecord = () => {
     if (!isRecording) return;
@@ -42,6 +35,5 @@ export const useRecorder = () => {
     startRecord,
     stopRecord,
     isRecording,
-    getEvents: () => eventRef.current,
   };
 };
