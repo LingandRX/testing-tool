@@ -16,6 +16,7 @@ export default defineConfig({
       'tabs',
       'offscreen',
     ],
+    host_permissions: ['<all_urls>'],
     action: {
       default_title: 'Testing Tools',
     },

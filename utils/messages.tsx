@@ -1,12 +1,22 @@
 export const messages = {
-  content: {
+  popup: {
     from: {
-
+      start: 'popup:start',
     },
+    to: {
+      stoped: 'popup:stoped',
+      started: 'popup:started',
+    },
+    checkStatus: 'popup:check-status',
+    ready: 'popup:ready',
+  },
+  content: {
+    from: {},
     to: {
       startRecording: 'content:start-recording',
       stopRecording: 'content:stop-recording',
-    }
+    },
+    checkStatus: 'content:check-status',
   },
   offscreen: {
     to: {

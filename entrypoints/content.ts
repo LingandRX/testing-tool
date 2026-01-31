@@ -1,25 +1,17 @@
 import '../.wxt/types/imports.d.ts';
-import { browser } from 'wxt/browser';
 
 export default defineContentScript({
   // matches: ['*://*.google.com/*'],
   matches: ['<all_urls>'],
   runAt: 'document_start',
   main() {
-    console.log('Content script loaded successfully', { id: browser.runtime.id });
-
-    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-      if (message.type === 'START_RECORD') {
-        // startRecord();
-        console.log('Start recording command received in content script');
-        sendResponse({ status: 'Recording started' });
-      } else if (message.type === 'STOP_RECORD') {
-        // stopRecord();
-        console.log('Stop recording command received in content script');
-        sendResponse({ status: 'Recording stopped' });
+    // 监听来自 background script 的消息
+    chrome.runtime.onMessage.addListener((msg: { type: string }, _sender, sendResponse) => {
+      if (msg.type === messages.content.checkStatus) {
+        console.log('[content] checkStatus received');
+        sendResponse({ ok: true });
       } else {
-        console.log('Unknown command received in content script');
-        sendResponse({ status: 'Unknown command' });
+        console.log('[content] unknown message type:', msg.type);
       }
 
       return true;

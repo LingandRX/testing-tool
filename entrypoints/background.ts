@@ -2,8 +2,7 @@ import '../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
 
 export default defineBackground(() => {
-  console.log('Hello background!', { id: browser.runtime.id });
-
+  // 监听扩展安装或更新事件
   browser.runtime.onInstalled.addListener(async ({ reason }) => {
     if (reason === 'install') {
       // 第一次安装扩展时触发
@@ -28,41 +27,42 @@ export default defineBackground(() => {
     }
   });
 
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    // 处理来自其他部分的消息
-    console.log('[bg] message received:', msg, sender.tab);
-
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const currentTab = tabs[0];
-      console.log('[bg] 真正活跃的页面标题是:', currentTab?.title);
-      sendResponse({ ok: true, title: currentTab?.title });
-    });
-
-    if (msg.type === 'CREATE_OFFSCREEN') {
-      console.log('[bg] offscreen created');
-      sendResponse({ ok: true });
+  // 监听来自 popup script 的消息
+  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (msg.type === messages.popup.checkStatus) {
+      console.log('[bg] checkStatus received');
+      // void chrome.runtime.sendMessage({ type: messages.content.checkStatus });
+      sendToActiveTab({ type: messages.content.checkStatus })
+        .then(() => {
+          sendResponse({ ok: true });
+        })
+        .catch(() => {
+          sendResponse({ ok: false });
+        });
+      return true;
     }
 
-    if (msg.type === 'DOWNLOAD') {
-      console.log('[bg] DOWNLOAD received');
+    if (msg.type === messages.offscreen.to.startRecording) {
+      console.log('[bg] startRecording received');
       sendResponse({ ok: true });
+      // void browser.runtime.sendMessage({ type: messages.popup.to.started });
     }
 
     return true;
   });
 
-  // async function _sendToActiveTab(message: {
-  //   type: string;
-  //   data?: unknown;
-  //   activeTabId?: number;
-  //   [key: string]: unknown;
-  // }) {
-  //   const activeTabs = await browser.tabs.query({
-  //     active: true,
-  //     currentWindow: true,
-  //   });
-  //   const activeTab = activeTabs[0];
-  //   const sendTo = message.activeTabId || activeTab.id;
-  //   await browser.tabs.sendMessage(sendTo!, message);
-  // }
+  async function sendToActiveTab(message: {
+    type: string;
+    data?: unknown;
+    activeTabId?: number;
+    [key: string]: unknown;
+  }) {
+    const activeTabs = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+    const activeTab = activeTabs[0];
+    const sendTo = message.activeTabId || activeTab.id;
+    await chrome.tabs.sendMessage(sendTo!, message);
+  }
 });

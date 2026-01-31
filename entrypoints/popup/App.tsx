@@ -1,7 +1,7 @@
 import { HashRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import TimestampPage from '../../pages/TimestampPage';
-import RecordeReplayPage from '../../pages/RecordeReplayPage';
+import TimestampPage from './pages/TimestampPage';
+import RecordeReplayPage from './pages/RecordeReplayPage';
 import './App.css';
 
 const navItems = [

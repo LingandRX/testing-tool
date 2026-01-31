@@ -1,4 +1,4 @@
-import { formatWithDate, formatWithZone } from '../utils/timeUtils';
+import { formatWithDate, formatWithZone } from '../../../utils/timeUtils';
 import { useState, useCallback } from 'react';
 
 /**
