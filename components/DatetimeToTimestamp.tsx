@@ -77,6 +77,7 @@ export function DatetimeToTimestamp() {
 
       setResult(finalResult.toString());
     } catch (err) {
+      console.error('转换错误:', err);
       setError('转换失败，请检查输入格式');
       setResult('');
     }

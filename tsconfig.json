@@ -4,6 +4,9 @@
     /* --- 原有配置保持 --- */
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "module": "ESNext", // 支持 import.meta
+    "moduleResolution": "Bundler", // 或者用 "Node"
 
     /* --- 1. 严格类型检查 (关键) --- */
     // 开启所有严格检查，包括 noImplicitAny。
@@ -15,6 +18,8 @@
     "noUnusedLocals": true,
     // 函数参数没使用报错
     "noUnusedParameters": true,
+    // 函数必须有返回值，防止遗漏 return
+    "noImplicitReturns": true,
     // switch 语句没有 break 时报错
     "noFallthroughCasesInSwitch": true,
 
@@ -31,7 +36,9 @@
     // WXT 通常会自动处理，但在这里显式声明有助于 VS Code 智能提示。
     "paths": {
       "@/*": ["./entrypoints/*", "./components/*", "./utils/*", "./assets/*"]
-    }
+    },
+    "types": ["chrome", "webextension-polyfill"],
+    "noImplicitAny": false
   },
   // 确保包含你的源代码目录
   "include": [
@@ -39,6 +46,9 @@
     "components/**/*",
     "utils/**/*",
     "assets/**/*",
-    ".wxt/types/**/*.ts"
-  ]
+    "hooks/**/*",
+    ".wxt/types/**/*.ts",
+    ".wxt/types/*.d.ts"
+  ],
+  "exclude": ["node_modules", ".wxt", "eslint.config.ts"]
 }

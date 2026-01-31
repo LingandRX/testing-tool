@@ -49,7 +49,7 @@ const TIMESTAMP_UNITS = [
 
 export function TimestampToDatetime() {
   /** @type {[string, function]} 输入的时间戳值 */
-  const [timestampValue, setTimestampValue] = useState(Date.now());
+  const [timestampValue, setTimestampValue] = useState(() => Date.now());
 
   /** @type {[string, function]} 转换结果 */
   const [timestampResult, setTimestampResult] = useState('');
@@ -87,6 +87,7 @@ export function TimestampToDatetime() {
       const result = formatWithZone(numericValue, selectedZone, unit);
       setTimestampResult(result);
     } catch (err) {
+      console.error('转换时间戳出错:', err);
       setError('转换失败，请检查输入格式');
       setTimestampResult('');
     }

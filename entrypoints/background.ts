@@ -1,3 +1,6 @@
+import '../.wxt/types/imports.d.ts';
+import { browser } from 'wxt/browser';
+
 export default defineBackground(() => {
   console.log('Hello background!', { id: browser.runtime.id });
 
@@ -48,18 +51,18 @@ export default defineBackground(() => {
     return true;
   });
 
-  async function sendToActiveTab(message: {
-    type: string;
-    data?: any;
-    activeTabId?: number;
-    [key: string]: any;
-  }) {
-    let activeTabs = await browser.tabs.query({
-      active: true,
-      currentWindow: true,
-    });
-    let activeTab = activeTabs[0];
-    const sendTo = message.activeTabId || activeTab.id;
-    await browser.tabs.sendMessage(sendTo!, message);
-  }
+  // async function _sendToActiveTab(message: {
+  //   type: string;
+  //   data?: unknown;
+  //   activeTabId?: number;
+  //   [key: string]: unknown;
+  // }) {
+  //   const activeTabs = await browser.tabs.query({
+  //     active: true,
+  //     currentWindow: true,
+  //   });
+  //   const activeTab = activeTabs[0];
+  //   const sendTo = message.activeTabId || activeTab.id;
+  //   await browser.tabs.sendMessage(sendTo!, message);
+  // }
 });

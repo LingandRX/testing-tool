@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 const RecordeReplayPage = () => {
   const [isRecording, setIsRecording] = useState(false);
 

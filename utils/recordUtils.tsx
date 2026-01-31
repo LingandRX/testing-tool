@@ -1,8 +1,8 @@
-// import rrwebPlayer from 'rrweb-player';
+import { eventWithTime } from 'rrweb';
 
-export const downloadHtml = (events) => {
+export const downloadHtml = (events: eventWithTime[]) => {
   if (events.length === 0) return;
-  
+
   // 1. 构建 HTML 模板字符串
   // 我们将 events 数据直接注入到 <script> 标签中
   const htmlContent = `
@@ -39,9 +39,9 @@ export const downloadHtml = (events) => {
 </body>
 </html>
   `;
-  
+
   // 2. 创建 Blob 并下载
-  const blob = new Blob([htmlContent], {type: 'text/html'});
+  const blob = new Blob([htmlContent], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

@@ -15,6 +15,7 @@ export const formatWithZone = (
       timeZone: zone,
     }).format(ms);
   } catch (e) {
+    console.error('formatWithZone error:', e);
     return '格式错误';
   }
 };

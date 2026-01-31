@@ -1,5 +1,4 @@
 import { useRef, useState, useCallback } from 'react';
-import { record } from 'rrweb';
 
 export const useRecorder = () => {
   // 存储停止录制函数
@@ -14,7 +13,10 @@ export const useRecorder = () => {
       setIsRecording(true);
 
       console.log('[content] rrweb started');
-    } catch (error) {}
+    } catch (error) {
+      console.error('Failed to start recording:', error);
+      setIsRecording(false);
+    }
   }, [isRecording]);
 
   const stopRecord = () => {

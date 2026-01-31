@@ -21,7 +21,7 @@ const CopyButton = ({
     return () => clearTimeout(timer);
   }, [status]);
 
-  const performCopy = async () => {
+  const performCopy = useCallback(async () => {
     if (!text) {
       console.warn('没有提供要复制的文本');
       return false;
@@ -38,7 +38,9 @@ const CopyButton = ({
         return false;
       }
     }
-  };
+
+    return false;
+  }, [text]);
 
   const handleClick = useCallback(async () => {
     setStatus('copying');
@@ -50,7 +52,7 @@ const CopyButton = ({
       console.error('复制时出错:', error);
       setStatus('error');
     }
-  }, [text]);
+  }, [performCopy]);
 
   // 根据状态计算当前显示的文本
   const currentText =

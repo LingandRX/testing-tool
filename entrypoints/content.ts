@@ -1,4 +1,5 @@
-// import { useRecorder } from '../hooks/useRecorder';
+import '../.wxt/types/imports.d.ts';
+import { browser } from 'wxt/browser';
 
 export default defineContentScript({
   // matches: ['*://*.google.com/*'],
@@ -7,7 +8,7 @@ export default defineContentScript({
   main() {
     console.log('Content script loaded successfully', { id: browser.runtime.id });
 
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (message.type === 'START_RECORD') {
         // startRecord();
         console.log('Start recording command received in content script');
