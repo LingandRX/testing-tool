@@ -1,5 +1,5 @@
-import { formatWithDate, formatWithZone } from '../../../utils/timeUtils';
 import { useState, useCallback } from 'react';
+import dayjs from '@/utils/dayjs';
 
 /**
  * 日期时间转时间戳组件
@@ -49,7 +49,7 @@ const TIMESTAMP_UNITS = [
 ];
 
 export function DatetimeToTimestamp() {
-  const [dateValue, setDateValue] = useState(() => formatWithZone(Date.now(), 'Asia/Shanghai'));
+  const [dateValue, setDateValue] = useState(() => dayjs().format('YYYY/MM/DD HH:mm:ss'));
 
   const [selectedZone, setSelectedZone] = useState('Asia/Shanghai');
 
@@ -59,64 +59,54 @@ export function DatetimeToTimestamp() {
 
   const [error, setError] = useState('');
 
-  /**
-   * 转换日期时间为时间戳
-   */
-  const handleConvertDatetimeToTimestamp = useCallback(() => {
-    try {
-      setError('');
-      const timestamp = formatWithDate(dateValue, selectedZone);
+  const performConversion = useCallback(
+    (currentDate: string, zone: string, currentUnit: string) => {
+      try {
+        if (!currentDate) {
+          setError('请输入有效的日期时间');
+          return '';
+        }
 
-      if (typeof timestamp !== 'number' || isNaN(timestamp)) {
-        setError('无效的日期时间格式');
-        setResult('');
-        return;
+        const timestamp = dayjs.tz(currentDate, zone);
+
+        if (!timestamp.isValid()) {
+          setError('无效的日期时间格式');
+          return '';
+        }
+
+        setError('');
+
+        const ms = timestamp.valueOf();
+        return currentUnit === TIMESTAMP_UNITS[0].value
+          ? ms.toString()
+          : Math.floor(ms / 1000).toString();
+      } catch (err) {
+        console.error('转换错误:', err);
+        return '';
       }
+    },
+    [],
+  );
 
-      const finalResult = unit === 'milliseconds' ? timestamp : Math.floor(timestamp / 1000);
-
-      setResult(finalResult.toString());
-    } catch (err) {
-      console.error('转换错误:', err);
-      setError('转换失败，请检查输入格式');
-      setResult('');
-    }
-  }, [dateValue, selectedZone, unit]);
-
-  /**
-   * 处理日期时间输入变化
-   */
-  const handleDateChange = useCallback((e) => {
-    setDateValue(e.target.value);
-    setError(''); // 清除错误信息
-  }, []);
-
-  /**
-   * 处理时区选择变化
-   */
-  const handleZoneChange = useCallback((e) => {
-    setSelectedZone(e.target.value);
-  }, []);
+  const handleConvert = useCallback(() => {
+    const newResult = performConversion(dateValue, selectedZone, unit);
+    setResult(newResult);
+  }, [dateValue, selectedZone, unit, performConversion]);
 
   /**
    * 处理时间戳单位变化
    */
   const handleUnitChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newUnit = e.target.value;
       setUnit(newUnit);
 
       // 如果已有结果，重新计算
       if (result) {
-        const currentResult = parseInt(result, 10);
-        if (!isNaN(currentResult)) {
-          const newResult =
-            newUnit === 'milliseconds' ? currentResult * 1000 : Math.floor(currentResult / 1000);
-          setResult(newResult.toString());
-        }
+        setResult(performConversion(dateValue, selectedZone, newUnit) || '');
       }
     },
-    [result],
+    [dateValue, selectedZone, result, performConversion],
   );
 
   return (
@@ -130,14 +120,17 @@ export function DatetimeToTimestamp() {
             placeholder="输入日期时间 (如: 2024-01-01 12:00:00)"
             value={dateValue}
             className="datetime-input"
-            onChange={handleDateChange}
+            onChange={(e) => {
+              setDateValue(e.target.value);
+              if (error) setError('');
+            }}
             aria-label="输入要转换的日期时间"
             title="支持格式: YYYY-MM-DD HH:mm:ss"
           />
           <select
             value={selectedZone}
             className="timezone-select"
-            onChange={handleZoneChange}
+            onChange={(e) => setSelectedZone(e.target.value)}
             aria-label="选择时区"
           >
             {TIME_ZONE_LIST.map((zone) => (
@@ -157,7 +150,7 @@ export function DatetimeToTimestamp() {
         <div className="action-group">
           <button
             className="converter-btn action-btn"
-            onClick={handleConvertDatetimeToTimestamp}
+            onClick={handleConvert}
             aria-label="转换日期时间为时间戳"
           >
             转换

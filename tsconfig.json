@@ -35,7 +35,7 @@
     // 如果你的 @/utils/... 爆红，可以手动添加这个映射。
     // WXT 通常会自动处理，但在这里显式声明有助于 VS Code 智能提示。
     "paths": {
-      "@/*": ["./entrypoints/*", "./components/*", "./utils/*", "./assets/*"]
+      "@/*": ["./*"]
     },
     "types": ["chrome", "webextension-polyfill"],
     "noImplicitAny": false

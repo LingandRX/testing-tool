@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { formatWithZone } from '../../../utils/timeUtils';
 
 /**
  * 时间戳转日期时间组件
@@ -9,11 +8,6 @@ import { formatWithZone } from '../../../utils/timeUtils';
  * 2. 支持多种时区选择
  * 3. 支持毫秒和秒单位切换
  * 4. 提供输入验证和错误提示
- *
- * @component
- * @example
- * ```jsx
- * <TimestampToDatetime />
  * ```
  *
  * @returns {JSX.Element} 时间戳转日期时间组件
@@ -48,54 +42,52 @@ const TIMESTAMP_UNITS = [
 ];
 
 export function TimestampToDatetime() {
-  /** @type {[string, function]} 输入的时间戳值 */
-  const [timestampValue, setTimestampValue] = useState(() => Date.now());
-
-  /** @type {[string, function]} 转换结果 */
+  const [timestampValue, setTimestampValue] = useState(() => dayjs().valueOf().toString());
   const [timestampResult, setTimestampResult] = useState('');
-
-  /** @type {[string, function]} 时间戳单位 ('milliseconds' | 'seconds') */
   const [unit, setUnit] = useState('milliseconds');
-
-  /** @type {[string, function]} 选择的时区 */
   const [selectedZone, setSelectedZone] = useState('Asia/Shanghai');
-
-  /** @type {[string, function]} 错误信息 */
   const [error, setError] = useState('');
 
-  /**
-   * 转换时间戳为日期时间
-   * @type {function(): void}
-   */
-  const handleConvertTimestampToDate = useCallback(() => {
-    try {
-      setError('');
-
-      if (!timestampValue) {
-        setError('请输入时间戳');
-        setTimestampResult('');
-        return;
+  const performConversion = useCallback(
+    (timestampValue: string, selectedZone: string, unit: string) => {
+      if (!timestampValue || timestampValue.trim() === '') {
+        setError('请输入有效的日期时间');
+        return '';
       }
 
-      const numericValue = Number(timestampValue);
-      if (isNaN(numericValue)) {
-        setError('无效的时间戳格式');
-        setTimestampResult('');
-        return;
-      }
+      try {
+        const numberValue = Number(timestampValue);
+        if (isNaN(numberValue)) {
+          setError('时间戳必须是数字');
+          return '';
+        }
 
-      const result = formatWithZone(numericValue, selectedZone, unit);
-      setTimestampResult(result);
-    } catch (err) {
-      console.error('转换时间戳出错:', err);
-      setError('转换失败，请检查输入格式');
-      setTimestampResult('');
-    }
-  }, [timestampValue, selectedZone, unit]);
+        const d = unit === TIMESTAMP_UNITS[0].value ? dayjs(numberValue) : dayjs.unix(numberValue);
+
+        if (!d.isValid()) {
+          setError('无效的时间戳格式');
+          return '';
+        }
+
+        const dateTime = d.tz(selectedZone).format('YYYY/MM/DD HH:mm:ss');
+
+        setError('');
+        return dateTime;
+      } catch (err) {
+        console.error('转换错误:', err);
+        return '';
+      }
+    },
+    [],
+  );
+
+  const handleConvert = useCallback(() => {
+    const newResult = performConversion(timestampValue, selectedZone, unit);
+    setTimestampResult(newResult);
+  }, [timestampValue, selectedZone, unit, performConversion]);
 
   /**
    * 处理时间戳输入变化
-   * @type {function(React.ChangeEvent<HTMLInputElement>): void}
    */
   const handleInputChange = useCallback((e) => {
     setTimestampValue(e.target.value);
@@ -104,18 +96,18 @@ export function TimestampToDatetime() {
 
   /**
    * 处理时区选择变化
-   * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
    */
-  const handleZoneChange = useCallback((e) => {
-    setSelectedZone(e.target.value);
+  const handleZoneChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newZone = e.target.value;
+    setSelectedZone(newZone);
   }, []);
 
   /**
    * 处理时间戳单位变化
-   * @type {function(React.ChangeEvent<HTMLSelectElement>): void}
    */
-  const handleUnitChange = useCallback((e) => {
-    setUnit(e.target.value);
+  const handleUnitChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newUnit = e.target.value;
+    setUnit(newUnit);
   }, []);
 
   return (
@@ -156,7 +148,7 @@ export function TimestampToDatetime() {
         <div className="action-group">
           <button
             className="converter-btn action-btn"
-            onClick={handleConvertTimestampToDate}
+            onClick={handleConvert}
             aria-label="转换时间戳为日期时间"
           >
             转换
