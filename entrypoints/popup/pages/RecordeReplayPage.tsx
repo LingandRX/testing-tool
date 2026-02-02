@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react';
 import { AppState } from '../types';
-import { messages } from '../../../utils/messages';
+import { messages } from '@/utils/messages';
 
 const RecordeReplayPage = () => {
   const [status, setStatus] = useState<AppState>(AppState.READ);
-  const [isRecording, setIsRecording] = useState(false);
-
-  const getActiveTab = async () => {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    return tab;
-  };
+  const isRecording = useMemo(() => status === AppState.RECORDING, [status]);
 
   useEffect(() => {
     const handleMessage = (msg: { type: string }) => {
       if (msg.type === messages.popup.ready) {
         setStatus(AppState.READ);
-      } else if (msg.type === messages.popup.to.started) {
+      }
+      
+      if (msg.type === messages.popup.to.started) {
+        console.log('[popup] Received started message');
         setStatus(AppState.RECORDING);
-      } else if (msg.type === messages.popup.to.stoped) {
+      }
+
+      if (msg.type === messages.popup.to.stoped) {
         setStatus(AppState.READ);
       }
     };
@@ -29,40 +29,23 @@ const RecordeReplayPage = () => {
     return () => browser.runtime.onMessage.removeListener(handleMessage);
   }, []);
 
-  useEffect(() => {
-    const checkStatus = async () => {
-      const tab = await getActiveTab();
-      if (tab?.id) {
-        try {
-          chrome.tabs.sendMessage(tab.id, { command: 'CHECK_STATUS' }, (response) => {
-            // 如果 content script 没加载，这里会报错，需要 catch
-            if (chrome.runtime.lastError) {
-              console.log('Content script not ready');
-              return;
-            }
-            if (response?.isRecording) {
-              setIsRecording(true);
-              setStatus(AppState.RECORDING);
-              console.log(status);
-            }
-          });
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    };
-    checkStatus();
-  }, [status]);
-
   const toggleRecording = async () => {
-    const tab = await getActiveTab();
-    if (!tab?.id) return;
+    try {
+      const actionType = isRecording ? messages.popup.from.stop : messages.popup.from.start;
+      await browser.runtime.sendMessage({ type: actionType });
+    } catch (error) {
+      console.error('Error toggling recording:', error);
+      setStatus(AppState.READ);
+    }
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-        <button className={`action-btn ${isRecording ? 'stop-btn' : ''}`} onClick={toggleRecording}>
+        <button
+          className={`action-btn ${isRecording ? 'stop-btn' : 'start-btn'}`}
+          onClick={toggleRecording}
+        >
           {isRecording ? '停止录制' : '开始录制'}
         </button>
       </div>

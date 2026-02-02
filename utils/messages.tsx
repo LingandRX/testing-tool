@@ -2,6 +2,7 @@ export const messages = {
   popup: {
     from: {
       start: 'popup:start',
+      stop: 'popup:stop',
     },
     to: {
       stoped: 'popup:stoped',

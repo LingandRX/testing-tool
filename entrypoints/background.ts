@@ -31,7 +31,6 @@ export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg.type === messages.popup.checkStatus) {
       console.log('[bg] checkStatus received');
-      // void chrome.runtime.sendMessage({ type: messages.content.checkStatus });
       sendToActiveTab({ type: messages.content.checkStatus })
         .then(() => {
           sendResponse({ ok: true });
@@ -42,10 +41,28 @@ export default defineBackground(() => {
       return true;
     }
 
-    if (msg.type === messages.offscreen.to.startRecording) {
+    if (msg.type === messages.popup.from.start) {
       console.log('[bg] startRecording received');
-      sendResponse({ ok: true });
-      // void browser.runtime.sendMessage({ type: messages.popup.to.started });
+      sendToActiveTab({ type: messages.content.to.startRecording })
+        .then(async () => {
+          await chrome.runtime.sendMessage({ type: messages.popup.to.started });
+          sendResponse({ ok: true });
+        })
+        .catch(() => {
+          sendResponse({ ok: false });
+        });
+    }
+
+    if (msg.type === messages.popup.from.stop) {
+      console.log('[bg] stopRecording received');
+      sendToActiveTab({ type: messages.content.to.stopRecording })
+        .then(async () => {
+          await chrome.runtime.sendMessage({ type: messages.popup.to.stoped });
+          sendResponse({ ok: true });
+        })
+        .catch(() => {
+          sendResponse({ ok: false });
+        });
     }
 
     return true;
