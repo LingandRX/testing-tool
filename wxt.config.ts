@@ -31,4 +31,18 @@ export default defineConfig({
       128: 'favicon.ico',
     },
   },
+  vite: () => ({
+    build: {
+      // 1. 切换压缩器为 terser
+      minify: 'terser',
+
+      // 2. 配置 terser 强制转义所有非 ASCII 字符
+      terserOptions: {
+        format: {
+          ascii_only: true,
+          comments: false, // 去掉注释，防止注释里有乱码
+        },
+      },
+    },
+  }),
 });

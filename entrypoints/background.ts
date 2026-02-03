@@ -19,11 +19,15 @@ export default defineBackground(() => {
       }
 
       // 注入 content script
-      const res = browser.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ['/content-scripts/content.js'],
-      });
-      console.log('Content script injected on installed/updated:', res);
+      try {
+        const res = await browser.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['/content-scripts/content.js'],
+        });
+        console.log('Content script injected on installed/updated:', res);
+      } catch (error) {
+        console.error('Failed to inject content script:', error);
+      }
     }
   });
 
@@ -36,6 +40,7 @@ export default defineBackground(() => {
           sendResponse({ ok: true });
         })
         .catch(() => {
+          console.error('Failed to check status in content script');
           sendResponse({ ok: false });
         });
       return true;
@@ -49,6 +54,7 @@ export default defineBackground(() => {
           sendResponse({ ok: true });
         })
         .catch(() => {
+          console.error('Failed to start recording in content script');
           sendResponse({ ok: false });
         });
     }
@@ -68,6 +74,14 @@ export default defineBackground(() => {
     return true;
   });
 
+  // 监听来自 content script 的消息
+  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (msg.type === messages.content.from.saveTrackeEvents) {
+      console.log('[bg] saveTrackeEvents received:', msg.payload);
+      sendResponse({ ok: true });
+    }
+  });
+
   async function sendToActiveTab(message: {
     type: string;
     data?: unknown;
@@ -80,6 +94,11 @@ export default defineBackground(() => {
     });
     const activeTab = activeTabs[0];
     const sendTo = message.activeTabId || activeTab.id;
-    await chrome.tabs.sendMessage(sendTo!, message);
+    try {
+      await chrome.tabs.sendMessage(sendTo!, message);
+    } catch (error) {
+      console.error('Error sending message to active tab:', error);
+      throw error;
+    }
   }
 });

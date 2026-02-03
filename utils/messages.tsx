@@ -12,7 +12,9 @@ export const messages = {
     ready: 'popup:ready',
   },
   content: {
-    from: {},
+    from: {
+      saveTrackeEvents: 'content:save-tracke-events',
+    },
     to: {
       startRecording: 'content:start-recording',
       stopRecording: 'content:stop-recording',
