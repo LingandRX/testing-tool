@@ -1,53 +1,65 @@
-import { eventWithTime } from 'rrweb';
+export const downloadHtmlInBackground = (events: unknown[]) => {
+  if (!events || events.length === 0) return;
 
-export const downloadHtml = (events: eventWithTime[]) => {
-  if (events.length === 0) return;
+  // 安全转义 (保持之前的修复)
+  const safeEventsString = JSON.stringify(events)
+    .replace(/\\/g, '\\\\')
+    .replace(/`/g, '\\`')
+    .replace(/<\/script>/g, '<\\/script>');
 
-  // 1. 构建 HTML 模板字符串
-  // 我们将 events 数据直接注入到 <script> 标签中
   const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RRWeb 录像回放</title>
+  <title>RRWeb 回放</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/style.css" />
 </head>
 <body style="margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5;">
-  
   <div id="player"></div>
-
+  
   <script src="https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/index.js"></script>
   
-  <script>
-    /* 注入录制的数据 */
-    const events = ${JSON.stringify(events)};
+  <script type="module">
+    import { getReplayConsolePlugin } from 'https://esm.sh/@rrweb/rrweb-plugin-console-replay?bundle';
 
-    /* 初始化播放器 */
+    const events = JSON.parse(\`${safeEventsString}\`);
+
     new rrwebPlayer({
       target: document.getElementById('player'),
       props: {
         events: events,
-        width: 1024, // 可以根据需要调整
+        width: 1024,
         height: 576,
         autoPlay: true,
         showController: true,
+        
+        // --- 👇 关键修复：添加下面这行 ---
+        // 这会告诉 rrweb 关闭严格的 iframe 沙盒限制
+        // 从而消除 "Blocked script execution" 错误
+        UNSAFE_replayCanvas: true, 
+        // ------------------------------
+
+        plugins: [
+          getReplayConsolePlugin({
+            level: ['info', 'log', 'warn', 'error'],
+          })
+        ]
       },
     });
   </script>
 </body>
-</html>
-  `;
+</html>`;
 
-  // 2. 创建 Blob 并下载
+  // 下载逻辑 (保持不变)
   const blob = new Blob([htmlContent], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `replay-${Date.now()}.html`; // 保存为 .html 文件
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const reader = new FileReader();
+  reader.onload = () => {
+    chrome.downloads.download({
+      url: reader.result as string,
+      filename: `replay-${Date.now()}.html`,
+      saveAs: true,
+    });
+  };
+  reader.readAsDataURL(blob);
 };

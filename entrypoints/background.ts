@@ -1,5 +1,8 @@
 import '../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
+import { downloadHtmlInBackground } from '@/utils/recordUtils.tsx';
+
+const events: unknown[] = [];
 
 export default defineBackground(() => {
   // 监听扩展安装或更新事件
@@ -36,8 +39,8 @@ export default defineBackground(() => {
     if (msg.type === messages.popup.checkStatus) {
       console.log('[bg] checkStatus received');
       sendToActiveTab({ type: messages.content.checkStatus })
-        .then(() => {
-          sendResponse({ ok: true });
+        .then((res) => {
+          sendResponse(res);
         })
         .catch(() => {
           console.error('Failed to check status in content script');
@@ -63,7 +66,8 @@ export default defineBackground(() => {
       console.log('[bg] stopRecording received');
       sendToActiveTab({ type: messages.content.to.stopRecording })
         .then(async () => {
-          await chrome.runtime.sendMessage({ type: messages.popup.to.stoped });
+          await chrome.runtime.sendMessage({ type: messages.popup.to.stopped });
+          downloadHtmlInBackground(events);
           sendResponse({ ok: true });
         })
         .catch(() => {
@@ -78,6 +82,7 @@ export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg.type === messages.content.from.saveTrackeEvents) {
       console.log('[bg] saveTrackeEvents received:', msg.payload);
+      events.push(msg.payload);
       sendResponse({ ok: true });
     }
   });
@@ -95,7 +100,7 @@ export default defineBackground(() => {
     const activeTab = activeTabs[0];
     const sendTo = message.activeTabId || activeTab.id;
     try {
-      await chrome.tabs.sendMessage(sendTo!, message);
+      return await chrome.tabs.sendMessage(sendTo!, message);
     } catch (error) {
       console.error('Error sending message to active tab:', error);
       throw error;

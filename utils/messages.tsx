@@ -5,7 +5,7 @@ export const messages = {
       stop: 'popup:stop',
     },
     to: {
-      stoped: 'popup:stoped',
+      stopped: 'popup:stopped',
       started: 'popup:started',
     },
     checkStatus: 'popup:check-status',
