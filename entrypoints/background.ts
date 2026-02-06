@@ -15,23 +15,40 @@ export default defineBackground(() => {
       console.log('Extension updated to a new version');
     }
 
-    // 给所有已打开的标签页注入 content script
-    for (const tab of await browser.tabs.query({})) {
-      if (tab.url?.match(/(chrome|chrome-extension):\/\//gi) || !tab.id) {
-        continue;
-      }
+    // 获取所有标签页
+    const tabs = await browser.tabs.query({});
 
-      // 注入 content script
-      try {
-        const res = await browser.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ['/content-scripts/content.js'],
-        });
-        console.log('Content script injected on installed/updated:', res);
-      } catch (error) {
-        console.error('Failed to inject content script:', error);
-      }
-    }
+    // 过滤不合法或受限制的 URL
+    const targetTabs = tabs.filter((tab) => {
+      if (!tab.id || !tab.url) return false;
+      // 过滤掉浏览器内部页面和不支持注入的协议
+      const restrictedProtocols = [
+        'chrome:',
+        'chrome-extension:',
+        'about:',
+        'edge:',
+        'view-source:',
+      ];
+      return !restrictedProtocols.some((protocol) => tab.url!.startsWith(protocol));
+    });
+
+    const results = await Promise.allSettled(
+      targetTabs.map((tab) =>
+        browser.scripting
+          .executeScript({
+            target: { tabId: tab.id! },
+            files: ['/content-scripts/content.js'],
+          })
+          .catch((err) => {
+            console.warn(`Failed to inject script into tab ${tab.id}:`, err.message);
+          }),
+      ),
+    );
+
+    const successCount = results.filter((r) => r.status === 'fulfilled').length;
+    console.log(
+      `Successfully injected content script into ${successCount}/${targetTabs.length} tabs.`,
+    );
   });
 
   // 监听来自 popup script 的消息
