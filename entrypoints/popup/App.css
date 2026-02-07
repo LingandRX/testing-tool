@@ -5,6 +5,7 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
+  scrollbar-gutter: stable;
 }
 
 /* 隐藏body滚动条但允许滚动 */
@@ -254,7 +255,6 @@ body {
   .nav-list {
     gap: 12px;
     flex-wrap: nowrap;
-    overflow: hidden;
   }
 
   /* 当菜单展开时，允许换行并显示所有可见项 */
