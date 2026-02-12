@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import CopyButton from './CopyButton';
+import { Button, Paper, Typography, Stack, Box } from '@mui/material';
 
 /**
  * 时间戳显示和执行组件
@@ -13,109 +14,110 @@ import CopyButton from './CopyButton';
  * @returns {JSX.Element} 时间戳组件
  */
 export function TimestampExecution() {
-  /** @type {[number, function]} 当前时间戳（毫秒）和更新函数 */
-  const [currentTimestamp, setCurrentTimestamp] = useState(() => Math.floor(Date.now()));
-
-  /** @type {[boolean, function]} 是否显示毫秒（true=毫秒，false=秒） */
+  const [currentTimestamp, setCurrentTimestamp] = useState(() =>
+    Math.floor(Date.now()),
+  );
   const [showMilliseconds, setShowMilliseconds] = useState(true);
-
-  /** @type {[boolean, function]} 时间戳是否正在自动更新 */
   const [isRunningTimestamp, setIsRunningTimestamp] = useState(true);
 
-  /**
-   * 计算显示的时间戳值
-   * @type {number}
-   */
   const displayTimestamp = showMilliseconds
     ? currentTimestamp
     : Math.floor(currentTimestamp / 1000);
 
   const unitText = showMilliseconds ? '毫秒' : '秒';
 
-  /**
-   * 定时更新时间戳的副作用
-   * 根据 isRunningTimestamp 和 showMilliseconds 控制定时器的启停和间隔
-   */
   useEffect(() => {
     let timer: number;
-
     if (isRunningTimestamp) {
       const interval = showMilliseconds ? 100 : 1000;
       timer = window.setInterval(() => {
         setCurrentTimestamp(Math.floor(Date.now()));
       }, interval);
     }
-
-    // 清理函数
     return () => clearInterval(timer);
   }, [isRunningTimestamp, showMilliseconds]);
 
-  /**
-   * 切换时间戳显示单位（毫秒/秒）
-   */
   const toggleUnit = useCallback(() => {
     setShowMilliseconds((prev) => !prev);
   }, []);
 
-  /**
-   * 切换时间戳自动更新状态（启动/停止）
-   */
   const toggleTimestamp = useCallback(() => {
     setIsRunningTimestamp((prev) => !prev);
   }, []);
 
-  /**
-   * 切换单位按钮的辅助文本
-   * @type {string}
-   */
-  const unitButtonLabel = showMilliseconds ? '切换为秒显示' : '切换为毫秒显示';
-
-  /**
-   * 启动/停止按钮的辅助文本
-   * @type {string}
-   */
-  const toggleButtonLabel = isRunningTimestamp ? '停止时间戳自动更新' : '开始时间戳自动更新';
-
-  /**
-   * 启动/停止按钮的显示文本
-   * @type {string}
-   */
+  const unitButtonLabel = showMilliseconds
+    ? '切换为秒显示'
+    : '切换为毫秒显示';
+  const toggleButtonLabel = isRunningTimestamp
+    ? '停止时间戳自动更新'
+    : '开始时间戳自动更新';
   const toggleButtonText = isRunningTimestamp ? '停止' : '开始';
 
   return (
-    <div className="timestamp-container">
-      <div className="timestamp-display">
-        <span className="timestamp-value">{displayTimestamp}</span>
-        <span className="timestamp-unit">{unitText}</span>
-      </div>
+    <Paper
+      elevation={3}
+      sx={{ p: 2, my: 2, borderRadius: 2, minWidth: 320, textAlign: 'center' }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'center',
+          gap: 1,
+          mb: 2,
+          overflowX: 'auto',
+          pb: 1,
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="span"
+          sx={{
+            fontFamily: 'monospace',
+            fontWeight: 'bold',
+            color: 'primary.main',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {displayTimestamp}
+        </Typography>
+        <Typography
+          variant="h6"
+          component="span"
+          sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}
+        >
+          {unitText}
+        </Typography>
+      </Box>
 
-      <div className="timestamp-controls">
-        <button
-          type="button"
-          className="action-btn"
+      <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
+        <Button
+          variant="contained"
+          color="secondary"
           onClick={toggleUnit}
           aria-label={unitButtonLabel}
           title={unitButtonLabel}
         >
           切换单位
-        </button>
+        </Button>
 
         <CopyButton
-          text={String(currentTimestamp)}
-          buttonText="复制时间戳"
+          textToCopy={String(currentTimestamp)}
+          buttonText="复制"
           aria-label="复制当前时间戳到剪贴板"
+          color="primary"
         />
 
-        <button
-          type="button"
-          className={`${isRunningTimestamp ? 'stop-btn' : 'action-btn'}`}
+        <Button
+          variant="contained"
+          color={isRunningTimestamp ? 'error' : 'primary'}
           onClick={toggleTimestamp}
           aria-label={toggleButtonLabel}
           title={toggleButtonLabel}
         >
           {toggleButtonText}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Stack>
+    </Paper>
   );
 }

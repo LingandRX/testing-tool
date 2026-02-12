@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { AppState } from '../types';
 import { messages } from '@/utils/messages';
+import { Button } from '@mui/material';
 
 const RecordeReplayPage = () => {
   const [status, setStatus] = useState<AppState>(AppState.READ);
@@ -53,12 +54,14 @@ const RecordeReplayPage = () => {
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-        <button
-          className={`action-btn ${isRecording ? 'stop-btn' : 'start-btn'}`}
+        <Button
+          variant="contained"
+          size="medium"
+          color={isRecording ? 'error' : 'primary'}
           onClick={toggleRecording}
         >
           {isRecording ? '停止录制' : '开始录制'}
-        </button>
+        </Button>
       </div>
     </div>
   );

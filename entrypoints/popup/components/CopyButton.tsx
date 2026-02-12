@@ -1,90 +1,133 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback, FC, ReactNode, useEffect } from 'react';
+import Button, { ButtonProps } from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert, { AlertColor } from '@mui/material/Alert';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
 
-const CopyButton = ({
-  text = '要复制的文本',
-  buttonText = '复制文本',
-  className = 'action-btn',
+type CopyStatus = 'idle' | 'copying' | 'success' | 'error';
+
+interface CopyButtonProps extends Omit<ButtonProps, 'onClick' | 'variant'> {
+  textToCopy: string | number;
+  buttonText?: ReactNode;
+  successMessage?: string;
+  errorMessage?: string;
+  variant?: ButtonProps['variant'];
+}
+
+const CopyButton: FC<CopyButtonProps> = ({
+  textToCopy,
+  buttonText = '复制',
   successMessage = '复制成功！',
   errorMessage = '复制失败，请手动复制。',
-  copyingMessage = '复制中...',
+  variant = 'contained',
+  ...buttonProps
 }) => {
-  const [status, setStatus] = useState('idle'); // 'idle' | 'copying' | 'success' | 'error'
+  const [status, setStatus] = useState<CopyStatus>('idle');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarContent, setSnackbarContent] = useState<{
+    message: string;
+    severity: AlertColor;
+  } | null>(null);
 
   useEffect(() => {
-    let timer: number;
     if (status === 'success' || status === 'error') {
-      timer = window.setTimeout(() => {
-        setStatus('idle');
-      }, 2000);
+      const timer = setTimeout(() => setStatus('idle'), 2000);
+      return () => clearTimeout(timer);
     }
-
-    return () => clearTimeout(timer);
+    return undefined;
   }, [status]);
 
   const performCopy = useCallback(async () => {
-    if (!text) {
+    if (!textToCopy) {
       console.warn('没有提供要复制的文本');
       return false;
     }
-
-    const safeText = String(text);
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      try {
-        await navigator.clipboard.writeText(safeText);
-        return true;
-      } catch (err) {
-        console.error('使用 Clipboard API 复制失败:', err);
-        return false;
-      }
+    const safeText = String(textToCopy);
+    try {
+      await navigator.clipboard.writeText(safeText);
+      return true;
+    } catch (err) {
+      console.error('使用 Clipboard API 复制失败:', err);
+      return false;
     }
-
-    return false;
-  }, [text]);
+  }, [textToCopy]);
 
   const handleClick = useCallback(async () => {
-    setStatus('copying');
+    if (status !== 'idle') return;
 
+    setStatus('copying');
+    let isSuccess = false;
     try {
-      const isSuccess = await performCopy();
-      setStatus(isSuccess ? 'success' : 'error');
+      [isSuccess] = await Promise.all([
+        performCopy(),
+        new Promise((resolve) => setTimeout(resolve, 300)),
+      ]);
     } catch (error) {
       console.error('复制时出错:', error);
-      setStatus('error');
+      isSuccess = false;
+    } finally {
+      const newStatus = isSuccess ? 'success' : 'error';
+      setStatus(newStatus);
+      setSnackbarContent({
+        message: isSuccess ? successMessage : errorMessage,
+        severity: newStatus,
+      });
+      setOpenSnackbar(true);
     }
-  }, [performCopy]);
+  }, [performCopy, status, successMessage, errorMessage]);
 
-  // 根据状态计算当前显示的文本
-  const currentText =
-    status === 'success'
-      ? successMessage
-      : status === 'error'
-        ? errorMessage
-        : status === 'copying'
-          ? copyingMessage
-          : buttonText;
+  const handleCloseSnackbar = (_event?: Event | React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setOpenSnackbar(false);
+  };
 
-  // 动态样式：只在非默认状态下覆盖颜色，平时让 className 控制
-  const getStyle = () => {
+  const renderButtonIcon = () => {
     if (status === 'success') {
-      return { backgroundColor: '#4CAF50', color: 'white' };
+      return <CheckIcon sx={{ mr: 1 }} fontSize="small" />;
     }
-    if (status === 'error') {
-      return { backgroundColor: '#f44336', color: 'white' };
-    }
-
-    return {};
+    return <ContentCopyIcon sx={{ mr: 1 }} fontSize="small" />;
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className={`${className} ${status} copy-button`}
-      style={getStyle()}
-      disabled={status === 'success' || status === 'copying'}
-    >
-      {currentText}
-    </button>
+    <>
+      <Button
+        onClick={handleClick}
+        disabled={status !== 'idle'}
+        variant={variant}
+        {...buttonProps}
+        sx={{
+          ...buttonProps.sx,
+          transition: 'background-color 0.3s',
+          ...(status === 'success' && {
+            bgcolor: 'success.main',
+            '&:hover': {
+              bgcolor: 'success.dark',
+            },
+          }),
+        }}
+      >
+        {renderButtonIcon()}
+        {buttonText}
+      </Button>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        {snackbarContent ? (
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbarContent.severity}
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {snackbarContent.message}
+          </Alert>
+        ) : undefined}
+      </Snackbar>
+    </>
   );
 };
 

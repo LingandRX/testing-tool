@@ -1,5 +1,8 @@
 import { NavLink } from 'react-router-dom';
 import { useState, useEffect, ReactNode } from 'react';
+import { IconButton } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface RouteItem {
   path: string;
@@ -76,16 +79,13 @@ function Navbar({ items = [] }: NavbarProps) {
                     </NavLink>
                   ))}
               </div>
-              <button
-                className="nav-toggle"
+              <IconButton
+                color="inherit"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label={isMenuOpen ? '收起菜单' : '展开菜单'}
               >
-                <span className="nav-toggle-icon">{isMenuOpen ? '×' : '☰'}</span>
-                {collapsedNavItems.length > 0 && !isMenuOpen && (
-                  <span className="nav-collapse-count">+{collapsedNavItems.length}</span>
-                )}
-              </button>
+                {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
+              </IconButton>
             </li>
           )}
         </ul>

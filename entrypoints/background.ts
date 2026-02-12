@@ -59,8 +59,17 @@ export default defineBackground(() => {
         .then((res) => {
           sendResponse(res);
         })
-        .catch(() => {
-          console.error('Failed to check status in content script');
+        .catch((error: Error) => {
+          if (error.message.includes('restricted URL')) {
+            console.warn(
+              'Could not check status: on a restricted page.',
+              error.message,
+            );
+          } else if (error.message.includes('No active tab found')) {
+            console.warn('Could not check status: no active tab found.');
+          } else {
+            console.error('Failed to check status in content script', error);
+          }
           sendResponse({ ok: false });
         });
       return true;
@@ -73,8 +82,17 @@ export default defineBackground(() => {
           await chrome.runtime.sendMessage({ type: messages.popup.to.started });
           sendResponse({ ok: true });
         })
-        .catch(() => {
-          console.error('Failed to start recording in content script');
+        .catch((error: Error) => {
+          if (error.message.includes('restricted URL')) {
+            console.warn(
+              'Could not start recording: on a restricted page.',
+              error.message,
+            );
+          } else if (error.message.includes('No active tab found')) {
+            console.warn('Could not start recording: no active tab found.');
+          } else {
+            console.error('Failed to start recording in content script', error);
+          }
           sendResponse({ ok: false });
         });
     }
@@ -87,7 +105,17 @@ export default defineBackground(() => {
           downloadHtmlInBackground(events);
           sendResponse({ ok: true });
         })
-        .catch(() => {
+        .catch((error: Error) => {
+          if (error.message.includes('restricted URL')) {
+            console.warn(
+              'Could not stop recording: on a restricted page.',
+              error.message,
+            );
+          } else if (error.message.includes('No active tab found')) {
+            console.warn('Could not stop recording: no active tab found.');
+          } else {
+            console.error('Failed to stop recording in content script', error);
+          }
           sendResponse({ ok: false });
         });
     }
@@ -115,6 +143,27 @@ export default defineBackground(() => {
       currentWindow: true,
     });
     const activeTab = activeTabs[0];
+
+    if (!activeTab) {
+      throw new Error('No active tab found.');
+    }
+
+    // 检查URL是否受限
+    if (activeTab?.url) {
+      const restrictedProtocols = [
+        'chrome:',
+        'chrome-extension:',
+        'about:',
+        'edge:',
+        'view-source:',
+        'data:',
+        'file:',
+      ];
+      if (restrictedProtocols.some((protocol) => activeTab.url!.startsWith(protocol))) {
+        throw new Error(`Cannot send message to a restricted URL: ${activeTab.url}`);
+      }
+    }
+
     const sendTo = message.activeTabId || activeTab.id;
     try {
       return await chrome.tabs.sendMessage(sendTo!, message);

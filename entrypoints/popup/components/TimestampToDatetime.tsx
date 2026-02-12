@@ -1,19 +1,24 @@
 import { useState, useCallback } from 'react';
+import dayjs from 'dayjs';
+import {
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Paper,
+  Typography,
+  Stack,
+  Box,
+  SelectChangeEvent,
+} from '@mui/material';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
-/**
- * 时间戳转日期时间组件
- *
- * 功能特性：
- * 1. 将时间戳转换为日期时间字符串
- * 2. 支持多种时区选择
- * 3. 支持毫秒和秒单位切换
- * 4. 提供输入验证和错误提示
- * ```
- *
- * @returns {JSX.Element} 时间戳转日期时间组件
- */
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-// 常用时区列表
 const TIME_ZONE_LIST = [
   'America/New_York',
   'America/Chicago',
@@ -35,10 +40,9 @@ const TIME_ZONE_LIST = [
   'Pacific/Auckland',
 ];
 
-// 时间戳单位选项
 const TIMESTAMP_UNITS = [
-  { value: 'milliseconds', label: '毫秒(ms)' },
-  { value: 'seconds', label: '秒(s)' },
+  { value: 'milliseconds', label: '毫秒 (ms)' },
+  { value: 'seconds', label: '秒 (s)' },
 ];
 
 export function TimestampToDatetime() {
@@ -48,136 +52,129 @@ export function TimestampToDatetime() {
   const [selectedZone, setSelectedZone] = useState('Asia/Shanghai');
   const [error, setError] = useState('');
 
-  const performConversion = useCallback(
-    (timestampValue: string, selectedZone: string, unit: string) => {
-      if (!timestampValue || timestampValue.trim() === '') {
-        setError('请输入有效的日期时间');
-        return '';
-      }
-
-      try {
-        const numberValue = Number(timestampValue);
-        if (isNaN(numberValue)) {
-          setError('时间戳必须是数字');
-          return '';
-        }
-
-        const d = unit === TIMESTAMP_UNITS[0].value ? dayjs(numberValue) : dayjs.unix(numberValue);
-
-        if (!d.isValid()) {
-          setError('无效的时间戳格式');
-          return '';
-        }
-
-        const dateTime = d.tz(selectedZone).format('YYYY/MM/DD HH:mm:ss');
-
-        setError('');
-        return dateTime;
-      } catch (err) {
-        console.error('转换错误:', err);
-        return '';
-      }
-    },
-    [],
-  );
+  const performConversion = useCallback((val: string, zone: string, u: string) => {
+    if (!val || val.trim() === '') {
+      setError('请输入有效的时间戳');
+      return '';
+    }
+    const numberValue = Number(val);
+    if (isNaN(numberValue)) {
+      setError('时间戳必须是数字');
+      return '';
+    }
+    const d = u === 'milliseconds' ? dayjs(numberValue) : dayjs.unix(numberValue);
+    if (!d.isValid()) {
+      setError('无效的时间戳格式');
+      return '';
+    }
+    setError('');
+    return d.tz(zone).format('YYYY/MM/DD HH:mm:ss');
+  }, []);
 
   const handleConvert = useCallback(() => {
     const newResult = performConversion(timestampValue, selectedZone, unit);
     setTimestampResult(newResult);
   }, [timestampValue, selectedZone, unit, performConversion]);
 
-  /**
-   * 处理时间戳输入变化
-   */
-  const handleInputChange = useCallback((e) => {
-    setTimestampValue(e.target.value);
-    setError(''); // 清除错误信息
-  }, []);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTimestampValue(e.target.value);
+      if (error) setError('');
+    },
+    [error],
+  );
 
-  /**
-   * 处理时区选择变化
-   */
-  const handleZoneChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newZone = e.target.value;
-    setSelectedZone(newZone);
-  }, []);
+  const handleZoneChange = useCallback(
+    (e: SelectChangeEvent<string>) => {
+      const newZone = e.target.value;
+      setSelectedZone(newZone);
+      if (timestampResult) {
+        const newResult = performConversion(timestampValue, newZone, unit);
+        setTimestampResult(newResult || '');
+      }
+    },
+    [performConversion, timestampResult, timestampValue, unit],
+  );
 
-  /**
-   * 处理时间戳单位变化
-   */
-  const handleUnitChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newUnit = e.target.value;
-    setUnit(newUnit);
-  }, []);
+  const handleUnitChange = useCallback(
+    (e: SelectChangeEvent<string>) => {
+      const newUnit = e.target.value;
+      setUnit(newUnit);
+      if (timestampResult) {
+        const newResult = performConversion(timestampValue, selectedZone, newUnit);
+        setTimestampResult(newResult || '');
+      }
+    },
+    [performConversion, timestampResult, timestampValue, selectedZone],
+  );
 
   return (
-    <div className="datetime-converter">
-      <h2 className="converter-title">时间戳转日期时间</h2>
-
-      <div className="converter-form">
-        <div className="input-group">
-          <input
-            type="number"
-            placeholder="输入时间戳 (如: 1704067200000)"
+    <Paper elevation={3} sx={{ p: 2, my: 2, borderRadius: 2 }}>
+      <Typography variant="h6" component="h2" align="center" gutterBottom>
+        时间戳转日期时间
+      </Typography>
+      <Stack spacing={2} sx={{ mt: 2 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          <TextField
+            label="输入时间戳"
+            placeholder="如: 1704067200000"
             value={timestampValue}
-            className="datetime-input"
             onChange={handleInputChange}
-            aria-label="输入要转换的时间戳"
-            title="支持毫秒或秒为单位的时间戳"
+            error={!!error}
+            helperText={error}
+            fullWidth
+            variant="outlined"
           />
-          <select
-            value={unit}
-            className="unit-select"
-            onChange={handleUnitChange}
-            aria-label="选择时间戳单位"
-          >
-            {TIMESTAMP_UNITS.map(({ value, label }) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+          <FormControl fullWidth>
+            <InputLabel>单位</InputLabel>
+            <Select
+              value={unit}
+              label="单位"
+              onChange={handleUnitChange}
+              MenuProps={{ disableScrollLock: true }}
+            >
+              {TIMESTAMP_UNITS.map(({ value, label }) => (
+                <MenuItem key={value} value={value}>
+                  {label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
 
-        {error && (
-          <div className="error-message" role="alert">
-            ⚠️ {error}
-          </div>
-        )}
-
-        <div className="action-group">
-          <button
-            className="converter-btn action-btn"
-            onClick={handleConvert}
-            aria-label="转换时间戳为日期时间"
-          >
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Button variant="contained" size="medium" color="primary" onClick={handleConvert}>
             转换
-          </button>
-        </div>
+          </Button>
+        </Box>
 
-        <div className="result-group">
-          <input
-            type="text"
-            placeholder="转换结果"
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          <TextField
+            label="转换结果"
             value={timestampResult}
-            className="result-input"
-            readOnly
-            aria-label="转换结果"
+            fullWidth
+            variant="outlined"
+            InputProps={{
+              readOnly: true,
+            }}
           />
-          <select
-            value={selectedZone}
-            className="timezone-select"
-            onChange={handleZoneChange}
-            aria-label="选择时区"
-          >
-            {TIME_ZONE_LIST.map((zone) => (
-              <option key={zone} value={zone}>
-                {zone}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-    </div>
+          <FormControl fullWidth>
+            <InputLabel>时区</InputLabel>
+            <Select
+              value={selectedZone}
+              label="时区"
+              onChange={handleZoneChange}
+              MenuProps={{ disableScrollLock: true }}
+            >
+              {TIME_ZONE_LIST.map((zone) => (
+                <MenuItem key={zone} value={zone}>
+                  {zone}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 }
