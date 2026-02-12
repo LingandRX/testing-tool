@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import CopyButton from './CopyButton';
 import { Button, Paper, Typography, Stack, Box } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
+import { useCopy } from './useCopy';
 
 /**
  * 时间戳显示和执行组件
@@ -14,9 +16,7 @@ import { Button, Paper, Typography, Stack, Box } from '@mui/material';
  * @returns {JSX.Element} 时间戳组件
  */
 export function TimestampExecution() {
-  const [currentTimestamp, setCurrentTimestamp] = useState(() =>
-    Math.floor(Date.now()),
-  );
+  const [currentTimestamp, setCurrentTimestamp] = useState(() => Math.floor(Date.now()));
   const [showMilliseconds, setShowMilliseconds] = useState(true);
   const [isRunningTimestamp, setIsRunningTimestamp] = useState(true);
 
@@ -45,19 +45,14 @@ export function TimestampExecution() {
     setIsRunningTimestamp((prev) => !prev);
   }, []);
 
-  const unitButtonLabel = showMilliseconds
-    ? '切换为秒显示'
-    : '切换为毫秒显示';
-  const toggleButtonLabel = isRunningTimestamp
-    ? '停止时间戳自动更新'
-    : '开始时间戳自动更新';
+  const unitButtonLabel = showMilliseconds ? '切换为秒显示' : '切换为毫秒显示';
+  const toggleButtonLabel = isRunningTimestamp ? '停止时间戳自动更新' : '开始时间戳自动更新';
   const toggleButtonText = isRunningTimestamp ? '停止' : '开始';
 
+  const { isCopied, copy } = useCopy();
+
   return (
-    <Paper
-      elevation={3}
-      sx={{ p: 2, my: 2, borderRadius: 2, minWidth: 320, textAlign: 'center' }}
-    >
+    <Paper elevation={3} sx={{ p: 2, my: 2, borderRadius: 2, minWidth: 320, textAlign: 'center' }}>
       <Box
         sx={{
           display: 'flex',
@@ -101,12 +96,21 @@ export function TimestampExecution() {
           切换单位
         </Button>
 
-        <CopyButton
+        {/* <CopyButton
           textToCopy={String(currentTimestamp)}
           buttonText="复制"
           aria-label="复制当前时间戳到剪贴板"
           color="primary"
-        />
+        /> */}
+
+        <Button
+          variant="contained"
+          onClick={() => copy(String(currentTimestamp))}
+          startIcon={isCopied ? <CheckIcon /> : <ContentCopyIcon />}
+          color={isCopied ? 'success' : 'primary'}
+        >
+          {isCopied ? '已复制' : '复制'}
+        </Button>
 
         <Button
           variant="contained"
