@@ -1,3 +1,5 @@
+import { defineExtensionMessaging } from '@webext-core/messaging';
+
 export const messages = {
   popup: {
     from: {
@@ -28,3 +30,9 @@ export const messages = {
     },
   },
 };
+
+interface ProtocolMap {
+  getStringLength(data: string): number;
+}
+
+export const { sendMessage, onMessage } = defineExtensionMessaging<ProtocolMap>();

@@ -15,6 +15,10 @@ export default defineContentScript({
     const recorder = createRecorder();
     let isRecording = false;
 
+    onMessage('getStringLength', (message) => {
+      console.log(`[content] getStringLength received: ${message.data}`);
+    });
+
     // 监听来自 background script 的消息
     chrome.runtime.onMessage.addListener(
       (msg: { type: string }, _sender, sendResponse: (response: IResponse) => void) => {

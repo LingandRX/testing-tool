@@ -8,7 +8,6 @@ import {
   FormControl,
   InputLabel,
   Paper,
-  Typography,
   Stack,
   Box,
   SelectChangeEvent,
@@ -110,9 +109,6 @@ export function TimestampToDatetime() {
 
   return (
     <Paper elevation={3} sx={{ p: 2, my: 2, borderRadius: 2 }}>
-      <Typography variant="h6" component="h2" align="center" gutterBottom>
-        时间戳转日期时间
-      </Typography>
       <Stack spacing={2} sx={{ mt: 2 }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <TextField

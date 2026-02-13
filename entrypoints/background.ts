@@ -61,10 +61,7 @@ export default defineBackground(() => {
         })
         .catch((error: Error) => {
           if (error.message.includes('restricted URL')) {
-            console.warn(
-              'Could not check status: on a restricted page.',
-              error.message,
-            );
+            console.warn('Could not check status: on a restricted page.', error.message);
           } else if (error.message.includes('No active tab found')) {
             console.warn('Could not check status: no active tab found.');
           } else {
@@ -84,10 +81,7 @@ export default defineBackground(() => {
         })
         .catch((error: Error) => {
           if (error.message.includes('restricted URL')) {
-            console.warn(
-              'Could not start recording: on a restricted page.',
-              error.message,
-            );
+            console.warn('Could not start recording: on a restricted page.', error.message);
           } else if (error.message.includes('No active tab found')) {
             console.warn('Could not start recording: no active tab found.');
           } else {
@@ -107,10 +101,7 @@ export default defineBackground(() => {
         })
         .catch((error: Error) => {
           if (error.message.includes('restricted URL')) {
-            console.warn(
-              'Could not stop recording: on a restricted page.',
-              error.message,
-            );
+            console.warn('Could not stop recording: on a restricted page.', error.message);
           } else if (error.message.includes('No active tab found')) {
             console.warn('Could not stop recording: no active tab found.');
           } else {
@@ -130,6 +121,10 @@ export default defineBackground(() => {
       events.push(msg.payload);
       sendResponse({ ok: true });
     }
+  });
+
+  onMessage('getStringLength', (message) => {
+    return message.data.length;
   });
 
   async function sendToActiveTab(message: {
