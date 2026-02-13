@@ -41,7 +41,7 @@ interface ProtocolMap {
   'popup:ready': () => void;
 
   // --- Content 相关 ---
-  'content:save-tracke-events': (event) => boolean;
+  'content:save-tracke-events': (event: unknown) => boolean;
   'content:start-recording': () => { ok: boolean; error?: string };
   'content:stop-recording': () => { ok: boolean };
   'content:check-status': () => boolean;

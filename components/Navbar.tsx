@@ -88,10 +88,12 @@ function Navbar({ items = [] }: NavbarProps) {
               anchorEl={anchorEl}
               open={isMenuOpen}
               onClose={handleMenuClose}
-              PaperProps={{
-                style: {
-                  maxHeight: 48 * 4.5,
-                  width: '20ch',
+              slotProps={{
+                paper: {
+                  style: {
+                    maxHeight: 48 * 4.5,
+                    width: '20ch',
+                  },
                 },
               }}
             >

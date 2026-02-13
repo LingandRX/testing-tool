@@ -21,7 +21,8 @@ export const downloadHtmlInBackground = (events: unknown[]) => {
   <script src="https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/index.js"></script>
   
   <script type="module">
-    import { getReplayConsolePlugin } from 'https://esm.sh/@rrweb/rrweb-plugin-console-replay?bundle';
+    import { getReplayConsolePlugin } from 'https://esm.sh/@rrweb/rrweb-plugin-console-replay?bundle'; 
+    import rrwebPlayer from 'rrweb-player';
 
     const events = JSON.parse(\`${safeEventsString}\`);
 
@@ -37,14 +38,16 @@ export const downloadHtmlInBackground = (events: unknown[]) => {
         // --- 👇 关键修复：添加下面这行 ---
         // 这会告诉 rrweb 关闭严格的 iframe 沙盒限制
         // 从而消除 "Blocked script execution" 错误
+        // @ts-ignore
         UNSAFE_replayCanvas: true, 
         // ------------------------------
 
+        // @ts-ignore
         plugins: [
           getReplayConsolePlugin({
             level: ['info', 'log', 'warn', 'error'],
-          })
-        ]
+          }),
+        ],
       },
     });
   </script>
@@ -59,7 +62,7 @@ export const downloadHtmlInBackground = (events: unknown[]) => {
       url: reader.result as string,
       filename: `replay-${Date.now()}.html`,
       saveAs: true,
-    });
+    }).then(r => console.log(r));
   };
   reader.readAsDataURL(blob);
 };

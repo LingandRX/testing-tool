@@ -49,7 +49,8 @@
     "hooks/**/*",
     ".wxt/types/**/*.ts",
     ".wxt/types/*.d.ts",
-    "components"
+    "components",
+    "eslint.config.ts"
   ],
-  "exclude": ["node_modules", ".wxt", "eslint.config.ts"]
+  "exclude": ["node_modules", ".wxt"]
 }

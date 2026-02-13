@@ -1,22 +1,12 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, JSX } from 'react';
 import CopyButton from './CopyButton';
 import { Button, Paper, Typography, Stack, Box } from '@mui/material';
 
 /**
  * 时间戳显示和执行组件
- *
- * @component
- * @example
- * ```jsx
- * <TimestampExecution />
- * ```
- *
- * @returns {JSX.Element} 时间戳组件
  */
-export function TimestampExecution() {
-  const [currentTimestamp, setCurrentTimestamp] = useState(() =>
-    Math.floor(Date.now()),
-  );
+export function TimestampExecution(): JSX.Element {
+  const [currentTimestamp, setCurrentTimestamp] = useState(() => Math.floor(Date.now()));
   const [showMilliseconds, setShowMilliseconds] = useState(true);
   const [isRunningTimestamp, setIsRunningTimestamp] = useState(true);
 
@@ -45,19 +35,12 @@ export function TimestampExecution() {
     setIsRunningTimestamp((prev) => !prev);
   }, []);
 
-  const unitButtonLabel = showMilliseconds
-    ? '切换为秒显示'
-    : '切换为毫秒显示';
-  const toggleButtonLabel = isRunningTimestamp
-    ? '停止时间戳自动更新'
-    : '开始时间戳自动更新';
+  const unitButtonLabel = showMilliseconds ? '切换为秒显示' : '切换为毫秒显示';
+  const toggleButtonLabel = isRunningTimestamp ? '停止时间戳自动更新' : '开始时间戳自动更新';
   const toggleButtonText = isRunningTimestamp ? '停止' : '开始';
 
   return (
-    <Paper
-      elevation={3}
-      sx={{ p: 2, my: 2, borderRadius: 2, minWidth: 320, textAlign: 'center' }}
-    >
+    <Paper elevation={3} sx={{ p: 2, my: 2, borderRadius: 2, minWidth: 320, textAlign: 'center' }}>
       <Box
         sx={{
           display: 'flex',

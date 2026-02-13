@@ -70,7 +70,7 @@ export function DatetimeToTimestamp() {
   }, [dateValue, selectedZone, unit, performConversion]);
 
   const handleUnitChange = useCallback(
-    (e: SelectChangeEvent<string>) => {
+    (e: SelectChangeEvent) => {
       const newUnit = e.target.value;
       setUnit(newUnit);
       if (result) {
@@ -80,7 +80,7 @@ export function DatetimeToTimestamp() {
     [dateValue, selectedZone, result, performConversion],
   );
 
-  const handleZoneChange = useCallback((e: SelectChangeEvent<string>) => {
+  const handleZoneChange = useCallback((e: SelectChangeEvent) => {
     setSelectedZone(e.target.value);
   }, []);
 
@@ -129,8 +129,10 @@ export function DatetimeToTimestamp() {
             value={result}
             fullWidth
             variant="outlined"
-            InputProps={{
-              readOnly: true,
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
             }}
           />
           <FormControl fullWidth>

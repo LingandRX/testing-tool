@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -84,7 +84,7 @@ export function TimestampToDatetime() {
   );
 
   const handleZoneChange = useCallback(
-    (e: SelectChangeEvent<string>) => {
+    (e: SelectChangeEvent) => {
       const newZone = e.target.value;
       setSelectedZone(newZone);
       if (timestampResult) {
@@ -96,7 +96,7 @@ export function TimestampToDatetime() {
   );
 
   const handleUnitChange = useCallback(
-    (e: SelectChangeEvent<string>) => {
+    (e: SelectChangeEvent) => {
       const newUnit = e.target.value;
       setUnit(newUnit);
       if (timestampResult) {
@@ -150,8 +150,10 @@ export function TimestampToDatetime() {
             value={timestampResult}
             fullWidth
             variant="outlined"
-            InputProps={{
-              readOnly: true,
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
             }}
           />
           <FormControl fullWidth>
