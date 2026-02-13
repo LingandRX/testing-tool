@@ -1,18 +1,16 @@
 import * as rrweb from 'rrweb';
 import { listenerHandler } from '@rrweb/types';
 import { getRecordConsolePlugin } from '@rrweb/rrweb-plugin-console-record';
+import { sendMessage } from '@/utils/messages';
 
 export const createRecorder = () => {
   let stopFn: listenerHandler | null = null;
 
-  const startRecord = async (msg: string) => {
+  const startRecord = async () => {
     try {
       const handler = rrweb.record({
         emit(event) {
-          chrome.runtime.sendMessage({
-            type: msg,
-            payload: event,
-          });
+          sendMessage('content:save-tracke-events', event);
         },
         plugins: [getRecordConsolePlugin()],
       });

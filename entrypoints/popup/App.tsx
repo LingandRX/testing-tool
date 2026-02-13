@@ -3,8 +3,8 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import TimestampPage from './pages/TimestampPage';
 import RecordeReplayPage from './pages/RecordeReplayPage';
 import TestPage from './pages/TestPage';
-import Navbar from './components/Navbar';
-import RoutePersistence from './components/RoutePersistence';
+import Navbar from '../../components/Navbar';
+import RoutePersistence from '../../components/RoutePersistence';
 import './App.css';
 
 // 路由配置数据

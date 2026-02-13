@@ -1,6 +1,7 @@
 import '../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
 import { downloadHtmlInBackground } from '@/utils/recordUtils.tsx';
+import { sendMessage, onMessage } from '@/utils/messages';
 
 const events: unknown[] = [];
 
@@ -51,88 +52,65 @@ export default defineBackground(() => {
     );
   });
 
-  // 监听来自 popup script 的消息
-  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-    if (msg.type === messages.popup.checkStatus) {
-      console.log('[bg] checkStatus received');
-      sendToActiveTab({ type: messages.content.checkStatus })
-        .then((res) => {
-          sendResponse(res);
-        })
-        .catch((error: Error) => {
-          if (error.message.includes('restricted URL')) {
-            console.warn('Could not check status: on a restricted page.', error.message);
-          } else if (error.message.includes('No active tab found')) {
-            console.warn('Could not check status: no active tab found.');
-          } else {
-            console.error('Failed to check status in content script', error);
-          }
-          sendResponse({ ok: false });
-        });
-      return true;
-    }
+  onMessage('popup:check-status', async (message) => {
+    console.log(`[background] popup:check-status: ${message}`);
+    const obj = {
+      active: false,
+      startTime: -1,
+    };
 
-    if (msg.type === messages.popup.from.start) {
-      console.log('[bg] startRecording received');
-      sendToActiveTab({ type: messages.content.to.startRecording })
-        .then(async () => {
-          await chrome.runtime.sendMessage({ type: messages.popup.to.started });
-          sendResponse({ ok: true });
-        })
-        .catch((error: Error) => {
-          if (error.message.includes('restricted URL')) {
-            console.warn('Could not start recording: on a restricted page.', error.message);
-          } else if (error.message.includes('No active tab found')) {
-            console.warn('Could not start recording: no active tab found.');
-          } else {
-            console.error('Failed to start recording in content script', error);
-          }
-          sendResponse({ ok: false });
-        });
+    try {
+      const tabId = await getActiveTabId();
+      const result = await sendMessage('content:check-status', undefined, tabId);
+      console.log(`[background]111${result}`);
+      obj.active = result;
+      obj.startTime = new Date().getTime();
+    } catch (err) {
+      console.error(`[background-err]${err}`);
     }
+    return obj;
+  });
 
-    if (msg.type === messages.popup.from.stop) {
-      console.log('[bg] stopRecording received');
-      sendToActiveTab({ type: messages.content.to.stopRecording })
-        .then(async () => {
-          await chrome.runtime.sendMessage({ type: messages.popup.to.stopped });
-          downloadHtmlInBackground(events);
-          sendResponse({ ok: true });
-        })
-        .catch((error: Error) => {
-          if (error.message.includes('restricted URL')) {
-            console.warn('Could not stop recording: on a restricted page.', error.message);
-          } else if (error.message.includes('No active tab found')) {
-            console.warn('Could not stop recording: no active tab found.');
-          } else {
-            console.error('Failed to stop recording in content script', error);
-          }
-          sendResponse({ ok: false });
-        });
+  onMessage('popup:start', async () => {
+    console.log('[bg] startRecording received');
+    try {
+      const tabId = await getActiveTabId();
+      const response = await sendMessage('content:start-recording', undefined, tabId);
+      if (response.ok) {
+        await sendMessage('popup:started', undefined);
+        return { ok: true };
+      }
+      return { ok: false };
+    } catch (error) {
+      console.error('Failed to start recording in content script', error);
+      return { ok: false };
     }
+  });
 
+  onMessage('popup:stop', async () => {
+    console.log('[bg] stopRecording received');
+    try {
+      const tabId = await getActiveTabId();
+      const response = await sendMessage('content:stop-recording', undefined, tabId);
+      if (response.ok) {
+        await sendMessage('popup:stopped', undefined);
+        downloadHtmlInBackground(events);
+        return { ok: true };
+      }
+      return { ok: false };
+    } catch (error: unknown) {
+      console.error('Failed to stop recording in content script', error);
+      return { ok: false };
+    }
+  });
+
+  onMessage('content:save-tracke-events', (eventsList) => {
+    console.log('[bg] saveTrackeEvents received:', eventsList);
+    events.push(eventsList);
     return true;
   });
 
-  // 监听来自 content script 的消息
-  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-    if (msg.type === messages.content.from.saveTrackeEvents) {
-      console.log('[bg] saveTrackeEvents received:', msg.payload);
-      events.push(msg.payload);
-      sendResponse({ ok: true });
-    }
-  });
-
-  onMessage('getStringLength', (message) => {
-    return message.data.length;
-  });
-
-  async function sendToActiveTab(message: {
-    type: string;
-    data?: unknown;
-    activeTabId?: number;
-    [key: string]: unknown;
-  }) {
+  async function getActiveTabId() {
     const activeTabs = await chrome.tabs.query({
       active: true,
       currentWindow: true,
@@ -159,12 +137,7 @@ export default defineBackground(() => {
       }
     }
 
-    const sendTo = message.activeTabId || activeTab.id;
-    try {
-      return await chrome.tabs.sendMessage(sendTo!, message);
-    } catch (error) {
-      console.error('Error sending message to active tab:', error);
-      throw error;
-    }
+    const sendTo = activeTab.id;
+    return sendTo!;
   }
 });

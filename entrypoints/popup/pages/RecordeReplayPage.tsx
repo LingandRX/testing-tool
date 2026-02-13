@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { AppState } from '../types';
-import { messages } from '@/utils/messages';
+import { sendMessage, onMessage } from '@/utils/messages';
 import { Button } from '@mui/material';
 
 const RecordeReplayPage = () => {
@@ -8,27 +8,22 @@ const RecordeReplayPage = () => {
   const isRecording = useMemo(() => status === AppState.RECORDING, [status]);
 
   useEffect(() => {
-    const handleMessage = (msg: { type: string }) => {
-      if (msg.type === messages.popup.ready) {
-        setStatus(AppState.READ);
-      }
+    const unlistenStarted = onMessage('popup:started', () => {
+      console.log('[popup] Received started message');
+      setStatus(AppState.RECORDING);
+    });
 
-      if (msg.type === messages.popup.to.started) {
-        console.log('[popup] Received started message');
-        setStatus(AppState.RECORDING);
-      }
+    const unlistenStopped = onMessage('popup:stopped', () => {
+      setStatus(AppState.READ);
+    });
 
-      if (msg.type === messages.popup.to.stopped) {
-        setStatus(AppState.READ);
-      }
-    };
+    const unlistenReady = onMessage('popup:ready', () => {
+      setStatus(AppState.READ);
+    });
 
-    browser.runtime.onMessage.addListener(handleMessage);
-
-    browser.runtime
-      .sendMessage({ type: messages.popup.checkStatus })
+    sendMessage('popup:check-status', undefined)
       .then((res) => {
-        if (res?.data?.isRecording) {
+        if (res?.active) {
           setStatus(AppState.RECORDING);
         } else {
           setStatus(AppState.READ);
@@ -38,13 +33,20 @@ const RecordeReplayPage = () => {
         console.error(err);
       });
 
-    return () => browser.runtime.onMessage.removeListener(handleMessage);
+    return () => {
+      unlistenStarted();
+      unlistenStopped();
+      unlistenReady();
+    };
   }, []);
 
   const toggleRecording = async () => {
     try {
-      const actionType = isRecording ? messages.popup.from.stop : messages.popup.from.start;
-      await browser.runtime.sendMessage({ type: actionType });
+      if (isRecording) {
+        await sendMessage('popup:stop', undefined);
+      } else {
+        await sendMessage('popup:start', undefined);
+      }
     } catch (error) {
       console.error('Error toggling recording:', error);
       setStatus(AppState.READ);
