@@ -2,6 +2,7 @@ import '../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
 import { downloadHtmlInBackground } from '@/utils/recordUtils.tsx';
 import { sendMessage, onMessage } from '@/utils/messages';
+import { getActiveTabId } from '@/utils/tabUtils';
 
 const events: unknown[] = [];
 
@@ -50,6 +51,14 @@ export default defineBackground(() => {
     console.log(
       `Successfully injected content script into ${successCount}/${targetTabs.length} tabs.`,
     );
+  });
+
+  chrome.tabs.onActivated.addListener((activeInfo) => {
+    console.log('当前活跃的 Tab ID:', activeInfo.tabId);
+  });
+
+  chrome.tabs.onUpdated.addListener((tabId) => {
+    console.log('加载完成的 Tab ID:', tabId);
   });
 
   onMessage('popup:check-status', async (message) => {
@@ -109,35 +118,4 @@ export default defineBackground(() => {
     events.push(eventsList);
     return true;
   });
-
-  async function getActiveTabId() {
-    const activeTabs = await chrome.tabs.query({
-      active: true,
-      currentWindow: true,
-    });
-    const activeTab = activeTabs[0];
-
-    if (!activeTab) {
-      throw new Error('No active tab found.');
-    }
-
-    // 检查URL是否受限
-    if (activeTab?.url) {
-      const restrictedProtocols = [
-        'chrome:',
-        'chrome-extension:',
-        'about:',
-        'edge:',
-        'view-source:',
-        'data:',
-        'file:',
-      ];
-      if (restrictedProtocols.some((protocol) => activeTab.url!.startsWith(protocol))) {
-        throw new Error(`Cannot send message to a restricted URL: ${activeTab.url}`);
-      }
-    }
-
-    const sendTo = activeTab.id;
-    return sendTo!;
-  }
 });

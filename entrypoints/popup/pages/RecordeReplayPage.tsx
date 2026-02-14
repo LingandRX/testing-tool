@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { AppState } from '../types';
 import { sendMessage, onMessage } from '@/utils/messages';
-import { Button } from '@mui/material';
+import { Button, Container, Stack } from '@mui/material';
 
 const RecordeReplayPage = () => {
   const [status, setStatus] = useState<AppState>(AppState.READ);
@@ -54,8 +54,8 @@ const RecordeReplayPage = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+    <Container maxWidth={false} sx={{ py: 2.5 }}>
+      <Stack direction="row" spacing={1.25} sx={{ mb: 2.5 }}>
         <Button
           variant="contained"
           size="medium"
@@ -64,8 +64,8 @@ const RecordeReplayPage = () => {
         >
           {isRecording ? '停止录制' : '开始录制'}
         </Button>
-      </div>
-    </div>
+      </Stack>
+    </Container>
   );
 };
 

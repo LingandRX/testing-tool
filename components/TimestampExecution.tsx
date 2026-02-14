@@ -40,7 +40,7 @@ export function TimestampExecution(): JSX.Element {
   const toggleButtonText = isRunningTimestamp ? '停止' : '开始';
 
   return (
-    <Paper elevation={3} sx={{ p: 2, my: 2, borderRadius: 2, minWidth: 320, textAlign: 'center' }}>
+    <Paper elevation={3} sx={{ p: 2, my: 2, borderRadius: 2 }}>
       <Box
         sx={{
           display: 'flex',
@@ -53,7 +53,7 @@ export function TimestampExecution(): JSX.Element {
         }}
       >
         <Typography
-          variant="h4"
+          variant="h5"
           component="span"
           sx={{
             fontFamily: 'monospace',

@@ -16,6 +16,7 @@ export default defineConfig({
       'tabs',
       'offscreen',
       'downloads',
+      'debugger',
     ],
     host_permissions: ['<all_urls>'],
     action: {
