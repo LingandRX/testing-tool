@@ -10,7 +10,7 @@ export const createRecorder = () => {
     try {
       const handler = rrweb.record({
         emit(event) {
-          sendMessage('content:save-tracke-events', event);
+          sendMessage('content:save-track-events', event);
         },
         plugins: [getRecordConsolePlugin()],
       });

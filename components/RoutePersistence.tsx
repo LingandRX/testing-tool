@@ -26,7 +26,7 @@ const RoutePersistence = () => {
       }
     };
 
-    restoreRoute();
+    restoreRoute().then(() => console.info('恢复路由成功'));
   }, [location, navigate]);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const RoutePersistence = () => {
       console.log('保存路由', location.pathname);
     };
 
-    saveRoute();
+    saveRoute().then(() => console.info('保存路由成功'));
   }, [location]);
 
   return null;
