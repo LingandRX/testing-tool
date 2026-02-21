@@ -43,13 +43,18 @@ const RecordeReplayPage = () => {
   const toggleRecording = async () => {
     try {
       if (isRecording) {
-        await sendMessage('popup:stop', undefined);
+        const result = await sendMessage('popup:stop', undefined);
+        if (!result?.ok) {
+          return;
+        }
       } else {
-        await sendMessage('popup:start', undefined);
+        const result = await sendMessage('popup:start', undefined);
+        if (!result?.ok) {
+          return;
+        }
       }
     } catch (error) {
       console.error('Error toggling recording:', error);
-      setStatus(AppState.READ);
     }
   };
 

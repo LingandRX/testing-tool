@@ -9,6 +9,7 @@ export const messages = {
     to: {
       stopped: 'popup:stopped',
       started: 'popup:started',
+      tabChanged: 'popup:tab-changed',
     },
     checkStatus: 'popup:check-status',
     ready: 'popup:ready',
@@ -33,10 +34,11 @@ export const messages = {
 
 interface ProtocolMap {
   // --- Popup 相关 ---
-  'popup:start': () => { ok: boolean };
-  'popup:stop': () => { ok: boolean };
+  'popup:start': () => { ok: boolean; error?: string };
+  'popup:stop': () => { ok: boolean; error?: string };
   'popup:started': () => void;
   'popup:stopped': () => void;
+  'popup:tab-changed': (data: { currentTabId: number; recordingTabId: number | undefined }) => void;
   'popup:check-status': () => { active: boolean; startTime?: number };
   'popup:ready': () => void;
 

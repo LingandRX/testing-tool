@@ -76,7 +76,7 @@ export function TimestampExecution(): JSX.Element {
       <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           onClick={toggleUnit}
           aria-label={unitButtonLabel}
           title={unitButtonLabel}
