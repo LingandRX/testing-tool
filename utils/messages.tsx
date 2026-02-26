@@ -1,37 +1,5 @@
 import { defineExtensionMessaging } from '@webext-core/messaging';
 
-export const messages = {
-  popup: {
-    from: {
-      start: 'popup:start',
-      stop: 'popup:stop',
-    },
-    to: {
-      stopped: 'popup:stopped',
-      started: 'popup:started',
-      tabChanged: 'popup:tab-changed',
-    },
-    checkStatus: 'popup:check-status',
-    ready: 'popup:ready',
-  },
-  content: {
-    from: {
-      saveTrackEvents: 'content:save-track-events',
-    },
-    to: {
-      startRecording: 'content:start-recording',
-      stopRecording: 'content:stop-recording',
-    },
-    checkStatus: 'content:check-status',
-  },
-  offscreen: {
-    to: {
-      startRecording: 'offscreen:start-recording',
-      stopRecording: 'offscreen:stop-recording',
-    },
-  },
-};
-
 interface ProtocolMap {
   // --- Popup 相关 ---
   'popup:start': () => { ok: boolean; error?: string };

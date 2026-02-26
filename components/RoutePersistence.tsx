@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { storage } from '@/utils/storage';
+import { storage } from '@/utils/chromeStorage';
 
 const RoutePersistence = () => {
   const location = useLocation();
