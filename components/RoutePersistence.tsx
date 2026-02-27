@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { storage } from '@/utils/chromeStorage';
+import { storageUtil } from '@/utils/chromeStorage';
 
 const RoutePersistence = () => {
   const location = useLocation();
@@ -13,7 +13,7 @@ const RoutePersistence = () => {
       if (isRestored.current) return;
 
       try {
-        const lastRoute = await storage.get('app/lastRoute');
+        const lastRoute = await storageUtil.get('app/lastRoute');
 
         if (lastRoute && lastRoute !== '/' && location.pathname === '/') {
           navigate(lastRoute, { replace: true });
@@ -32,7 +32,7 @@ const RoutePersistence = () => {
   useEffect(() => {
     const saveRoute = async () => {
       if (!isRestored.current) return;
-      await storage.set('app/lastRoute', location.pathname);
+      await storageUtil.set('app/lastRoute', location.pathname);
       console.log('保存路由', location.pathname);
     };
 
