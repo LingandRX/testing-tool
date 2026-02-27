@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { storage } from '@/utils/storage';
+import { storage } from '@/utils/chromeStorage';
 
 const RoutePersistence = () => {
   const location = useLocation();
@@ -26,7 +26,7 @@ const RoutePersistence = () => {
       }
     };
 
-    restoreRoute();
+    restoreRoute().then(() => console.info('恢复路由成功'));
   }, [location, navigate]);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const RoutePersistence = () => {
       console.log('保存路由', location.pathname);
     };
 
-    saveRoute();
+    saveRoute().then(() => console.info('保存路由成功'));
   }, [location]);
 
   return null;

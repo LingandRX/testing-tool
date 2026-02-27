@@ -1,70 +1,127 @@
-# Getting Started with Create React App
+# Testing Tools Browser Extension
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+这是一个基于 WXT 框架的浏览器扩展项目，提供了多种实用的测试工具，包括时间戳转换、用户操作录制与回放等功能。
 
-## Available Scripts
+## 项目概述
 
-In the project directory, you can run:
+Testing Tools 是一个功能丰富的浏览器扩展，旨在帮助开发者和测试人员更高效地进行网页测试工作。项目采用现代化的技术栈，包括 React 19、TypeScript 和 Material UI，并利用 WXT 框架简化浏览器扩展的开发流程。
 
-### `npm start`
+## 功能特性
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 1. 时间戳转换工具
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- 日期与时间戳之间的双向转换
+- 支持多种日期格式
+- 快速复制转换结果
 
-### `npm test`
+### 2. 录制与回放功能
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- 基于 rrweb 库的用户操作录制
+- 完整的会话回放功能
+- 支持复杂交互场景的重现
 
-### `npm run build`
+### 3. 测试工具页面
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- 提供多种实用的测试功能
+- 集成测试库支持
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 技术栈
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **框架**: WXT (Web Extension Toolkit)
+- **前端**: React 19 + TypeScript
+- **UI 库**: Material UI
+- **状态管理**: React Hooks
+- **数据库**: Dexie.js (IndexedDB 包装器)
+- **录制回放**: rrweb
+- **路由**: React Router DOM
 
-### `npm run eject`
+## 项目结构
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+├── components/           # 可复用的 UI 组件
+├── entrypoints/         # 浏览器扩展入口点
+│   ├── popup/           # 扩展弹窗界面
+│   ├── options/         # 选项页面
+│   ├── offscreen/       # 离屏文档
+│   ├── background.ts    # 后台脚本
+│   └── content.ts       # 内容脚本
+├── assets/              # 静态资源
+├── wxt.config.ts        # WXT 配置文件
+├── package.json         # 项目依赖和脚本
+└── README.md            # 项目说明文档
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 开发环境要求
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Node.js >= 18
+- npm 或 yarn
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 安装与运行
 
-## Learn More
+### 1. 安装依赖
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm install
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 2. 开发模式
 
-### Code Splitting
+```bash
+# Chrome 浏览器
+npm run dev
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+# Firefox 浏览器
+npm run dev:firefox
+```
 
-### Analyzing the Bundle Size
+### 3. 构建生产版本
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+# Chrome 浏览器
+npm run build
 
-### Making a Progressive Web App
+# Firefox 浏览器
+npm run build:firefox
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 4. 打包分发
 
-### Advanced Configuration
+```bash
+# Chrome 浏览器
+npm run zip
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# Firefox 浏览器
+npm run zip:firefox
+```
 
-### Deployment
+## 权限说明
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+扩展请求以下权限：
 
-### `npm run build` fails to minify
+- `storage` 和 `unlimitedStorage` - 本地数据存储
+- `clipboardWrite` - 剪贴板写入
+- `activeTab`, `scripting`, `tabs` - 当前标签页控制
+- `offscreen` - 离屏文档处理
+- `downloads` - 下载管理
+- `<all_urls>` - 访问所有网站内容
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 主要依赖
+
+- `react`, `react-dom` - 前端框架
+- `@mui/material` - UI 组件库
+- `rrweb`, `rrweb-player` - 录制回放功能
+- `dexie`, `dexie-react-hooks` - 数据库操作
+- `react-router-dom` - 路由管理
+- `@testing-library/*` - 测试工具
+
+## 贡献指南
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
+
+## 许可证
+
+此项目为私有项目 (private: true)，仅供内部使用。

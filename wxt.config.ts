@@ -16,12 +16,12 @@ export default defineConfig({
       'tabs',
       'offscreen',
       'downloads',
+      'debugger',
     ],
     host_permissions: ['<all_urls>'],
     action: {
       default_title: 'Testing Tools',
     },
-    // 注意：WXT 会根据 entrypoints/options/index.html 自动生成 options_ui 的 page 路径
     options_ui: {
       open_in_tab: true,
     },
@@ -41,7 +41,7 @@ export default defineConfig({
       terserOptions: {
         format: {
           ascii_only: true,
-          comments: false, // 去掉注释，防止注释里有乱码
+          comments: false,
         },
       },
     },

@@ -1,11 +1,6 @@
 import '../.wxt/types/imports.d.ts';
 import { createRecorder } from '@/utils/useRecorder';
-
-interface IResponse {
-  ok: boolean;
-  error?: string;
-  data?: unknown;
-}
+import { onMessage } from '@/utils/messages.tsx';
 
 export default defineContentScript({
   // matches: ['*://*.google.com/*'],
@@ -15,52 +10,36 @@ export default defineContentScript({
     const recorder = createRecorder();
     let isRecording = false;
 
-    // 监听来自 background script 的消息
-    chrome.runtime.onMessage.addListener(
-      (msg: { type: string }, _sender, sendResponse: (response: IResponse) => void) => {
-        const handleAsyncMessage = async () => {
-          try {
-            switch (msg.type) {
-              // 在这里处理异步消息类型
-              case messages.content.checkStatus:
-                return { ok: true, data: { isRecording } };
+    onMessage('content:check-status', () => {
+      console.log(`[content]${isRecording}`);
+      return isRecording;
+    });
 
-              case messages.content.to.startRecording: {
-                const started = await recorder.startRecord(messages.content.from.saveTrackeEvents);
+    onMessage('content:start-recording', async () => {
+      try {
+        const started = await recorder.startRecord();
+        if (started) {
+          isRecording = true;
+          return { ok: true };
+        } else {
+          return { ok: false, error: 'Failed to start recorder' };
+        }
+      } catch (error) {
+        console.error('Error handling start recording:', error);
+        return { ok: false };
+      }
+    });
 
-                if (started) {
-                  isRecording = true;
-                  return { ok: true };
-                } else {
-                  // 如果启动失败，返回错误信息
-                  return { ok: false, error: 'Failed to start recorder' };
-                }
-              }
-
-              case messages.content.to.stopRecording:
-                // 停止录制的处理逻辑
-                console.log('[content] stopRecording received');
-                recorder.stopRecord();
-                isRecording = false;
-                return { ok: true };
-
-              default:
-                return { ok: false, error: 'Unknown message type' };
-            }
-          } catch (error) {
-            console.error('Error handling message:', error);
-            return { ok: false };
-          }
-        };
-
-        handleAsyncMessage().then((response) => {
-          if (sendResponse) {
-            sendResponse(response);
-          }
-        });
-
-        return true;
-      },
-    );
+    onMessage('content:stop-recording', () => {
+      try {
+        console.log('[content] stopRecording received');
+        recorder.stopRecord();
+        isRecording = false;
+        return { ok: true };
+      } catch (error) {
+        console.error('Error handling stop recording:', error);
+        return { ok: false };
+      }
+    });
   },
 });
