@@ -55,11 +55,13 @@ export const downloadHtmlInBackground = (events: unknown[]) => {
   const blob = new Blob([htmlContent], { type: 'text/html' });
   const reader = new FileReader();
   reader.onload = () => {
-    chrome.downloads.download({
-      url: reader.result as string,
-      filename: `replay-${Date.now()}.html`,
-      saveAs: true,
-    }).then(r => console.log(r));
+    chrome.downloads
+      .download({
+        url: reader.result as string,
+        filename: `replay-${Date.now()}.html`,
+        saveAs: true,
+      })
+      .then((r) => console.log(r));
   };
   reader.readAsDataURL(blob);
 };

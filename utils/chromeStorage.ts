@@ -40,4 +40,4 @@ class StorageUtils {
   }
 }
 
-export const storage = new StorageUtils();
+export const storageUtil = new StorageUtils();
