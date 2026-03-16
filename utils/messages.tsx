@@ -9,6 +9,10 @@ interface ProtocolMap {
   'popup:tab-changed': (data: { currentTabId: number; recordingTabId: number | undefined }) => void;
   'popup:check-status': () => { active: boolean; startTime?: number };
   'popup:ready': () => void;
+  'popup:get-sessions': () => { id: string; startTime: number; tabId: number; chunkCount: number; totalEvents: number }[];
+  'popup:get-session-events': (sessionId: string) => unknown[];
+  'popup:delete-session': (sessionId: string) => { ok: boolean };
+  'popup:download-session': (sessionId: string) => { ok: boolean };
 
   // --- Content 相关 ---
   'content:save-track-events': (event: unknown) => boolean;

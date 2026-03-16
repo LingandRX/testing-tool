@@ -1,6 +1,6 @@
 import '../.wxt/types/imports.d.ts';
 import { createRecorder } from '@/utils/useRecorder';
-import { onMessage } from '@/utils/messages.tsx';
+import { onMessage } from '@/utils/messages';
 
 export default defineContentScript({
   // matches: ['*://*.google.com/*'],

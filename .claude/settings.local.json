@@ -1,5 +1,8 @@
 {
   "permissions": {
-    "allow": ["WebSearch"]
+    "allow": [
+      "WebSearch",
+      "Bash(npm install:*)"
+    ]
   }
 }

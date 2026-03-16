@@ -5,7 +5,7 @@ import * as reactPlugin from 'eslint-plugin-react';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['dist', '.wxt', 'node_modules', 'eslint.config.ts'] },
+  { ignores: ['dist', '.wxt', 'node_modules', 'eslint.config.ts', '**/*.test.tsx', '**/*.test.ts', '**/__tests__/**'] },
 
   {
     files: [

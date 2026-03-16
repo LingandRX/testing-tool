@@ -13,6 +13,7 @@ stats.html
 stats-*.json
 .wxt
 .vitest
+.claude
 
 # Editor directories and files
 .vscode/*

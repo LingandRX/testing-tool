@@ -89,18 +89,33 @@ export async function initRecordingSession(sessionId: string, tabId: number): Pr
  * 获取当前会话的 chunk 数量
  */
 export async function getSessionChunkCount(sessionId: string): Promise<number> {
+  // 参数验证
+  if (!sessionId || typeof sessionId !== 'string') {
+    console.error('[db] Invalid sessionId for getSessionChunkCount:', sessionId);
+    return 0;
+  }
+
   const database = await openDB();
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const tx = database.transaction('sessions', 'readonly');
     const store = tx.objectStore('sessions');
-    const request = store.get(sessionId);
 
-    request.onsuccess = () => {
-      const session = request.result as RecordingSession | undefined;
-      resolve(session?.chunkCount || 0);
-    };
-    request.onerror = () => reject(request.error);
+    try {
+      const request = store.get(sessionId);
+
+      request.onsuccess = () => {
+        const session = request.result as RecordingSession | undefined;
+        resolve(session?.chunkCount || 0);
+      };
+      request.onerror = (e) => {
+        console.error('[db] Error getting session chunk count:', e);
+        resolve(0);
+      };
+    } catch (error) {
+      console.error('[db] Exception getting session chunk count:', error);
+      resolve(0);
+    }
   });
 }
 
@@ -150,14 +165,28 @@ async function getChunk(
   sessionId: string,
   chunkIndex: number,
 ): Promise<EventChunk | null> {
-  return new Promise((resolve, reject) => {
-    const tx = database.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
-    const index = store.index('sessionId_chunkIndex');
-    const request = index.get([sessionId, chunkIndex]);
+  // 参数验证
+  if (!sessionId || typeof sessionId !== 'string') {
+    console.error('[db] Invalid sessionId for getChunk:', sessionId);
+    return null;
+  }
 
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject(request.error);
+  return new Promise((resolve) => {
+    try {
+      const tx = database.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const index = store.index('sessionId_chunkIndex');
+      const request = index.get([sessionId, chunkIndex]);
+
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = (e) => {
+        console.error('[db] Error getting chunk:', e);
+        resolve(null);
+      };
+    } catch (error) {
+      console.error('[db] Exception getting chunk:', error);
+      resolve(null);
+    }
   });
 }
 
@@ -211,14 +240,26 @@ export async function streamAllEvents(
   sessionId: string,
   onChunk: (events: unknown[]) => void | Promise<void>,
 ): Promise<void> {
-  const database = await openDB();
-  const chunkCount = await getSessionChunkCount(sessionId);
+  // 参数验证
+  if (!sessionId || typeof sessionId !== 'string') {
+    console.error('[db] Invalid sessionId for streamAllEvents:', sessionId);
+    return;
+  }
 
-  for (let i = 0; i < chunkCount; i++) {
-    const chunk = await getChunk(database, sessionId, i);
-    if (chunk && chunk.events.length > 0) {
-      await onChunk(chunk.events);
+  try {
+    const database = await openDB();
+    const chunkCount = await getSessionChunkCount(sessionId);
+
+    console.log(`[db] Streaming ${chunkCount} chunks for session ${sessionId}`);
+
+    for (let i = 0; i < chunkCount; i++) {
+      const chunk = await getChunk(database, sessionId, i);
+      if (chunk && chunk.events.length > 0) {
+        await onChunk(chunk.events);
+      }
     }
+  } catch (error) {
+    console.error('[db] Error streaming events:', error);
   }
 }
 
@@ -227,6 +268,12 @@ export async function streamAllEvents(
  * 注意：这会将所有事件加载到内存，仅在需要导出时调用
  */
 export async function getAllEvents(sessionId: string): Promise<unknown[]> {
+  // 参数验证
+  if (!sessionId || typeof sessionId !== 'string') {
+    console.error('[db] Invalid sessionId for getAllEvents:', sessionId);
+    return [];
+  }
+
   const allEvents: unknown[] = [];
 
   await streamAllEvents(sessionId, (events) => {
@@ -268,6 +315,33 @@ export async function deleteRecordingSession(sessionId: string): Promise<void> {
     };
 
     chunkTx.onerror = () => reject(chunkTx.error);
+  });
+}
+
+/**
+ * 获取所有录制会话列表
+ */
+export async function getAllSessions(): Promise<RecordingSession[]> {
+  const database = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction('sessions', 'readonly');
+    const store = tx.objectStore('sessions');
+    const index = store.index('startTime');
+    const request = index.openCursor(null, 'prev'); // 按时间倒序排列
+    const sessions: RecordingSession[] = [];
+
+    request.onsuccess = (event) => {
+      const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+      if (cursor) {
+        sessions.push(cursor.value);
+        cursor.continue();
+      } else {
+        resolve(sessions);
+      }
+    };
+
+    request.onerror = () => reject(request.error);
   });
 }
 

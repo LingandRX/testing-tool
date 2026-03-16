@@ -9,6 +9,8 @@ import {
   streamAllEvents,
   deleteRecordingSession,
   generateSessionId,
+  getAllSessions,
+  getAllEvents,
 } from '@/utils/recordEventsDb';
 
 interface RecorderState {
@@ -210,14 +212,14 @@ export default defineBackground(() => {
 
       if (response.ok) {
         // 从 IndexedDB 流式读取所有事件并下载回放文件
-        if (state.sessionId) {const allEvents: unknown[] = [];
+        if (state.sessionId) {
+          const allEvents: unknown[] = [];
           await streamAllEvents(state.sessionId, (events) => {
             allEvents.push(...events);
           });
           downloadHtmlInBackground(allEvents);
 
-          // 删除会话数据
-          await deleteRecordingSession(state.sessionId);
+          // 不再删除会话数据，保留录制历史
         }
 
         // 清空状态
@@ -235,6 +237,54 @@ export default defineBackground(() => {
     } catch (error: unknown) {
       console.error('Failed to stop recording in content script', error);
       return { ok: false, error: String(error) };
+    }
+  });
+
+  // 获取所有录制会话
+  onMessage('popup:get-sessions', async () => {
+    try {
+      const sessions = await getAllSessions();
+      return sessions;
+    } catch (error) {
+      console.error('[bg] 获取录制会话失败:', error);
+      return [];
+    }
+  });
+
+  // 获取会话事件
+  onMessage('popup:get-session-events', async (message) => {
+    try {
+      const sessionId = message.data;
+      const events = await getAllEvents(sessionId);
+      return events;
+    } catch (error) {
+      console.error('[bg] 获取会话事件失败:', error);
+      return [];
+    }
+  });
+
+  // 删除会话
+  onMessage('popup:delete-session', async (message) => {
+    try {
+      const sessionId = message.data;
+      await deleteRecordingSession(sessionId);
+      return { ok: true };
+    } catch (error) {
+      console.error('[bg] 删除会话失败:', error);
+      return { ok: false };
+    }
+  });
+
+  // 下载会话回放
+  onMessage('popup:download-session', async (message) => {
+    try {
+      const sessionId = message.data;
+      const events = await getAllEvents(sessionId);
+      downloadHtmlInBackground(events);
+      return { ok: true };
+    } catch (error) {
+      console.error('[bg] 下载会话失败:', error);
+      return { ok: false };
     }
   });
 
