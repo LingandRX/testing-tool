@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import dayjs from 'dayjs';
+import dayjs from '@/utils/dayjs';
 import {
   Button,
   TextField,
@@ -12,37 +12,7 @@ import {
   Box,
   SelectChangeEvent,
 } from '@mui/material';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-const TIME_ZONE_LIST = [
-  'America/New_York',
-  'America/Chicago',
-  'America/Denver',
-  'America/Los_Angeles',
-  'America/Anchorage',
-  'America/Honolulu',
-  'Europe/London',
-  'Europe/Paris',
-  'Europe/Berlin',
-  'Europe/Moscow',
-  'Asia/Tokyo',
-  'Asia/Shanghai',
-  'Asia/Hong_Kong',
-  'Asia/Singapore',
-  'Asia/Dubai',
-  'Asia/Kolkata',
-  'Australia/Sydney',
-  'Pacific/Auckland',
-];
-
-const TIMESTAMP_UNITS = [
-  { value: 'milliseconds', label: '毫秒 (ms)' },
-  { value: 'seconds', label: '秒 (s)' },
-];
+import { TIME_ZONE_LIST, TIMESTAMP_UNITS } from './constants';
 
 export function TimestampToDatetime() {
   const [timestampValue, setTimestampValue] = useState(() => dayjs().valueOf().toString());

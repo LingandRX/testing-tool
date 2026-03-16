@@ -12,32 +12,7 @@ import {
   Box,
   SelectChangeEvent,
 } from '@mui/material';
-
-const TIME_ZONE_LIST = [
-  'America/New_York',
-  'America/Chicago',
-  'America/Denver',
-  'America/Los_Angeles',
-  'America/Anchorage',
-  'America/Honolulu',
-  'Europe/London',
-  'Europe/Paris',
-  'Europe/Berlin',
-  'Europe/Moscow',
-  'Asia/Tokyo',
-  'Asia/Shanghai',
-  'Asia/Hong_Kong',
-  'Asia/Singapore',
-  'Asia/Dubai',
-  'Asia/Kolkata',
-  'Australia/Sydney',
-  'Pacific/Auckland',
-];
-
-const TIMESTAMP_UNITS = [
-  { value: 'milliseconds', label: '毫秒 (ms)' },
-  { value: 'seconds', label: '秒 (s)' },
-];
+import { TIME_ZONE_LIST, TIMESTAMP_UNITS } from './constants';
 
 export function DatetimeToTimestamp() {
   const [dateValue, setDateValue] = useState(() => dayjs().format('YYYY/MM/DD HH:mm:ss'));
@@ -52,7 +27,8 @@ export function DatetimeToTimestamp() {
         setError('请输入有效的日期时间');
         return '';
       }
-      const timestamp = dayjs.tz(currentDate, zone);
+      // 使用 tz 方法直接解析带时区的日期
+      const timestamp = dayjs.tz(currentDate, 'YYYY/MM/DD HH:mm:ss', zone);
       if (!timestamp.isValid()) {
         setError('无效的日期时间格式');
         return '';

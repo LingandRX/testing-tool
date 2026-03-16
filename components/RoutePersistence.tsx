@@ -17,7 +17,6 @@ const RoutePersistence = () => {
 
         if (lastRoute && lastRoute !== '/' && location.pathname === '/') {
           navigate(lastRoute, { replace: true });
-          console.log('跳转路由', lastRoute);
         }
       } catch (err) {
         console.error('恢复路由失败', err);
@@ -26,17 +25,16 @@ const RoutePersistence = () => {
       }
     };
 
-    restoreRoute().then(() => console.info('恢复路由成功'));
-  }, [location, navigate]);
+    restoreRoute();
+  }, [navigate, location.pathname]);
 
   useEffect(() => {
     const saveRoute = async () => {
       if (!isRestored.current) return;
       await storageUtil.set('app/lastRoute', location.pathname);
-      console.log('保存路由', location.pathname);
     };
 
-    saveRoute().then(() => console.info('保存路由成功'));
+    saveRoute();
   }, [location]);
 
   return null;

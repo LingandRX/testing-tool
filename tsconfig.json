@@ -52,5 +52,13 @@
     "components",
     "eslint.config.ts"
   ],
-  "exclude": ["node_modules", ".wxt"]
+  "exclude": [
+    "node_modules",
+    ".wxt",
+    "components/__tests__",
+    "**/*.test.tsx",
+    "**/*.test.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts"
+  ]
 }
