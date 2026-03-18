@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-这是一个基于 WXT 框架的浏览器扩展项目，提供测试工具功能，包括时间戳转换、用户操作录制与回放等。
+这是一个基于 WXT 框架的浏览器扩展项目，提供测试工具功能，包括时间戳转换等。
 
 ## 核心命令
 
@@ -52,50 +52,33 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 - **前端**: React 19 + TypeScript
 - **UI 库**: Material UI (MUI)
 - **状态管理**: React Hooks
-- **数据库**: Dexie.js (IndexedDB)
-- **录制回放**: rrweb
 - **路由**: React Router DOM
 
 ### 目录结构
 
 ```
-
-├── components/ # 可复用 UI 组件
-│ ├── CopyButton.tsx # 复制按钮组件
-│ ├── DatetimeToTimestamp.tsx # 日期转时间戳组件
-│ ├── Navbar.tsx # 导航栏组件
-│ ├── RoutePersistence.tsx # 路由持久化组件
-│ ├── TimestampExecution.tsx # 时间戳执行组件
-│ └── TimestampToDatetime.tsx # 时间戳转日期组件
-├── entrypoints/ # 浏览器扩展入口点
-│ ├── background.ts # 后台脚本（主进程）
-│ ├── content.ts # 内容脚本（注入到页面）
-│ ├── offscreen/ # 离屏文档（用于长时间运行任务）
-│ ├── popup/ # 扩展弹窗界面
-│ │ ├── App.tsx # 弹窗主应用
-│ │ ├── main.tsx # 弹窗入口
-│ │ └── pages/ # 弹窗页面
-│ │ ├── RecordeReplayPage.tsx # 录制回放页面
-│ │ ├── TestPage.tsx # 测试页面
-│ │ └── TimestampPage.tsx # 时间戳工具页面
-│ └── options/ # 选项页面（未列出）
-├── assets/ # 静态资源
-├── utils/ # 工具函数
-│ ├── chromeStorage.ts # Chrome 存储工具
-│ ├── dayjs.ts # 日期处理工具
-│ ├── messages.tsx # 消息通信工具
-│ ├── recordEventsDb.ts # IndexedDB 数据库工具（录制事件存储）
-│ ├── recordUtils.tsx # 录制工具函数
-│ ├── tabUtils.ts # 标签页工具
-│ └── useRecorder.tsx # 录制器 Hook
-├── types/ # 类型定义
-│ └── storage.d.ts # 存储相关类型
-├── public/ # 公共资源
-├── package.json # 项目依赖和脚本
-├── tsconfig.json # TypeScript 配置
-├── wxt.config.ts # WXT 配置
-└── web-ext.config.ts # WebExtensions 配置
-
+├── components/           # 可复用 UI 组件
+│   ├── CopyButton.tsx           # 复制按钮组件
+│   ├── DatetimeToTimestamp.tsx   # 日期转时间戳组件
+│   ├── Navbar.tsx                # 导航栏组件
+│   ├── RoutePersistence.tsx      # 路由持久化组件
+│   ├── TimestampExecution.tsx    # 时间戳执行组件
+│   └── TimestampToDatetime.tsx   # 时间戳转日期组件
+├── entrypoints/          # 浏览器扩展入口点
+│   ├── background.ts     # 后台脚本（主进程）
+│   ├── content.ts        # 内容脚本（注入到页面）
+│   └── popup/            # 扩展弹窗界面
+│       ├── App.tsx       # 弹窗主应用
+│       ├── main.tsx      # 弹窗入口
+│       └── pages/        # 弹窗页面
+│           ├── TestPage.tsx      # 测试页面
+│           └── TimestampPage.tsx # 时间戳工具页面
+├── utils/                # 工具函数
+│   ├── chromeStorage.ts  # Chrome 存储工具
+│   ├── dayjs.ts          # 日期处理工具
+│   └── messages.tsx      # 消息通信工具
+├── types/                # 类型定义
+│   └── storage.d.ts      # 存储相关类型
 ```
 
 ### 核心功能实现
@@ -106,69 +89,15 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 - 依赖: dayjs 库进行日期处理
 - 功能: 支持日期与时间戳的双向转换，支持多种格式
 
-#### 2. 录制与回放功能
-
-- 位置: `utils/useRecorder.tsx` (核心录制逻辑)、`utils/recordUtils.tsx` (工具函数)
-- 依赖: rrweb 库
-- 存储: IndexedDB (Dexie.js) - `utils/recordEventsDb.ts`
-- 特点: 支持分块存储录制事件，优化性能
-
-**录制架构流程：**
-
-1. **开始录制** (`popup:start` → `background.ts` → `content.ts`)
-   - Popup 发送开始录制消息
-   - Background 生成 sessionId，初始化 IndexedDB 会话
-   - Content Script 启动 rrweb 录制器
-
-2. **事件存储** (`content:save-track-events`)
-   - rrweb 捕获事件后通过消息发送给 Background
-   - Background 使用 IndexedDB 分块存储（每块 100 个事件）
-
-3. **停止录制** (`popup:stop`)
-   - Background 从 IndexedDB 流式读取所有事件
-   - 生成回放 HTML 文件并下载
-   - 保留录制历史（不删除 IndexedDB 数据）
-
-4. **状态管理**
-   - 录制状态存储在 `chrome.storage.local` (recorder_state)
-   - 支持 Tab 切换检测和 Tab 关闭自动停止
-
-#### 3. 通信系统
+#### 2. 通信系统
 
 - 位置: `utils/messages.tsx`
 - 机制: 使用 `@webext-core/messaging` 库实现
-- 通信通道: 后台脚本 ↔ 内容脚本 ↔ 弹窗 ↔ 离屏文档
+- 通信通道: 后台脚本 ↔ 内容脚本 ↔ 弹窗
 
-**核心消息类型：**
-
-- `popup:start` / `popup:stop` - Popup 控制录制
-- `popup:started` / `popup:stopped` - 状态变化通知
-- `popup:check-status` - 查询录制状态
-- `content:start-recording` / `content:stop-recording` - 控制 Content Script
-- `content:save-track-events` - 保存录制事件
-- `popup:get-sessions` / `popup:delete-session` - 录制会话管理
-
-#### 4. 数据存储
+#### 3. 数据存储
 
 - Chrome Storage API: `utils/chromeStorage.ts` (用于配置等小数据)
-- IndexedDB: `utils/recordEventsDb.ts` (用于存储大量录制事件)
-
-**IndexedDB 数据结构：**
-
-- **sessions** 表: 录制会话元数据
-  - `id`: sessionId (string)
-  - `startTime`: 录制开始时间 (number)
-  - `tabId`: 录制的标签页 ID (number)
-  - `chunkCount`: 数据块数量 (number)
-  - `totalEvents`: 总事件数 (number)
-
-- **events** 表: 事件数据块
-  - `id`: 自增 ID (number)
-  - `sessionId`: 关联的会话 ID
-  - `chunkIndex`: 块索引 (number)
-  - `events`: rrweb 事件数组 (unknown[])
-  - `timestamp`: 时间戳 (number)
-  - CHUNK_SIZE: 100 个事件/块
 
 ### 关键配置文件
 
@@ -189,8 +118,6 @@ permissions: [
   'activeTab',         // 当前标签页
   'scripting',         // 脚本注入
   'tabs',              // 标签页管理
-  'offscreen',         // 离屏文档
-  'downloads',         // 下载管理
   'debugger',          // 调试器
 ],
 host_permissions: ['<all_urls>']  // 访问所有网站
@@ -203,7 +130,6 @@ host_permissions: ['<all_urls>']  // 访问所有网站
 - **后台脚本**: `entrypoints/background.ts` - 处理扩展生命周期和后台任务
 - **内容脚本**: `entrypoints/content.ts` - 注入到网页中，处理 DOM 交互
 - **弹窗**: `entrypoints/popup/main.tsx` - 用户点击扩展图标时显示
-- **离屏文档**: `entrypoints/offscreen/main.tsx` - 处理长时间运行的任务（如录制）
 
 ### 浏览器兼容性
 
