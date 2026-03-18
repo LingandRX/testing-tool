@@ -1,4 +1,3 @@
-import { sendMessage } from '@/utils/messages';
 import { Button } from '@mui/material';
 import { useState, useEffect } from 'react';
 
@@ -16,11 +15,6 @@ const TestPage = () => {
       else throw new Error('no active tab');
     })();
   });
-
-  const handleSeedMessage = async () => {
-    const status = await sendMessage('popup:check-status');
-    console.log(`[popup]status: ${status}`);
-  };
 
   const handleAttach = () => {
     try {
@@ -61,9 +55,6 @@ const TestPage = () => {
   };
   return (
     <div>
-      <Button variant="contained" color="primary" onClick={handleSeedMessage}>
-        发送消息
-      </Button>
       <Button variant="contained" color="primary" onClick={handleAttach}>
         attach
       </Button>

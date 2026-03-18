@@ -1,4 +1,3 @@
-```
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -10,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 核心命令
 
 ### 开发相关
+
 - `npm run dev` - 启动 Chrome 浏览器的开发模式
 - `npm run dev:firefox` - 启动 Firefox 浏览器的开发模式
 - `npm run build` - 构建 Chrome 浏览器的生产版本
@@ -19,7 +19,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run compile` - TypeScript 类型检查（不生成文件）
 - `npm run lint` - 运行 ESLint 检查
 
+### 测试相关
+
+- `npm run test` - 运行所有测试（单次执行）
+- `npm run test:watch` - 运行测试并监听文件变化
+- `npm run test:coverage` - 运行测试并生成覆盖率报告
+
+**运行单个测试文件：**
+
+```bash
+npx vitest run components/__tests__/CopyButton.test.tsx
+```
+
+**测试技术栈：**
+
+- Vitest - 测试框架
+- @testing-library/react - React 组件测试
+- @testing-library/user-event v13 - 用户交互模拟（注意：v13 不支持 setup()，使用 fireEvent）
+- jsdom - 浏览器环境模拟
+
 ### 依赖与准备
+
 - `npm install` - 安装依赖
 - `postinstall` 会自动运行 `wxt prepare` 准备开发环境
 - `prepare` 钩子会初始化 Husky Git 钩子
@@ -27,6 +47,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 项目架构
 
 ### 技术栈
+
 - **框架**: WXT (Web Extension Toolkit) - 浏览器扩展开发框架
 - **前端**: React 19 + TypeScript
 - **UI 库**: Material UI (MUI)
@@ -36,6 +57,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **路由**: React Router DOM
 
 ### 目录结构
+
 ```
 
 ├── components/ # 可复用 UI 组件
@@ -74,39 +96,91 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ├── wxt.config.ts # WXT 配置
 └── web-ext.config.ts # WebExtensions 配置
 
-````
+```
 
 ### 核心功能实现
 
 #### 1. 时间戳转换工具
+
 - 位置: `components/` 目录下的时间戳相关组件
 - 依赖: dayjs 库进行日期处理
 - 功能: 支持日期与时间戳的双向转换，支持多种格式
 
 #### 2. 录制与回放功能
+
 - 位置: `utils/useRecorder.tsx` (核心录制逻辑)、`utils/recordUtils.tsx` (工具函数)
 - 依赖: rrweb 库
 - 存储: IndexedDB (Dexie.js) - `utils/recordEventsDb.ts`
 - 特点: 支持分块存储录制事件，优化性能
 
+**录制架构流程：**
+
+1. **开始录制** (`popup:start` → `background.ts` → `content.ts`)
+   - Popup 发送开始录制消息
+   - Background 生成 sessionId，初始化 IndexedDB 会话
+   - Content Script 启动 rrweb 录制器
+
+2. **事件存储** (`content:save-track-events`)
+   - rrweb 捕获事件后通过消息发送给 Background
+   - Background 使用 IndexedDB 分块存储（每块 100 个事件）
+
+3. **停止录制** (`popup:stop`)
+   - Background 从 IndexedDB 流式读取所有事件
+   - 生成回放 HTML 文件并下载
+   - 保留录制历史（不删除 IndexedDB 数据）
+
+4. **状态管理**
+   - 录制状态存储在 `chrome.storage.local` (recorder_state)
+   - 支持 Tab 切换检测和 Tab 关闭自动停止
+
 #### 3. 通信系统
+
 - 位置: `utils/messages.tsx`
 - 机制: 使用 `@webext-core/messaging` 库实现
 - 通信通道: 后台脚本 ↔ 内容脚本 ↔ 弹窗 ↔ 离屏文档
 
+**核心消息类型：**
+
+- `popup:start` / `popup:stop` - Popup 控制录制
+- `popup:started` / `popup:stopped` - 状态变化通知
+- `popup:check-status` - 查询录制状态
+- `content:start-recording` / `content:stop-recording` - 控制 Content Script
+- `content:save-track-events` - 保存录制事件
+- `popup:get-sessions` / `popup:delete-session` - 录制会话管理
+
 #### 4. 数据存储
+
 - Chrome Storage API: `utils/chromeStorage.ts` (用于配置等小数据)
 - IndexedDB: `utils/recordEventsDb.ts` (用于存储大量录制事件)
+
+**IndexedDB 数据结构：**
+
+- **sessions** 表: 录制会话元数据
+  - `id`: sessionId (string)
+  - `startTime`: 录制开始时间 (number)
+  - `tabId`: 录制的标签页 ID (number)
+  - `chunkCount`: 数据块数量 (number)
+  - `totalEvents`: 总事件数 (number)
+
+- **events** 表: 事件数据块
+  - `id`: 自增 ID (number)
+  - `sessionId`: 关联的会话 ID
+  - `chunkIndex`: 块索引 (number)
+  - `events`: rrweb 事件数组 (unknown[])
+  - `timestamp`: 时间戳 (number)
+  - CHUNK_SIZE: 100 个事件/块
 
 ### 关键配置文件
 
 #### wxt.config.ts
+
 - 配置 WXT 框架参数
 - 启用 React 模块
 - 配置浏览器扩展权限
 - Vite 构建配置（使用 Terser 压缩，强制 ASCII 编码）
 
 #### manifest 权限
+
 ```typescript
 permissions: [
   'storage',           // 存储权限
@@ -120,7 +194,7 @@ permissions: [
   'debugger',          // 调试器
 ],
 host_permissions: ['<all_urls>']  // 访问所有网站
-````
+```
 
 ## 开发注意事项
 
@@ -141,7 +215,3 @@ host_permissions: ['<all_urls>']  // 访问所有网站
 - 使用 ESLint 进行代码检查
 - Husky 用于 Git 钩子管理
 - Lint-staged 确保暂存文件符合规范
-
-```
-
-```
