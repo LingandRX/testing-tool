@@ -366,38 +366,6 @@ export interface CleaningResult {
 }
 ```
 
-```typescript
-export interface StorageCleanerOptions {
-  localStorage: boolean;
-  sessionStorage: boolean;
-  indexedDB: boolean;
-  cookies: boolean;
-  cacheStorage: boolean;
-  serviceWorkers: boolean;
-}
-
-export type StorageCleanResult =
-  | {
-      success: true;
-      count: number;
-    }
-  | {
-      success: false;
-      error: string;
-    };
-
-export interface CleaningResult {
-  success: boolean;
-  error?: string;
-  localStorage?: StorageCleanResult;
-  sessionStorage?: StorageCleanResult;
-  indexedDB?: StorageCleanResult;
-  cookies?: StorageCleanResult;
-  cacheStorage?: StorageCleanResult;
-  serviceWorkers?: StorageCleanResult;
-}
-```
-
 ## 测试计划
 
 1. 测试各种存储类型的单独清理
