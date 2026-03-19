@@ -97,7 +97,15 @@ function App() {
 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
 // 检查受限页面
-const restrictedProtocols = ['chrome:', 'chrome-extension:', 'about:', 'edge:', 'view-source:'];
+const restrictedProtocols = [
+  'chrome:',
+  'chrome-extension:',
+  'about:',
+  'edge:',
+  'view-source:',
+  'file:',
+  'data:',
+];
 
 if (!tab?.url || restrictedProtocols.some((p) => tab.url!.startsWith(p))) {
   throw new Error('存储清理功能不支持此页面');
@@ -174,10 +182,8 @@ if (typeof indexedDB.databases === 'function') {
   }
   return count;
 }
-// 降级方案：使用传统方法
-let count = 0;
-// 尝试遍历已知数据库或提示用户手动清除
-return count;
+// 降级方案：由于无法获取所有数据库名称，提示返回特殊值表示需要手动操作
+return { error: 'databases_api_unavailable' };
 ```
 
 #### 清理 Cache Storage
@@ -228,7 +234,19 @@ return 0;
 ### 页面刷新
 
 ```typescript
-await chrome.tabs.reload(tab.id);
+// 显示刷新提示
+setRefreshing(true);
+setTimeout(async () => {
+  await chrome.tabs.reload(tab.id);
+}, 1500); // 1.5秒延迟让用户看到提示信息
+```
+
+### 空状态处理
+
+当所有存储类型清理返回 0 时，显示友好的提示：
+
+```
+该页面没有可清理的存储数据
 ```
 
 ## 错误处理
@@ -251,6 +269,39 @@ await chrome.tabs.reload(tab.id);
 - 刷新页面后 Popup 会自动关闭
 - 需要在刷新前显示提示："页面即将刷新，Popup 将关闭"
 
+## 用户偏好持久化
+
+使用现有的 `chromeStorage.ts` 工具保存用户偏好：
+
+```typescript
+// 保存用户偏好
+await storageUtil.set('storageCleaner/preferences', {
+  autoRefresh: true, // 默认勾选自动刷新
+  selectedTypes: {
+    // 可以保存用户上次选择的存储类型
+    localStorage: true,
+    sessionStorage: true,
+    indexedDB: true,
+    cookies: true,
+    cacheStorage: true,
+    serviceWorkers: true,
+  },
+});
+
+// 读取用户偏好
+const preferences = await storageUtil.get('storageCleaner/preferences', {
+  autoRefresh: true,
+  selectedTypes: {
+    localStorage: true,
+    sessionStorage: true,
+    indexedDB: true,
+    cookies: true,
+    cacheStorage: true,
+    serviceWorkers: true,
+  },
+});
+```
+
 ## 权限需求
 
 需要在 manifest 中添加 `cookies` 权限：
@@ -271,6 +322,49 @@ permissions: [
 ## TypeScript 类型定义
 
 在现有 `types/storage.d.ts` 中添加存储清理相关的类型：
+
+```typescript
+export interface StorageSchema {
+  'app/lastRoute': string;
+  'app/theme': string;
+  'storageCleaner/preferences': StorageCleanerPreferences;
+}
+
+export interface StorageCleanerPreferences {
+  autoRefresh: boolean;
+  selectedTypes: StorageCleanerOptions;
+}
+
+export interface StorageCleanerOptions {
+  localStorage: boolean;
+  sessionStorage: boolean;
+  indexedDB: boolean;
+  cookies: boolean;
+  cacheStorage: boolean;
+  serviceWorkers: boolean;
+}
+
+export type StorageCleanResult =
+  | {
+      success: true;
+      count: number;
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+export interface CleaningResult {
+  success: boolean;
+  error?: string;
+  localStorage?: StorageCleanResult;
+  sessionStorage?: StorageCleanResult;
+  indexedDB?: StorageCleanResult;
+  cookies?: StorageCleanResult;
+  cacheStorage?: StorageCleanResult;
+  serviceWorkers?: StorageCleanResult;
+}
+```
 
 ```typescript
 export interface StorageCleanerOptions {
@@ -310,10 +404,13 @@ export interface CleaningResult {
 2. 测试同时清理多种存储类型
 3. 测试自动刷新功能
 4. 测试手动刷新按钮
-5. 测试无存储数据时的清理
+5. 测试无存储数据时的清理（显示空状态提示）
 6. 测试无法访问页面的错误处理
-7. 测试 IndexedDB onblocked 场景
-8. 测试 httponly 和 secure cookies 清理
+7. 测试受限页面（chrome://, about://, file://, data://）
+8. 测试 IndexedDB onblocked 场景
+9. 测试 httponly 和 secure cookies 清理
+10. 测试本地开发环境（localhost）
+11. 测试用户偏好持久化
 
 ## 后续优化
 
