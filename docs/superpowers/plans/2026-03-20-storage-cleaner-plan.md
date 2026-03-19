@@ -673,14 +673,37 @@ export default function StorageCleanerPage() {
           }}
         >
           <Typography variant="h6">确认清理</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-            确定要清理选中的存储数据吗？此操作不可撤销。
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 1 }}>
+            将清理以下存储类型：
+          </Typography>
+          <Box sx={{ mb: 1 }}>
+            {options.localStorage && (
+              <Typography variant="body2">- localStorage</Typography>
+            )}
+            {options.sessionStorage && (
+              <Typography variant="body2">- sessionStorage</Typography>
+            )}
+            {options.indexedDB && <Typography variant="body2">- IndexedDB</Typography>}
+            {options.cookies && <Typography variant="body2">- Cookies</Typography>}
+            {options.cacheStorage && (
+              <Typography variant="body2">- Cache Storage</Typography>
+            )}
+            {options.serviceWorkers && (
+              <Typography variant="body2">- Service Workers</Typography>
+            )}
+          </Box>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ textAlign: 'center', mb: 1 }}
+          >
+            此操作不可撤销。
           </Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button variant="outlined" onClick={() => setShowConfirm(false)}>
               取消
             </Button>
-            <Button variant="contained" onClick={handleClean}>
+            <Button variant="contained" color="error" onClick={handleClean}>
               确认清理
             </Button>
           </Box>
@@ -721,7 +744,7 @@ git commit -m "feat: add StorageCleanerPage component"
 
 ```typescript
 import { useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import TimestampPage from './pages/TimestampPage';
 import StorageCleanerPage from './pages/StorageCleanerPage';
 import './App.css';
@@ -814,10 +837,12 @@ After implementation, verify:
 - [ ] All storage type checkboxes toggle correctly
 - [ ] Auto refresh checkbox persists across sessions
 - [ ] Clear confirmation dialog appears
+- [ ] Confirmation dialog shows selected storage types
 - [ ] localStorage clears successfully
 - [ ] sessionStorage clears successfully
 - [ ] IndexedDB clears successfully (or shows error if unavailable)
 - [ ] Cookies clear successfully
+- [ ] Clear httponly and secure cookies
 - [ ] Cache Storage clears successfully
 - [ ] Service Workers unregister successfully
 - [ ] Result message displays correctly
@@ -826,6 +851,7 @@ After implementation, verify:
 - [ ] Manual refresh button appears when auto-refresh is off
 - [ ] Restricted pages show error message
 - [ ] Snackbar notifications appear correctly
+- [ ] Test on localhost
 
 ---
 
