@@ -157,12 +157,12 @@ return count;
 #### 清理 IndexedDB
 
 ```javascript
-// 检查 databases indexedDB 方法是否可用
+// 检查 indexedDB.databases 方法是否可用
 if (typeof indexedDB.databases === 'function') {
   const databases = await indexedDB.databases();
   let count = 0;
   for (const db of databases) {
-    const deleteReq = indexedDB.databases(db.name);
+    const deleteReq = indexedDB.deleteDatabase(db.name);
     deleteReq.onblocked = () => {
       console.warn('IndexedDB delete blocked:', db.name);
     };
@@ -244,12 +244,6 @@ await chrome.tabs.reload(tab.id);
 | Cookies 删除失败                | 记录错误，显示清理失败提示               |
 | 无权限                          | 提示用户刷新扩展或检查权限               |
 | 脚本注入失败                    | 显示错误提示："无法注入清理脚本"         |
-
-**Popup 生命周期说明：**
-
-- Popup 在页面失去焦点时会关闭
-- 刷新页面后 Popup 会自动关闭
-- 需要在刷新前显示提示："页面即将刷新，Popup 将关闭"
 
 **Popup 生命周期说明：**
 
