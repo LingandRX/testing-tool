@@ -1,6 +1,6 @@
 # Storage Cleaner Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagentation-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a storage cleaner feature to the browser extension popup that allows users to clear localStorage, sessionStorage, IndexedDB, Cookies, Cache Storage, andress Workers for the current page.
 
