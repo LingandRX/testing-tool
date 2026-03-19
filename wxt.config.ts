@@ -15,6 +15,7 @@ export default defineConfig({
       'scripting',
       'tabs',
       'debugger',
+      'cookies',
     ],
     host_permissions: ['<all_urls>'],
     action: {
