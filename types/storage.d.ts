@@ -1,4 +1,8 @@
+export type PageType = 'timestamp' | 'storageCleaner';
+
 export interface StorageSchema {
+  'app/currentRoute': PageType;
+  'app/visiblePages': PageType[];
   'app/lastRoute': string;
   'app/theme': string;
   'storageCleaner/preferences': StorageCleanerPreferences;

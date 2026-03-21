@@ -25,6 +25,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `postinstall` 会自动运行 `wxt prepare` 准备开发环境
 - `prepare` 钩子会初始化 Husky Git 钩子
 
+### CI/CD
+
+- GitHub Actions 配置: `.github/workflows/node.js.yml`
+- 在 main 分支推送或 PR 时触发
+- 使用 Node.js 22.x 运行 build
+- 测试命令当前被注释（项目暂无测试）
+
 ## 项目架构
 
 ### 技术栈
@@ -142,15 +149,17 @@ host_permissions: ['<all_urls>']  // 访问所有网站
 
 - 使用 ESLint 进行代码检查（零警告）
 - Husky 用于 Git 钩子管理
-- Lint-staged 确保暂存文件符合规范
+- Lint-staged 确保暂存文件符合规范（ESLint + TypeScript + Prettier）
 - Prettier 用于代码格式化
+- Prettier 配置: 100 字符行宽，2 空格缩进，单引号，trailing comma
 
 ### TypeScript 配置
 
 - 严格模式开启（`strict: true`）
-- 不允许隐式 any（可配置，当前关闭）
-- 未使用变量/参数会报错
+- `noImplicitAny` 设置为 `false`（允许隐式 any）
+- 未使用变量/参数会报错（`noUnusedLocals`, `noUnusedParameters`）
 - 模块解析模式：Bundler
+- 排除测试文件（`**/*.test.tsx`, `**/*.test.ts`）以避免类型检查
 
 ### 项目历史
 

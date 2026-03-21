@@ -48,3 +48,32 @@ body {
     transform: translateY(0);
   }
 }
+
+/* 导航容器 */
+.nav-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+/* 导航按钮 */
+.nav-button {
+  padding: 8px 16px;
+  border: 1px solid var(--btn-bg);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--btn-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.nav-button:hover {
+  background: var(--btn-bg);
+}
+
+.nav-button.active {
+  background: var(--btn-bg);
+  font-weight: 500;
+}
