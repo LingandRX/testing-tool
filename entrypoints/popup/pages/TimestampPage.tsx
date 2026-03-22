@@ -73,7 +73,7 @@ const LiveClock = React.memo(({
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
       <Stack direction="row" spacing={1} alignItems="baseline">
-        <Typography variant="h4" sx={{ fontWeight: 300, letterSpacing: '-1px', color: 'text.primary', fontFamily: 'monospace' }}>
+        <Typography variant="h5" sx={{ fontWeight: 300, letterSpacing: '-1px', color: 'text.primary', fontFamily: 'monospace' }}>
           {displayVal}
         </Typography>
         <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase' }}>
