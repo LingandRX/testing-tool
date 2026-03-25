@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
 import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import TimestampPage from './pages/TimestampPage';
@@ -52,6 +53,10 @@ function App() {
     setCurrentPage(page);
   };
 
+  const handleOpenOptions = () => {
+    chrome.runtime.openOptionsPage();
+  };
+
   const NavButton = ({ pageKey }: { pageKey: PageType }) => {
     const config = PAGE_CONFIG[pageKey];
     if (!config) return null;
@@ -78,6 +83,15 @@ function App() {
         {(Object.keys(PAGE_CONFIG) as PageType[])
           .filter((key) => visiblePages.includes(key))
           .map((key) => <NavButton key={key} pageKey={key} />)}
+        <Box key="settings" sx={{ display: 'inline-block' }}>
+          <button
+            className="nav-button settings-button"
+            onClick={handleOpenOptions}
+            title="打开设置"
+          >
+            <SettingsIcon sx={{ fontSize: 18, verticalAlign: 'middle' }} />
+          </button>
+        </Box>
       </Box>
       {currentPage === 'timestamp' && <TimestampPage />}
       {currentPage === 'storageCleaner' && <StorageCleanerPage />}
