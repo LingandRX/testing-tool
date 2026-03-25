@@ -77,3 +77,11 @@ body {
   background: var(--btn-bg);
   font-weight: 500;
 }
+
+.nav-button.settings-button {
+  padding: 8px 12px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
