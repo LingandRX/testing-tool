@@ -22,6 +22,7 @@ export default defineConfig({
       default_title: 'Testing Tools',
     },
     options_ui: {
+      page: 'entrypoints/options/index.html',
       open_in_tab: true,
     },
     // 将 favicon.ico 放入 public/ 文件夹中

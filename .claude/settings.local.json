@@ -8,7 +8,12 @@
       "Bash(npm run:*)",
       "Bash(git show-ref:*)",
       "Bash(git checkout:*)",
-      "mcp__plugin_playwright_playwright__browser_navigate"
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "Skill(code-review:code-review)",
+      "Bash(grep -E \"\\\\.\\(md|txt\\)$\")",
+      "Bash(pkill -f \"wxt\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(git restore:*)"
     ]
   }
 }
