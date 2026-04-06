@@ -93,8 +93,20 @@ function App() {
           </button>
         </Box>
       </Box>
-      {currentPage === 'timestamp' && <TimestampPage />}
-      {currentPage === 'storageCleaner' && <StorageCleanerPage />}
+      
+      {/* 统一滚动容器 */}
+      <Box 
+        sx={{ 
+          flex: 1, 
+          overflowY: 'auto', 
+          scrollbarGutter: 'stable',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        {currentPage === 'timestamp' && <TimestampPage />}
+        {currentPage === 'storageCleaner' && <StorageCleanerPage />}
+      </Box>
     </div>
   );
 }
