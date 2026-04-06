@@ -4,7 +4,6 @@ import {
   Typography,
   Box,
   Checkbox,
-  Button,
   FormControlLabel,
   Alert,
   Snackbar,
@@ -16,8 +15,14 @@ import {
 import RefreshIcon from '@mui/icons-material/Refresh';
 import WarningIcon from '@mui/icons-material/Warning';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Button from '@/components/Button';
+import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
 import { storageUtil } from '@/utils/chromeStorage';
-import type { StorageCleanerOptions, CleaningResult, StorageCleanerPreferences } from 'types/storage';
+import type {
+  StorageCleanerOptions,
+  CleaningResult,
+  StorageCleanerPreferences,
+} from 'types/storage';
 import {
   getCurrentTab,
   isRestrictedUrl,
@@ -70,10 +75,7 @@ export default function StorageCleanerPage() {
       setDomain(new URL(tab.url).hostname);
 
       // Load user preferences
-      const prefs = await storageUtil.get(
-        'storageCleaner/preferences',
-        DEFAULT_PREFERENCES,
-      );
+      const prefs = await storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES);
       setAutoRefresh(prefs?.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
       setOptions(prefs?.selectedTypes ?? DEFAULT_PREFERENCES.selectedTypes);
     };
@@ -84,10 +86,7 @@ export default function StorageCleanerPage() {
   const handleAutoRefreshChange = useCallback(async (checked: boolean) => {
     setAutoRefresh(checked);
     // Save preference immediately
-    const prefs = await storageUtil.get(
-      'storageCleaner/preferences',
-      DEFAULT_PREFERENCES,
-    );
+    const prefs = await storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES);
     await storageUtil.set('storageCleaner/preferences', {
       ...(prefs || DEFAULT_PREFERENCES),
       autoRefresh: checked,
@@ -98,13 +97,12 @@ export default function StorageCleanerPage() {
     setOptions((prev) => {
       const newOptions = { ...prev, [key]: !prev[key] };
       // Save options immediately
-      storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES)
-        .then(prefs => {
-          storageUtil.set('storageCleaner/preferences', {
-            ...(prefs || DEFAULT_PREFERENCES),
-            selectedTypes: newOptions,
-          });
+      storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES).then((prefs) => {
+        storageUtil.set('storageCleaner/preferences', {
+          ...(prefs || DEFAULT_PREFERENCES),
+          selectedTypes: newOptions,
         });
+      });
       return newOptions;
     });
   }, []);
@@ -122,12 +120,9 @@ export default function StorageCleanerPage() {
       serviceWorkers: checked,
     };
     setOptions(newOptions);
-    
+
     // Save options immediately
-    const prefs = await storageUtil.get(
-      'storageCleaner/preferences',
-      DEFAULT_PREFERENCES,
-    );
+    const prefs = await storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES);
     await storageUtil.set('storageCleaner/preferences', {
       ...(prefs || DEFAULT_PREFERENCES),
       selectedTypes: newOptions,
@@ -193,9 +188,6 @@ export default function StorageCleanerPage() {
     <Paper sx={{ p: 2, m: 1, borderRadius: 2 }}>
       {/* Header */}
       <Box sx={{ textAlign: 'center', mb: 2 }}>
-        <Typography variant="h5" component="h1" sx={{ mb: 1 }}>
-          存储清理
-        </Typography>
         <Typography variant="body2" color="text.secondary">
           当前页面: {domain || '加载中...'}
         </Typography>
@@ -327,10 +319,8 @@ export default function StorageCleanerPage() {
           variant="contained"
           onClick={() => setShowConfirm(true)}
           sx={{
-            py: 1.6, borderRadius: 3, fontSize: '1rem', fontWeight: 600, textTransform: 'none',
-            bgcolor: 'primary.main', transition: 'all 0.2s',
-            '&:hover': { bgcolor: 'primary.dark', transform: 'translateY(-1px)' },
-            '&:active': { transform: 'translateY(0)' }
+            bgcolor: 'primary.main',
+            '&:hover': { bgcolor: 'primary.dark' },
           }}
           disabled={loading}
           fullWidth
@@ -362,60 +352,12 @@ export default function StorageCleanerPage() {
       )}
 
       {/* Confirmation Dialog */}
-      {showConfirm && (
-        <Paper
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            bgcolor: 'rgba(255,255,255, 0.95)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 2,
-            zIndex: 10,
-          }}
-        >
-          <Typography variant="h6">确认清理</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 1 }}>
-            将清理以下存储类型：
-          </Typography>
-          <Box sx={{ mb: 1 }}>
-            {options.localStorage && (
-              <Typography variant="body2">- localStorage</Typography>
-            )}
-            {options.sessionStorage && (
-              <Typography variant="body2">- sessionStorage</Typography>
-            )}
-            {options.indexedDB && <Typography variant="body2">- IndexedDB</Typography>}
-            {options.cookies && <Typography variant="body2">- Cookies</Typography>}
-            {options.cacheStorage && (
-              <Typography variant="body2">- Cache Storage</Typography>
-            )}
-            {options.serviceWorkers && (
-              <Typography variant="body2">- Service Workers</Typography>
-            )}
-          </Box>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ textAlign: 'center', mb: 1 }}
-          >
-            此操作不可撤销。
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button variant="outlined" onClick={() => setShowConfirm(false)}>
-              取消
-            </Button>
-            <Button variant="contained" color="error" onClick={handleClean}>
-              确认清理
-            </Button>
-          </Box>
-        </Paper>
-      )}
+      <StorageCleanerConfirm
+        open={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleClean}
+        options={options}
+      />
 
       {/* Snackbar */}
       <Snackbar

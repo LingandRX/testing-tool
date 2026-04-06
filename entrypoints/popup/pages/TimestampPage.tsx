@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dayjs from '@/utils/dayjs';
 import {
-  Button,
   TextField,
   Select,
   MenuItem,
@@ -21,6 +20,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'; 
 import CheckIcon from '@mui/icons-material/Check';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import Button from '@/components/Button';
 
 // ================= 常量配置 =================
 const DATE_FORMAT = 'YYYY/MM/DD HH:mm:ss';
@@ -324,12 +324,6 @@ export default function TimestampPage() {
             <Button
               key={m} fullWidth disableRipple
               onClick={() => { setMode(m); setError(''); setResult(''); }}
-              sx={{
-                position: 'relative', zIndex: 1, borderRadius: 3, py: 1, textTransform: 'none',
-                fontSize: '0.875rem', fontWeight: 500, transition: 'color 0.2s',
-                color: mode === m ? 'text.primary' : 'text.disabled',
-                '&:hover': { bgcolor: 'transparent', color: mode === m ? 'text.primary' : 'text.secondary' },
-              }}
             >
               {m === 'ts2dt' ? '时间戳 → 日期' : '日期 → 时间戳'}
             </Button>
@@ -384,12 +378,6 @@ export default function TimestampPage() {
         <Button
           fullWidth variant="contained" disableElevation disableRipple
           onClick={convert}
-          sx={{
-            py: 1.6, borderRadius: 3, fontSize: '1rem', fontWeight: 600, textTransform: 'none',
-            bgcolor: 'primary.main', transition: 'all 0.2s',
-            '&:hover': { bgcolor: 'primary.dark', transform: 'translateY(-1px)' },
-            '&:active': { transform: 'translateY(0)' }
-          }}
         >
           立即转换
         </Button>

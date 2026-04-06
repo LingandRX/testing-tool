@@ -1,18 +1,4 @@
-/* 隐藏页面滚动条 */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  scrollbar-gutter: stable;
-}
-
-/* 隐藏body滚动条但允许滚动 */
-body {
-  overflow: auto;
-}
-
+/* 极简滚动条变量 */
 :root {
   /* 统一圆角变量 */
   --radius: 8px;
@@ -25,16 +11,54 @@ body {
   /* 统一按钮文字颜色变量 */
   --btn-text: #333333;
   --border: 1px solid #e0e0e0;
+
+  /* 滚动条变量 */
+  --sb-width: 6px;
+  --sb-thumb-color: rgba(0, 0, 0, 0.1);
+  --sb-thumb-hover: rgba(0, 0, 0, 0.2);
+  --sb-track-color: transparent;
+}
+
+/* 强制固定视口尺寸 */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 400px;
+  height: 600px;
+  overflow: hidden; /* 禁用外层滚动 */
+}
+
+/* 全局极简滚动条定制 */
+*::-webkit-scrollbar {
+  width: var(--sb-width);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 10px;
+  background-clip: content-box;
+  border: 1px solid transparent;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-thumb-hover);
 }
 
 .app {
-  width: 400px;
-  min-height: 100%;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  overflow-x: hidden;
+  overflow: hidden; /* 内部由 flex 子项控制滚动 */
 }
 
 @keyframes fadeIn {
@@ -52,9 +76,12 @@ body {
 .nav-container {
   display: flex;
   justify-content: center;
-  margin-top: 16px;
-  margin-bottom: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
   gap: 8px;
+  flex-shrink: 0; /* 禁止导航栏被挤压缩放 */
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* 导航按钮 */
