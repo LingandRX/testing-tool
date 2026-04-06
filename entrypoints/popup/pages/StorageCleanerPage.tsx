@@ -16,6 +16,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import WarningIcon from '@mui/icons-material/Warning';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Button from '@/components/Button';
+import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
 import { storageUtil } from '@/utils/chromeStorage';
 import type {
   StorageCleanerOptions,
@@ -351,55 +352,12 @@ export default function StorageCleanerPage() {
       )}
 
       {/* Confirmation Dialog */}
-      {showConfirm && (
-        <Paper
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            bgcolor: 'rgba(255,255,255, 0.95)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 2,
-            zIndex: 10,
-          }}
-        >
-          <Typography variant="h6">确认清理</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 1 }}>
-            将清理以下存储类型：
-          </Typography>
-          <Box sx={{ mb: 1 }}>
-            {options.localStorage && <Typography variant="body2">- localStorage</Typography>}
-            {options.sessionStorage && <Typography variant="body2">- sessionStorage</Typography>}
-            {options.indexedDB && <Typography variant="body2">- IndexedDB</Typography>}
-            {options.cookies && <Typography variant="body2">- Cookies</Typography>}
-            {options.cacheStorage && <Typography variant="body2">- Cache Storage</Typography>}
-            {options.serviceWorkers && <Typography variant="body2">- Service Workers</Typography>}
-          </Box>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 1 }}>
-            此操作不可撤销。
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              variant="outlined"
-              onClick={() => setShowConfirm(false)}
-            >
-              取消
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleClean}
-            >
-              确认清理
-            </Button>
-          </Box>
-        </Paper>
-      )}
+      <StorageCleanerConfirm
+        open={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleClean}
+        options={options}
+      />
 
       {/* Snackbar */}
       <Snackbar
