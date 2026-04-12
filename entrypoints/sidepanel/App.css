@@ -1,0 +1,114 @@
+/* 极简滚动条变量 */
+:root {
+  /* 统一圆角变量 */
+  --radius: 8px;
+  /* 统一背景颜色变量 */
+  --bg-color: #fafafa;
+  /* 统一文字颜色变量 */
+  --text-color: #333333;
+  /* 统一按钮颜色变量 */
+  --btn-bg: #e0e0e0;
+  /* 统一按钮文字颜色变量 */
+  --btn-text: #333333;
+  --border: 1px solid #e0e0e0;
+
+  /* 滚动条变量 */
+  --sb-width: 6px;
+  --sb-thumb-color: rgba(0, 0, 0, 0.1);
+  --sb-thumb-hover: rgba(0, 0, 0, 0.2);
+  --sb-track-color: transparent;
+}
+
+/* 适配侧边栏 - 使用百分比而非固定尺寸 */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden; /* 禁用外层滚动 */
+}
+
+/* 全局极简滚动条定制 */
+*::-webkit-scrollbar {
+  width: var(--sb-width);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 10px;
+  background-clip: content-box;
+  border: 1px solid transparent;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-thumb-hover);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden; /* 内部由 flex 子项控制滚动 */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 导航容器 */
+.nav-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  gap: 8px;
+  flex-shrink: 0; /* 禁止导航栏被挤压缩放 */
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 导航按钮 */
+.nav-button {
+  padding: 8px 16px;
+  border: 1px solid var(--btn-bg);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--btn-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.nav-button:hover {
+  background: var(--btn-bg);
+}
+
+.nav-button.active {
+  background: var(--btn-bg);
+  font-weight: 500;
+}
+
+.nav-button.settings-button {
+  padding: 8px 12px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

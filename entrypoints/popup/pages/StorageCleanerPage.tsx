@@ -22,7 +22,7 @@ import type {
   StorageCleanerOptions,
   CleaningResult,
   StorageCleanerPreferences,
-} from 'types/storage';
+} from '@/types/storage';
 import {
   getCurrentTab,
   isRestrictedUrl,

@@ -1,4 +1,4 @@
-import type { StorageCleanerOptions, CleaningResult, StorageCleanResult } from 'types/storage';
+import type { StorageCleanerOptions, CleaningResult, StorageCleanResult } from '@/types/storage';
 
 const RESTRICTED_PROTOCOLS = [
   'chrome:',

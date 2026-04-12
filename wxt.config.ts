@@ -16,10 +16,14 @@ export default defineConfig({
       'tabs',
       'debugger',
       'cookies',
+      'sidePanel',
     ],
     host_permissions: ['<all_urls>'],
     action: {
       default_title: 'Testing Tools',
+    },
+    side_panel: {
+      default_path: 'entrypoints/sidepanel/index.html',
     },
     options_ui: {
       page: 'entrypoints/options/index.html',
