@@ -17,6 +17,7 @@ import { storageUtil } from '@/utils/chromeStorage';
 const PAGE_CONFIG = {
   timestamp: { label: '时间戳', defaultVisible: true },
   storageCleaner: { label: '存储清理', defaultVisible: true },
+  openUrl: { label: 'Open Url', defaultVisible: true },
 } as const satisfies Record<PageType, { label: string; defaultVisible: boolean }>;
 
 function App() {
@@ -34,12 +35,13 @@ function App() {
       const saved = await storageUtil.get('app/visiblePages', [
         'timestamp',
         'storageCleaner',
+        'openUrl',
       ] as PageType[]);
       // Ensure we always have an array
-      setVisiblePages(saved ?? ['timestamp', 'storageCleaner']);
+      setVisiblePages(saved ?? ['timestamp', 'storageCleaner', 'openUrl']);
     } catch (error) {
       console.error('Failed to load config:', error);
-      setVisiblePages(['timestamp', 'storageCleaner']);
+      setVisiblePages(['timestamp', 'storageCleaner', 'openUrl']);
     } finally {
       setIsLoaded(true);
     }

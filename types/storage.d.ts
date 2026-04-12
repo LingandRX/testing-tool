@@ -1,4 +1,4 @@
-export type PageType = 'timestamp' | 'storageCleaner';
+export type PageType = 'timestamp' | 'storageCleaner' | 'openUrl';
 
 export interface StorageSchema {
   'app/currentRoute': PageType;
@@ -6,11 +6,16 @@ export interface StorageSchema {
   'app/lastRoute': string;
   'app/theme': string;
   'storageCleaner/preferences': StorageCleanerPreferences;
+  'openUrl/preferences': OpenUrlPreferences;
 }
 
 export interface StorageCleanerPreferences {
   autoRefresh: boolean;
   selectedTypes: StorageCleanerOptions;
+}
+
+export interface OpenUrlPreferences {
+  apiUrl: string;
 }
 
 export interface StorageCleanerOptions {

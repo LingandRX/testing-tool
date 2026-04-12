@@ -5,16 +5,18 @@ import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import TimestampPage from '@/entrypoints/popup/pages/TimestampPage';
 import StorageCleanerPage from '@/entrypoints/popup/pages/StorageCleanerPage';
+import OpenUrlPage from '@/entrypoints/popup/pages/OpenUrlPage';
 import './App.css';
 
 const PAGE_CONFIG = {
   timestamp: { label: '时间戳', defaultVisible: true },
   storageCleaner: { label: '存储清理', defaultVisible: true },
+  openUrl: { label: 'Open Url', defaultVisible: true },
 } as const satisfies Record<PageType, { label: string; defaultVisible: boolean }>;
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('timestamp');
-  const [visiblePages, setVisiblePages] = useState<PageType[]>(['timestamp', 'storageCleaner']);
+  const [visiblePages, setVisiblePages] = useState<PageType[]>(['timestamp', 'storageCleaner', 'openUrl']);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -105,6 +107,7 @@ function App() {
       >
         {currentPage === 'timestamp' && <TimestampPage />}
         {currentPage === 'storageCleaner' && <StorageCleanerPage />}
+        {currentPage === 'openUrl' && <OpenUrlPage />}
       </Box>
     </div>
   );

@@ -5,17 +5,19 @@ import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import TimestampPage from './pages/TimestampPage';
 import StorageCleanerPage from './pages/StorageCleanerPage';
+import OpenUrlPage from './pages/OpenUrlPage';
 import './App.css';
 
 
 const PAGE_CONFIG = {
   timestamp: { label: '时间戳', defaultVisible: true },
   storageCleaner: { label: '存储清理', defaultVisible: true },
+  openUrl: { label: 'Open Url', defaultVisible: true },
 } as const satisfies Record<PageType, { label: string; defaultVisible: boolean }>;
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('timestamp');
-  const [visiblePages, setVisiblePages] = useState<PageType[]>(['timestamp', 'storageCleaner']);
+  const [visiblePages, setVisiblePages] = useState<PageType[]>(['timestamp', 'storageCleaner', 'openUrl']);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ function App() {
     try {
       const [savedRoute, savedVisiblePages] = await Promise.all([
         storageUtil.get('app/currentRoute', 'timestamp'),
-        storageUtil.get('app/visiblePages', ['timestamp', 'storageCleaner'] as PageType[]),
+        storageUtil.get('app/visiblePages', ['timestamp', 'storageCleaner', 'openUrl'] as PageType[]),
       ]);
 
       if (savedRoute) {
@@ -95,10 +97,10 @@ function App() {
       </Box>
       
       {/* 统一滚动容器 */}
-      <Box 
-        sx={{ 
-          flex: 1, 
-          overflowY: 'auto', 
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: 'auto',
           scrollbarGutter: 'stable',
           display: 'flex',
           flexDirection: 'column'
@@ -106,6 +108,7 @@ function App() {
       >
         {currentPage === 'timestamp' && <TimestampPage />}
         {currentPage === 'storageCleaner' && <StorageCleanerPage />}
+        {currentPage === 'openUrl' && <OpenUrlPage />}
       </Box>
     </div>
   );
