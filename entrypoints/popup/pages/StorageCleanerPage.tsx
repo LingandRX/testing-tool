@@ -6,7 +6,6 @@ import {
   Checkbox,
   FormControlLabel,
   Alert,
-  Snackbar,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -16,6 +15,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import WarningIcon from '@mui/icons-material/Warning';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Button from '@/components/Button';
+import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
 import { storageUtil } from '@/utils/chromeStorage';
 import type {
@@ -52,10 +52,7 @@ export default function StorageCleanerPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
-  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string }>({
-    open: false,
-    message: '',
-  });
+  const { snackbarProps, showMessage } = useSnackbar();
 
   // Load tab info and user preferences
   useEffect(() => {
@@ -133,7 +130,7 @@ export default function StorageCleanerPage() {
     const tab = await getCurrentTab();
 
     if (!tab || !tab.id || !tab.url) {
-      setSnackbar({ open: true, message: '无法获取当前标签页' });
+      showMessage('无法获取当前标签页');
       return;
     }
 
@@ -151,28 +148,28 @@ export default function StorageCleanerPage() {
 
       // Auto refresh if enabled
       if (autoRefresh && cleaningResult.success && tab.id !== undefined) {
-        setSnackbar({ open: true, message: '页面即将刷新，Popup 将关闭' });
+        showMessage('页面即将刷新，Popup 将关闭');
         setTimeout(() => {
           chrome.tabs.reload(tab.id!);
         }, 1500);
       }
     } catch (err) {
-      setSnackbar({ open: true, message: `清理失败: ${String(err)}` });
+      showMessage(`清理失败: ${String(err)}`, { severity: 'error' });
     } finally {
       setLoading(false);
       setShowConfirm(false);
     }
-  }, [options, autoRefresh]);
+  }, [options, autoRefresh, showMessage]);
 
   const handleRefresh = useCallback(async () => {
     const tab = await getCurrentTab();
     if (tab?.id !== undefined) {
-      setSnackbar({ open: true, message: '页面即将刷新，Popup 将关闭' });
+      showMessage('页面即将刷新，Popup 将关闭');
       setTimeout(() => {
         chrome.tabs.reload(tab.id!);
       }, 1500);
     }
-  }, []);
+  }, [showMessage]);
 
   if (error) {
     return (
@@ -360,15 +357,7 @@ export default function StorageCleanerPage() {
       />
 
       {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert severity="info" variant="filled">
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      <GlobalSnackbar {...snackbarProps} />
     </Paper>
   );
 }

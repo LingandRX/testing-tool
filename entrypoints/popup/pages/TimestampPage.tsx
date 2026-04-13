@@ -9,13 +9,12 @@ import {
   Typography,
   Box,
   IconButton,
-  Snackbar,
-  Alert,
   InputAdornment,
   alpha,
   Tooltip,
   Theme,
 } from '@mui/material';
+import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'; 
 import CheckIcon from '@mui/icons-material/Check';
@@ -227,16 +226,18 @@ export default function TimestampPage() {
   const [zone, setZone] = useState<ZoneType>('Asia/Shanghai');
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
-  const [snack, setSnack] = useState<{ open: boolean; msg: string }>({ open: false, msg: '' });
+  const { snackbarProps, showMessage } = useSnackbar({
+    autoHideDuration: 1500,
+  });
 
   const copy = useCallback(async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setSnack({ open: true, msg: '已复制' });
+      showMessage('已复制', { severity: 'success' });
     } catch {
-      setSnack({ open: true, msg: '复制失败' });
+      showMessage('复制失败', { severity: 'error' });
     }
-  }, []);
+  }, [showMessage]);
 
   const convert = useCallback(() => {
     if (mode === 'ts2dt') {
@@ -386,15 +387,7 @@ export default function TimestampPage() {
         <ResultView result={result} mode={mode} unit={unit} zone={zone} onCopy={copy} />
       </Paper>
 
-      <Snackbar 
-        open={snack.open} autoHideDuration={1500} 
-        onClose={() => { setSnack((s) => ({ ...s, open: false })); }}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" variant="filled" icon={false} sx={{ borderRadius: 2.5, bgcolor: 'grey.900' }}>
-          {snack.msg}
-        </Alert>
-      </Snackbar>
+      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

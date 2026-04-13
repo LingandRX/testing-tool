@@ -94,6 +94,7 @@ body,
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
+  line-height: 1.5;
 }
 
 .nav-button:hover {

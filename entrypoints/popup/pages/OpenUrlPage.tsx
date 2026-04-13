@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Paper, Box, TextField, Alert, Snackbar } from '@mui/material';
+import { Paper, Box, TextField, Alert } from '@mui/material';
 import Button from '@/components/Button';
+import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
 import type { OpenUrlPreferences } from '@/types/storage';
 
@@ -10,10 +11,8 @@ const DEFAULT_PREFERENCES: OpenUrlPreferences = {
 
 export default function OpenUrlPage() {
   const [apiUrl, setApiUrl] = useState<string>(DEFAULT_PREFERENCES.apiUrl);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [isLoaded, setIsLoaded] = useState(false);
+  const { snackbarProps, showMessage } = useSnackbar();
 
   // 混合内容警告检查
   const showMixedContentWarning =
@@ -63,15 +62,9 @@ export default function OpenUrlPage() {
     return () => clearTimeout(timer);
   }, [apiUrl, isLoaded, savePreferences]);
 
-  const showMessage = (message: string, severity: 'success' | 'error') => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
-
   const handleOpenInSidepanel = async () => {
     if (!isValidUrl()) {
-      showMessage('请输入有效的 URL', 'error');
+      showMessage('请输入有效的 URL', { severity: 'error' });
       return;
     }
 
@@ -83,7 +76,7 @@ export default function OpenUrlPage() {
       });
       const tabId = currentTab.id;
       if (!tabId) {
-        showMessage('无法获取当前标签页', 'error');
+        showMessage('无法获取当前标签页', { severity: 'error' });
         return;
       }
 
@@ -95,22 +88,21 @@ export default function OpenUrlPage() {
       });
       await chrome.sidePanel.open({ windowId: currentTab.windowId });
 
-      showMessage('Your Url 已在侧边栏打开', 'success');
+      // 关闭弹出窗口
+      window.close();
+
+      showMessage('Your Url 已在侧边栏打开', { severity: 'success' });
     } catch (error) {
       console.error('Failed to open side panel:', error);
-      showMessage(`打开失败: ${(error as Error).message}`, 'error');
+      showMessage(`打开失败: ${(error as Error).message}`, { severity: 'error' });
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
   };
 
   return (
     <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Paper elevation={1} sx={{ p: 2, flex: 1 }}>
         <TextField
-          label="API URL"
+          label="Base URL"
           placeholder="例如: http://localhost:8000/docs"
           value={apiUrl}
           onChange={(e) => setApiUrl(e.target.value)}
@@ -139,13 +131,7 @@ export default function OpenUrlPage() {
         </Box>
       </Paper>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-        color={snackbarSeverity === 'success' ? 'success' : 'error'}
-      />
+      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }
