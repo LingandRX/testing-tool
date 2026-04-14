@@ -29,12 +29,6 @@ export default defineConfig({
       page: 'entrypoints/options/index.html',
       open_in_tab: true,
     },
-    // 将 favicon.ico 放入 public/ 文件夹中
-    icons: {
-      16: 'favicon.ico',
-      48: 'favicon.ico',
-      128: 'favicon.ico',
-    },
   },
   vite: () => ({
     build: {
