@@ -1,4 +1,4 @@
-export type PageType = 'timestamp' | 'storageCleaner' | 'openUrl';
+export type PageType = 'timestamp' | 'storageCleaner' | 'openUrl' | 'openUrlViewer';
 
 export interface StorageSchema {
   'app/currentRoute': PageType;
@@ -7,6 +7,7 @@ export interface StorageSchema {
   'app/theme': string;
   'storageCleaner/preferences': StorageCleanerPreferences;
   'openUrl/preferences': OpenUrlPreferences;
+  'openUrl/currentUrl': string;
 }
 
 export interface StorageCleanerPreferences {
@@ -14,8 +15,13 @@ export interface StorageCleanerPreferences {
   selectedTypes: StorageCleanerOptions;
 }
 
+export interface OpenUrlEntry {
+  name: string;
+  url: string;
+}
+
 export interface OpenUrlPreferences {
-  apiUrl: string;
+  entries: OpenUrlEntry[];
 }
 
 export interface StorageCleanerOptions {

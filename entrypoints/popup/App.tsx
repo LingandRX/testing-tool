@@ -6,6 +6,7 @@ import { storageUtil } from '@/utils/chromeStorage';
 import TimestampPage from './pages/TimestampPage';
 import StorageCleanerPage from './pages/StorageCleanerPage';
 import OpenUrlPage from './pages/OpenUrlPage';
+import OpenUrlViewerPage from './pages/OpenUrlViewerPage';
 import './App.css';
 
 
@@ -13,6 +14,7 @@ const PAGE_CONFIG = {
   timestamp: { label: '时间戳', defaultVisible: true },
   storageCleaner: { label: '存储清理', defaultVisible: true },
   openUrl: { label: 'Open Url', defaultVisible: true },
+  openUrlViewer: { label: '查看', defaultVisible: false },
 } as const satisfies Record<PageType, { label: string; defaultVisible: boolean }>;
 
 function App() {
@@ -95,7 +97,7 @@ function App() {
           </button>
         </Box>
       </Box>
-      
+
       {/* 统一滚动容器 */}
       <Box
         sx={{
@@ -109,6 +111,7 @@ function App() {
         {currentPage === 'timestamp' && <TimestampPage />}
         {currentPage === 'storageCleaner' && <StorageCleanerPage />}
         {currentPage === 'openUrl' && <OpenUrlPage />}
+        {currentPage === 'openUrlViewer' && <OpenUrlViewerPage />}
       </Box>
     </div>
   );

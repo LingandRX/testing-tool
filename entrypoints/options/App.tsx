@@ -18,6 +18,7 @@ const PAGE_CONFIG = {
   timestamp: { label: '时间戳', defaultVisible: true },
   storageCleaner: { label: '存储清理', defaultVisible: true },
   openUrl: { label: 'Open Url', defaultVisible: true },
+  openUrlViewer: { label: '查看', defaultVisible: false },
 } as const satisfies Record<PageType, { label: string; defaultVisible: boolean }>;
 
 function App() {
