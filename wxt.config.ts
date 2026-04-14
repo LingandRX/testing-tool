@@ -14,7 +14,6 @@ export default defineConfig({
       'activeTab',
       'scripting',
       'tabs',
-      'debugger',
       'cookies',
       'sidePanel',
     ],

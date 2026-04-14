@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Paper,
   Typography,
@@ -53,6 +53,16 @@ export default function StorageCleanerPage() {
   const [result, setResult] = useState<CleaningResult | null>(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const { snackbarProps, showMessage } = useSnackbar();
+  const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (reloadTimeoutRef.current) {
+        clearTimeout(reloadTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Load tab info and user preferences
   useEffect(() => {
@@ -82,27 +92,25 @@ export default function StorageCleanerPage() {
 
   const handleAutoRefreshChange = useCallback(async (checked: boolean) => {
     setAutoRefresh(checked);
-    // Save preference immediately
-    const prefs = await storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES);
+    // Save preference immediately - use existing options from state
     await storageUtil.set('storageCleaner/preferences', {
-      ...(prefs || DEFAULT_PREFERENCES),
       autoRefresh: checked,
+      selectedTypes: options,
     });
-  }, []);
+  }, [options]);
 
   const handleOptionChange = useCallback(async (key: keyof StorageCleanerOptions) => {
-    setOptions((prev) => {
+    // Calculate new options outside the state updater to avoid race conditions
+    setOptions(prev => {
       const newOptions = { ...prev, [key]: !prev[key] };
       // Save options immediately
-      storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES).then((prefs) => {
-        storageUtil.set('storageCleaner/preferences', {
-          ...(prefs || DEFAULT_PREFERENCES),
-          selectedTypes: newOptions,
-        });
+      storageUtil.set('storageCleaner/preferences', {
+        autoRefresh,
+        selectedTypes: newOptions,
       });
       return newOptions;
     });
-  }, []);
+  }, [autoRefresh]);
 
   const allSelected = Object.values(options).every(Boolean);
   const someSelected = Object.values(options).some(Boolean) && !allSelected;
@@ -118,13 +126,12 @@ export default function StorageCleanerPage() {
     };
     setOptions(newOptions);
 
-    // Save options immediately
-    const prefs = await storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES);
+    // Save options immediately - use existing autoRefresh from state
     await storageUtil.set('storageCleaner/preferences', {
-      ...(prefs || DEFAULT_PREFERENCES),
+      autoRefresh,
       selectedTypes: newOptions,
     });
-  }, []);
+  }, [autoRefresh]);
 
   const handleClean = useCallback(async () => {
     const tab = await getCurrentTab();
@@ -149,7 +156,7 @@ export default function StorageCleanerPage() {
       // Auto refresh if enabled
       if (autoRefresh && cleaningResult.success && tab.id !== undefined) {
         showMessage('页面即将刷新，Popup 将关闭');
-        setTimeout(() => {
+        reloadTimeoutRef.current = setTimeout(() => {
           chrome.tabs.reload(tab.id!);
         }, 1500);
       }
@@ -165,7 +172,7 @@ export default function StorageCleanerPage() {
     const tab = await getCurrentTab();
     if (tab?.id !== undefined) {
       showMessage('页面即将刷新，Popup 将关闭');
-      setTimeout(() => {
+      reloadTimeoutRef.current = setTimeout(() => {
         chrome.tabs.reload(tab.id!);
       }, 1500);
     }

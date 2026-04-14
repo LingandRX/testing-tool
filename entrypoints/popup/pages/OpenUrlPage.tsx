@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Fragment } from 'react';
 import {
   Paper,
   Box,
@@ -133,9 +133,8 @@ export default function OpenUrlPage() {
       await chrome.sidePanel.open({ windowId: currentTab.windowId });
 
       // 关闭弹出窗口
-      window.close();
-
       showMessage(`已在侧边栏打开: ${entry.name}`, { severity: 'success' });
+      window.close();
     } catch (error) {
       console.error('Failed to open side panel:', error);
       showMessage(`打开失败: ${(error as Error).message}`, { severity: 'error' });
@@ -152,9 +151,6 @@ export default function OpenUrlPage() {
     <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* 添加新 URL 表单 */}
       <Paper elevation={1} sx={{ p: 2 }}>
-        <Typography variant="subtitle1" sx={{ mb: 2 }}>
-          添加新的快捷方式
-        </Typography>
         <TextField
           label="名称"
           placeholder="例如: 本地文档"
@@ -208,7 +204,7 @@ export default function OpenUrlPage() {
         ) : (
           <List disablePadding>
             {entries.map((entry, index) => (
-              <div key={index}>
+              <Fragment key={index}>
                 <ListItem
                   disablePadding
                   sx={{
@@ -259,7 +255,7 @@ export default function OpenUrlPage() {
                   </Box>
                 </ListItem>
                 {index < entries.length - 1 && <Divider sx={{ my: 1 }} />}
-              </div>
+              </Fragment>
             ))}
           </List>
         )}
