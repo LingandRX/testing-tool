@@ -17,7 +17,8 @@ import AddIcon from '@mui/icons-material/Add';
 import Button from '@/components/Button';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
-import type { OpenUrlPreferences, OpenUrlEntry, PageType } from '@/types/storage';
+import { useRouter } from '@/providers/RouterProvider';
+import type { OpenUrlPreferences, OpenUrlEntry } from '@/types/storage';
 
 const DEFAULT_PREFERENCES: OpenUrlPreferences = {
   entries: [],
@@ -29,6 +30,7 @@ export default function OpenUrlPage() {
   const [newUrl, setNewUrl] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
   const { snackbarProps, showMessage } = useSnackbar();
+  const { navigateTo } = useRouter();
 
   // 混合内容警告检查
   const showMixedContentWarning =
@@ -108,8 +110,8 @@ export default function OpenUrlPage() {
     try {
       // 保存当前选中的 URL
       await storageUtil.set('openUrl/currentUrl', entry.url);
-      // 切换到查看页面
-      await storageUtil.set('app/currentRoute', 'openUrlViewer' as PageType);
+      // 切换到查看页面 - now use navigateTo instead of direct storage set
+      navigateTo('openUrlViewer');
 
       // 获取当前标签页并打开侧边栏
       const [currentTab] = await chrome.tabs.query({

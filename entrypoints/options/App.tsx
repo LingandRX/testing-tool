@@ -13,13 +13,7 @@ import {
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
-
-const PAGE_CONFIG = {
-  timestamp: { label: '时间戳', defaultVisible: true },
-  storageCleaner: { label: '存储清理', defaultVisible: true },
-  openUrl: { label: 'Open Url', defaultVisible: true },
-  openUrlViewer: { label: '查看', defaultVisible: false },
-} as const satisfies Record<PageType, { label: string; defaultVisible: boolean }>;
+import { ROUTES } from '@/config/routes';
 
 function App() {
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
@@ -66,8 +60,9 @@ function App() {
     try {
       await storageUtil.set('app/visiblePages', newPages);
       setVisiblePages(newPages);
+      const route = ROUTES.find(r => r.key === page);
       showToast(
-        `已${isCurrentlyVisible ? '隐藏' : '显示'} ${PAGE_CONFIG[page].label}`,
+        `已${isCurrentlyVisible ? '隐藏' : '显示'} ${route?.label || page}`,
         'success',
       );
     } catch (error) {
@@ -78,9 +73,9 @@ function App() {
 
   const handleRestoreDefaults = async () => {
     try {
-      const defaults = (Object.keys(PAGE_CONFIG) as PageType[]).filter(
-        (key) => PAGE_CONFIG[key].defaultVisible,
-      );
+      const defaults = ROUTES
+        .filter(route => route.defaultVisible)
+        .map(route => route.key);
       await storageUtil.set('app/visiblePages', defaults);
       setVisiblePages(defaults);
       showToast('已恢复默认设置', 'success');
@@ -134,23 +129,22 @@ function App() {
           可见页面设置
         </Typography>
 
-        {(Object.keys(PAGE_CONFIG) as PageType[]).map((pageKey) => {
-          const config = PAGE_CONFIG[pageKey];
-          const isChecked = visiblePages.includes(pageKey);
+        {ROUTES.map((route) => {
+          const isChecked = visiblePages.includes(route.key);
           const isDisabled = !isChecked && visiblePages.length === 1;
 
           return (
             <FormControlLabel
-              key={pageKey}
+              key={route.key}
               control={
                 <Switch
                   checked={isChecked}
-                  onChange={() => handlePageToggle(pageKey)}
+                  onChange={() => handlePageToggle(route.key)}
                   disabled={isDisabled}
                   color="primary"
                 />
               }
-              label={config.label}
+              label={route.label}
               sx={{
                 width: '100%',
                 mb: 1,
