@@ -20,6 +20,51 @@ export function isRestrictedUrl(url?: string): boolean {
   return RESTRICTED_PROTOCOLS.some((p) => url.startsWith(p));
 }
 
+export async function getCookieSize(url: string): Promise<number> {
+  try {
+    const cookies = await chrome.cookies.getAll({ url });
+    return cookies.reduce((acc, c) => acc + c.name.length + c.value.length, 0);
+  } catch {
+    return 0;
+  }
+}
+
+export async function getLocalStorageSize(tabId: number): Promise<number> {
+  try {
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: () => {
+        return Object.entries(localStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+      },
+    });
+    return (result?.result as number) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+export async function getSessionStorageSize(tabId: number): Promise<number> {
+  try {
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: () => {
+        return Object.entries(sessionStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+      },
+    });
+    return (result?.result as number) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function formatSize(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
 export async function clearCookies(url: string): Promise<StorageCleanResult> {
   try {
     const cookies = await chrome.cookies.getAll({ url });

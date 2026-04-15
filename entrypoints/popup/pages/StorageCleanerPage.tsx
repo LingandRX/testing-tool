@@ -1,19 +1,17 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Paper,
   Typography,
   Box,
   Checkbox,
-  FormControlLabel,
   Alert,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Divider,
+  Container,
+  Stack,
+  Switch,
+  Grid,
 } from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import WarningIcon from '@mui/icons-material/Warning';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import StorageIcon from '@mui/icons-material/Storage';
 import Button from '@/components/Button';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
@@ -28,6 +26,10 @@ import {
   isRestrictedUrl,
   clearStorage,
   formatCleaningResult,
+  getCookieSize,
+  getLocalStorageSize,
+  getSessionStorageSize,
+  formatSize,
 } from '@/utils/storageCleaner';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
@@ -48,6 +50,7 @@ export default function StorageCleanerPage() {
   const [domain, setDomain] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [options, setOptions] = useState<StorageCleanerOptions>(DEFAULT_OPTIONS);
+  const [sizes, setSizes] = useState<Record<string, number>>({});
   const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
@@ -55,110 +58,110 @@ export default function StorageCleanerPage() {
   const { snackbarProps, showMessage } = useSnackbar();
   const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
-      if (reloadTimeoutRef.current) {
-        clearTimeout(reloadTimeoutRef.current);
-      }
+      if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
     };
   }, []);
 
-  // Load tab info and user preferences
+  const loadInfo = async () => {
+    const tab = await getCurrentTab();
+    if (!tab || !tab.url) {
+      setError('无法获取当前标签页');
+      return;
+    }
+    if (isRestrictedUrl(tab.url)) {
+      setError('存储清理功能不支持此页面');
+      return;
+    }
+    const url = tab.url;
+    const tabId = tab.id!;
+    setDomain(new URL(url).hostname);
+
+    const [savedPrefs, cSize, lsSize, ssSize] = await Promise.all([
+      storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES),
+      getCookieSize(url),
+      getLocalStorageSize(tabId),
+      getSessionStorageSize(tabId),
+    ]);
+
+    setAutoRefresh(savedPrefs?.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
+    setOptions(savedPrefs?.selectedTypes ?? DEFAULT_PREFERENCES.selectedTypes);
+    setSizes({
+      cookies: cSize,
+      localStorage: lsSize,
+      sessionStorage: ssSize,
+    });
+  };
+
   useEffect(() => {
-    const loadInfo = async () => {
-      const tab = await getCurrentTab();
-
-      if (!tab || !tab.url) {
-        setError('无法获取当前标签页');
-        return;
-      }
-
-      if (isRestrictedUrl(tab.url)) {
-        setError('存储清理功能不支持此页面');
-        return;
-      }
-
-      setDomain(new URL(tab.url).hostname);
-
-      // Load user preferences
-      const prefs = await storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES);
-      setAutoRefresh(prefs?.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
-      setOptions(prefs?.selectedTypes ?? DEFAULT_PREFERENCES.selectedTypes);
-    };
-
     loadInfo();
   }, []);
 
-  const handleAutoRefreshChange = useCallback(async (checked: boolean) => {
-    setAutoRefresh(checked);
-    // Save preference immediately - use existing options from state
-    await storageUtil.set('storageCleaner/preferences', {
-      autoRefresh: checked,
-      selectedTypes: options,
-    });
-  }, [options]);
-
-  const handleOptionChange = useCallback(async (key: keyof StorageCleanerOptions) => {
-    // Calculate new options outside the state updater to avoid race conditions
-    setOptions(prev => {
-      const newOptions = { ...prev, [key]: !prev[key] };
-      // Save options immediately
-      storageUtil.set('storageCleaner/preferences', {
-        autoRefresh,
-        selectedTypes: newOptions,
+  const handleAutoRefreshChange = useCallback(
+    async (checked: boolean) => {
+      setAutoRefresh(checked);
+      await storageUtil.set('storageCleaner/preferences', {
+        autoRefresh: checked,
+        selectedTypes: options,
       });
-      return newOptions;
-    });
-  }, [autoRefresh]);
+    },
+    [options],
+  );
+
+  const handleOptionChange = useCallback(
+    async (key: keyof StorageCleanerOptions) => {
+      setOptions((prev) => {
+        const newOptions = { ...prev, [key]: !prev[key] };
+        storageUtil.set('storageCleaner/preferences', {
+          autoRefresh,
+          selectedTypes: newOptions,
+        });
+        return newOptions;
+      });
+    },
+    [autoRefresh],
+  );
 
   const allSelected = Object.values(options).every(Boolean);
   const someSelected = Object.values(options).some(Boolean) && !allSelected;
 
-  const handleSelectAll = useCallback(async (checked: boolean) => {
-    const newOptions = {
-      localStorage: checked,
-      sessionStorage: checked,
-      indexedDB: checked,
-      cookies: checked,
-      cacheStorage: checked,
-      serviceWorkers: checked,
-    };
-    setOptions(newOptions);
-
-    // Save options immediately - use existing autoRefresh from state
-    await storageUtil.set('storageCleaner/preferences', {
-      autoRefresh,
-      selectedTypes: newOptions,
-    });
-  }, [autoRefresh]);
+  const handleSelectAll = useCallback(
+    async (checked: boolean) => {
+      const newOptions = {
+        localStorage: checked,
+        sessionStorage: checked,
+        indexedDB: checked,
+        cookies: checked,
+        cacheStorage: checked,
+        serviceWorkers: checked,
+      };
+      setOptions(newOptions);
+      await storageUtil.set('storageCleaner/preferences', {
+        autoRefresh,
+        selectedTypes: newOptions,
+      });
+    },
+    [autoRefresh],
+  );
 
   const handleClean = useCallback(async () => {
     const tab = await getCurrentTab();
-
     if (!tab || !tab.id || !tab.url) {
       showMessage('无法获取当前标签页');
       return;
     }
-
     setLoading(true);
-
     try {
       const cleaningResult = await clearStorage(tab.id, tab.url, options);
       setResult(cleaningResult);
-
-      // Save user preferences
-      await storageUtil.set('storageCleaner/preferences', {
-        autoRefresh,
-        selectedTypes: options,
-      });
-
-      // Auto refresh if enabled
       if (autoRefresh && cleaningResult.success && tab.id !== undefined) {
-        showMessage('页面即将刷新，Popup 将关闭');
+        showMessage('清理成功，即将刷新页面');
         reloadTimeoutRef.current = setTimeout(() => {
           chrome.tabs.reload(tab.id!);
         }, 1500);
+      } else {
+        loadInfo();
       }
     } catch (err) {
       showMessage(`清理失败: ${String(err)}`, { severity: 'error' });
@@ -168,203 +171,282 @@ export default function StorageCleanerPage() {
     }
   }, [options, autoRefresh, showMessage]);
 
-  const handleRefresh = useCallback(async () => {
-    const tab = await getCurrentTab();
-    if (tab?.id !== undefined) {
-      showMessage('页面即将刷新，Popup 将关闭');
-      reloadTimeoutRef.current = setTimeout(() => {
-        chrome.tabs.reload(tab.id!);
-      }, 1500);
-    }
-  }, [showMessage]);
-
   if (error) {
     return (
-      <Paper sx={{ p: 2, m: 1, borderRadius: 2 }}>
-        <Alert severity="error" icon={<WarningIcon />}>
+      <Container sx={{ py: 4 }}>
+        <Alert severity="error" icon={<WarningIcon />} sx={{ borderRadius: 3 }}>
           {error}
         </Alert>
-      </Paper>
+      </Container>
     );
   }
 
-  return (
-    <Paper sx={{ p: 2, m: 1, borderRadius: 2 }}>
-      {/* Header */}
-      <Box sx={{ textAlign: 'center', mb: 2 }}>
-        <Typography variant="body2" color="text.secondary">
-          当前页面: {domain || '加载中...'}
-        </Typography>
-      </Box>
+  const totalSize = Object.values(sizes).reduce((acc, curr) => acc + curr, 0);
 
-      {/* Storage Type Options */}
-      <Accordion
-        disableGutters
-        elevation={0}
-        sx={{
-          bgcolor: 'grey.50',
-          borderRadius: 2,
-          mb: 2,
-          '&:before': { display: 'none' },
-          '&.Mui-expanded': { m: 0, mb: 2 },
-        }}
-      >
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon sx={{ fontSize: '1.1rem' }} />}
+  const OptionItem = ({
+    label,
+    checked,
+    size,
+    onChange,
+  }: {
+    label: string;
+    checked: boolean;
+    size?: number;
+    onChange: () => void;
+  }) => (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        py: 0.6,
+        px: 1.2,
+        borderRadius: 2.5,
+        transition: 'all 0.2s',
+        '&:hover': { bgcolor: 'grey.50' },
+      }}
+    >
+      <Stack direction="row" spacing={0.8} alignItems="baseline">
+        <Typography
+          variant="caption"
+          fontWeight={700}
+          color="text.primary"
+          sx={{ fontSize: '0.75rem' }}
+        >
+          {label}
+        </Typography>
+        {size !== undefined && size > 0 && (
+          <Typography
+            variant="caption"
+            sx={{ color: 'text.disabled', fontSize: '0.65rem', fontWeight: 500 }}
+          >
+            {formatSize(size)}
+          </Typography>
+        )}
+      </Stack>
+      <Checkbox
+        size="small"
+        checked={checked}
+        onChange={onChange}
+        color="warning"
+        sx={{ p: 0.5 }}
+      />
+    </Box>
+  );
+
+  return (
+    <Box sx={{ pb: 2 }}>
+      <Container sx={{ py: 2 }}>
+        {/* Domain Header */}
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+          <Box
+            sx={{
+              p: 1,
+              borderRadius: 2.5,
+              bgcolor: '#fff4e5',
+              color: '#ff9800',
+              display: 'flex',
+            }}
+          >
+            <StorageIcon sx={{ fontSize: 20 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography
+                variant="subtitle1"
+                fontWeight={900}
+                sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}
+              >
+                存储清理
+              </Typography>
+              {totalSize > 0 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    bgcolor: '#fff4e5',
+                    color: '#ff9800',
+                    px: 1,
+                    py: 0.2,
+                    borderRadius: 1.5,
+                    fontWeight: 800,
+                    fontSize: '0.65rem',
+                  }}
+                >
+                  已占用 {formatSize(totalSize)}
+                </Typography>
+              )}
+            </Stack>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                fontWeight: 600,
+                display: 'block',
+                maxWidth: 220,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {domain || '加载中...'}
+            </Typography>
+          </Box>
+        </Stack>
+
+        {/* Storage Options Grid */}
+        <Box
           sx={{
-            px: 2,
-            minHeight: 48,
-            '&.Mui-expanded': { minHeight: 48 },
-            '& .MuiAccordionSummary-content': { my: 1, '&.Mui-expanded': { my: 1 } },
+            mb: 2,
+            border: '1px solid',
+            borderColor: 'grey.100',
+            borderRadius: 4,
+            p: 0.8,
+            bgcolor: 'background.paper',
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            清理选项 {allSelected ? '(全部)' : someSelected ? '(部分)' : '(未选)'}
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ px: 2, pt: 0, pb: 1.5 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={options.localStorage}
-                  onChange={() => handleOptionChange('localStorage')}
-                />
-              }
-              label={<Typography variant="body2">localStorage</Typography>}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={options.sessionStorage}
-                  onChange={() => handleOptionChange('sessionStorage')}
-                />
-              }
-              label={<Typography variant="body2">sessionStorage</Typography>}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={options.indexedDB}
-                  onChange={() => handleOptionChange('indexedDB')}
-                />
-              }
-              label={<Typography variant="body2">IndexedDB</Typography>}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={options.cookies}
-                  onChange={() => handleOptionChange('cookies')}
-                />
-              }
-              label={<Typography variant="body2">Cookies</Typography>}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={options.cacheStorage}
-                  onChange={() => handleOptionChange('cacheStorage')}
-                />
-              }
-              label={<Typography variant="body2">Cache Storage</Typography>}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={options.serviceWorkers}
-                  onChange={() => handleOptionChange('serviceWorkers')}
-                />
-              }
-              label={<Typography variant="body2">Service Workers</Typography>}
-            />
-            <Divider sx={{ my: 1, opacity: 0.6 }} />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={allSelected}
-                  indeterminate={someSelected}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                />
-              }
-              label={
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  全选
-                </Typography>
-              }
+          <Grid container spacing={0}>
+            <Grid size={6}>
+              <OptionItem
+                label="LocalStorage"
+                checked={options.localStorage}
+                size={sizes.localStorage}
+                onChange={() => handleOptionChange('localStorage')}
+              />
+            </Grid>
+            <Grid size={6}>
+              <OptionItem
+                label="Session"
+                checked={options.sessionStorage}
+                size={sizes.sessionStorage}
+                onChange={() => handleOptionChange('sessionStorage')}
+              />
+            </Grid>
+            <Grid size={6}>
+              <OptionItem
+                label="IndexedDB"
+                checked={options.indexedDB}
+                onChange={() => handleOptionChange('indexedDB')}
+              />
+            </Grid>
+            <Grid size={6}>
+              <OptionItem
+                label="Cookies"
+                checked={options.cookies}
+                size={sizes.cookies}
+                onChange={() => handleOptionChange('cookies')}
+              />
+            </Grid>
+            <Grid size={6}>
+              <OptionItem
+                label="Cache"
+                checked={options.cacheStorage}
+                onChange={() => handleOptionChange('cacheStorage')}
+              />
+            </Grid>
+            <Grid size={6}>
+              <OptionItem
+                label="Workers"
+                checked={options.serviceWorkers}
+                onChange={() => handleOptionChange('serviceWorkers')}
+              />
+            </Grid>
+          </Grid>
+          <Divider sx={{ my: 0.8, borderColor: 'grey.50' }} />
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              px: 1.2,
+              py: 0.4,
+            }}
+          >
+            <Typography
+              variant="caption"
+              fontWeight={800}
+              sx={{ color: 'text.secondary', fontSize: '0.65rem' }}
+            >
+              全选所有项
+            </Typography>
+            <Checkbox
+              size="small"
+              checked={allSelected}
+              indeterminate={someSelected}
+              onChange={(e) => handleSelectAll(e.target.checked)}
+              color="warning"
+              sx={{ p: 0.5 }}
             />
           </Box>
-        </AccordionDetails>
-      </Accordion>
+        </Box>
 
-      {/* Auto Refresh Option */}
-      <Box sx={{ mb: 2 }}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={autoRefresh}
-              onChange={(e) => handleAutoRefreshChange(e.target.checked)}
-            />
-          }
-          label="清理完成后自动刷新页面"
-        />
-      </Box>
+        {/* Auto Refresh Toggle */}
+        <Box
+          sx={{
+            mb: 2,
+            p: 1.2,
+            borderRadius: 4,
+            bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'grey.100',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="caption" fontWeight={700}>
+            清理后自动刷新页面
+          </Typography>
+          <Switch
+            size="small"
+            checked={autoRefresh}
+            onChange={(e) => handleAutoRefreshChange(e.target.checked)}
+            color="warning"
+          />
+        </Box>
 
-      {/* Action Buttons */}
-      <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+        {/* Primary Action */}
         <Button
           variant="contained"
           onClick={() => setShowConfirm(true)}
           sx={{
-            bgcolor: 'primary.main',
-            '&:hover': { bgcolor: 'primary.dark' },
+            py: 1.2,
+            borderRadius: 4,
+            bgcolor: '#ff9800',
+            fontWeight: 800,
+            fontSize: '0.85rem',
+            boxShadow: 'none',
+            '&:hover': { bgcolor: '#f57c00', boxShadow: '0 8px 16px rgba(255, 152, 0, 0.2)' },
           }}
           disabled={loading}
           fullWidth
         >
-          {loading ? '清理中...' : '清理'}
+          {loading ? '正在清理...' : '立即清理'}
         </Button>
-      </Box>
 
-      {/* Result Display */}
-      {result && (
-        <Box sx={{ mb: 2 }}>
-          <Alert
-            severity={result.success ? 'success' : 'error'}
-            sx={{ mb: !autoRefresh && result.success ? 1 : 0 }}
-          >
-            {result.success ? formatCleaningResult(result) : result.error || '清理失败'}
-          </Alert>
-          {!autoRefresh && result.success && (
-            <Button
-              variant="outlined"
-              startIcon={<RefreshIcon />}
-              onClick={handleRefresh}
-              fullWidth
+        {/* Result & Refresh Secondary Action */}
+        {result && (
+          <Box sx={{ mt: 2 }}>
+            <Alert
+              severity={result.success ? 'success' : 'error'}
+              sx={{
+                borderRadius: 2.5,
+                py: 0,
+                '& .MuiAlert-message': { fontSize: '0.75rem', fontWeight: 600 },
+              }}
             >
-              刷新页面
-            </Button>
-          )}
-        </Box>
-      )}
+              {result.success ? formatCleaningResult(result) : result.error || '清理失败'}
+            </Alert>
+          </Box>
+        )}
+      </Container>
 
-      {/* Confirmation Dialog */}
       <StorageCleanerConfirm
         open={showConfirm}
         onClose={() => setShowConfirm(false)}
         onConfirm={handleClean}
         options={options}
       />
-
-      {/* Snackbar */}
       <GlobalSnackbar {...snackbarProps} />
-    </Paper>
+    </Box>
   );
 }
