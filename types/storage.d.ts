@@ -1,4 +1,4 @@
-export type PageType = 'timestamp' | 'storageCleaner' | 'openUrl' | 'openUrlViewer';
+export type PageType = 'dashboard' | 'timestamp' | 'storageCleaner' | 'openUrl' | 'openUrlViewer';
 
 export interface StorageSchema {
   'app/currentRoute': PageType;

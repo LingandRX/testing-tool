@@ -1,4 +1,5 @@
 import type { PageType } from '@/types/storage';
+import DashboardPage from '@/entrypoints/popup/pages/DashboardPage';
 import TimestampPage from '@/entrypoints/popup/pages/TimestampPage';
 import StorageCleanerPage from '@/entrypoints/popup/pages/StorageCleanerPage';
 import OpenUrlPage from '@/entrypoints/popup/pages/OpenUrlPage';
@@ -12,6 +13,12 @@ export interface RouteConfig {
 }
 
 export const ROUTES: RouteConfig[] = [
+  {
+    key: 'dashboard',
+    label: 'Dashboard',
+    defaultVisible: true,
+    component: DashboardPage,
+  },
   {
     key: 'timestamp',
     label: '时间戳',

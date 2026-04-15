@@ -8,6 +8,7 @@ interface RouterContextType {
   visiblePages: PageType[];
   isLoaded: boolean;
   navigateTo: (page: PageType) => void;
+  goBack: () => void;
   setVisiblePages: (pages: PageType[]) => void;
 }
 
@@ -20,7 +21,7 @@ interface RouterProviderProps {
 
 export function RouterProvider({
   children,
-  defaultRoute = 'timestamp'
+  defaultRoute = 'dashboard'
 }: RouterProviderProps) {
   const [currentPage, setCurrentPage] = useState<PageType>(defaultRoute);
   const [visiblePages, setVisiblePages] = useState<PageType[]>(getDefaultVisibleRoutes());
@@ -60,6 +61,10 @@ export function RouterProvider({
     setCurrentPage(page);
   };
 
+  const goBack = () => {
+    setCurrentPage('dashboard');
+  };
+
   return (
     <RouterContext.Provider
       value={{
@@ -67,6 +72,7 @@ export function RouterProvider({
         visiblePages,
         isLoaded,
         navigateTo,
+        goBack,
         setVisiblePages
       }}
     >

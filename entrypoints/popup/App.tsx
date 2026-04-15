@@ -1,6 +1,6 @@
 import './App.css';
 import RouterProvider from '@/providers/RouterProvider';
-import NavigationBar from '@/components/NavigationBar';
+import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 
 function App() {
@@ -9,9 +9,9 @@ function App() {
   };
 
   return (
-    <RouterProvider>
-      <div className="app">
-        <NavigationBar onOpenOptions={handleOpenOptions} />
+    <RouterProvider defaultRoute="dashboard">
+      <div className="app" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+        <TopBar onOpenOptions={handleOpenOptions} />
         <RouterContainer />
       </div>
     </RouterProvider>

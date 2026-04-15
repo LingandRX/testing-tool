@@ -61,55 +61,31 @@ body,
   overflow: hidden; /* 内部由 flex 子项控制滚动 */
 }
 
+/* Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-5px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
-/* 导航容器 */
-.nav-container {
-  display: flex;
-  justify-content: center;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  gap: 8px;
-  flex-shrink: 0; /* 禁止导航栏被挤压缩放 */
-  background-color: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+.page-transition-enter {
+  animation: slideInRight 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
 }
 
-/* 导航按钮 */
-.nav-button {
-  padding: 8px 16px;
-  border: 1px solid var(--btn-bg);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--btn-text);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.nav-button:hover {
-  background: var(--btn-bg);
-}
-
-.nav-button.active {
-  background: var(--btn-bg);
-  font-weight: 500;
-}
-
-.nav-button.settings-button {
-  padding: 8px 12px;
-  min-width: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.page-transition-dashboard {
+  animation: fadeIn 0.3s ease-out forwards;
 }
