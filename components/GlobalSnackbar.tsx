@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Snackbar, Alert, type SxProps, type Theme } from '@mui/material';
+import { Snackbar, Alert, type SxProps, type Theme, alpha } from '@mui/material';
 
 export type SnackbarSeverity = 'success' | 'info' | 'warning' | 'error';
 
@@ -49,7 +49,7 @@ const defaultProps: Required<
   >
 > = {
   severity: 'info',
-  autoHideDuration: 3000,
+  autoHideDuration: 2000,
   anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
   showAlert: true,
   hideIcon: false,
@@ -67,6 +67,17 @@ export function GlobalSnackbar({
   sx,
   alertSx,
 }: GlobalSnackbarProps) {
+  // 共享的固定定位样式
+  const fixedSx: SxProps<Theme> = {
+    position: 'fixed',
+    bottom: '24px !important', // 固定在视口底部
+    left: '50% !important',
+    transform: 'translateX(-50%) !important',
+    zIndex: (theme) => theme.zIndex.tooltip + 100,
+    maxWidth: '90%',
+    width: 'max-content',
+  };
+
   if (showAlert) {
     return (
       <Snackbar
@@ -74,14 +85,39 @@ export function GlobalSnackbar({
         autoHideDuration={autoHideDuration}
         onClose={onClose}
         anchorOrigin={anchorOrigin}
-        sx={[{ maxWidth: '90%' }, ...(Array.isArray(sx) ? sx : [sx])]}
+        disableWindowBlurListener
+        sx={[fixedSx, ...(Array.isArray(sx) ? sx : [sx])]}
       >
         <Alert
           severity={severity}
           variant="filled"
           icon={hideIcon ? false : undefined}
           sx={[
-            { borderRadius: 2.5, width: '100%' },
+            { 
+              borderRadius: '50px',
+              px: 2.5,
+              py: 0.2,
+              minWidth: '140px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '0.75rem',
+              letterSpacing: '0.02em',
+              backgroundImage: 'none',
+              boxShadow: (theme: Theme) => `0 12px 32px ${alpha(theme.palette[severity].main, 0.35)}`,
+              
+              '& .MuiAlert-icon': {
+                mr: 0.5,
+                fontSize: '1.1rem',
+                color: '#fff'
+              },
+              '& .MuiAlert-message': {
+                color: '#fff',
+                padding: '6px 0',
+                textAlign: 'center'
+              }
+            },
             ...(Array.isArray(alertSx) ? alertSx : [alertSx]),
           ]}
         >
@@ -98,8 +134,7 @@ export function GlobalSnackbar({
       onClose={onClose}
       anchorOrigin={anchorOrigin}
       message={message}
-      color={severity}
-      sx={sx}
+      sx={[fixedSx, ...(Array.isArray(sx) ? sx : [sx])]}
     />
   );
 }
@@ -119,7 +154,8 @@ export function useSnackbar(initialOptions?: SnackbarOptions): UseSnackbarResult
     setOpen(false);
   };
 
-  const handleClose = () => {
+  const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
     closeMessage();
   };
 
