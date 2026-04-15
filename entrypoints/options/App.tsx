@@ -3,12 +3,12 @@ import {
   Box,
   Typography,
   Paper,
-  FormControlLabel,
   Switch,
   Button,
   Snackbar,
   Alert,
   CircularProgress,
+  Stack,
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { PageType } from '@/types/storage';
@@ -32,7 +32,6 @@ function App() {
         'storageCleaner',
         'openUrl',
       ] as PageType[]);
-      // Ensure we always have an array
       setVisiblePages(saved ?? ['timestamp', 'storageCleaner', 'openUrl']);
     } catch (error) {
       console.error('Failed to load config:', error);
@@ -47,7 +46,6 @@ function App() {
     let newPages: PageType[];
 
     if (isCurrentlyVisible) {
-      // 尝试隐藏，但至少保留一个
       if (visiblePages.length <= 1) {
         showToast('至少需要保留一个可见页面', 'warning');
         return;
@@ -60,28 +58,23 @@ function App() {
     try {
       await storageUtil.set('app/visiblePages', newPages);
       setVisiblePages(newPages);
-      const route = ROUTES.find(r => r.key === page);
-      showToast(
-        `已${isCurrentlyVisible ? '隐藏' : '显示'} ${route?.label || page}`,
-        'success',
-      );
+      const route = ROUTES.find((r) => r.key === page);
+      showToast(`已${isCurrentlyVisible ? '隐藏' : '显示'} ${route?.label || page}`, 'success');
     } catch (error) {
       console.error('Failed to save config:', error);
-      showToast('保存失败，请重试', 'warning');
+      showToast('保存失败', 'warning');
     }
   };
 
   const handleRestoreDefaults = async () => {
     try {
-      const defaults = ROUTES
-        .filter(route => route.defaultVisible)
-        .map(route => route.key);
+      const defaults = ROUTES.filter((route) => route.defaultVisible).map((route) => route.key);
       await storageUtil.set('app/visiblePages', defaults);
       setVisiblePages(defaults);
-      showToast('已恢复默认设置', 'success');
+      showToast('已恢复默认', 'success');
     } catch (error) {
       console.error('Failed to restore defaults:', error);
-      showToast('恢复失败，请重试', 'warning');
+      showToast('恢复失败', 'warning');
     }
   };
 
@@ -90,81 +83,82 @@ function App() {
     setToastSeverity(severity);
   };
 
-  const handleCloseToast = () => {
-    setToast(null);
-  };
+  const handleCloseToast = () => setToast(null);
 
   if (!isLoaded) {
     return (
       <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}
       >
-        <CircularProgress />
+        <CircularProgress size={24} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: 600, mx: 'auto' }}>
-      <Typography variant="h5" gutterBottom fontWeight="bold">
-        ⚙️ 扩展设置
-      </Typography>
-
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        paragraph
-        sx={{ mb: 3 }}
-      >
-        自定义 popup 弹窗中显示的功能页面。更改将立即生效，无需保存。
-      </Typography>
-
-      <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', mb: 2 }}>
-        <Typography variant="subtitle1" gutterBottom fontWeight="medium" sx={{ mb: 2 }}>
-          可见页面设置
-        </Typography>
-
-        {ROUTES.map((route) => {
-          const isChecked = visiblePages.includes(route.key);
-          const isDisabled = !isChecked && visiblePages.length === 1;
-
-          return (
-            <FormControlLabel
-              key={route.key}
-              control={
-                <Switch
-                  checked={isChecked}
-                  onChange={() => handlePageToggle(route.key)}
-                  disabled={isDisabled}
-                  color="primary"
-                />
-              }
-              label={route.label}
-              sx={{
-                width: '100%',
-                mb: 1,
-                '&:last-child': { mb: 0 },
-              }}
-            />
-          );
-        })}
-      </Paper>
-
-      <Box display="flex" justifyContent="flex-start" sx={{ mb: 3 }}>
+    <Box sx={{ p: 4, maxWidth: 600, mx: 'auto', minHeight: '100vh', bgcolor: 'grey.50' }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 4 }}>
         <Button
-          variant="outlined"
-          onClick={handleRestoreDefaults}
-          startIcon={<RefreshIcon />}
+          variant="text"
           size="small"
+          onClick={handleRestoreDefaults}
+          startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
+          sx={{ color: 'text.secondary', fontWeight: 600 }}
         >
           恢复默认
         </Button>
-      </Box>
+      </Stack>
+
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 4,
+          border: '1px solid',
+          borderColor: 'grey.200',
+          overflow: 'hidden',
+          bgcolor: 'background.paper',
+        }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          {ROUTES.filter((route) => route.key !== 'dashboard' && route.key !== 'openUrlViewer').map(
+            (route, index, array) => {
+              const isChecked = visiblePages.includes(route.key);
+              const isDisabled = isChecked && visiblePages.length === 1;
+
+              return (
+                <Box
+                  key={route.key}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    p: 2.5,
+                    borderBottom: index === array.length - 1 ? 'none' : '1px solid',
+                    borderColor: 'grey.100',
+                    transition: 'all 0.2s',
+                    '&:hover': { bgcolor: 'grey.50' },
+                  }}
+                >
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                      {route.label}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}
+                    </Typography>
+                  </Box>
+                  <Switch
+                    size="small"
+                    checked={isChecked}
+                    onChange={() => handlePageToggle(route.key)}
+                    disabled={isDisabled}
+                  />
+                </Box>
+              );
+            },
+          )}
+        </Box>
+      </Paper>
 
       <Snackbar
         open={!!toast}
@@ -176,17 +170,11 @@ function App() {
           onClose={handleCloseToast}
           severity={toastSeverity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{ borderRadius: 2, fontWeight: 600 }}
         >
           {toast}
         </Alert>
       </Snackbar>
-
-      <Box mt={4} pt={2} borderTop={1} borderColor="divider">
-        <Typography variant="caption" color="text.secondary">
-          提示：更改将立即应用到 popup 弹窗。如需查看效果,请关闭并重新打开扩展弹窗。
-        </Typography>
-      </Box>
     </Box>
   );
 }
