@@ -1,17 +1,19 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
-import { getDefaultVisibleRoutes } from '@/config/routes';
+import { getDefaultVisibleRoutes, getDefaultPageOrder } from '@/config/routes';
 
 interface RouterContextType {
   currentPage: PageType;
   visiblePages: PageType[];
+  pageOrder: PageType[];
   isLoaded: boolean;
   navigateTo: (page: PageType) => void;
   navigateLocal: (page: PageType) => void;
   syncNavigation: (page: PageType) => void;
   goBack: () => void;
   setVisiblePages: (pages: PageType[]) => void;
+  setPageOrder: (pages: PageType[]) => void;
 }
 
 const RouterContext = createContext<RouterContextType | null>(null);
@@ -31,6 +33,7 @@ export function RouterProvider({
 }: RouterProviderProps) {
   const [currentPage, setCurrentPage] = useState<PageType>(defaultRoute);
   const [visiblePages, setVisiblePages] = useState<PageType[]>(getDefaultVisibleRoutes());
+  const [pageOrder, setPageOrder] = useState<PageType[]>(getDefaultPageOrder());
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -62,9 +65,10 @@ export function RouterProvider({
 
   const loadInitialData = async () => {
     try {
-      const [savedRoute, savedVisiblePages] = await Promise.all([
+      const [savedRoute, savedVisiblePages, savedPageOrder] = await Promise.all([
         storageUtil.get(syncKey, defaultRoute),
         storageUtil.get('app/visiblePages', getDefaultVisibleRoutes()),
+        storageUtil.get('app/pageOrder', getDefaultPageOrder()),
       ]);
 
       if (savedRoute && syncRoute) {
@@ -72,6 +76,9 @@ export function RouterProvider({
       }
       if (savedVisiblePages) {
         setVisiblePages(savedVisiblePages);
+      }
+      if (savedPageOrder && savedPageOrder.length > 0) {
+        setPageOrder(savedPageOrder);
       }
     } catch (error) {
       console.error('Failed to load initial routing data:', error);
@@ -101,12 +108,14 @@ export function RouterProvider({
       value={{
         currentPage,
         visiblePages,
+        pageOrder,
         isLoaded,
         navigateTo,
         navigateLocal,
         syncNavigation,
         goBack,
-        setVisiblePages
+        setVisiblePages,
+        setPageOrder
       }}
     >
       {children}
