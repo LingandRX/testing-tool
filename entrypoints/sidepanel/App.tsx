@@ -9,7 +9,7 @@ function App() {
   };
 
   return (
-    <RouterProvider defaultRoute="dashboard">
+    <RouterProvider defaultRoute="dashboard" syncKey="app/sidepanelRoute">
       <div className="app" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
         <TopBar onOpenOptions={handleOpenOptions} />
         <RouterContainer />
