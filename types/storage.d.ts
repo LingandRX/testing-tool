@@ -2,7 +2,10 @@ export type PageType = 'dashboard' | 'timestamp' | 'storageCleaner' | 'openUrl' 
 
 export interface StorageSchema {
   'app/currentRoute': PageType;
+  'app/popupRoute': PageType;
+  'app/sidepanelRoute': PageType;
   'app/visiblePages': PageType[];
+  'app/pageOrder': PageType[];
   'app/lastRoute': string;
   'app/theme': string;
   'storageCleaner/preferences': StorageCleanerPreferences;
