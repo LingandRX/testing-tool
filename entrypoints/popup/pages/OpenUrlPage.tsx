@@ -158,7 +158,11 @@ export default function OpenUrlPage() {
         enabled: true,
       });
       await chrome.sidePanel.open({ windowId: currentTab.windowId });
-      window.close();
+
+      // 仅当在 Popup 中时才关闭窗口，防止在侧边栏内点击预览时导致侧边栏关闭
+      if (window.location.pathname.includes('popup.html')) {
+        window.close();
+      }
     } catch (error) {
       console.error('Failed to open side panel:', error);
       showMessage(`打开失败: ${(error as Error).message}`, { severity: 'error' });
