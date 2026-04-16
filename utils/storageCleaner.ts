@@ -11,9 +11,26 @@ const RESTRICTED_PROTOCOLS = [
 ] as const;
 
 export async function getCurrentTab() {
-  // 使用 lastFocusedWindow: true 确保在 Side Panel 或 Popup 中都能获取到用户正在查看的标签页
-  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-  return tab;
+  // First, try the active tab in the last focused window (works for standard popups and side panels)
+  const [lastFocusedTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+
+  // If the tab is valid and NOT an extension page/restricted URL, use it
+  if (lastFocusedTab && !isRestrictedUrl(lastFocusedTab.url)) {
+    return lastFocusedTab;
+  }
+
+  // Fallback: If we're in a standalone extension window (which is focused),
+  // find the active tab in the most recently focused 'normal' browser window.
+  const [normalTab] = await chrome.tabs.query({
+    active: true,
+    windowType: 'normal',
+    lastFocusedWindow: true,
+  });
+  if (normalTab) return normalTab;
+
+  // Final fallback: any active normal tab (if multiple windows exist, it returns all active tabs)
+  const normalTabs = await chrome.tabs.query({ active: true, windowType: 'normal' });
+  return normalTabs[0];
 }
 
 export function isRestrictedUrl(url?: string): boolean {

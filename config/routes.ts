@@ -56,3 +56,7 @@ export function getDefaultVisibleRoutes(): PageType[] {
 export function getAllRouteKeys(): PageType[] {
   return ROUTES.map(route => route.key);
 }
+
+export function getDefaultPageOrder(): PageType[] {
+  return ROUTES.filter(route => route.key !== 'dashboard' && route.key !== 'openUrlViewer').map(route => route.key);
+}

@@ -9,14 +9,18 @@ import {
   Alert,
   CircularProgress,
   Stack,
+  IconButton,
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
-import { ROUTES } from '@/config/routes';
+import { getRouteByKey, getDefaultPageOrder } from '@/config/routes';
 
 function App() {
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
+  const [pageOrder, setPageOrder] = useState<PageType[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [toastSeverity, setToastSeverity] = useState<'success' | 'info' | 'warning'>('info');
@@ -27,15 +31,20 @@ function App() {
 
   const loadConfig = async () => {
     try {
-      const saved = await storageUtil.get('app/visiblePages', [
-        'timestamp',
-        'storageCleaner',
-        'openUrl',
-      ] as PageType[]);
-      setVisiblePages(saved ?? ['timestamp', 'storageCleaner', 'openUrl']);
+      const [savedVisible, savedOrder] = await Promise.all([
+        storageUtil.get('app/visiblePages', [
+          'timestamp',
+          'storageCleaner',
+          'openUrl',
+        ] as PageType[]),
+        storageUtil.get('app/pageOrder', getDefaultPageOrder()),
+      ]);
+      setVisiblePages(savedVisible ?? ['timestamp', 'storageCleaner', 'openUrl']);
+      setPageOrder(savedOrder && savedOrder.length > 0 ? savedOrder : getDefaultPageOrder());
     } catch (error) {
       console.error('Failed to load config:', error);
       setVisiblePages(['timestamp', 'storageCleaner', 'openUrl']);
+      setPageOrder(getDefaultPageOrder());
     } finally {
       setIsLoaded(true);
     }
@@ -58,7 +67,7 @@ function App() {
     try {
       await storageUtil.set('app/visiblePages', newPages);
       setVisiblePages(newPages);
-      const route = ROUTES.find((r) => r.key === page);
+      const route = getRouteByKey(page);
       showToast(`已${isCurrentlyVisible ? '隐藏' : '显示'} ${route?.label || page}`, 'success');
     } catch (error) {
       console.error('Failed to save config:', error);
@@ -66,11 +75,36 @@ function App() {
     }
   };
 
+  const handleMove = async (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === pageOrder.length - 1) return;
+
+    const newOrder = [...pageOrder];
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    [newOrder[index], newOrder[swapIndex]] = [newOrder[swapIndex], newOrder[index]];
+
+    try {
+      await storageUtil.set('app/pageOrder', newOrder);
+      setPageOrder(newOrder);
+    } catch (error) {
+      console.error('Failed to save order:', error);
+      showToast('排序保存失败', 'warning');
+    }
+  };
+
   const handleRestoreDefaults = async () => {
     try {
-      const defaults = ROUTES.filter((route) => route.defaultVisible).map((route) => route.key);
-      await storageUtil.set('app/visiblePages', defaults);
+      const { getDefaultVisibleRoutes } = await import('@/config/routes');
+      const defaults = getDefaultVisibleRoutes();
+      const defaultOrder = getDefaultPageOrder();
+
+      await Promise.all([
+        storageUtil.set('app/visiblePages', defaults),
+        storageUtil.set('app/pageOrder', defaultOrder),
+      ]);
+
       setVisiblePages(defaults);
+      setPageOrder(defaultOrder);
       showToast('已恢复默认', 'success');
     } catch (error) {
       console.error('Failed to restore defaults:', error);
@@ -120,43 +154,62 @@ function App() {
         }}
       >
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          {ROUTES.filter((route) => route.key !== 'dashboard' && route.key !== 'openUrlViewer').map(
-            (route, index, array) => {
-              const isChecked = visiblePages.includes(route.key);
-              const isDisabled = isChecked && visiblePages.length === 1;
+          {pageOrder.map((key, index, array) => {
+            const route = getRouteByKey(key);
+            if (!route) return null;
 
-              return (
-                <Box
-                  key={route.key}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    p: 2.5,
-                    borderBottom: index === array.length - 1 ? 'none' : '1px solid',
-                    borderColor: 'grey.100',
-                    transition: 'all 0.2s',
-                    '&:hover': { bgcolor: 'grey.50' },
-                  }}
-                >
-                  <Box>
-                    <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                      {route.label}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}
-                    </Typography>
-                  </Box>
+            const isChecked = visiblePages.includes(key);
+            const isDisabled = isChecked && visiblePages.length === 1;
+
+            return (
+              <Box
+                key={key}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  p: 2.5,
+                  borderBottom: index === array.length - 1 ? 'none' : '1px solid',
+                  borderColor: 'grey.100',
+                  transition: 'all 0.2s',
+                  '&:hover': { bgcolor: 'grey.50' },
+                }}
+              >
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                    {route.label}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleMove(index, 'up')}
+                    disabled={index === 0}
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    <KeyboardArrowUpIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleMove(index, 'down')}
+                    disabled={index === array.length - 1}
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    <KeyboardArrowDownIcon fontSize="small" />
+                  </IconButton>
                   <Switch
                     size="small"
                     checked={isChecked}
-                    onChange={() => handlePageToggle(route.key)}
+                    onChange={() => handlePageToggle(key)}
                     disabled={isDisabled}
                   />
                 </Box>
-              );
-            },
-          )}
+              </Box>
+            );
+          })}
         </Box>
       </Paper>
 
