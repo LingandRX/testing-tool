@@ -2,6 +2,17 @@ import '../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
 
 export default defineBackground(() => {
+  // 监听扩展图标点击事件，打开侧边栏
+  browser.action.onClicked.addListener(async (tab) => {
+    if (tab.id) {
+      try {
+        await browser.sidePanel.open({ tabId: tab.id });
+      } catch (err) {
+        console.error('Failed to open side panel:', err);
+      }
+    }
+  });
+
   // 监听扩展安装或更新事件
   browser.runtime.onInstalled.addListener(async ({ reason }) => {
     if (reason === 'install') {

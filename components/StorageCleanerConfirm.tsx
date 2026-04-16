@@ -5,6 +5,7 @@ import {
   DialogActions,
   Typography,
   Box,
+  Chip,
 } from '@mui/material';
 import type { StorageCleanerOptions } from '@/types/storage';
 import Button from '@/components/Button';
@@ -22,6 +23,10 @@ export function StorageCleanerConfirm({
   onConfirm,
   options,
 }: StorageCleanerConfirmProps) {
+  const selectedOptions = Object.entries(options)
+    .filter(([_, value]) => value)
+    .map(([key, _]) => key);
+
   return (
     <Dialog
       open={open}
@@ -31,47 +36,67 @@ export function StorageCleanerConfirm({
       slotProps={{
         paper: {
           sx: {
-            borderRadius: 4,
+            borderRadius: 5,
             backgroundImage: 'none',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+            boxShadow: '0 24px 48px -12px rgba(0,0,0,0.15)',
+            p: 1
           },
         },
       }}
     >
-      <DialogTitle sx={{ textAlign: 'center', pb: 1, pt: 3, fontWeight: 700 }}>
-        确认清理
+      <DialogTitle sx={{ textAlign: 'center', pt: 3, pb: 1, fontWeight: 900, letterSpacing: '-0.5px', fontSize: '1.25rem' }}>
+        确认清理数据？
       </DialogTitle>
+      
       <DialogContent sx={{ textAlign: 'center', pb: 2 }}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          将清理以下存储类型：
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontWeight: 500 }}>
+          您将清除当前页面的选定存储项。
         </Typography>
-        <Box
-          sx={{
-            bgcolor: 'grey.50',
-            borderRadius: 3,
-            p: 2,
-            mb: 2,
-            display: 'inline-block',
-            textAlign: 'left',
-            minWidth: '60%',
-          }}
-        >
-          {options.localStorage && <Typography variant="body2">- localStorage</Typography>}
-          {options.sessionStorage && <Typography variant="body2">- sessionStorage</Typography>}
-          {options.indexedDB && <Typography variant="body2">- IndexedDB</Typography>}
-          {options.cookies && <Typography variant="body2">- Cookies</Typography>}
-          {options.cacheStorage && <Typography variant="body2">- Cache Storage</Typography>}
-          {options.serviceWorkers && <Typography variant="body2">- Service Workers</Typography>}
+        
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center', mb: 3 }}>
+          {selectedOptions.map((opt) => (
+            <Chip 
+              key={opt} 
+              label={opt} 
+              size="small" 
+              sx={{ 
+                bgcolor: 'grey.50', 
+                fontWeight: 600, 
+                color: 'text.secondary',
+                fontSize: '0.7rem',
+                border: '1px solid',
+                borderColor: 'grey.200'
+              }} 
+            />
+          ))}
         </Box>
-        <Typography variant="body2" color="text.secondary">
-          此操作不可撤销。
+
+        <Typography variant="caption" sx={{ color: '#ff9800', fontWeight: 700, bgcolor: '#fff4e5', px: 1.5, py: 0.5, borderRadius: 2 }}>
+          ⚠️ 此操作不可撤销
         </Typography>
       </DialogContent>
-      <DialogActions sx={{ p: 3, pt: 1, gap: 1 }}>
-        <Button variant="outlined" onClick={onClose} fullWidth>
+
+      <DialogActions sx={{ p: 2.5, gap: 1.5 }}>
+        <Button 
+          variant="text" 
+          onClick={onClose} 
+          fullWidth
+          sx={{ fontWeight: 700, color: 'text.secondary', borderRadius: 3 }}
+        >
           取消
         </Button>
-        <Button variant="contained" color="error" onClick={onConfirm} fullWidth>
+        <Button 
+          variant="contained" 
+          onClick={onConfirm} 
+          fullWidth
+          sx={{ 
+            bgcolor: '#ff9800', 
+            '&:hover': { bgcolor: '#f57c00' },
+            fontWeight: 800,
+            borderRadius: 3,
+            boxShadow: 'none'
+          }}
+        >
           确认清理
         </Button>
       </DialogActions>
