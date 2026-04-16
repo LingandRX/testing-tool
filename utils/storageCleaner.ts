@@ -11,7 +11,8 @@ const RESTRICTED_PROTOCOLS = [
 ] as const;
 
 export async function getCurrentTab() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  // 使用 lastFocusedWindow: true 确保在 Side Panel 或 Popup 中都能获取到用户正在查看的标签页
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
   return tab;
 }
 
@@ -23,8 +24,10 @@ export function isRestrictedUrl(url?: string): boolean {
 export async function getCookieSize(url: string): Promise<number> {
   try {
     const cookies = await chrome.cookies.getAll({ url });
-    return cookies.reduce((acc, c) => acc + c.name.length + c.value.length, 0);
-  } catch {
+    // 估算：名称 + 值 + 域名 + 路径 的长度
+    return cookies.reduce((acc, c) => acc + c.name.length + c.value.length + (c.domain?.length || 0) + (c.path?.length || 0), 0);
+  } catch (error) {
+    console.error('Failed to get cookie size:', error);
     return 0;
   }
 }
@@ -34,11 +37,16 @@ export async function getLocalStorageSize(tabId: number): Promise<number> {
     const [result] = await chrome.scripting.executeScript({
       target: { tabId },
       func: () => {
-        return Object.entries(localStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+        try {
+          return Object.entries(localStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+        } catch {
+          return 0;
+        }
       },
     });
     return (result?.result as number) || 0;
-  } catch {
+  } catch (error) {
+    console.error('Failed to get LocalStorage size:', error);
     return 0;
   }
 }
@@ -48,17 +56,95 @@ export async function getSessionStorageSize(tabId: number): Promise<number> {
     const [result] = await chrome.scripting.executeScript({
       target: { tabId },
       func: () => {
-        return Object.entries(sessionStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+        try {
+          return Object.entries(sessionStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+        } catch {
+          return 0;
+        }
       },
     });
     return (result?.result as number) || 0;
-  } catch {
+  } catch (error) {
+    console.error('Failed to get SessionStorage size:', error);
+    return 0;
+  }
+}
+
+export async function getIndexedDBSize(tabId: number): Promise<number> {
+  try {
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: async () => {
+        try {
+          // 注意：navigator.storage.estimate() 返回的是整个 Origin 的估算值
+          // 包含 IndexedDB, CacheStorage, ServiceWorker 注册等
+          if (navigator.storage && navigator.storage.estimate) {
+            const estimate = await navigator.storage.estimate();
+            return estimate.usage || 0;
+          }
+          return 0;
+        } catch {
+          return 0;
+        }
+      },
+    });
+    return (result?.result as number) || 0;
+  } catch (error) {
+    console.error('Failed to get IndexedDB size:', error);
+    return 0;
+  }
+}
+
+export async function getCacheStorageSize(tabId: number): Promise<number> {
+  try {
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: async () => {
+        try {
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            return keys.length; // 对于 CacheStorage，我们先返回缓存库的数量
+          }
+          return 0;
+        } catch {
+          return 0;
+        }
+      },
+    });
+    // 由于获取具体字节数较慢，这里返回的是缓存条目的数量标识，UI 上可以特殊处理
+    return (result?.result as number) || 0;
+  } catch (error) {
+    console.error('Failed to get CacheStorage size:', error);
+    return 0;
+  }
+}
+
+export async function getServiceWorkerCount(tabId: number): Promise<number> {
+  try {
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: async () => {
+        try {
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            return regs.length;
+          }
+          return 0;
+        } catch {
+          return 0;
+        }
+      },
+    });
+    return (result?.result as number) || 0;
+  } catch (error) {
+    console.error('Failed to get ServiceWorker count:', error);
     return 0;
   }
 }
 
 export function formatSize(bytes: number): string {
   if (bytes === 0) return '0 B';
+  if (bytes < 1024) return `${bytes} B`; // 处理小于 1KB 的情况
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
