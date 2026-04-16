@@ -4,20 +4,19 @@ import {
   TextField,
   Select,
   MenuItem,
-  Paper,
   Stack,
   Typography,
   Box,
   IconButton,
-  Snackbar,
-  Alert,
-  InputAdornment,
   alpha,
   Tooltip,
   Theme,
+  Container,
+  Fade,
+  Divider,
 } from '@mui/material';
+import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz'; 
 import CheckIcon from '@mui/icons-material/Check';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
@@ -31,33 +30,45 @@ type ZoneType = (typeof ZONES)[number];
 
 const INPUT_STYLE = {
   '& .MuiOutlinedInput-root': {
-    bgcolor: 'grey.50',
-    borderRadius: 3,
+    bgcolor: 'background.paper',
+    borderRadius: 3.5,
+    border: '1px solid',
+    borderColor: 'grey.100',
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
     '& fieldset': { border: 'none' },
-    '&:hover': { bgcolor: 'grey.100' },
+    '&:hover': { borderColor: 'grey.300', bgcolor: 'grey.50' },
     '&.Mui-focused': {
       bgcolor: '#fff',
-      boxShadow: (theme: Theme) => `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}, 0 4px 12px rgba(0,0,0,0.03)`,
+      borderColor: 'primary.main',
+      boxShadow: (theme: Theme) => `0 0 0 4px ${alpha(theme.palette.primary.main, 0.1)}`,
     },
     '&.Mui-error': {
-      boxShadow: (theme: Theme) => `0 0 0 2px ${alpha(theme.palette.error.main, 0.2)}`,
+      borderColor: 'error.main',
+      boxShadow: (theme: Theme) => `0 0 0 4px ${alpha(theme.palette.error.main, 0.1)}`,
     },
   },
-  '& .MuiInputBase-input': { py: 1.5, fontFamily: 'monospace' },
+  '& .MuiInputBase-input': { 
+    py: 1.4, 
+    px: 2,
+    fontSize: '0.9rem',
+    fontFamily: 'monospace',
+    fontWeight: 600
+  },
 };
 
-// ================= 子组件：实时时钟 =================
+// ================= 子组件：实时时钟 (优化交互) =================
 interface LiveClockProps {
   unit: UnitType;
   onCopy: (val: string) => void;
   onUseNow: (val: number) => void;
+  onUnitChange: (u: UnitType) => void;
 }
 
 const LiveClock = React.memo(({ 
   unit, 
   onCopy, 
-  onUseNow 
+  onUseNow,
+  onUnitChange
 }: LiveClockProps) => {
   const [now, setNow] = useState(() => Date.now());
 
@@ -71,36 +82,78 @@ const LiveClock = React.memo(({
   [now, unit]);
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
-      <Stack direction="row" spacing={1} alignItems="baseline">
-        <Typography variant="h5" sx={{ fontWeight: 300, letterSpacing: '-1px', color: 'text.primary', fontFamily: 'monospace' }}>
+    <Box sx={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'space-between', 
+      p: 1.8,
+      mb: 2.5,
+      bgcolor: alpha('#2196f3', 0.04),
+      borderRadius: 4,
+      border: '1px solid',
+      borderColor: alpha('#2196f3', 0.1)
+    }}>
+      <Stack spacing={0.5}>
+        <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: 1 }}>
+          当前时间戳
+        </Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', fontFamily: 'monospace', fontSize: '1.2rem', letterSpacing: '-0.5px', lineHeight: 1.2 }}>
           {displayVal}
         </Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase' }}>
-          {unit}
-        </Typography>
       </Stack>
-      <Stack direction="row" spacing={0.5}>
-        <Tooltip title="填充到下方">
+
+      <Stack direction="row" spacing={1} alignItems="center">
+        {/* 胶囊式单位切换器 */}
+        <Box sx={{ 
+          display: 'flex', 
+          p: 0.4, 
+          bgcolor: alpha('#2196f3', 0.08), 
+          borderRadius: 2.5,
+          border: '1px solid',
+          borderColor: alpha('#2196f3', 0.1)
+        }}>
+          {(['ms', 's'] as const).map((u) => (
+            <Box
+              key={u}
+              onClick={() => onUnitChange(u)}
+              sx={{ 
+                px: 1.2, 
+                py: 0.35, 
+                borderRadius: 2, 
+                cursor: 'pointer',
+                fontSize: '0.65rem', 
+                fontWeight: 900,
+                transition: 'all 0.2s',
+                bgcolor: unit === u ? '#fff' : 'transparent',
+                color: unit === u ? 'primary.main' : alpha('#2196f3', 0.4),
+                boxShadow: unit === u ? '0 2px 6px rgba(33, 150, 243, 0.2)' : 'none',
+              }}
+            >
+              {u.toUpperCase()}
+            </Box>
+          ))}
+        </Box>
+        
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5, my: 1, borderColor: alpha('#2196f3', 0.1) }} />
+
+        <Stack direction="row" spacing={0.5}>
+          <Tooltip title="填充到下方">
+            <IconButton 
+              size="small" 
+              onClick={() => onUseNow(now)} 
+              sx={{ color: 'primary.main', bgcolor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', '&:hover': { bgcolor: 'primary.main', color: '#fff' } }}
+            >
+              <AccessTimeIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <IconButton 
-            aria-label="use current time"
-            size="small" 
-            onClick={() => onUseNow(now)} 
-            sx={{ color: 'primary.main', transition: 'all 0.2s', '&:hover': { bgcolor: alpha('#2563eb', 0.08) } }}
-          >
-            <AccessTimeIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="复制当前时间戳">
-          <IconButton 
-            aria-label="copy current timestamp"
             size="small" 
             onClick={() => onCopy(displayVal)} 
-            sx={{ color: 'grey.400', transition: 'all 0.2s', '&:hover': { color: 'primary.main', transform: 'scale(1.1)' } }}
+            sx={{ color: 'grey.400', '&:hover': { color: 'primary.main' } }}
           >
             <ContentCopyIcon fontSize="small" />
           </IconButton>
-        </Tooltip>
+        </Stack>
       </Stack>
     </Box>
   );
@@ -146,73 +199,79 @@ const ResultView = React.memo(({
   if (!result) return null;
 
   return (
-    <Box sx={{ 
-      mt: 3, pt: 3, borderTop: '1px solid', borderColor: 'grey.50',
-      animation: 'fadeIn 0.3s ease-out',
-      '@keyframes fadeIn': { from: { opacity: 0, transform: 'translateY(10px)' }, to: { opacity: 1, transform: 'translateY(0)' } }
-    }}>
-      <Typography variant="caption" sx={{ color: 'text.disabled', mb: 1, display: 'block', ml: 1, fontWeight: 500 }}>
-        转换结果
-      </Typography>
-      <TextField
-        fullWidth
-        value={result}
-        slotProps={{
-          input: {
-            readOnly: true,
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton 
-                  aria-label="copy result"
-                  size="small" 
-                  onClick={handleCopy} 
-                  sx={{ 
-                    color: copied ? 'success.main' : 'primary.main',
-                    transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    transform: copied ? 'scale(1.2)' : 'scale(1)',
-                  }}
-                >
-                  {copied ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-        sx={{
-          ...INPUT_STYLE,
-          mb: 2,
-          '& .MuiOutlinedInput-root': {
-            ...INPUT_STYLE['& .MuiOutlinedInput-root'],
-            bgcolor: alpha('#2563eb', 0.03),
-          },
-        }}
-      />
-      
-      {/* 辅助信息预览 */}
-      <Stack spacing={1} sx={{ px: 1 }}>
-        {[
-          { label: '相对时间', value: extraInfo?.relative },
-          { label: 'ISO 8601', value: extraInfo?.iso },
-          { label: 'UTC 时间', value: extraInfo?.utc },
-        ].map((item) => (
-          <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{item.label}</Typography>
-            <Typography 
-              variant="caption" 
-              onClick={() => { if (item.value) onCopy(item.value); }}
-              sx={{ 
-                fontFamily: 'monospace', 
-                color: 'text.primary', 
-                cursor: 'pointer',
-                '&:hover': { color: 'primary.main', textDecoration: 'underline' }
-              }}
-            >
-              {item.value}
-            </Typography>
-          </Box>
-        ))}
-      </Stack>
-    </Box>
+    <Fade in={!!result}>
+      <Box sx={{ mt: 3, pt: 2.5, borderTop: '1px solid', borderColor: 'grey.50' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1.2, display: 'block', fontWeight: 800, fontSize: '0.7rem' }}>
+          转换结果
+        </Typography>
+        
+        <Box sx={{ 
+          bgcolor: alpha('#2196f3', 0.05),
+          p: 2,
+          borderRadius: 4,
+          position: 'relative',
+          mb: 2.5,
+          border: '1px solid',
+          borderColor: alpha('#2196f3', 0.1)
+        }}>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              fontFamily: 'monospace', 
+              fontWeight: 700, 
+              color: 'primary.main',
+              wordBreak: 'break-all',
+              pr: 4,
+              fontSize: '1rem'
+            }}
+          >
+            {result}
+          </Typography>
+          <IconButton 
+            size="small" 
+            onClick={handleCopy}
+            sx={{ 
+              position: 'absolute', 
+              right: 8, 
+              top: '50%', 
+              transform: 'translateY(-50%)',
+              color: copied ? 'success.main' : 'primary.main',
+              bgcolor: '#fff',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              '&:hover': { bgcolor: copied ? 'success.main' : 'primary.main', color: '#fff' }
+            }}
+          >
+            {copied ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+          </IconButton>
+        </Box>
+        
+        <Stack spacing={1.2}>
+          {[
+            { label: '相对时间', value: extraInfo?.relative },
+            { label: 'ISO 8601', value: extraInfo?.iso },
+            { label: 'UTC 时间', value: extraInfo?.utc },
+          ].map((item) => (
+            <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 1 }}>
+              <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 700, fontSize: '0.65rem' }}>{item.label}</Typography>
+              <Typography 
+                variant="caption" 
+                onClick={() => { if (item.value) onCopy(item.value); }}
+                sx={{ 
+                  fontFamily: 'monospace', 
+                  color: 'text.secondary', 
+                  fontWeight: 600,
+                  fontSize: '0.65rem',
+                  cursor: 'pointer',
+                  '&:hover': { color: 'primary.main' }
+                }}
+              >
+                {item.value}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+    </Fade>
   );
 });
 
@@ -227,16 +286,16 @@ export default function TimestampPage() {
   const [zone, setZone] = useState<ZoneType>('Asia/Shanghai');
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
-  const [snack, setSnack] = useState<{ open: boolean; msg: string }>({ open: false, msg: '' });
+  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
 
   const copy = useCallback(async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setSnack({ open: true, msg: '已复制' });
+      showMessage('已复制', { severity: 'success' });
     } catch {
-      setSnack({ open: true, msg: '复制失败' });
+      showMessage('复制失败', { severity: 'error' });
     }
-  }, []);
+  }, [showMessage]);
 
   const convert = useCallback(() => {
     if (mode === 'ts2dt') {
@@ -259,14 +318,9 @@ export default function TimestampPage() {
     }
   }, [mode, tsInput, dtInput, unit, zone]);
 
-  // 智能实时转换 (Debounce Effect)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      convert();
-    }, 400);
-    return () => {
-      clearTimeout(timer);
-    };
+    const timer = setTimeout(convert, 400);
+    return () => clearTimeout(timer);
   }, [convert]);
 
   const handleUseNow = useCallback((now: number) => {
@@ -278,59 +332,71 @@ export default function TimestampPage() {
   }, [mode, unit, zone]);
 
   return (
-    <Box sx={{ p: 1, width: '100%', bgcolor: 'transparent', boxSizing: 'border-box' }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2.5,
-          borderRadius: 4,
+    <Box sx={{ pb: 3 }}>
+      <Container sx={{ py: 2 }}>
+        {/* Header with Icon */}
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
+          <Box sx={{ p: 1, borderRadius: 2.5, bgcolor: alpha('#2196f3', 0.1), color: 'primary.main', display: 'flex' }}>
+            <AccessTimeIcon sx={{ fontSize: 20 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="subtitle1" fontWeight={900} sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}>
+              时间戳转换
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+              Unix 毫秒数转换与格式化
+            </Typography>
+          </Box>
+        </Stack>
+
+        {/* Live Clock Card */}
+        <LiveClock unit={unit} onCopy={copy} onUseNow={handleUseNow} onUnitChange={setUnit} />
+
+        {/* Mode Switcher */}
+        <Box sx={{ 
+          position: 'relative', 
+          display: 'flex', 
+          p: 0.6, 
+          bgcolor: 'grey.100', 
+          borderRadius: 4, 
+          mb: 2.5,
           border: '1px solid',
-          borderColor: 'grey.100',
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': { boxShadow: '0 12px 40px rgba(0,0,0,0.06)', borderColor: 'grey.200' },
-        }}
-      >
-        {/* 1. 实时时钟 */}
-        <Box sx={{ position: 'relative' }}>
-          <LiveClock unit={unit} onCopy={copy} onUseNow={handleUseNow} />
-          <Tooltip title="切换单位">
-            <IconButton 
-              aria-label="switch unit"
-              size="small" 
-              onClick={() => { setUnit((u) => (u === 'ms' ? 's' : 'ms')); }} 
+          borderColor: 'grey.200'
+        }}>
+          <Box sx={{
+            position: 'absolute', 
+            height: 'calc(100% - 10px)', 
+            width: 'calc(50% - 5px)',
+            bgcolor: '#fff', 
+            borderRadius: 3.5, 
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+            transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transform: mode === 'ts2dt' ? 'translateX(0)' : 'translateX(100%)',
+            top: 5, left: 5,
+          }} />
+          {(['ts2dt', 'dt2ts'] as const).map((m) => (
+            <Box
+              key={m}
+              onClick={() => { setMode(m); setError(''); setResult(''); }}
               sx={{ 
-                position: 'absolute', right: 80, top: 4, color: 'grey.400',
-                transition: 'transform 0.3s ease',
-                '&:hover': { transform: 'rotate(180deg)', color: 'primary.main' }
+                flex: 1, 
+                py: 1, 
+                textAlign: 'center', 
+                position: 'relative', 
+                zIndex: 1, 
+                cursor: 'pointer',
+                fontWeight: 800,
+                fontSize: '0.75rem',
+                color: mode === m ? 'primary.main' : 'text.secondary',
+                transition: 'color 0.3s'
               }}
             >
-              <SwapHorizIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        {/* 2. 模式切换 */}
-        <Box sx={{ position: 'relative', display: 'flex', p: 0.5, bgcolor: 'grey.100', borderRadius: 3.5, mb: 3, overflow: 'hidden' }}>
-          <Box
-            sx={{
-              position: 'absolute', height: 'calc(100% - 8px)', width: 'calc(50% - 4px)',
-              bgcolor: '#fff', borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-              transform: mode === 'ts2dt' ? 'translateX(0)' : 'translateX(100%)',
-              top: 4, left: 4,
-            }}
-          />
-          {(['ts2dt', 'dt2ts'] as const).map((m) => (
-            <Button
-              key={m} fullWidth disableRipple
-              onClick={() => { setMode(m); setError(''); setResult(''); }}
-            >
               {m === 'ts2dt' ? '时间戳 → 日期' : '日期 → 时间戳'}
-            </Button>
+            </Box>
           ))}
         </Box>
 
-        {/* 3. 输入与设置 */}
+        {/* Input Area */}
         <Stack spacing={2} sx={{ mb: 3 }}>
           <TextField
             placeholder={mode === 'ts2dt' ? "输入时间戳..." : DATE_FORMAT}
@@ -350,51 +416,76 @@ export default function TimestampPage() {
             sx={INPUT_STYLE}
           />
 
-          <Stack direction="row" spacing={2}>
-            <Select
-              fullWidth value={unit}
-              onChange={(e) => { setUnit(e.target.value as UnitType); }}
-              sx={{ ...INPUT_STYLE, flex: 1 }}
-              MenuProps={{ PaperProps: { sx: { borderRadius: 3, mt: 1, boxShadow: '0 10px 40px rgba(0,0,0,0.1)' } } }}
-            >
-              <MenuItem value="ms">毫秒 (ms)</MenuItem>
-              <MenuItem value="s">秒 (s)</MenuItem>
-            </Select>
+          <Stack direction="row" spacing={1.5}>
+            {/* 优化后的单位选择按钮组 */}
+            <Box sx={{ 
+              flex: 1, 
+              display: 'flex', 
+              bgcolor: 'grey.50', 
+              p: 0.5, 
+              borderRadius: 3.5,
+              border: '1px solid',
+              borderColor: 'grey.100'
+            }}>
+              {(['ms', 's'] as const).map((u) => (
+                <Box
+                  key={u}
+                  onClick={() => setUnit(u)}
+                  sx={{ 
+                    flex: 1, 
+                    py: 0.8, 
+                    textAlign: 'center', 
+                    borderRadius: 3, 
+                    cursor: 'pointer',
+                    fontSize: '0.75rem', 
+                    fontWeight: 800,
+                    transition: 'all 0.2s',
+                    bgcolor: unit === u ? '#fff' : 'transparent',
+                    color: unit === u ? 'primary.main' : 'text.disabled',
+                    boxShadow: unit === u ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                  }}
+                >
+                  {u === 'ms' ? '毫秒 (ms)' : '秒 (s)'}
+                </Box>
+              ))}
+            </Box>
 
             <Select
               fullWidth value={zone}
-              onChange={(e) => { setZone(e.target.value as ZoneType); }}
-              sx={{ ...INPUT_STYLE, flex: 1.5 }}
-              MenuProps={{ PaperProps: { sx: { borderRadius: 3, mt: 1, boxShadow: '0 10px 40px rgba(0,0,0,0.1)' } } }}
+              onChange={(e) => setZone(e.target.value as ZoneType)}
+              sx={{ ...INPUT_STYLE, flex: 1 }}
+              MenuProps={{ PaperProps: { sx: { borderRadius: 3, mt: 1, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' } } }}
             >
               {ZONES.map((z) => (
-                <MenuItem key={z} value={z}>{z}</MenuItem>
+                <MenuItem key={z} value={z} sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{z}</MenuItem>
               ))}
             </Select>
           </Stack>
         </Stack>
 
-        {/* 4. 转换操作 (作为手动确认) */}
+        {/* Main Action */}
         <Button
-          fullWidth variant="contained" disableElevation disableRipple
+          fullWidth 
+          variant="contained" 
           onClick={convert}
+          sx={{
+            py: 1.4,
+            borderRadius: 4,
+            bgcolor: 'primary.main',
+            fontWeight: 800,
+            fontSize: '0.9rem',
+            boxShadow: 'none',
+            '&:hover': { bgcolor: 'primary.dark', boxShadow: `0 8px 24px ${alpha('#2196f3', 0.2)}` }
+          }}
         >
           立即转换
         </Button>
 
-        {/* 5. 结果展示 */}
+        {/* Result View */}
         <ResultView result={result} mode={mode} unit={unit} zone={zone} onCopy={copy} />
-      </Paper>
+      </Container>
 
-      <Snackbar 
-        open={snack.open} autoHideDuration={1500} 
-        onClose={() => { setSnack((s) => ({ ...s, open: false })); }}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" variant="filled" icon={false} sx={{ borderRadius: 2.5, bgcolor: 'grey.900' }}>
-          {snack.msg}
-        </Alert>
-      </Snackbar>
+      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }
