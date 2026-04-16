@@ -21,7 +21,7 @@ export default function DashboardPage() {
 
   return (
     <Box sx={{ bgcolor: 'grey.50', minHeight: '100%', pb: 4 }}>
-      <Container maxWidth="sm" sx={{ py: 3, px: 2 }}>
+      <Container maxWidth="sm" sx={{ py: 3, px: 2 }}>``
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {isVisible('timestamp') && (
             <ToolCard

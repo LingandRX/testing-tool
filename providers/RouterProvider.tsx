@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { PageType } from '@/types/storage';
+import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import { getDefaultVisibleRoutes } from '@/config/routes';
 
@@ -20,12 +20,14 @@ interface RouterProviderProps {
   children: ReactNode;
   defaultRoute?: PageType;
   syncRoute?: boolean;
+  syncKey?: keyof StorageSchema;
 }
 
 export function RouterProvider({
   children,
   defaultRoute = 'dashboard',
-  syncRoute = true
+  syncRoute = true,
+  syncKey = 'app/currentRoute'
 }: RouterProviderProps) {
   const [currentPage, setCurrentPage] = useState<PageType>(defaultRoute);
   const [visiblePages, setVisiblePages] = useState<PageType[]>(getDefaultVisibleRoutes());
@@ -33,21 +35,21 @@ export function RouterProvider({
 
   useEffect(() => {
     loadInitialData();
-  }, []);
+  }, [syncKey]);
 
   useEffect(() => {
     if (isLoaded && syncRoute) {
-      storageUtil.set('app/currentRoute', currentPage);
+      storageUtil.set(syncKey, currentPage as any);
     }
-  }, [currentPage, isLoaded, syncRoute]);
+  }, [currentPage, isLoaded, syncRoute, syncKey]);
 
   // Listen for storage changes if sync is enabled
   useEffect(() => {
     if (!syncRoute) return;
 
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      if (changes['app/currentRoute']) {
-        const newRoute = changes['app/currentRoute'].newValue as PageType;
+      if (changes[syncKey as string]) {
+        const newRoute = changes[syncKey as string].newValue as PageType;
         if (newRoute && newRoute !== currentPage) {
           setCurrentPage(newRoute);
         }
@@ -56,17 +58,17 @@ export function RouterProvider({
 
     chrome.storage.onChanged.addListener(handleStorageChange);
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
-  }, [syncRoute, currentPage]);
+  }, [syncRoute, currentPage, syncKey]);
 
   const loadInitialData = async () => {
     try {
       const [savedRoute, savedVisiblePages] = await Promise.all([
-        storageUtil.get('app/currentRoute', defaultRoute),
+        storageUtil.get(syncKey, defaultRoute),
         storageUtil.get('app/visiblePages', getDefaultVisibleRoutes()),
       ]);
 
       if (savedRoute && syncRoute) {
-        setCurrentPage(savedRoute);
+        setCurrentPage(savedRoute as PageType);
       }
       if (savedVisiblePages) {
         setVisiblePages(savedVisiblePages);
@@ -87,7 +89,7 @@ export function RouterProvider({
   };
 
   const syncNavigation = (page: PageType) => {
-    storageUtil.set('app/currentRoute', page);
+    storageUtil.set(syncKey, page as any);
   };
 
   const goBack = () => {
