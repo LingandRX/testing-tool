@@ -29,6 +29,9 @@ import {
   getCookieSize,
   getLocalStorageSize,
   getSessionStorageSize,
+  getIndexedDBSize,
+  getCacheStorageSize,
+  getServiceWorkerCount,
   formatSize,
 } from '@/utils/storageCleaner';
 
@@ -78,11 +81,14 @@ export default function StorageCleanerPage() {
     const tabId = tab.id!;
     setDomain(new URL(url).hostname);
 
-    const [savedPrefs, cSize, lsSize, ssSize] = await Promise.all([
+    const [savedPrefs, cSize, lsSize, ssSize, idbSize, cacheCount, swCount] = await Promise.all([
       storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES),
       getCookieSize(url),
       getLocalStorageSize(tabId),
       getSessionStorageSize(tabId),
+      getIndexedDBSize(tabId),
+      getCacheStorageSize(tabId),
+      getServiceWorkerCount(tabId),
     ]);
 
     setAutoRefresh(savedPrefs?.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
@@ -91,6 +97,9 @@ export default function StorageCleanerPage() {
       cookies: cSize,
       localStorage: lsSize,
       sessionStorage: ssSize,
+      indexedDB: idbSize,
+      cacheStorage: cacheCount,
+      serviceWorkers: swCount,
     });
   };
 
@@ -181,17 +190,20 @@ export default function StorageCleanerPage() {
     );
   }
 
-  const totalSize = Object.values(sizes).reduce((acc, curr) => acc + curr, 0);
+  // 这里的总大小仅包含以字节计算的项
+  const totalSize = (sizes.cookies || 0) + (sizes.localStorage || 0) + (sizes.sessionStorage || 0) + (sizes.indexedDB || 0);
 
   const OptionItem = ({
     label,
     checked,
     size,
+    isCount = false,
     onChange,
   }: {
     label: string;
     checked: boolean;
     size?: number;
+    isCount?: boolean;
     onChange: () => void;
   }) => (
     <Box
@@ -199,31 +211,60 @@ export default function StorageCleanerPage() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        py: 0.6,
+        py: 0.8,
         px: 1.2,
         borderRadius: 2.5,
         transition: 'all 0.2s',
         '&:hover': { bgcolor: 'grey.50' },
       }}
     >
-      <Stack direction="row" spacing={0.8} alignItems="baseline">
+      <Box sx={{ flex: 1, minWidth: 0, mr: 1 }}>
         <Typography
           variant="caption"
-          fontWeight={700}
+          fontWeight={800}
           color="text.primary"
-          sx={{ fontSize: '0.75rem' }}
+          sx={{ 
+            fontSize: '0.7rem', 
+            display: 'block', 
+            lineHeight: 1.1,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
         >
           {label}
         </Typography>
-        {size !== undefined && size > 0 && (
+        {size !== undefined && size > 0 ? (
           <Typography
             variant="caption"
-            sx={{ color: 'text.disabled', fontSize: '0.65rem', fontWeight: 500 }}
+            sx={{ 
+              color: 'text.disabled', 
+              fontSize: '0.6rem', 
+              fontWeight: 700,
+              display: 'block',
+              mt: 0.2,
+              lineHeight: 1,
+              whiteSpace: 'nowrap'
+            }}
           >
-            {formatSize(size)}
+            {isCount ? `${size} 个` : formatSize(size)}
+          </Typography>
+        ) : (
+          <Typography
+            variant="caption"
+            sx={{ 
+              color: 'grey.300', 
+              fontSize: '0.6rem', 
+              fontWeight: 500,
+              display: 'block',
+              mt: 0.2,
+              lineHeight: 1
+            }}
+          >
+            无数据
           </Typography>
         )}
-      </Stack>
+      </Box>
       <Checkbox
         size="small"
         checked={checked}
@@ -325,6 +366,7 @@ export default function StorageCleanerPage() {
               <OptionItem
                 label="IndexedDB"
                 checked={options.indexedDB}
+                size={sizes.indexedDB}
                 onChange={() => handleOptionChange('indexedDB')}
               />
             </Grid>
@@ -340,6 +382,8 @@ export default function StorageCleanerPage() {
               <OptionItem
                 label="Cache"
                 checked={options.cacheStorage}
+                size={sizes.cacheStorage}
+                isCount
                 onChange={() => handleOptionChange('cacheStorage')}
               />
             </Grid>
@@ -347,7 +391,9 @@ export default function StorageCleanerPage() {
               <OptionItem
                 label="Workers"
                 checked={options.serviceWorkers}
-                onChange={() => handleOptionChange('serviceWorkers')}
+                size={sizes.serviceWorkers}
+                isCount
+              onChange={() => handleOptionChange('serviceWorkers')}
               />
             </Grid>
           </Grid>
