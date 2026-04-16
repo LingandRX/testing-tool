@@ -19,14 +19,14 @@
   --sb-track-color: transparent;
 }
 
-/* 强制固定视口尺寸 */
+/* 适配侧边栏 - 使用百分比而非固定尺寸 */
 html,
 body,
 #root {
   margin: 0;
   padding: 0;
-  width: 400px;
-  height: 600px;
+  width: 100%;
+  height: 100vh;
   overflow: hidden; /* 禁用外层滚动 */
 }
 

@@ -1,4 +1,4 @@
-import { StorageSchema } from 'types/storage';
+import { StorageSchema } from '@/types/storage';
 
 class StorageUtils {
   async get<K extends keyof StorageSchema>(key: K): Promise<StorageSchema[K]>;
