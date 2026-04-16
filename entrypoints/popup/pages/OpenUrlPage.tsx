@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, Fragment } from 'react';
 import {
-  Paper,
   Box,
   TextField,
   Alert,
@@ -9,16 +8,55 @@ import {
   IconButton,
   Typography,
   Divider,
+  Container,
+  Stack,
+  alpha,
+  Theme,
+  Tooltip,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddIcon from '@mui/icons-material/Add';
+import LanguageIcon from '@mui/icons-material/Language';
+import LinkIcon from '@mui/icons-material/Link';
 import Button from '@/components/Button';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
 import { useRouter } from '@/providers/RouterProvider';
 import type { OpenUrlPreferences, OpenUrlEntry } from '@/types/storage';
+
+const THEME_COLOR = '#9c27b0';
+
+const INPUT_STYLE = {
+  '& .MuiOutlinedInput-root': {
+    bgcolor: 'background.paper',
+    borderRadius: 3.5,
+    border: '1px solid',
+    borderColor: 'grey.100',
+    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    '& fieldset': { border: 'none' },
+    '&:hover': { borderColor: 'grey.300', bgcolor: 'grey.50' },
+    '&.Mui-focused': {
+      bgcolor: '#fff',
+      borderColor: THEME_COLOR,
+      boxShadow: (_theme: Theme) => `0 0 0 4px ${alpha(THEME_COLOR, 0.1)}`,
+    },
+  },
+  '& .MuiInputBase-input': {
+    py: 1.2,
+    px: 2,
+    fontSize: '0.85rem',
+    fontWeight: 600,
+  },
+  '& .MuiInputLabel-root': {
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    color: 'text.secondary',
+    mb: 0.5,
+    '&.Mui-focused': { color: THEME_COLOR },
+  },
+};
 
 const DEFAULT_PREFERENCES: OpenUrlPreferences = {
   entries: [],
@@ -30,13 +68,11 @@ export default function OpenUrlPage() {
   const [newUrl, setNewUrl] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
   const { snackbarProps, showMessage } = useSnackbar();
-  const { navigateTo } = useRouter();
+  const { syncNavigation } = useRouter();
 
-  // 混合内容警告检查
   const showMixedContentWarning =
     newUrl.startsWith('http://') && !newUrl.includes('localhost') && !newUrl.includes('127.0.0.1');
 
-  // 验证 URL 是否有效
   const isValidUrl = (url: string) => {
     if (!url.trim()) return false;
     try {
@@ -47,7 +83,6 @@ export default function OpenUrlPage() {
     }
   };
 
-  // 从存储加载偏好设置
   useEffect(() => {
     const loadPreferences = async () => {
       try {
@@ -64,7 +99,6 @@ export default function OpenUrlPage() {
     loadPreferences();
   }, []);
 
-  // 去抖保存到存储
   const savePreferences = useCallback(() => {
     const preferences: OpenUrlPreferences = { entries };
     storageUtil.set('openUrl/preferences', preferences).catch((error) => {
@@ -80,7 +114,6 @@ export default function OpenUrlPage() {
     return () => clearTimeout(timer);
   }, [entries, isLoaded, savePreferences]);
 
-  // 添加新条目
   const handleAddEntry = () => {
     if (!newName.trim()) {
       showMessage('请输入名称', { severity: 'error' });
@@ -97,7 +130,6 @@ export default function OpenUrlPage() {
     showMessage('添加成功', { severity: 'success' });
   };
 
-  // 删除条目
   const handleDeleteEntry = (index: number) => {
     const newEntries = [...entries];
     newEntries.splice(index, 1);
@@ -105,15 +137,11 @@ export default function OpenUrlPage() {
     showMessage('删除成功', { severity: 'success' });
   };
 
-  // 在侧边栏打开 URL
   const handleOpenInSidebar = async (entry: OpenUrlEntry) => {
     try {
-      // 保存当前选中的 URL
       await storageUtil.set('openUrl/currentUrl', entry.url);
-      // 切换到查看页面 - now use navigateTo instead of direct storage set
-      navigateTo('openUrlViewer');
+      syncNavigation('openUrlViewer');
 
-      // 获取当前标签页并打开侧边栏
       const [currentTab] = await chrome.tabs.query({
         active: true,
         currentWindow: true,
@@ -124,16 +152,12 @@ export default function OpenUrlPage() {
         return;
       }
 
-      // 设置侧边栏为插件自己的页面
       await chrome.sidePanel.setOptions({
         tabId,
         path: 'sidepanel.html',
         enabled: true,
       });
       await chrome.sidePanel.open({ windowId: currentTab.windowId });
-
-      // 关闭弹出窗口
-      showMessage(`已在侧边栏打开: ${entry.name}`, { severity: 'success' });
       window.close();
     } catch (error) {
       console.error('Failed to open side panel:', error);
@@ -141,126 +165,234 @@ export default function OpenUrlPage() {
     }
   };
 
-  // 在新标签页打开 URL
   const handleOpenInNewTab = (entry: OpenUrlEntry) => {
     chrome.tabs.create({ url: entry.url });
     window.close();
   };
 
   return (
-    <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* 添加新 URL 表单 */}
-      <Paper elevation={1} sx={{ p: 2 }}>
-        <TextField
-          label="名称"
-          placeholder="例如: 本地文档"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          size="small"
-        />
-        <TextField
-          label="URL"
-          placeholder="例如: http://localhost:8000/docs"
-          value={newUrl}
-          onChange={(e) => setNewUrl(e.target.value)}
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          size="small"
-        />
-
-        {showMixedContentWarning && (
-          <Alert severity="warning" sx={{ mt: 2, mb: 2 }}>
-            ⚠️ 混合内容警告：当前 HTTPS 页面无法加载 HTTP 资源。请考虑使用 HTTPS 或确认目标是
-            localhost。
-          </Alert>
-        )}
-
-        <Box sx={{ mt: 2 }}>
-          <Button
-            variant="contained"
-            onClick={handleAddEntry}
-            disabled={!newName.trim() || !isValidUrl(newUrl)}
-            fullWidth
-            startIcon={<AddIcon />}
+    <Box sx={{ pb: 3 }}>
+      <Container sx={{ py: 2 }}>
+        {/* Header */}
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
+          <Box
+            sx={{
+              p: 1,
+              borderRadius: 2.5,
+              bgcolor: alpha(THEME_COLOR, 0.1),
+              color: THEME_COLOR,
+              display: 'flex',
+            }}
           >
-            添加
-          </Button>
+            <LanguageIcon sx={{ fontSize: 20 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="subtitle1"
+              fontWeight={900}
+              sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}
+            >
+              URL 实验室
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+              多环境跳转与安全性预检
+            </Typography>
+          </Box>
+        </Stack>
+
+        {/* Form Section */}
+        <Box
+          sx={{
+            bgcolor: 'background.paper',
+            p: 2,
+            borderRadius: 4,
+            border: '1px solid',
+            borderColor: 'grey.100',
+            mb: 3,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+          }}
+        >
+          <Stack spacing={2}>
+            <TextField
+              label="环境名称"
+              placeholder="例如: 本地文档"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              fullWidth
+              variant="outlined"
+              sx={INPUT_STYLE}
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label="目标 URL"
+              placeholder="例如: http://localhost:8000/docs"
+              value={newUrl}
+              onChange={(e) => setNewUrl(e.target.value)}
+              fullWidth
+              variant="outlined"
+              sx={INPUT_STYLE}
+              InputLabelProps={{ shrink: true }}
+            />
+
+            {showMixedContentWarning && (
+              <Alert
+                severity="warning"
+                sx={{
+                  borderRadius: 3,
+                  '& .MuiAlert-message': { fontSize: '0.7rem', fontWeight: 600, lineHeight: 1.4 },
+                }}
+              >
+                混合内容警告：当前 HTTPS 页面无法加载 HTTP 资源。
+              </Alert>
+            )}
+
+            <Button
+              variant="contained"
+              onClick={handleAddEntry}
+              disabled={!newName.trim() || !isValidUrl(newUrl)}
+              fullWidth
+              startIcon={<AddIcon />}
+              sx={{
+                py: 1.2,
+                borderRadius: 4,
+                bgcolor: THEME_COLOR,
+                fontWeight: 800,
+                boxShadow: 'none',
+                '&:hover': {
+                  bgcolor: alpha(THEME_COLOR, 0.85),
+                  boxShadow: `0 8px 24px ${alpha(THEME_COLOR, 0.2)}`,
+                },
+              }}
+            >
+              添加快捷方式
+            </Button>
+          </Stack>
         </Box>
-      </Paper>
 
-      {/* URL 列表 */}
-      <Paper elevation={1} sx={{ p: 2, flex: 1, overflowY: 'auto' }}>
-        <Typography variant="subtitle1" sx={{ mb: 2 }}>
-          快捷方式列表
-        </Typography>
-        {entries.length === 0 ? (
-          <Typography color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-            暂无快捷方式，请添加
+        {/* List Section */}
+        <Box>
+          <Typography
+            variant="caption"
+            sx={{ color: 'text.secondary', fontWeight: 800, px: 1, mb: 1, display: 'block' }}
+          >
+            已保存的快捷方式 ({entries.length})
           </Typography>
-        ) : (
-          <List disablePadding>
-            {entries.map((entry, index) => (
-              <Fragment key={index}>
-                <ListItem
-                  disablePadding
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    py: 1,
-                  }}
-                >
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="body1" noWrap>
-                      {entry.name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      noWrap
-                      sx={{ fontSize: '0.75rem' }}
-                    >
-                      {entry.url}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 0.5 }}>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleOpenInSidebar(entry)}
-                      title="在侧边栏打开"
-                      color="primary"
-                    >
-                      <VisibilityIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleOpenInNewTab(entry)}
-                      title="在新标签页打开"
-                      color="default"
-                    >
-                      <OpenInNewIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDeleteEntry(index)}
-                      title="删除"
-                      color="error"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                </ListItem>
-                {index < entries.length - 1 && <Divider sx={{ my: 1 }} />}
-              </Fragment>
-            ))}
-          </List>
-        )}
-      </Paper>
 
+          {entries.length === 0 ? (
+            <Box
+              sx={{
+                textAlign: 'center',
+                py: 4,
+                bgcolor: 'grey.50',
+                borderRadius: 4,
+                border: '1px dashed',
+                borderColor: 'grey.200',
+              }}
+            >
+              <LinkIcon sx={{ color: 'grey.300', fontSize: 40, mb: 1 }} />
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                sx={{ display: 'block', fontWeight: 600 }}
+              >
+                暂无快捷方式，请在上方添加
+              </Typography>
+            </Box>
+          ) : (
+            <List
+              disablePadding
+              sx={{
+                bgcolor: 'background.paper',
+                borderRadius: 4,
+                border: '1px solid',
+                borderColor: 'grey.100',
+                overflow: 'hidden',
+              }}
+            >
+              {entries.map((entry, index) => (
+                <Fragment key={index}>
+                  <ListItem
+                    sx={{
+                      px: 2,
+                      py: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      transition: 'background-color 0.2s',
+                      '&:hover': { bgcolor: 'grey.50' },
+                    }}
+                  >
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 800, color: 'text.primary' }}
+                        noWrap
+                      >
+                        {entry.name}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        noWrap
+                        sx={{
+                          fontSize: '0.65rem',
+                          fontWeight: 500,
+                          display: 'block',
+                          mt: 0.2,
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {entry.url}
+                      </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={0.5}>
+                      <Tooltip title="在侧边栏预览">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenInSidebar(entry)}
+                          sx={{
+                            color: THEME_COLOR,
+                            bgcolor: alpha(THEME_COLOR, 0.05),
+                            '&:hover': { bgcolor: THEME_COLOR, color: '#fff' },
+                          }}
+                        >
+                          <VisibilityIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="新标签页打开">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenInNewTab(entry)}
+                          sx={{
+                            color: 'grey.500',
+                            bgcolor: 'grey.100',
+                            '&:hover': { bgcolor: 'grey.600', color: '#fff' },
+                          }}
+                        >
+                          <OpenInNewIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="删除">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDeleteEntry(index)}
+                          sx={{
+                            color: 'error.main',
+                            '&:hover': { color: 'error.dark', bgcolor: alpha('#f44336', 0.05) },
+                          }}
+                        >
+                          <DeleteIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  </ListItem>
+                  {index < entries.length - 1 && <Divider sx={{ mx: 2, borderColor: 'grey.50' }} />}
+                </Fragment>
+              ))}
+            </List>
+          )}
+        </Box>
+      </Container>
       <GlobalSnackbar {...snackbarProps} />
     </Box>
   );

@@ -8,6 +8,8 @@ interface RouterContextType {
   visiblePages: PageType[];
   isLoaded: boolean;
   navigateTo: (page: PageType) => void;
+  navigateLocal: (page: PageType) => void;
+  syncNavigation: (page: PageType) => void;
   goBack: () => void;
   setVisiblePages: (pages: PageType[]) => void;
 }
@@ -17,11 +19,13 @@ const RouterContext = createContext<RouterContextType | null>(null);
 interface RouterProviderProps {
   children: ReactNode;
   defaultRoute?: PageType;
+  syncRoute?: boolean;
 }
 
 export function RouterProvider({
   children,
-  defaultRoute = 'dashboard'
+  defaultRoute = 'dashboard',
+  syncRoute = true
 }: RouterProviderProps) {
   const [currentPage, setCurrentPage] = useState<PageType>(defaultRoute);
   const [visiblePages, setVisiblePages] = useState<PageType[]>(getDefaultVisibleRoutes());
@@ -32,10 +36,27 @@ export function RouterProvider({
   }, []);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && syncRoute) {
       storageUtil.set('app/currentRoute', currentPage);
     }
-  }, [currentPage, isLoaded]);
+  }, [currentPage, isLoaded, syncRoute]);
+
+  // Listen for storage changes if sync is enabled
+  useEffect(() => {
+    if (!syncRoute) return;
+
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      if (changes['app/currentRoute']) {
+        const newRoute = changes['app/currentRoute'].newValue as PageType;
+        if (newRoute && newRoute !== currentPage) {
+          setCurrentPage(newRoute);
+        }
+      }
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    return () => chrome.storage.onChanged.removeListener(handleStorageChange);
+  }, [syncRoute, currentPage]);
 
   const loadInitialData = async () => {
     try {
@@ -44,7 +65,7 @@ export function RouterProvider({
         storageUtil.get('app/visiblePages', getDefaultVisibleRoutes()),
       ]);
 
-      if (savedRoute) {
+      if (savedRoute && syncRoute) {
         setCurrentPage(savedRoute);
       }
       if (savedVisiblePages) {
@@ -61,6 +82,14 @@ export function RouterProvider({
     setCurrentPage(page);
   };
 
+  const navigateLocal = (page: PageType) => {
+    setCurrentPage(page);
+  };
+
+  const syncNavigation = (page: PageType) => {
+    storageUtil.set('app/currentRoute', page);
+  };
+
   const goBack = () => {
     setCurrentPage('dashboard');
   };
@@ -72,6 +101,8 @@ export function RouterProvider({
         visiblePages,
         isLoaded,
         navigateTo,
+        navigateLocal,
+        syncNavigation,
         goBack,
         setVisiblePages
       }}
