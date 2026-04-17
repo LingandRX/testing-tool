@@ -1,12 +1,18 @@
 # Testing Tools Browser Extension
 
-这是一个基于 WXT 框架的浏览器扩展项目，提供时间戳转换工具。
+这是一个基于 WXT 框架的浏览器扩展项目，提供实用的测试工具功能。
 
 ## 项目概述
 
-Testing Tools 是一个轻量级的浏览器扩展，提供实用的时间戳转换功能。项目采用现代化的技术栈，包括 React 19、TypeScript 和 Material UI，并利用 WXT 框架简化浏览器扩展的开发流程。
+Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试工具功能。项目采用现代化的技术栈，包括 React 19、TypeScript 和 Material UI，并利用 WXT 框架简化浏览器扩展的开发流程。
 
 ## 功能特性
+
+### Dashboard 首页
+
+- 卡片式工具展示
+- 支持自定义工具排序和可见性
+- 实时数据预览（时间戳等）
 
 ### 时间戳转换工具
 
@@ -16,6 +22,28 @@ Testing Tools 是一个轻量级的浏览器扩展，提供实用的时间戳转
 - 一键复制转换结果
 - 输入验证和错误提示
 
+### 存储清理工具
+
+- 自动读取当前域名
+- 支持清理多种存储类型：
+  - localStorage
+  - sessionStorage
+  - IndexedDB
+  - Cookies
+  - Cache Storage
+  - Service Workers
+- 可选择的清理类型（默认全选）
+- 确认对话框防止误操作
+- 清理结果统计
+- 自动刷新页面选项
+
+### URL 工具
+
+- 保存常用 URL 列表
+- 快速打开保存的 URL
+- 支持 URL 验证和安全检查
+- 内置 URL 查看器（iframe 沙箱模式）
+
 ## 技术栈
 
 - **框架**: WXT (Web Extension Toolkit)
@@ -24,22 +52,77 @@ Testing Tools 是一个轻量级的浏览器扩展，提供实用的时间戳转
 - **日期处理**: dayjs (含 UTC 和时区插件)
 - **通信**: @webext-core/messaging
 - **存储**: Chrome Storage API (类型安全封装)
+- **测试**: Vitest + Testing Library
 
 ## 项目结构
 
 ```
+├── components/           # 可复用 UI 组件
+│   ├── Button.tsx
+│   ├── GlobalSnackbar.tsx
+│   ├── RouterContainer.tsx
+│   ├── StorageCleanerConfirm.tsx
+│   ├── ToolCard.tsx
+│   └── TopBar.tsx
+├── config/              # 路由配置
+│   └── routes.ts        # 页面路由定义
 ├── entrypoints/         # 浏览器扩展入口点
-│   ├── popup/           # 扩展弹窗界面（时间戳转换页面）
-│   ├── options/         # 选项页面
-│   ├── background.ts    # 后台脚本
-│   └── content.ts       # 内容脚本
-├── utils/              # 工具函数（存储、日期处理、消息通信）
-├── types/              # TypeScript 类型定义
-├── public/             # 静态资源
-├── wxt.config.ts       # WXT 配置文件
-├── package.json        # 项目依赖和脚本
-└── README.md           # 项目说明文档
+│   ├── popup/          # 扩展弹窗界面
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── pages/      # 页面组件
+│   │       ├── DashboardPage.tsx
+│   │       ├── OpenUrlPage.tsx
+│   │       ├── OpenUrlViewerPage.tsx
+│   │       ├── StorageCleanerPage.tsx
+│   │       └── TimestampPage.tsx
+│   ├── options/        # 选项页面
+│   ├── sidepanel/      # 侧边栏
+│   ├── background.ts   # 后台脚本
+│   └── content.ts      # 内容脚本
+├── providers/           # React Context providers
+│   └── RouterProvider.tsx  # 路由状态管理
+├── types/               # TypeScript 类型定义
+│   └── storage.d.ts
+├── utils/               # 工具函数
+│   ├── chromeStorage.ts
+│   ├── dayjs.ts
+│   ├── messages.tsx
+│   └── storageCleaner.ts
+├── public/              # 静态资源
+├── wxt.config.ts        # WXT 配置文件
+├── package.json
+└── README.md
 ```
+
+## 路由系统
+
+项目实现了灵活的路由系统，支持：
+
+- **页面导航**: 在不同工具页面之间切换
+- **路由同步**: 通过 Chrome Storage 同步路由状态
+- **可见性控制**: 可配置显示哪些页面
+- **页面排序**: 自定义工具卡片的显示顺序
+
+### 页面类型 (PageType)
+
+| 页面             | 说明       | 默认可见 |
+| ---------------- | ---------- | -------- |
+| `dashboard`      | 首页       | ✓        |
+| `timestamp`      | 时间戳转换 | ✓        |
+| `storageCleaner` | 存储清理   | ✓        |
+| `openUrl`        | URL 工具   | ✓        |
+| `openUrlViewer`  | URL 查看器 | ✗        |
+
+## 扩展入口点
+
+| 入口点         | 说明                     |
+| -------------- | ------------------------ |
+| **popup**      | 点击扩展图标弹出的界面   |
+| **options**    | 扩展选项页面             |
+| **sidepanel**  | 浏览器侧边栏             |
+| **background** | 后台脚本（生命周期管理） |
+| **content**    | 内容脚本（注入到网页）   |
 
 ## 开发环境要求
 
@@ -80,15 +163,23 @@ npm run build:firefox
 # Chrome 浏览器
 npm run zip
 
-# Firefox
+# Firefox 浏览器
 npm run zip:firefox
 ```
 
-### 5. 其他命令
+### 5. 代码质量
 
 ```bash
 npm run compile    # TypeScript 类型检查
 npm run lint       # ESLint 代码检查
+```
+
+### 6. 测试
+
+```bash
+npm run test              # 运行所有测试
+npm run test:watch        # 运行测试并监听文件变化
+npm run test:coverage     # 运行测试并生成覆盖率报告
 ```
 
 ## 权限说明
@@ -98,7 +189,8 @@ npm run lint       # ESLint 代码检查
 - `storage` 和 `unlimitedStorage` - 本地数据存储
 - `clipboardWrite` - 剪贴板写入（复制功能）
 - `activeTab`, `scripting`, `tabs` - 当前标签页控制和脚本注入
-- `debugger` - 调试器权限
+- `cookies` - Cookie 访问
+- `sidePanel` - 侧边栏支持
 - `<all_urls>` - 访问所有网站内容（内容脚本注入）
 
 ## 主要依赖
@@ -107,14 +199,13 @@ npm run lint       # ESLint 代码检查
 - `@mui/material` - UI 组件库
 - `dayjs` - 日期处理
 - `@webext-core/messaging` - 扩展消息通信
+- `vitest` - 测试框架
+- `@testing-library/react` - React 组件测试
 
-## 贡献指南
+## 浏览器兼容性
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+- Chrome (推荐)
+- Firefox
 
 ## 许可证
 
