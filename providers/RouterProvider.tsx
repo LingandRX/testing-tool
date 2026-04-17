@@ -51,11 +51,20 @@ export function RouterProvider({
     if (!syncRoute) return;
 
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      if (changes[syncKey as string]) {
+      // 同步路由
+      if (syncRoute && changes[syncKey as string]) {
         const newRoute = changes[syncKey as string].newValue as PageType;
         if (newRoute && newRoute !== currentPage) {
           setCurrentPage(newRoute);
         }
+      }
+      // 同步可见页面列表
+      if (changes['app/visiblePages']) {
+        setVisiblePages(changes['app/visiblePages'].newValue as PageType[]);
+      }
+      // 同步页面排序
+      if (changes['app/pageOrder']) {
+        setPageOrder(changes['app/pageOrder'].newValue as PageType[]);
       }
     };
 

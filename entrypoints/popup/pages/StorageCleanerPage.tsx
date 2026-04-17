@@ -9,6 +9,7 @@ import {
   Stack,
   Switch,
   Grid,
+  CircularProgress,
 } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -52,6 +53,7 @@ const DEFAULT_PREFERENCES: StorageCleanerPreferences = {
 export default function StorageCleanerPage() {
   const [domain, setDomain] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
   const [options, setOptions] = useState<StorageCleanerOptions>(DEFAULT_OPTIONS);
   const [sizes, setSizes] = useState<Record<string, number>>({});
   const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
@@ -60,52 +62,83 @@ export default function StorageCleanerPage() {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const { snackbarProps, showMessage } = useSnackbar();
   const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const resultTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
       if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
+      if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
     };
   }, []);
 
-  const loadInfo = async () => {
-    const tab = await getCurrentTab();
-    if (!tab || !tab.url) {
-      setError('无法获取当前标签页');
-      return;
-    }
-    if (isRestrictedUrl(tab.url)) {
-      setError('存储清理功能不支持此页面');
-      return;
-    }
-    const url = tab.url;
-    const tabId = tab.id!;
-    setDomain(new URL(url).hostname);
+  const loadInfo = useCallback(async () => {
+    try {
+      const tab = await getCurrentTab();
+      if (!tab || !tab.url) {
+        setError('无法获取当前标签页');
+        return;
+      }
+      if (isRestrictedUrl(tab.url)) {
+        setError('存储清理功能不支持此页面');
+        return;
+      }
+      
+      // 重置错误状态
+      setError('');
+      
+      const url = tab.url;
+      const tabId = tab.id!;
+      setDomain(new URL(url).hostname);
 
-    const [savedPrefs, cSize, lsSize, ssSize, idbSize, cacheCount, swCount] = await Promise.all([
-      storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES),
-      getCookieSize(url),
-      getLocalStorageSize(tabId),
-      getSessionStorageSize(tabId),
-      getIndexedDBSize(tabId),
-      getCacheStorageSize(tabId),
-      getServiceWorkerCount(tabId),
-    ]);
+      const [savedPrefs, cSize, lsSize, ssSize, idbSize, cacheCount, swCount] = await Promise.all([
+        storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES),
+        getCookieSize(url),
+        getLocalStorageSize(tabId),
+        getSessionStorageSize(tabId),
+        getIndexedDBSize(tabId),
+        getCacheStorageSize(tabId),
+        getServiceWorkerCount(tabId),
+      ]);
 
-    setAutoRefresh(savedPrefs?.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
-    setOptions(savedPrefs?.selectedTypes ?? DEFAULT_PREFERENCES.selectedTypes);
-    setSizes({
-      cookies: cSize,
-      localStorage: lsSize,
-      sessionStorage: ssSize,
-      indexedDB: idbSize,
-      cacheStorage: cacheCount,
-      serviceWorkers: swCount,
-    });
-  };
+      if (savedPrefs) {
+        setAutoRefresh(savedPrefs.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
+        setOptions(savedPrefs.selectedTypes ?? DEFAULT_PREFERENCES.selectedTypes);
+      }
+      
+      setSizes({
+        cookies: cSize,
+        localStorage: lsSize,
+        sessionStorage: ssSize,
+        indexedDB: idbSize,
+        cacheStorage: cacheCount,
+        serviceWorkers: swCount,
+      });
+    } finally {
+      setIsInitializing(false);
+    }
+  }, []);
 
   useEffect(() => {
     loadInfo();
-  }, []);
+
+    // 监听标签页切换、更新及窗口焦点变化
+    const handleTabChange = () => loadInfo();
+    const handleTabUpdated = (_tabId: number, changeInfo: { status?: string; url?: string }) => {
+      if (changeInfo.status === 'complete' || changeInfo.url) {
+        loadInfo();
+      }
+    };
+
+    chrome.tabs.onActivated.addListener(handleTabChange);
+    chrome.tabs.onUpdated.addListener(handleTabUpdated);
+    chrome.windows.onFocusChanged.addListener(handleTabChange);
+
+    return () => {
+      chrome.tabs.onActivated.removeListener(handleTabChange);
+      chrome.tabs.onUpdated.removeListener(handleTabUpdated);
+      chrome.windows.onFocusChanged.removeListener(handleTabChange);
+    };
+  }, [loadInfo]);
 
   const handleAutoRefreshChange = useCallback(
     async (checked: boolean) => {
@@ -164,6 +197,13 @@ export default function StorageCleanerPage() {
     try {
       const cleaningResult = await clearStorage(tab.id, tab.url, options);
       setResult(cleaningResult);
+
+      // 5秒后自动清除结果提示
+      if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
+      resultTimeoutRef.current = setTimeout(() => {
+        setResult(null);
+      }, 5000);
+
       if (autoRefresh && cleaningResult.success && tab.id !== undefined) {
         showMessage('清理成功，即将刷新页面');
         reloadTimeoutRef.current = setTimeout(() => {
@@ -178,7 +218,15 @@ export default function StorageCleanerPage() {
       setLoading(false);
       setShowConfirm(false);
     }
-  }, [options, autoRefresh, showMessage]);
+  }, [options, autoRefresh, showMessage, loadInfo]);
+
+  if (isInitializing) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress size={24} color="warning" />
+      </Box>
+    );
+  }
 
   if (error) {
     return (

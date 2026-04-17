@@ -196,10 +196,10 @@ export default function OpenUrlPage() {
               fontWeight={900}
               sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}
             >
-              URL 实验室
+              URL 工具
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-              多环境跳转与安全性预检
+              快速打开 URL 或复制链接
             </Typography>
           </Box>
         </Stack>
