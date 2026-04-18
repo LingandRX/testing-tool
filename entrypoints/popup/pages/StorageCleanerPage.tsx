@@ -118,14 +118,16 @@ export default function StorageCleanerPage() {
     }
   }, []);
 
-  useEffect(() => {
-    loadInfo();
+  const loadInfoRef = useRef(loadInfo);
+  loadInfoRef.current = loadInfo;
 
-    // 监听标签页切换、更新及窗口焦点变化
-    const handleTabChange = () => loadInfo();
+  useEffect(() => {
+    loadInfoRef.current();
+
+    const handleTabChange = () => loadInfoRef.current();
     const handleTabUpdated = (_tabId: number, changeInfo: { status?: string; url?: string }) => {
       if (changeInfo.status === 'complete' || changeInfo.url) {
-        loadInfo();
+        loadInfoRef.current();
       }
     };
 
@@ -138,7 +140,7 @@ export default function StorageCleanerPage() {
       chrome.tabs.onUpdated.removeListener(handleTabUpdated);
       chrome.windows.onFocusChanged.removeListener(handleTabChange);
     };
-  }, [loadInfo]);
+  }, []);
 
   const handleAutoRefreshChange = useCallback(
     async (checked: boolean) => {
