@@ -5,8 +5,6 @@ import {
   Paper,
   Switch,
   Button,
-  Snackbar,
-  Alert,
   CircularProgress,
   Stack,
   IconButton,
@@ -17,13 +15,13 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import { getRouteByKey, getDefaultPageOrder, getDefaultVisibleRoutes } from '@/config/routes';
+import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 
 function App() {
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
   const [pageOrder, setPageOrder] = useState<PageType[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const [toastSeverity, setToastSeverity] = useState<'success' | 'info' | 'warning'>('info');
+  const { snackbarProps, showMessage } = useSnackbar();
 
   useEffect(() => {
     loadConfig();
@@ -109,11 +107,8 @@ function App() {
   };
 
   const showToast = (message: string, severity: 'success' | 'info' | 'warning') => {
-    setToast(message);
-    setToastSeverity(severity);
+    showMessage(message, { severity });
   };
-
-  const handleCloseToast = () => setToast(null);
 
   if (!isLoaded) {
     return (
@@ -209,21 +204,7 @@ function App() {
         </Box>
       </Paper>
 
-      <Snackbar
-        open={!!toast}
-        autoHideDuration={2000}
-        onClose={handleCloseToast}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={handleCloseToast}
-          severity={toastSeverity}
-          variant="filled"
-          sx={{ borderRadius: 2, fontWeight: 600 }}
-        >
-          {toast}
-        </Alert>
-      </Snackbar>
+      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

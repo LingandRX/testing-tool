@@ -232,10 +232,54 @@ export default function StorageCleanerPage() {
 
   if (error) {
     return (
-      <Container sx={{ py: 4 }}>
-        <Alert severity="error" icon={<WarningIcon />} sx={{ borderRadius: 3 }}>
-          {error}
-        </Alert>
+      <Container sx={{ 
+        py: 8, 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '400px',
+        textAlign: 'center'
+      }}>
+        <Box sx={{ width: '100%', maxWidth: 320 }}>
+          <Box 
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 4,
+              p: 4,
+              boxShadow: '0 8px 24px rgba(244, 67, 54, 0.15)',
+              border: '1px solid rgba(244, 67, 54, 0.2)',
+              bgcolor: 'rgba(244, 67, 54, 0.05)'
+            }}
+          >
+            <WarningIcon sx={{ fontSize: 36, color: '#f44336', mb: 2 }} />
+            <Typography 
+              variant="body1" 
+              color="error.main" 
+              sx={{ 
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                lineHeight: 1.4,
+                mb: 3
+              }}
+            >
+              {error}
+            </Typography>
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ 
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                lineHeight: 1.4
+              }}
+            >
+              存储清理功能仅适用于标准网页
+            </Typography>
+          </Box>
+        </Box>
       </Container>
     );
   }
@@ -261,25 +305,32 @@ export default function StorageCleanerPage() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        py: 0.8,
-        px: 1.2,
-        borderRadius: 2.5,
-        transition: 'all 0.2s',
-        '&:hover': { bgcolor: 'grey.50' },
+        py: 1,
+        px: 1.5,
+        borderRadius: 3,
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        bgcolor: checked ? 'rgba(255, 152, 0, 0.05)' : 'transparent',
+        border: `1px solid ${checked ? 'rgba(255, 152, 0, 0.2)' : 'transparent'}`,
+        '&:hover': { 
+          bgcolor: checked ? 'rgba(255, 152, 0, 0.1)' : 'rgba(0, 0, 0, 0.02)',
+          transform: 'translateY(-1px)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+        },
       }}
     >
-      <Box sx={{ flex: 1, minWidth: 0, mr: 1 }}>
+      <Box sx={{ flex: 1, minWidth: 0, mr: 1.5 }}>
         <Typography
-          variant="caption"
-          fontWeight={800}
-          color="text.primary"
+          variant="body2"
+          fontWeight={700}
+          color={checked ? '#ff9800' : 'text.primary'}
           sx={{ 
-            fontSize: '0.7rem', 
+            fontSize: '0.75rem', 
             display: 'block', 
-            lineHeight: 1.1,
+            lineHeight: 1.2,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
-            textOverflow: 'ellipsis'
+            textOverflow: 'ellipsis',
+            transition: 'color 0.2s'
           }}
         >
           {label}
@@ -288,13 +339,14 @@ export default function StorageCleanerPage() {
           <Typography
             variant="caption"
             sx={{ 
-              color: 'text.disabled', 
-              fontSize: '0.6rem', 
-              fontWeight: 700,
+              color: 'text.secondary', 
+              fontSize: '0.65rem', 
+              fontWeight: 600,
               display: 'block',
-              mt: 0.2,
+              mt: 0.3,
               lineHeight: 1,
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              opacity: 0.8
             }}
           >
             {isCount ? `${size} 个` : formatSize(size)}
@@ -303,12 +355,13 @@ export default function StorageCleanerPage() {
           <Typography
             variant="caption"
             sx={{ 
-              color: 'grey.300', 
-              fontSize: '0.6rem', 
+              color: 'grey.400', 
+              fontSize: '0.65rem', 
               fontWeight: 500,
               display: 'block',
-              mt: 0.2,
-              lineHeight: 1
+              mt: 0.3,
+              lineHeight: 1,
+              fontStyle: 'italic'
             }}
           >
             无数据
@@ -320,7 +373,16 @@ export default function StorageCleanerPage() {
         checked={checked}
         onChange={onChange}
         color="warning"
-        sx={{ p: 0.5 }}
+        sx={{
+          p: 0.6,
+          '& .MuiSvgIcon-root': {
+            fontSize: 18,
+            transition: 'transform 0.2s'
+          },
+          '&:hover .MuiSvgIcon-root': {
+            transform: 'scale(1.1)'
+          }
+        }}
       />
     </Box>
   );
@@ -329,54 +391,71 @@ export default function StorageCleanerPage() {
     <Box sx={{ pb: 2 }}>
       <Container sx={{ py: 2 }}>
         {/* Domain Header */}
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
           <Box
             sx={{
-              p: 1,
-              borderRadius: 2.5,
-              bgcolor: '#fff4e5',
+              p: 1.2,
+              borderRadius: 3,
+              bgcolor: 'rgba(255, 152, 0, 0.1)',
               color: '#ff9800',
               display: 'flex',
+              boxShadow: '0 2px 8px rgba(255, 152, 0, 0.15)',
+              transition: 'all 0.2s',
+              '&:hover': {
+                bgcolor: 'rgba(255, 152, 0, 0.15)',
+                transform: 'scale(1.05)'
+              }
             }}
           >
-            <StorageIcon sx={{ fontSize: 20 }} />
+            <StorageIcon sx={{ fontSize: 22 }} />
           </Box>
           <Box sx={{ flex: 1 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography
-                variant="subtitle1"
+                variant="h6"
                 fontWeight={900}
-                sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}
+                sx={{ 
+                  letterSpacing: '-0.5px', 
+                  lineHeight: 1.2,
+                  fontSize: '1rem',
+                  color: 'text.primary'
+                }}
               >
                 存储清理
               </Typography>
               {totalSize > 0 && (
-                <Typography
-                  variant="caption"
+                <Box
                   sx={{
-                    bgcolor: '#fff4e5',
+                    bgcolor: 'rgba(255, 152, 0, 0.15)',
                     color: '#ff9800',
-                    px: 1,
-                    py: 0.2,
-                    borderRadius: 1.5,
+                    px: 1.5,
+                    py: 0.3,
+                    borderRadius: 2,
                     fontWeight: 800,
-                    fontSize: '0.65rem',
+                    fontSize: '0.7rem',
+                    boxShadow: '0 2px 4px rgba(255, 152, 0, 0.2)',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      bgcolor: 'rgba(255, 152, 0, 0.25)'
+                    }
                   }}
                 >
                   已占用 {formatSize(totalSize)}
-                </Typography>
+                </Box>
               )}
             </Stack>
             <Typography
-              variant="caption"
+              variant="body2"
               color="text.secondary"
               sx={{
                 fontWeight: 600,
                 display: 'block',
-                maxWidth: 220,
+                maxWidth: 240,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                mt: 0.3,
+                fontSize: '0.75rem'
               }}
             >
               {domain || '加载中...'}
@@ -387,15 +466,20 @@ export default function StorageCleanerPage() {
         {/* Storage Options Grid */}
         <Box
           sx={{
-            mb: 2,
+            mb: 3,
             border: '1px solid',
             borderColor: 'grey.100',
             borderRadius: 4,
-            p: 0.8,
+            p: 1.2,
             bgcolor: 'background.paper',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+            transition: 'all 0.2s',
+            '&:hover': {
+              boxShadow: '0 6px 16px rgba(0, 0, 0, 0.08)'
+            }
           }}
         >
-          <Grid container spacing={0}>
+          <Grid container spacing={1.5}>
             <Grid size={6}>
               <OptionItem
                 label="LocalStorage"
@@ -406,7 +490,7 @@ export default function StorageCleanerPage() {
             </Grid>
             <Grid size={6}>
               <OptionItem
-                label="Session"
+                label="Session Storage"
                 checked={options.sessionStorage}
                 size={sizes.sessionStorage}
                 onChange={() => handleOptionChange('sessionStorage')}
@@ -430,7 +514,7 @@ export default function StorageCleanerPage() {
             </Grid>
             <Grid size={6}>
               <OptionItem
-                label="Cache"
+                label="Cache Storage"
                 checked={options.cacheStorage}
                 size={sizes.cacheStorage}
                 isCount
@@ -439,28 +523,34 @@ export default function StorageCleanerPage() {
             </Grid>
             <Grid size={6}>
               <OptionItem
-                label="Workers"
+                label="Service Workers"
                 checked={options.serviceWorkers}
                 size={sizes.serviceWorkers}
                 isCount
-              onChange={() => handleOptionChange('serviceWorkers')}
+                onChange={() => handleOptionChange('serviceWorkers')}
               />
             </Grid>
           </Grid>
-          <Divider sx={{ my: 0.8, borderColor: 'grey.50' }} />
+          <Divider sx={{ my: 1.2, borderColor: 'grey.100' }} />
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              px: 1.2,
-              py: 0.4,
+              px: 1.5,
+              py: 0.6,
+              bgcolor: 'rgba(0, 0, 0, 0.02)',
+              borderRadius: 2,
+              transition: 'all 0.2s',
+              '&:hover': {
+                bgcolor: 'rgba(0, 0, 0, 0.04)'
+              }
             }}
           >
             <Typography
-              variant="caption"
-              fontWeight={800}
-              sx={{ color: 'text.secondary', fontSize: '0.65rem' }}
+              variant="body2"
+              fontWeight={700}
+              sx={{ color: 'text.secondary', fontSize: '0.7rem' }}
             >
               全选所有项
             </Typography>
@@ -470,7 +560,16 @@ export default function StorageCleanerPage() {
               indeterminate={someSelected}
               onChange={(e) => handleSelectAll(e.target.checked)}
               color="warning"
-              sx={{ p: 0.5 }}
+              sx={{
+                p: 0.6,
+                '& .MuiSvgIcon-root': {
+                  fontSize: 18,
+                  transition: 'transform 0.2s'
+                },
+                '&:hover .MuiSvgIcon-root': {
+                  transform: 'scale(1.1)'
+                }
+              }}
             />
           </Box>
         </Box>
@@ -478,8 +577,8 @@ export default function StorageCleanerPage() {
         {/* Auto Refresh Toggle */}
         <Box
           sx={{
-            mb: 2,
-            p: 1.2,
+            mb: 3,
+            p: 1.5,
             borderRadius: 4,
             bgcolor: 'background.paper',
             border: '1px solid',
@@ -487,9 +586,14 @@ export default function StorageCleanerPage() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+            transition: 'all 0.2s',
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
+            }
           }}
         >
-          <Typography variant="caption" fontWeight={700}>
+          <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.8rem' }}>
             清理后自动刷新页面
           </Typography>
           <Switch
@@ -497,6 +601,18 @@ export default function StorageCleanerPage() {
             checked={autoRefresh}
             onChange={(e) => handleAutoRefreshChange(e.target.checked)}
             color="warning"
+            sx={{
+              '& .MuiSwitch-track': {
+                borderRadius: 20,
+              },
+              '& .MuiSwitch-thumb': {
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.2s'
+              },
+              '&:hover .MuiSwitch-thumb': {
+                transform: 'scale(1.1)'
+              }
+            }}
           />
         </Box>
 
@@ -505,13 +621,21 @@ export default function StorageCleanerPage() {
           variant="contained"
           onClick={() => setShowConfirm(true)}
           sx={{
-            py: 1.2,
+            py: 1.3,
             borderRadius: 4,
             bgcolor: '#ff9800',
             fontWeight: 800,
             fontSize: '0.85rem',
-            boxShadow: 'none',
-            '&:hover': { bgcolor: '#f57c00', boxShadow: '0 8px 16px rgba(255, 152, 0, 0.2)' },
+            boxShadow: '0 4px 12px rgba(255, 152, 0, 0.25)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': { 
+              bgcolor: '#f57c00', 
+              boxShadow: '0 8px 20px rgba(255, 152, 0, 0.35)',
+              transform: 'translateY(-2px)'
+            },
+            '&:active': {
+              transform: 'translateY(0)'
+            }
           }}
           disabled={loading}
           fullWidth
@@ -521,13 +645,23 @@ export default function StorageCleanerPage() {
 
         {/* Result & Refresh Secondary Action */}
         {result && (
-          <Box sx={{ mt: 2 }}>
+          <Box sx={{ mt: 3, animation: 'fadeIn 0.3s ease-in-out' }}>
             <Alert
               severity={result.success ? 'success' : 'error'}
               sx={{
-                borderRadius: 2.5,
-                py: 0,
-                '& .MuiAlert-message': { fontSize: '0.75rem', fontWeight: 600 },
+                borderRadius: 3,
+                py: 1,
+                px: 2,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                '& .MuiAlert-message': { 
+                  fontSize: '0.8rem', 
+                  fontWeight: 600,
+                  lineHeight: 1.4
+                },
+                '& .MuiAlert-icon': {
+                  fontSize: '1.2rem',
+                  mr: 1
+                }
               }}
             >
               {result.success ? formatCleaningResult(result) : result.error || '清理失败'}
