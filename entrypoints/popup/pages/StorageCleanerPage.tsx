@@ -35,6 +35,7 @@ import {
   getServiceWorkerCount,
   formatSize,
 } from '@/utils/storageCleaner';
+import { storageCleanerPageStyles } from '@/config/pageTheme';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
   localStorage: true,
@@ -254,7 +255,7 @@ export default function StorageCleanerPage() {
               bgcolor: 'rgba(244, 67, 54, 0.05)'
             }}
           >
-            <WarningIcon sx={{ fontSize: 36, color: '#f44336', mb: 2 }} />
+            <WarningIcon sx={{ fontSize: 36, color: 'error.main', mb: 2 }} />
             <Typography 
               variant="body1" 
               color="error.main" 
@@ -322,7 +323,7 @@ export default function StorageCleanerPage() {
         <Typography
           variant="body2"
           fontWeight={700}
-          color={checked ? '#ff9800' : 'text.primary'}
+          color={checked ? storageCleanerPageStyles.warningColor : 'text.primary'}
           sx={{ 
             fontSize: '0.75rem', 
             display: 'block', 
@@ -397,7 +398,7 @@ export default function StorageCleanerPage() {
               p: 1.2,
               borderRadius: 3,
               bgcolor: 'rgba(255, 152, 0, 0.1)',
-              color: '#ff9800',
+              color: storageCleanerPageStyles.warningColor,
               display: 'flex',
               boxShadow: '0 2px 8px rgba(255, 152, 0, 0.15)',
               transition: 'all 0.2s',
@@ -427,7 +428,7 @@ export default function StorageCleanerPage() {
                 <Box
                   sx={{
                     bgcolor: 'rgba(255, 152, 0, 0.15)',
-                    color: '#ff9800',
+                    color: storageCleanerPageStyles.warningColor,
                     px: 1.5,
                     py: 0.3,
                     borderRadius: 2,
@@ -623,13 +624,13 @@ export default function StorageCleanerPage() {
           sx={{
             py: 1.3,
             borderRadius: 4,
-            bgcolor: '#ff9800',
+            bgcolor: storageCleanerPageStyles.warningColor,
             fontWeight: 800,
             fontSize: '0.85rem',
             boxShadow: '0 4px 12px rgba(255, 152, 0, 0.25)',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': { 
-              bgcolor: '#f57c00', 
+              bgcolor: storageCleanerPageStyles.warningDark, 
               boxShadow: '0 8px 20px rgba(255, 152, 0, 0.35)',
               transform: 'translateY(-2px)'
             },

@@ -8,6 +8,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import type { PageType } from '@/types/storage';
 import { useEffect, useState } from 'react';
 import dayjs from '@/utils/dayjs';
+import { dashboardPageStyles } from '@/config/pageTheme';
 
 export default function DashboardPage() {
   const { navigateTo, visiblePages, pageOrder } = useRouter();
@@ -37,7 +38,7 @@ export default function DashboardPage() {
                   sx={{
                     fontFamily: 'monospace',
                     fontWeight: 600,
-                    color: '#2196f3',
+                    color: dashboardPageStyles.primaryColor,
                     fontSize: '0.85rem',
                   }}
                 >

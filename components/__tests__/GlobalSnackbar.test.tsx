@@ -25,22 +25,15 @@ describe('GlobalSnackbar Component', () => {
       expect(screen.getByText('Test message')).toBeInTheDocument();
     });
 
-    it('should render with different severity levels', () => {
-      const severities: Array<GlobalSnackbarProps['severity']> = [
-        'success',
-        'info',
-        'warning',
-        'error',
-      ];
-
-      severities.forEach((severity) => {
-        const { container } = render(
+    it.each(['success', 'info', 'warning', 'error'] as const)(
+      'should render with %s severity',
+      (severity) => {
+        render(
           <GlobalSnackbar {...defaultProps} severity={severity} />
         );
-        const alertElement = container.querySelector(`[role="alert"]`);
-        expect(alertElement).toBeInTheDocument();
-      });
-    });
+        expect(screen.getByText('Test message')).toBeInTheDocument();
+      }
+    );
 
     it('should render with custom anchor origin', () => {
       render(

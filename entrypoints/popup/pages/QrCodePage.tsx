@@ -24,6 +24,7 @@ import qrcode from 'qrcode';
 import jsQR from 'jsqr';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
+import { qrCodePageStyles } from '@/config/pageTheme';
 
 const QrCodePage = () => {
   const { snackbarProps, showMessage } = useSnackbar();
@@ -131,8 +132,8 @@ const QrCodePage = () => {
         width: 200,
         margin: 2,
         color: {
-          dark: '#000000',
-          light: '#FFFFFF',
+          dark: qrCodePageStyles.black,
+          light: qrCodePageStyles.white,
         },
       });
 
@@ -271,10 +272,10 @@ const QrCodePage = () => {
                 sx={{
                   py: 1.2,
                   borderRadius: 3,
-                  bgcolor: '#2196f3',
+                  bgcolor: qrCodePageStyles.primaryColor,
                   fontWeight: 700,
                   '&:hover': {
-                    bgcolor: '#1976d2',
+                    bgcolor: qrCodePageStyles.primaryDark,
                   },
                 }}
               >
@@ -318,10 +319,10 @@ const QrCodePage = () => {
                       sx={{
                         mt: 2,
                         borderRadius: 2,
-                        borderColor: '#2196f3',
-                        color: '#2196f3',
+                        borderColor: qrCodePageStyles.primaryColor,
+                        color: qrCodePageStyles.primaryColor,
                         '&:hover': {
-                          borderColor: '#1976d2',
+                          borderColor: qrCodePageStyles.primaryDark,
                           bgcolor: 'rgba(33, 150, 243, 0.05)',
                         },
                       }}
@@ -367,15 +368,15 @@ const QrCodePage = () => {
                   justifyContent: 'center',
                   minHeight: 200,
                   border: '2px dashed',
-                  borderColor: qrCodeFile ? '#4caf50' : 'grey.200',
+                  borderColor: qrCodeFile ? qrCodePageStyles.successColor : 'grey.200',
                   borderRadius: 3,
                   p: 4,
                   bgcolor: qrCodeFile ? 'rgba(76, 175, 80, 0.05)' : 'grey.50',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   '&:hover': {
-                    borderColor: '#4caf50',
-                    bgcolor: 'rgba(76, 175, 80, 0.05)',
+                    borderColor: qrCodePageStyles.successColor,
+                  bgcolor: 'rgba(76, 175, 80, 0.05)',
                   },
                 }}
               >
@@ -433,10 +434,10 @@ const QrCodePage = () => {
                 sx={{
                   py: 1.2,
                   borderRadius: 3,
-                  bgcolor: '#4caf50',
+                  bgcolor: qrCodePageStyles.successColor,
                   fontWeight: 700,
                   '&:hover': {
-                    bgcolor: '#388e3c',
+                    bgcolor: qrCodePageStyles.successDark,
                   },
                 }}
               >

@@ -9,8 +9,8 @@ import {
 
 describe('routes', () => {
   describe('ROUTES', () => {
-    it('should have 5 routes defined', () => {
-      expect(ROUTES).toHaveLength(5);
+    it('should have 6 routes defined', () => {
+      expect(ROUTES).toHaveLength(6);
     });
 
     it('should have all required properties for each route', () => {
@@ -101,11 +101,12 @@ describe('routes', () => {
   describe('getAllRouteKeys', () => {
     it('should return all route keys', () => {
       const allKeys = getAllRouteKeys();
-      expect(allKeys).toHaveLength(5);
+      expect(allKeys).toHaveLength(6);
       expect(allKeys).toContain('dashboard');
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
       expect(allKeys).toContain('openUrl');
+      expect(allKeys).toContain('qrCode');
       expect(allKeys).toContain('openUrlViewer');
     });
   });
@@ -121,16 +122,17 @@ describe('routes', () => {
       expect(pageOrder).not.toContain('openUrlViewer');
     });
 
-    it('should include timestamp, storageCleaner, openUrl in page order', () => {
+    it('should include timestamp, storageCleaner, openUrl, qrCode in page order', () => {
       const pageOrder = getDefaultPageOrder();
       expect(pageOrder).toContain('timestamp');
       expect(pageOrder).toContain('storageCleaner');
       expect(pageOrder).toContain('openUrl');
+      expect(pageOrder).toContain('qrCode');
     });
 
-    it('should have 3 items in page order', () => {
+    it('should have 4 items in page order', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(3);
+      expect(pageOrder).toHaveLength(4);
     });
   });
 });

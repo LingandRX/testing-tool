@@ -11,7 +11,6 @@ import {
   Container,
   Stack,
   alpha,
-  Theme,
   Tooltip,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,43 +23,9 @@ import Button from '@/components/Button';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
 import type { OpenUrlPreferences, OpenUrlEntry } from '@/types/storage';
+import { openUrlPageStyles } from '@/config/pageTheme';
 
-const THEME_COLOR = '#9c27b0';
-
-const INPUT_STYLE = {
-  '& .MuiOutlinedInput-root': {
-    bgcolor: 'background.paper',
-    borderRadius: 3.5,
-    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-    '& fieldset': {
-      border: '1px solid',
-      borderColor: 'grey.100',
-    },
-    '&:hover fieldset': {
-      borderColor: 'grey.300',
-    },
-    '&:hover': { bgcolor: 'grey.50' },
-    '&.Mui-focused fieldset': {
-      borderColor: THEME_COLOR,
-    },
-    '&.Mui-focused': {
-      bgcolor: '#fff',
-      boxShadow: (_theme: Theme) => `0 0 0 4px ${alpha(THEME_COLOR, 0.1)}`,
-    },
-  },
-  '& .MuiInputBase-input': {
-    py: 1.2,
-    px: 2,
-    fontSize: '0.85rem',
-    fontWeight: 600,
-  },
-  '& .MuiInputLabel-root': {
-    fontSize: '0.85rem',
-    fontWeight: 700,
-    color: 'text.secondary',
-    '&.Mui-focused': { color: THEME_COLOR },
-  },
-};
+const THEME_COLOR = openUrlPageStyles.themeColor;
 
 const DEFAULT_PREFERENCES: OpenUrlPreferences = {
   entries: [],
@@ -229,7 +194,7 @@ export default function OpenUrlPage() {
               onChange={(e) => setNewName(e.target.value)}
               fullWidth
               variant="outlined"
-              sx={INPUT_STYLE}
+              sx={openUrlPageStyles.INPUT_STYLE}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -243,7 +208,7 @@ export default function OpenUrlPage() {
               onChange={(e) => setNewUrl(e.target.value)}
               fullWidth
               variant="outlined"
-              sx={INPUT_STYLE}
+              sx={openUrlPageStyles.INPUT_STYLE}
               slotProps={{
                 inputLabel: {
                   shrink: true,
