@@ -14,12 +14,12 @@ import {
   AccordionDetails,
 } from '@mui/material';
 import { Container } from '@mui/system';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import ImageIcon from '@mui/icons-material/Image';
 import LinkIcon from '@mui/icons-material/Link';
 import DownloadIcon from '@mui/icons-material/Download';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import qrcode from 'qrcode';
 import jsQR from 'jsqr';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
@@ -86,7 +86,16 @@ const QrCodePage = () => {
   // 初始化未完成时显示加载状态
   if (!isInitialized) {
     return (
-      <Container sx={{ py: 4, maxWidth: 400, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+      <Container
+        sx={{
+          py: 4,
+          maxWidth: 400,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 200,
+        }}
+      >
         <CircularProgress />
       </Container>
     );
@@ -223,6 +232,29 @@ const QrCodePage = () => {
     }
   };
 
+  // 复制二维码到剪贴板
+  const copyQrCode = async () => {
+    if (!qrCodeDataUrl) return;
+
+    try {
+      // 将 data URL 转换为 Blob
+      const response = await fetch(qrCodeDataUrl);
+      const blob = await response.blob();
+
+      // 使用 Clipboard API 写入图像
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': blob,
+        }),
+      ]);
+
+      showMessage('二维码已复制到剪贴板', { severity: 'success', autoHideDuration: 1000 });
+    } catch (error) {
+      console.error('复制二维码失败:', error);
+      showMessage('复制二维码失败，请重试', { severity: 'error', autoHideDuration: 300 });
+    }
+  };
+
   return (
     <Container sx={{ py: 4, maxWidth: 400 }}>
       <Stack spacing={3}>
@@ -312,23 +344,38 @@ const QrCodePage = () => {
                       alt="QR Code"
                       style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
                     />
-                    <Button
-                      variant="outlined"
-                      startIcon={<DownloadIcon />}
-                      onClick={downloadQrCode}
-                      sx={{
-                        mt: 2,
-                        borderRadius: 2,
-                        borderColor: qrCodePageStyles.primaryColor,
-                        color: qrCodePageStyles.primaryColor,
-                        '&:hover': {
-                          borderColor: qrCodePageStyles.primaryDark,
-                          bgcolor: 'rgba(33, 150, 243, 0.05)',
-                        },
-                      }}
-                    >
-                      下载二维码
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<DownloadIcon />}
+                        onClick={downloadQrCode}
+                        sx={{
+                          borderRadius: 2,
+                          borderColor: qrCodePageStyles.primaryColor,
+                          color: qrCodePageStyles.primaryColor,
+                          '&:hover': {
+                            borderColor: qrCodePageStyles.primaryDark,
+                            bgcolor: 'rgba(33, 150, 243, 0.05)',
+                          },
+                        }}
+                      >
+                        下载二维码
+                      </Button>
+                      <Button
+                        variant="contained"
+                        startIcon={<ContentCopyIcon />}
+                        onClick={copyQrCode}
+                        sx={{
+                          borderRadius: 2,
+                          bgcolor: qrCodePageStyles.primaryColor,
+                          '&:hover': {
+                            bgcolor: qrCodePageStyles.primaryDark,
+                          },
+                        }}
+                      >
+                        复制二维码
+                      </Button>
+                    </Box>
                   </Box>
                 ) : (
                   <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
@@ -376,7 +423,7 @@ const QrCodePage = () => {
                   transition: 'all 0.2s',
                   '&:hover': {
                     borderColor: qrCodePageStyles.successColor,
-                  bgcolor: 'rgba(76, 175, 80, 0.05)',
+                    bgcolor: 'rgba(76, 175, 80, 0.05)',
                   },
                 }}
               >
