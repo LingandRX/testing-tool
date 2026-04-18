@@ -1,8 +1,8 @@
 {
-  "name": "wxt-react-starter",
-  "description": "manifest.json description",
+  "name": "testing-tools",
+  "description": "A browser extension providing useful testing tools including timestamp conversion and storage management",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -14,7 +14,10 @@
     "compile": "tsc --noEmit",
     "postinstall": "wxt prepare",
     "prepare": "husky",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -27,6 +30,9 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/chrome": "^0.1.36",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -40,11 +46,13 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.2.0",
     "husky": "^9.1.7",
+    "jsdom": "^25.0.0",
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "terser": "^5.46.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0",
+    "vitest": "^2.0.0",
     "wxt": "^0.20.6"
   }
 }

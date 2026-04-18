@@ -16,7 +16,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
-import { getRouteByKey, getDefaultPageOrder } from '@/config/routes';
+import { getRouteByKey, getDefaultPageOrder, getDefaultVisibleRoutes } from '@/config/routes';
 
 function App() {
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
@@ -32,18 +32,14 @@ function App() {
   const loadConfig = async () => {
     try {
       const [savedVisible, savedOrder] = await Promise.all([
-        storageUtil.get('app/visiblePages', [
-          'timestamp',
-          'storageCleaner',
-          'openUrl',
-        ] as PageType[]),
+        storageUtil.get('app/visiblePages', getDefaultVisibleRoutes()),
         storageUtil.get('app/pageOrder', getDefaultPageOrder()),
       ]);
-      setVisiblePages(savedVisible ?? ['timestamp', 'storageCleaner', 'openUrl']);
+      setVisiblePages(savedVisible ?? getDefaultVisibleRoutes());
       setPageOrder(savedOrder && savedOrder.length > 0 ? savedOrder : getDefaultPageOrder());
     } catch (error) {
       console.error('Failed to load config:', error);
-      setVisiblePages(['timestamp', 'storageCleaner', 'openUrl']);
+      setVisiblePages(getDefaultVisibleRoutes());
       setPageOrder(getDefaultPageOrder());
     } finally {
       setIsLoaded(true);
