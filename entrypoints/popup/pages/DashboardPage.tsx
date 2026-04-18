@@ -4,6 +4,7 @@ import ToolCard from '@/components/ToolCard';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
 import LanguageIcon from '@mui/icons-material/Language';
+import QrCodeIcon from '@mui/icons-material/QrCode';
 import type { PageType } from '@/types/storage';
 import { useEffect, useState } from 'react';
 import dayjs from '@/utils/dayjs';
@@ -69,6 +70,17 @@ export default function DashboardPage() {
             colorCode="#9c27b0"
             icon={<LanguageIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('openUrl')}
+          />
+        );
+      case 'qrCode':
+        return (
+          <ToolCard
+            key={key}
+            title="二维码工具"
+            description="URL 转二维码与二维码解析"
+            colorCode="#4caf50"
+            icon={<QrCodeIcon sx={{ fontSize: 20 }} />}
+            onClick={() => navigateTo('qrCode')}
           />
         );
       default:
