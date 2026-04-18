@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import { storageUtil } from '@/utils/chromeStorage';
 
 // 只允许 HTTP/HTTPS 协议，阻止危险协议
@@ -8,6 +8,7 @@ const ALLOWED_PROTOCOLS = ['http:', 'https:'];
 export default function OpenUrlViewerPage() {
   const [currentUrl, setCurrentUrl] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // 验证 URL 是否安全
@@ -24,33 +25,59 @@ export default function OpenUrlViewerPage() {
   };
 
   // 从存储加载当前选中的 URL
-  useEffect(() => {
-    const loadCurrentUrl = async () => {
-      try {
-        const saved = await storageUtil.get('openUrl/currentUrl', '');
-        if (saved) {
-          const validationError = validateUrl(saved);
-          if (validationError) {
-            setError(validationError);
-          } else {
-            setCurrentUrl(saved);
-            setError(null);
-          }
+  const loadCurrentUrl = useCallback(async () => {
+    try {
+      const saved = await storageUtil.get('openUrl/currentUrl', '');
+      if (saved) {
+        const validationError = validateUrl(saved);
+        if (validationError) {
+          setError(validationError);
+        } else {
+          setCurrentUrl(saved);
+          setError(null);
+          setIframeLoading(true); // 重置 iframe 加载状态
         }
-      } catch (error) {
-        console.error('Failed to load current URL:', error);
-        setError('加载 URL 失败');
-      } finally {
-        setIsLoaded(true);
+      } else {
+        setError(null);
+        setCurrentUrl('');
+      }
+    } catch (error) {
+      console.error('Failed to load current URL:', error);
+      setError('加载 URL 失败');
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  // 初始加载
+  useEffect(() => {
+    loadCurrentUrl();
+  }, [loadCurrentUrl]);
+
+  // 监听存储变化，确保 URL 变更时能及时更新
+  useEffect(() => {
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      if (changes['openUrl/currentUrl']) {
+        loadCurrentUrl();
       }
     };
-    loadCurrentUrl();
-  }, []);
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    return () => chrome.storage.onChanged.removeListener(handleStorageChange);
+  }, [loadCurrentUrl]);
 
   if (!isLoaded) {
     return (
-      <Box sx={{ p: 2, flex: 1 }}>
-        <Typography color="text.secondary">Loading...</Typography>
+      <Box
+        sx={{
+          p: 2,
+          flex: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <CircularProgress size={40} />
       </Box>
     );
   }
@@ -58,7 +85,10 @@ export default function OpenUrlViewerPage() {
   if (error) {
     return (
       <Box sx={{ p: 2, flex: 1 }}>
-        <Typography color="error">{error}</Typography>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+        <Typography color="text.secondary">请返回 OpenUrl 页面选择有效的 URL。</Typography>
       </Box>
     );
   }
@@ -66,15 +96,38 @@ export default function OpenUrlViewerPage() {
   if (!currentUrl) {
     return (
       <Box sx={{ p: 2, flex: 1 }}>
-        <Typography color="text.secondary">
-          没有选中的 URL，请先在 OpenUrl 页面选择一个 URL 打开。
-        </Typography>
+        <Alert severity="info" sx={{ mb: 2 }}>
+          没有选中的 URL
+        </Alert>
+        <Typography color="text.secondary">请先在 OpenUrl 页面选择一个 URL 打开。</Typography>
       </Box>
     );
   }
 
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* 加载状态指示器 */}
+      {iframeLoading && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: 'rgba(255, 255, 255, 0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <Box sx={{ textAlign: 'center' }}>
+            <CircularProgress size={60} />
+            <Typography sx={{ mt: 2 }}>加载中...</Typography>
+          </Box>
+        </Box>
+      )}
       <iframe
         src={currentUrl}
         title="OpenUrl Viewer"
@@ -84,6 +137,11 @@ export default function OpenUrlViewerPage() {
           width: '100%',
           border: 'none',
           display: 'block',
+        }}
+        onLoad={() => setIframeLoading(false)}
+        onError={() => {
+          setIframeLoading(false);
+          setError('URL 加载失败，请检查网络连接或 URL 是否正确');
         }}
       />
     </Box>

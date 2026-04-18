@@ -23,7 +23,6 @@ import LinkIcon from '@mui/icons-material/Link';
 import Button from '@/components/Button';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
-import { useRouter } from '@/providers/RouterProvider';
 import type { OpenUrlPreferences, OpenUrlEntry } from '@/types/storage';
 
 const THEME_COLOR = '#9c27b0';
@@ -32,14 +31,20 @@ const INPUT_STYLE = {
   '& .MuiOutlinedInput-root': {
     bgcolor: 'background.paper',
     borderRadius: 3.5,
-    border: '1px solid',
-    borderColor: 'grey.100',
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-    '& fieldset': { border: 'none' },
-    '&:hover': { borderColor: 'grey.300', bgcolor: 'grey.50' },
+    '& fieldset': {
+      border: '1px solid',
+      borderColor: 'grey.100',
+    },
+    '&:hover fieldset': {
+      borderColor: 'grey.300',
+    },
+    '&:hover': { bgcolor: 'grey.50' },
+    '&.Mui-focused fieldset': {
+      borderColor: THEME_COLOR,
+    },
     '&.Mui-focused': {
       bgcolor: '#fff',
-      borderColor: THEME_COLOR,
       boxShadow: (_theme: Theme) => `0 0 0 4px ${alpha(THEME_COLOR, 0.1)}`,
     },
   },
@@ -53,7 +58,6 @@ const INPUT_STYLE = {
     fontSize: '0.85rem',
     fontWeight: 700,
     color: 'text.secondary',
-    mb: 0.5,
     '&.Mui-focused': { color: THEME_COLOR },
   },
 };
@@ -68,7 +72,6 @@ export default function OpenUrlPage() {
   const [newUrl, setNewUrl] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
   const { snackbarProps, showMessage } = useSnackbar();
-  const { syncNavigation } = useRouter();
 
   const showMixedContentWarning =
     newUrl.startsWith('http://') && !newUrl.includes('localhost') && !newUrl.includes('127.0.0.1');
@@ -139,8 +142,10 @@ export default function OpenUrlPage() {
 
   const handleOpenInSidebar = async (entry: OpenUrlEntry) => {
     try {
+      // 存储目标 URL
       await storageUtil.set('openUrl/currentUrl', entry.url);
-      syncNavigation('openUrlViewer');
+      // 直接设置侧边栏的路由，而不是通过 syncNavigation 影响弹窗路由
+      await storageUtil.set('app/sidepanelRoute', 'openUrlViewer');
 
       const [currentTab] = await chrome.tabs.query({
         active: true,
@@ -225,7 +230,11 @@ export default function OpenUrlPage() {
               fullWidth
               variant="outlined"
               sx={INPUT_STYLE}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
             />
             <TextField
               label="目标 URL"
@@ -235,7 +244,11 @@ export default function OpenUrlPage() {
               fullWidth
               variant="outlined"
               sx={INPUT_STYLE}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
             />
 
             {showMixedContentWarning && (
