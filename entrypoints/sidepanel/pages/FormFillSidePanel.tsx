@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Typography,
@@ -19,6 +19,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import HighlightAltIcon from '@mui/icons-material/HighlightAlt';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { FieldType, FillMode } from '@/utils/dummyDataGenerator';
+import { MessageAction, sendMessageToContent, injectContentScript } from '@/utils/messages';
 
 interface FieldData {
   id: string;
@@ -41,38 +42,21 @@ const FormFillSidePanel = () => {
   const [includeHidden] = useState(false);
   const [hoveredFieldId, setHoveredFieldId] = useState<string | null>(null);
 
-  interface MessagePayload {
-    fieldId?: string;
-    fieldIds?: string[];
-    fields?: FieldData[];
-    mode?: FillMode;
-    includeHidden?: boolean;
-  }
-
-  interface MessageResponse {
-    success: boolean;
-    message?: string;
-    fields?: FieldData[];
-    totalCount?: number;
-    validCount?: number;
-    hasModal?: boolean;
-  }
-
-  const sendMessageToContent = useCallback(
-    async (action: string, payload?: MessagePayload): Promise<MessageResponse> => {
-      return new Promise((resolve) => {
-        chrome.runtime.sendMessage({ action, ...payload }, (response) => {
-          resolve(response as MessageResponse);
-        });
-      });
-    },
-    [],
-  );
-
   const handleScan = async () => {
     setScanning(true);
     try {
-      const response = await sendMessageToContent('scanFormFields');
+      let response = await sendMessageToContent(MessageAction.SCAN_FORM_FIELDS);
+
+      // 如果连接失败，尝试注入内容脚本
+      if (!response.success && response.message && response.message.includes('无法连接')) {
+        showMessage('正在注入内容脚本...', { severity: 'info' });
+        const injected = await injectContentScript();
+        if (injected) {
+          // 注入成功后再次尝试
+          response = await sendMessageToContent(MessageAction.SCAN_FORM_FIELDS);
+        }
+      }
+
       if (response.success) {
         setFields(response.fields || []);
         showMessage(`扫描完成，发现 ${response.totalCount} 个可填充字段`, { severity: 'success' });
@@ -131,7 +115,7 @@ const FormFillSidePanel = () => {
     setLoading(true);
     try {
       const selectedFields = fields.filter((f) => f.isSelected);
-      const response = await sendMessageToContent('fillSelectedFields', {
+      const response = await sendMessageToContent(MessageAction.FILL_SELECTED_FIELDS, {
         fields: selectedFields,
         mode: mode === 'valid' ? FillMode.VALID : FillMode.INVALID,
         includeHidden,
@@ -152,7 +136,7 @@ const FormFillSidePanel = () => {
   const handleClear = async () => {
     setLoading(true);
     try {
-      const response = await sendMessageToContent('clearAllFields');
+      const response = await sendMessageToContent(MessageAction.CLEAR_ALL_FIELDS);
       if (response.success) {
         showMessage(response.message || '已清空', { severity: 'success' });
       } else {
@@ -169,9 +153,9 @@ const FormFillSidePanel = () => {
   const handleHoverField = async (fieldId: string | null) => {
     setHoveredFieldId(fieldId);
     if (fieldId) {
-      await sendMessageToContent('highlightField', { fieldId });
+      await sendMessageToContent(MessageAction.HIGHLIGHT_FIELD, { fieldId });
     } else {
-      await sendMessageToContent('unhighlightAllFields');
+      await sendMessageToContent(MessageAction.UNHIGHLIGHT_ALL_FIELDS);
     }
   };
 
