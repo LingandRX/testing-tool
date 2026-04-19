@@ -19,7 +19,7 @@
   --sb-track-color: transparent;
 }
 
-/* 强制固定视口尺寸 */
+/* 默认 Popup 尺寸 */
 html,
 body,
 #root {
@@ -28,6 +28,18 @@ body,
   width: 400px;
   height: 600px;
   overflow: hidden; /* 禁用外层滚动 */
+}
+
+/* 独立窗口全屏自适应 */
+@media screen and (min-width: 401px), screen and (min-height: 601px) {
+  html,
+  body,
+  #root {
+    width: 100vw;
+    height: 100vh;
+    min-width: 400px;
+    min-height: 600px;
+  }
 }
 
 /* 全局极简滚动条定制 */
