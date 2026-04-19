@@ -4,6 +4,7 @@ export type PageType =
   | 'storageCleaner'
   | 'openUrl'
   | 'qrCode'
+  | 'formRecognizer'
   | 'openUrlViewer';
 
 export interface StorageSchema {

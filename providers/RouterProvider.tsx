@@ -29,7 +29,7 @@ export function RouterProvider({
   children,
   defaultRoute = 'dashboard',
   syncRoute = true,
-  syncKey = 'app/currentRoute'
+  syncKey = 'app/currentRoute',
 }: RouterProviderProps) {
   const [currentPage, setCurrentPage] = useState<PageType>(defaultRoute);
   const [visiblePages, setVisiblePages] = useState<PageType[]>(getDefaultVisibleRoutes());
@@ -124,7 +124,7 @@ export function RouterProvider({
         syncNavigation,
         goBack,
         setVisiblePages,
-        setPageOrder
+        setPageOrder,
       }}
     >
       {children}
