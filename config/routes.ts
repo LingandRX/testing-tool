@@ -4,6 +4,7 @@ import TimestampPage from '@/entrypoints/popup/pages/TimestampPage';
 import StorageCleanerPage from '@/entrypoints/popup/pages/StorageCleanerPage';
 import OpenUrlPage from '@/entrypoints/popup/pages/OpenUrlPage';
 import OpenUrlViewerPage from '@/entrypoints/popup/pages/OpenUrlViewerPage';
+import QrCodePage from '@/entrypoints/popup/pages/QrCodePage';
 
 export interface RouteConfig {
   key: PageType;
@@ -36,6 +37,12 @@ export const ROUTES: RouteConfig[] = [
     label: 'Open Url',
     defaultVisible: true,
     component: OpenUrlPage,
+  },
+  {
+    key: 'qrCode',
+    label: '二维码工具',
+    defaultVisible: true,
+    component: QrCodePage,
   },
   {
     key: 'openUrlViewer',

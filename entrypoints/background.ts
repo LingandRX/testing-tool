@@ -56,7 +56,9 @@ export default defineBackground(() => {
     );
   });
 
-  chrome.tabs.onUpdated.addListener((tabId) => {
-    console.log('加载完成的 Tab ID:', tabId);
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.status === 'complete') {
+      console.log('加载完成的 Tab ID:', tabId);
+    }
   });
 });
