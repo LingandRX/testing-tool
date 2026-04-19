@@ -6,7 +6,6 @@ import {
   Button,
   Stack,
   Alert,
-  IconButton,
   InputAdornment,
   CircularProgress,
   Accordion,
@@ -23,11 +22,12 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import qrcode from 'qrcode';
 import jsQR from 'jsqr';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import CopyButton from '@/components/CopyButton';
 import { storageUtil } from '@/utils/chromeStorage';
 import { qrCodePageStyles, dashboardPageStyles } from '@/config/pageTheme';
 
 const QrCodePage = () => {
-  const { snackbarProps, showMessage } = useSnackbar();
+  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
   const [isInitialized, setIsInitialized] = useState(false);
 
   // URL 转二维码状态
@@ -215,21 +215,6 @@ const QrCodePage = () => {
     link.download = 'qrcode.png';
     link.click();
     showMessage('二维码下载成功', { severity: 'success', autoHideDuration: 300 });
-  };
-
-  // 复制到剪贴板
-  const handleCopy = async (text: string) => {
-    try {
-      if (!text) {
-        showMessage('未检测要复制的文本', { severity: 'error', autoHideDuration: 300 });
-        return;
-      }
-      await navigator.clipboard.writeText(text);
-      showMessage('复制成功', { severity: 'success', autoHideDuration: 300 });
-    } catch (error) {
-      console.error('复制失败:', error);
-      showMessage('复制失败，请重试', { severity: 'error', autoHideDuration: 300 });
-    }
   };
 
   // 复制二维码到剪贴板
@@ -503,7 +488,9 @@ const QrCodePage = () => {
 
                 <Button
                   variant="contained"
-                  startIcon={parsing ? <CircularProgress size={16} color="inherit" /> : <LinkIcon />}
+                  startIcon={
+                    parsing ? <CircularProgress size={16} color="inherit" /> : <LinkIcon />
+                  }
                   onClick={parseQrCode}
                   disabled={parsing}
                   sx={{
@@ -536,9 +523,13 @@ const QrCodePage = () => {
                         readOnly: true,
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton edge="end" onClick={() => handleCopy(parsedUrl)} size="small">
-                              <ContentCopyIcon sx={{ fontSize: 16 }} />
-                            </IconButton>
+                            <CopyButton
+                              text={parsedUrl}
+                              tooltip="复制"
+                              size="small"
+                              color={qrCodePageStyles.primaryColor}
+                              showMessage={showMessage}
+                            />
                           </InputAdornment>
                         ),
                       },

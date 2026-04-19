@@ -106,7 +106,15 @@ export default function OpenUrlViewerPage() {
   }
 
   return (
-    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: dashboardPageStyles.backgroundColor }}>
+    <Box
+      sx={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        bgcolor: dashboardPageStyles.backgroundColor,
+      }}
+    >
       {/* 加载状态指示器 */}
       {iframeLoading && (
         <Box

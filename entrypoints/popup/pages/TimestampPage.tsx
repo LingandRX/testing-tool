@@ -15,30 +15,29 @@ import {
   alpha,
 } from '@mui/material';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import CheckIcon from '@mui/icons-material/Check';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
+import CopyButton from '@/components/CopyButton';
 import { DATE_FORMAT, ZONES, timestampPageStyles } from '@/config/pageTheme';
 import type { UnitType, ZoneType } from '@/config/pageTheme';
 
 // ================= 子组件：实时时钟 (优化交互) =================
 interface LiveClockProps {
   unit: UnitType;
-  onCopy: (val: string) => void;
   onUseNow: (val: number) => void;
   onUnitChange: (u: UnitType) => void;
+  showMessage?: (message: string, options?: { severity: 'success' | 'error' }) => void;
 }
 
-const LiveClock = React.memo(({ unit, onCopy, onUseNow, onUnitChange }: LiveClockProps) => {
+const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: LiveClockProps) => {
   const [now, setNow] = useState(() => Date.now());
-  const onCopyRef = useRef(onCopy);
   const onUseNowRef = useRef(onUseNow);
+  const showMessageRef = useRef(showMessage);
 
   useEffect(() => {
-    onCopyRef.current = onCopy;
     onUseNowRef.current = onUseNow;
-  }, [onCopy, onUseNow]);
+    showMessageRef.current = showMessage;
+  }, [onUseNow, showMessage]);
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -49,10 +48,6 @@ const LiveClock = React.memo(({ unit, onCopy, onUseNow, onUnitChange }: LiveCloc
     () => String(Math.floor(now / (unit === 'ms' ? 1 : 1000))),
     [now, unit],
   );
-
-  const handleCopy = useCallback(() => {
-    onCopyRef.current(displayVal);
-  }, [displayVal]);
 
   const handleUseNow = useCallback(() => {
     onUseNowRef.current(now);
@@ -146,22 +141,22 @@ const LiveClock = React.memo(({ unit, onCopy, onUseNow, onUnitChange }: LiveCloc
               size="small"
               onClick={handleUseNow}
               sx={{
-                color: 'primary.main',
+                color: timestampPageStyles.primaryColor,
                 bgcolor: '#fff',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                '&:hover': { bgcolor: 'primary.main', color: '#fff' },
+                '&:hover': { bgcolor: timestampPageStyles.primaryColor, color: '#fff' },
               }}
             >
               <AccessTimeIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <IconButton
+          <CopyButton
+            text={displayVal}
+            tooltip="复制时间戳"
             size="small"
-            onClick={handleCopy}
-            sx={{ color: 'grey.400', '&:hover': { color: 'primary.main' } }}
-          >
-            <ContentCopyIcon fontSize="small" />
-          </IconButton>
+            color={timestampPageStyles.primaryColor}
+            showMessage={showMessage}
+          />
         </Stack>
       </Stack>
     </Box>
@@ -176,18 +171,10 @@ interface ResultViewProps {
   mode: 'ts2dt' | 'dt2ts';
   unit: UnitType;
   zone: string;
-  onCopy: (val: string) => void;
+  showMessage?: (message: string, options?: { severity: 'success' | 'error' }) => void;
 }
 
-const ResultView = React.memo(({ result, mode, unit, zone, onCopy }: ResultViewProps) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(() => {
-    onCopy(result);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }, [onCopy, result]);
-
+const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: ResultViewProps) => {
   const extraInfo = useMemo(() => {
     if (!result) return null;
     const d =
@@ -246,22 +233,18 @@ const ResultView = React.memo(({ result, mode, unit, zone, onCopy }: ResultViewP
           >
             {result}
           </Typography>
-          <IconButton
+          <CopyButton
+            text={result}
+            tooltip="复制结果"
             size="small"
-            onClick={handleCopy}
-            sx={{
+            color={timestampPageStyles.primaryColor}
+            style={{
               position: 'absolute',
               right: 8,
               top: '50%',
               transform: 'translateY(-50%)',
-              color: copied ? 'success.main' : 'primary.main',
-              bgcolor: '#fff',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-              '&:hover': { bgcolor: copied ? 'success.main' : 'primary.main', color: '#fff' },
             }}
-          >
-            {copied ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
-          </IconButton>
+          />
         </Box>
 
         <Stack spacing={1.2}>
@@ -280,22 +263,28 @@ const ResultView = React.memo(({ result, mode, unit, zone, onCopy }: ResultViewP
               >
                 {item.label}
               </Typography>
-              <Typography
-                variant="caption"
-                onClick={() => {
-                  if (item.value) onCopy(item.value);
-                }}
-                sx={{
-                  fontFamily: 'monospace',
-                  color: 'text.secondary',
-                  fontWeight: 600,
-                  fontSize: '0.65rem',
-                  cursor: 'pointer',
-                  '&:hover': { color: 'primary.main' },
-                }}
-              >
-                {item.value}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontFamily: 'monospace',
+                    color: 'text.secondary',
+                    fontWeight: 600,
+                    fontSize: '0.65rem',
+                  }}
+                >
+                  {item.value}
+                </Typography>
+                {item.value && (
+                  <CopyButton
+                    text={item.value}
+                    tooltip="复制"
+                    size="small"
+                    color="primary"
+                    showMessage={showMessage}
+                  />
+                )}
+              </Box>
             </Box>
           ))}
         </Stack>
@@ -316,18 +305,6 @@ export default function TimestampPage() {
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
   const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
-
-  const copy = useCallback(
-    async (text: string) => {
-      try {
-        await navigator.clipboard.writeText(text);
-        showMessage('已复制', { severity: 'success' });
-      } catch {
-        showMessage('复制失败', { severity: 'error' });
-      }
-    },
-    [showMessage],
-  );
 
   const convert = useCallback(() => {
     if (mode === 'ts2dt') {
@@ -406,7 +383,12 @@ export default function TimestampPage() {
         </Stack>
 
         {/* Live Clock Card */}
-        <LiveClock unit={unit} onCopy={copy} onUseNow={handleUseNow} onUnitChange={setUnit} />
+        <LiveClock
+          unit={unit}
+          onUseNow={handleUseNow}
+          onUnitChange={setUnit}
+          showMessage={showMessage}
+        />
 
         {/* Mode Switcher */}
         <Box
@@ -559,7 +541,7 @@ export default function TimestampPage() {
         </Button>
 
         {/* Result View */}
-        <ResultView result={result} mode={mode} unit={unit} zone={zone} onCopy={copy} />
+        <ResultView result={result} mode={mode} unit={unit} zone={zone} showMessage={showMessage} />
       </Container>
 
       <GlobalSnackbar {...snackbarProps} />

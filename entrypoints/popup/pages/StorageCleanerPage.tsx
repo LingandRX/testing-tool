@@ -83,10 +83,10 @@ export default function StorageCleanerPage() {
         setError('存储清理功能不支持此页面');
         return;
       }
-      
+
       // 重置错误状态
       setError('');
-      
+
       const url = tab.url;
       const tabId = tab.id!;
       setDomain(new URL(url).hostname);
@@ -105,7 +105,7 @@ export default function StorageCleanerPage() {
         setAutoRefresh(savedPrefs.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
         setOptions(savedPrefs.selectedTypes ?? DEFAULT_PREFERENCES.selectedTypes);
       }
-      
+
       setSizes({
         cookies: cSize,
         localStorage: lsSize,
@@ -233,16 +233,18 @@ export default function StorageCleanerPage() {
 
   if (error) {
     return (
-      <Container sx={{ 
-        py: 8, 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px',
-        textAlign: 'center'
-      }}>
+      <Container
+        sx={{
+          py: 8,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '400px',
+          textAlign: 'center',
+        }}
+      >
         <Box sx={{ width: '100%', maxWidth: 320 }}>
-          <Box 
+          <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
@@ -252,29 +254,29 @@ export default function StorageCleanerPage() {
               p: 4,
               boxShadow: '0 8px 24px rgba(244, 67, 54, 0.15)',
               border: '1px solid rgba(244, 67, 54, 0.2)',
-              bgcolor: 'rgba(244, 67, 54, 0.05)'
+              bgcolor: 'rgba(244, 67, 54, 0.05)',
             }}
           >
             <WarningIcon sx={{ fontSize: 36, color: 'error.main', mb: 2 }} />
-            <Typography 
-              variant="body1" 
-              color="error.main" 
-              sx={{ 
+            <Typography
+              variant="body1"
+              color="error.main"
+              sx={{
                 fontSize: '0.9rem',
                 fontWeight: 700,
                 lineHeight: 1.4,
-                mb: 3
+                mb: 3,
               }}
             >
               {error}
             </Typography>
-            <Typography 
-              variant="body2" 
-              color="text.secondary" 
-              sx={{ 
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
                 fontSize: '0.75rem',
                 fontWeight: 500,
-                lineHeight: 1.4
+                lineHeight: 1.4,
               }}
             >
               存储清理功能仅适用于标准网页
@@ -286,7 +288,11 @@ export default function StorageCleanerPage() {
   }
 
   // 这里的总大小仅包含以字节计算的项
-  const totalSize = (sizes.cookies || 0) + (sizes.localStorage || 0) + (sizes.sessionStorage || 0) + (sizes.indexedDB || 0);
+  const totalSize =
+    (sizes.cookies || 0) +
+    (sizes.localStorage || 0) +
+    (sizes.sessionStorage || 0) +
+    (sizes.indexedDB || 0);
 
   const OptionItem = ({
     label,
@@ -312,10 +318,10 @@ export default function StorageCleanerPage() {
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         bgcolor: checked ? 'rgba(255, 152, 0, 0.05)' : 'transparent',
         border: `1px solid ${checked ? 'rgba(255, 152, 0, 0.2)' : 'transparent'}`,
-        '&:hover': { 
+        '&:hover': {
           bgcolor: checked ? 'rgba(255, 152, 0, 0.1)' : 'rgba(0, 0, 0, 0.02)',
           transform: 'translateY(-1px)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
         },
       }}
     >
@@ -324,14 +330,14 @@ export default function StorageCleanerPage() {
           variant="body2"
           fontWeight={700}
           color={checked ? storageCleanerPageStyles.warningColor : 'text.primary'}
-          sx={{ 
-            fontSize: '0.75rem', 
-            display: 'block', 
+          sx={{
+            fontSize: '0.75rem',
+            display: 'block',
             lineHeight: 1.2,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            transition: 'color 0.2s'
+            transition: 'color 0.2s',
           }}
         >
           {label}
@@ -339,15 +345,15 @@ export default function StorageCleanerPage() {
         {size !== undefined && size > 0 ? (
           <Typography
             variant="caption"
-            sx={{ 
-              color: 'text.secondary', 
-              fontSize: '0.65rem', 
+            sx={{
+              color: 'text.secondary',
+              fontSize: '0.65rem',
               fontWeight: 600,
               display: 'block',
               mt: 0.3,
               lineHeight: 1,
               whiteSpace: 'nowrap',
-              opacity: 0.8
+              opacity: 0.8,
             }}
           >
             {isCount ? `${size} 个` : formatSize(size)}
@@ -355,14 +361,14 @@ export default function StorageCleanerPage() {
         ) : (
           <Typography
             variant="caption"
-            sx={{ 
-              color: 'grey.400', 
-              fontSize: '0.65rem', 
+            sx={{
+              color: 'grey.400',
+              fontSize: '0.65rem',
               fontWeight: 500,
               display: 'block',
               mt: 0.3,
               lineHeight: 1,
-              fontStyle: 'italic'
+              fontStyle: 'italic',
             }}
           >
             无数据
@@ -378,11 +384,11 @@ export default function StorageCleanerPage() {
           p: 0.6,
           '& .MuiSvgIcon-root': {
             fontSize: 18,
-            transition: 'transform 0.2s'
+            transition: 'transform 0.2s',
           },
           '&:hover .MuiSvgIcon-root': {
-            transform: 'scale(1.1)'
-          }
+            transform: 'scale(1.1)',
+          },
         }}
       />
     </Box>
@@ -404,8 +410,8 @@ export default function StorageCleanerPage() {
               transition: 'all 0.2s',
               '&:hover': {
                 bgcolor: 'rgba(255, 152, 0, 0.15)',
-                transform: 'scale(1.05)'
-              }
+                transform: 'scale(1.05)',
+              },
             }}
           >
             <StorageIcon sx={{ fontSize: 22 }} />
@@ -415,11 +421,11 @@ export default function StorageCleanerPage() {
               <Typography
                 variant="h6"
                 fontWeight={900}
-                sx={{ 
-                  letterSpacing: '-0.5px', 
+                sx={{
+                  letterSpacing: '-0.5px',
                   lineHeight: 1.2,
                   fontSize: '1rem',
-                  color: 'text.primary'
+                  color: 'text.primary',
                 }}
               >
                 存储清理
@@ -437,8 +443,8 @@ export default function StorageCleanerPage() {
                     boxShadow: '0 2px 4px rgba(255, 152, 0, 0.2)',
                     transition: 'all 0.2s',
                     '&:hover': {
-                      bgcolor: 'rgba(255, 152, 0, 0.25)'
-                    }
+                      bgcolor: 'rgba(255, 152, 0, 0.25)',
+                    },
                   }}
                 >
                   已占用 {formatSize(totalSize)}
@@ -456,7 +462,7 @@ export default function StorageCleanerPage() {
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 mt: 0.3,
-                fontSize: '0.75rem'
+                fontSize: '0.75rem',
               }}
             >
               {domain || '加载中...'}
@@ -476,8 +482,8 @@ export default function StorageCleanerPage() {
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
             transition: 'all 0.2s',
             '&:hover': {
-              boxShadow: '0 6px 16px rgba(0, 0, 0, 0.08)'
-            }
+              boxShadow: '0 6px 16px rgba(0, 0, 0, 0.08)',
+            },
           }}
         >
           <Grid container spacing={1.5}>
@@ -544,8 +550,8 @@ export default function StorageCleanerPage() {
               borderRadius: 2,
               transition: 'all 0.2s',
               '&:hover': {
-                bgcolor: 'rgba(0, 0, 0, 0.04)'
-              }
+                bgcolor: 'rgba(0, 0, 0, 0.04)',
+              },
             }}
           >
             <Typography
@@ -565,11 +571,11 @@ export default function StorageCleanerPage() {
                 p: 0.6,
                 '& .MuiSvgIcon-root': {
                   fontSize: 18,
-                  transition: 'transform 0.2s'
+                  transition: 'transform 0.2s',
                 },
                 '&:hover .MuiSvgIcon-root': {
-                  transform: 'scale(1.1)'
-                }
+                  transform: 'scale(1.1)',
+                },
               }}
             />
           </Box>
@@ -590,8 +596,8 @@ export default function StorageCleanerPage() {
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
             transition: 'all 0.2s',
             '&:hover': {
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
-            }
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+            },
           }}
         >
           <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.8rem' }}>
@@ -608,11 +614,11 @@ export default function StorageCleanerPage() {
               },
               '& .MuiSwitch-thumb': {
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
               },
               '&:hover .MuiSwitch-thumb': {
-                transform: 'scale(1.1)'
-              }
+                transform: 'scale(1.1)',
+              },
             }}
           />
         </Box>
@@ -629,14 +635,14 @@ export default function StorageCleanerPage() {
             fontSize: '0.85rem',
             boxShadow: '0 4px 12px rgba(255, 152, 0, 0.25)',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            '&:hover': { 
-              bgcolor: storageCleanerPageStyles.warningDark, 
+            '&:hover': {
+              bgcolor: storageCleanerPageStyles.warningDark,
               boxShadow: '0 8px 20px rgba(255, 152, 0, 0.35)',
-              transform: 'translateY(-2px)'
+              transform: 'translateY(-2px)',
             },
             '&:active': {
-              transform: 'translateY(0)'
-            }
+              transform: 'translateY(0)',
+            },
           }}
           disabled={loading}
           fullWidth
@@ -654,15 +660,15 @@ export default function StorageCleanerPage() {
                 py: 1,
                 px: 2,
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-                '& .MuiAlert-message': { 
-                  fontSize: '0.8rem', 
+                '& .MuiAlert-message': {
+                  fontSize: '0.8rem',
                   fontWeight: 600,
-                  lineHeight: 1.4
+                  lineHeight: 1.4,
                 },
                 '& .MuiAlert-icon': {
                   fontSize: '1.2rem',
-                  mr: 1
-                }
+                  mr: 1,
+                },
               }}
             >
               {result.success ? formatCleaningResult(result) : result.error || '清理失败'}

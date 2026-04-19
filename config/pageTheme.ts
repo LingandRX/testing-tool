@@ -19,6 +19,7 @@ export const THEME_COLORS = {
 } as const;
 
 export const timestampPageStyles = {
+  primaryColor: THEME_COLORS.primary,
   INPUT_STYLE: {
     '& .MuiOutlinedInput-root': {
       bgcolor: 'background.paper',
@@ -108,8 +109,8 @@ export const storageCleanerPageStyles = {
 } as const;
 
 export const qrCodePageStyles = {
-  primaryColor: THEME_COLORS.primary,
-  primaryDark: '#1976d2',
+  primaryColor: THEME_COLORS.success,
+  primaryDark: '#388e3c',
   successColor: THEME_COLORS.success,
   successDark: '#388e3c',
   white: THEME_COLORS.white,
