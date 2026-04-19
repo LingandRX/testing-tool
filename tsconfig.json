@@ -24,7 +24,7 @@
     // 编译目标设置为最新，WXT 底层 Vite 会处理降级兼容
     "target": "ESNext",
 
-    "types": ["chrome", "webextension-polyfill"],
+    "types": ["chrome", "webextension-polyfill", "@testing-library/jest-dom", "vitest/globals"],
     "noImplicitAny": false
   },
   // 确保包含你的源代码目录
@@ -41,13 +41,5 @@
     "components",
     "eslint.config.ts"
   ],
-  "exclude": [
-    "node_modules",
-    ".wxt",
-    "components/__tests__",
-    "**/*.test.tsx",
-    "**/*.test.ts",
-    "vitest.config.ts",
-    "vitest.setup.ts"
-  ]
+  "exclude": ["node_modules", ".wxt", "dist"]
 }

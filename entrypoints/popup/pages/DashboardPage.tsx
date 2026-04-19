@@ -4,9 +4,11 @@ import ToolCard from '@/components/ToolCard';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
 import LanguageIcon from '@mui/icons-material/Language';
+import QrCodeIcon from '@mui/icons-material/QrCode';
 import type { PageType } from '@/types/storage';
 import { useEffect, useState } from 'react';
 import dayjs from '@/utils/dayjs';
+import { dashboardPageStyles } from '@/config/pageTheme';
 
 export default function DashboardPage() {
   const { navigateTo, visiblePages, pageOrder } = useRouter();
@@ -30,13 +32,14 @@ export default function DashboardPage() {
             colorCode="#2196f3"
             icon={<AccessTimeIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('timestamp')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
             snapshot={
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography
                   sx={{
                     fontFamily: 'monospace',
                     fontWeight: 600,
-                    color: '#2196f3',
+                    color: dashboardPageStyles.primaryColor,
                     fontSize: '0.85rem',
                   }}
                 >
@@ -58,6 +61,7 @@ export default function DashboardPage() {
             colorCode="#ff9800"
             icon={<StorageIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('storageCleaner')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
       case 'openUrl':
@@ -69,6 +73,19 @@ export default function DashboardPage() {
             colorCode="#9c27b0"
             icon={<LanguageIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('openUrl')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
+          />
+        );
+      case 'qrCode':
+        return (
+          <ToolCard
+            key={key}
+            title="二维码工具"
+            description="URL 转二维码与二维码解析"
+            colorCode="#4caf50"
+            icon={<QrCodeIcon sx={{ fontSize: 20 }} />}
+            onClick={() => navigateTo('qrCode')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
       default:
@@ -77,7 +94,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <Box sx={{ bgcolor: 'grey.50', minHeight: '100%', pb: 4 }}>
+    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 4 }}>
       <Container maxWidth="sm" sx={{ py: 3, px: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {pageOrder.map((key) => (isVisible(key) ? renderCard(key) : null))}

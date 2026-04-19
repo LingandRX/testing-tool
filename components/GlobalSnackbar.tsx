@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Snackbar, Alert, type SxProps, type Theme, alpha } from '@mui/material';
+import { Snackbar, Alert, type SxProps, type Theme, alpha, Portal } from '@mui/material';
 
 export type SnackbarSeverity = 'success' | 'info' | 'warning' | 'error';
 
@@ -61,39 +61,30 @@ export function GlobalSnackbar({
   onClose,
   severity = defaultProps.severity,
   autoHideDuration = defaultProps.autoHideDuration,
-  anchorOrigin = defaultProps.anchorOrigin,
   showAlert = defaultProps.showAlert,
   hideIcon = defaultProps.hideIcon,
-  sx,
-  alertSx,
 }: GlobalSnackbarProps) {
-  // 共享的固定定位样式
-  const fixedSx: SxProps<Theme> = {
-    position: 'fixed',
-    bottom: '24px !important', // 固定在视口底部
-    left: '50% !important',
-    transform: 'translateX(-50%) !important',
-    zIndex: (theme) => theme.zIndex.tooltip + 100,
-    maxWidth: '90%',
-    width: 'max-content',
-  };
-
-  if (showAlert) {
-    return (
+  // 使用 Portal 将 Snackbar 传送到 DOM 顶层 (body 标签下)
+  return (
+    <Portal>
       <Snackbar
         open={open}
         autoHideDuration={autoHideDuration}
         onClose={onClose}
-        anchorOrigin={anchorOrigin}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         disableWindowBlurListener
-        sx={[fixedSx, ...(Array.isArray(sx) ? sx : [sx])]}
+        sx={{
+          zIndex: 999999,
+          // 确保距离底部的间距
+          bottom: { xs: '24px', sm: '24px' },
+        }}
       >
-        <Alert
-          severity={severity}
-          variant="filled"
-          icon={hideIcon ? false : undefined}
-          sx={[
-            { 
+        {showAlert ? (
+          <Alert
+            severity={severity}
+            variant="filled"
+            icon={hideIcon ? false : undefined}
+            sx={{
               borderRadius: '50px',
               px: 2.5,
               py: 0.2,
@@ -103,39 +94,18 @@ export function GlobalSnackbar({
               justifyContent: 'center',
               fontWeight: 800,
               fontSize: '0.75rem',
-              letterSpacing: '0.02em',
               backgroundImage: 'none',
-              boxShadow: (theme: Theme) => `0 12px 32px ${alpha(theme.palette[severity].main, 0.35)}`,
-              
-              '& .MuiAlert-icon': {
-                mr: 0.5,
-                fontSize: '1.1rem',
-                color: '#fff'
-              },
-              '& .MuiAlert-message': {
-                color: '#fff',
-                padding: '6px 0',
-                textAlign: 'center'
-              }
-            },
-            ...(Array.isArray(alertSx) ? alertSx : [alertSx]),
-          ]}
-        >
-          {message}
-        </Alert>
+              boxShadow: (theme: Theme) =>
+                `0 12px 32px ${alpha(theme.palette[severity].main, 0.35)}`,
+              '& .MuiAlert-icon': { mr: 0.5, fontSize: '1.1rem', color: '#fff' },
+              '& .MuiAlert-message': { color: '#fff', padding: '6px 0' },
+            }}
+          >
+            {message}
+          </Alert>
+        ) : undefined}
       </Snackbar>
-    );
-  }
-
-  return (
-    <Snackbar
-      open={open}
-      autoHideDuration={autoHideDuration}
-      onClose={onClose}
-      anchorOrigin={anchorOrigin}
-      message={message}
-      sx={[fixedSx, ...(Array.isArray(sx) ? sx : [sx])]}
-    />
+    </Portal>
   );
 }
 

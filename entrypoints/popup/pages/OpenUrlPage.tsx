@@ -11,7 +11,6 @@ import {
   Container,
   Stack,
   alpha,
-  Theme,
   Tooltip,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -23,40 +22,10 @@ import LinkIcon from '@mui/icons-material/Link';
 import Button from '@/components/Button';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
-import { useRouter } from '@/providers/RouterProvider';
 import type { OpenUrlPreferences, OpenUrlEntry } from '@/types/storage';
+import { openUrlPageStyles, dashboardPageStyles } from '@/config/pageTheme';
 
-const THEME_COLOR = '#9c27b0';
-
-const INPUT_STYLE = {
-  '& .MuiOutlinedInput-root': {
-    bgcolor: 'background.paper',
-    borderRadius: 3.5,
-    border: '1px solid',
-    borderColor: 'grey.100',
-    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-    '& fieldset': { border: 'none' },
-    '&:hover': { borderColor: 'grey.300', bgcolor: 'grey.50' },
-    '&.Mui-focused': {
-      bgcolor: '#fff',
-      borderColor: THEME_COLOR,
-      boxShadow: (_theme: Theme) => `0 0 0 4px ${alpha(THEME_COLOR, 0.1)}`,
-    },
-  },
-  '& .MuiInputBase-input': {
-    py: 1.2,
-    px: 2,
-    fontSize: '0.85rem',
-    fontWeight: 600,
-  },
-  '& .MuiInputLabel-root': {
-    fontSize: '0.85rem',
-    fontWeight: 700,
-    color: 'text.secondary',
-    mb: 0.5,
-    '&.Mui-focused': { color: THEME_COLOR },
-  },
-};
+const THEME_COLOR = openUrlPageStyles.themeColor;
 
 const DEFAULT_PREFERENCES: OpenUrlPreferences = {
   entries: [],
@@ -68,7 +37,6 @@ export default function OpenUrlPage() {
   const [newUrl, setNewUrl] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
   const { snackbarProps, showMessage } = useSnackbar();
-  const { syncNavigation } = useRouter();
 
   const showMixedContentWarning =
     newUrl.startsWith('http://') && !newUrl.includes('localhost') && !newUrl.includes('127.0.0.1');
@@ -139,8 +107,10 @@ export default function OpenUrlPage() {
 
   const handleOpenInSidebar = async (entry: OpenUrlEntry) => {
     try {
+      // 存储目标 URL
       await storageUtil.set('openUrl/currentUrl', entry.url);
-      syncNavigation('openUrlViewer');
+      // 直接设置侧边栏的路由，而不是通过 syncNavigation 影响弹窗路由
+      await storageUtil.set('app/sidepanelRoute', 'openUrlViewer');
 
       const [currentTab] = await chrome.tabs.query({
         active: true,
@@ -175,7 +145,7 @@ export default function OpenUrlPage() {
   };
 
   return (
-    <Box sx={{ pb: 3 }}>
+    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
       <Container sx={{ py: 2 }}>
         {/* Header */}
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
@@ -196,10 +166,10 @@ export default function OpenUrlPage() {
               fontWeight={900}
               sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}
             >
-              URL 实验室
+              URL 工具
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-              多环境跳转与安全性预检
+              快速打开 URL 或复制链接
             </Typography>
           </Box>
         </Stack>
@@ -224,8 +194,12 @@ export default function OpenUrlPage() {
               onChange={(e) => setNewName(e.target.value)}
               fullWidth
               variant="outlined"
-              sx={INPUT_STYLE}
-              InputLabelProps={{ shrink: true }}
+              sx={openUrlPageStyles.INPUT_STYLE}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
             />
             <TextField
               label="目标 URL"
@@ -234,8 +208,12 @@ export default function OpenUrlPage() {
               onChange={(e) => setNewUrl(e.target.value)}
               fullWidth
               variant="outlined"
-              sx={INPUT_STYLE}
-              InputLabelProps={{ shrink: true }}
+              sx={openUrlPageStyles.INPUT_STYLE}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
             />
 
             {showMixedContentWarning && (
