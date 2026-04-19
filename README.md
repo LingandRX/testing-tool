@@ -44,6 +44,15 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 - 支持 URL 验证和安全检查
 - 内置 URL 查看器（iframe 沙箱模式）
 
+### 二维码工具
+
+- URL 转二维码（生成器）
+- 二维码转 URL（解析器）
+- 支持上传二维码图片解析
+- 生成的二维码可下载
+- 一键复制转换结果
+- 卡片式布局，节省空间
+
 ## 技术栈
 
 - **框架**: WXT (Web Extension Toolkit)
@@ -52,6 +61,7 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 - **日期处理**: dayjs (含 UTC 和时区插件)
 - **通信**: @webext-core/messaging
 - **存储**: Chrome Storage API (类型安全封装)
+- **二维码**: qrcode (生成) + jsqr (解析)
 - **测试**: Vitest + Testing Library
 
 ## 项目结构
@@ -59,6 +69,7 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 ```
 ├── components/           # 可复用 UI 组件
 │   ├── Button.tsx
+│   ├── CopyButton.tsx
 │   ├── GlobalSnackbar.tsx
 │   ├── RouterContainer.tsx
 │   ├── StorageCleanerConfirm.tsx
@@ -74,6 +85,7 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 │   │       ├── DashboardPage.tsx
 │   │       ├── OpenUrlPage.tsx
 │   │       ├── OpenUrlViewerPage.tsx
+│   │       ├── QrCodePage.tsx
 │   │       ├── StorageCleanerPage.tsx
 │   │       └── TimestampPage.tsx
 │   ├── options/        # 选项页面
@@ -86,6 +98,7 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 │   └── storage.d.ts
 ├── utils/               # 工具函数
 │   ├── chromeStorage.ts
+│   ├── clipboard.ts
 │   ├── dayjs.ts
 │   ├── messages.tsx
 │   └── storageCleaner.ts
@@ -112,6 +125,7 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 | `timestamp`      | 时间戳转换 | ✓        |
 | `storageCleaner` | 存储清理   | ✓        |
 | `openUrl`        | URL 工具   | ✓        |
+| `qrCode`         | 二维码工具 | ✓        |
 | `openUrlViewer`  | URL 查看器 | ✗        |
 
 ## 扩展入口点
@@ -209,4 +223,4 @@ npm run test:coverage     # 运行测试并生成覆盖率报告
 
 ## 许可证
 
-此项目为私有项目 (private: true)，仅供内部使用。
+此项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
