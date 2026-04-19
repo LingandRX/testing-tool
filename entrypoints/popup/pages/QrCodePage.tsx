@@ -54,7 +54,7 @@ const QrCodePage = () => {
     const loadState = async () => {
       try {
         const savedUrlExpanded = await storageUtil.get('qrCode/urlExpanded', true);
-        const savedQrExpanded = await storageUtil.get('qrCode/expanded', false);
+        const savedQrExpanded = await storageUtil.get('qrCode/qrExpanded', false);
         setUrlExpanded(savedUrlExpanded ?? true);
         setQrExpanded(savedQrExpanded ?? false);
       } catch (error) {
@@ -74,7 +74,7 @@ const QrCodePage = () => {
     const saveState = async () => {
       try {
         await storageUtil.set('qrCode/urlExpanded', urlExpanded);
-        await storageUtil.set('qrCode/expanded', qrExpanded);
+        await storageUtil.set('qrCode/qrExpanded', qrExpanded);
       } catch (error) {
         console.error('保存状态失败:', error);
       }

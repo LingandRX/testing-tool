@@ -1,4 +1,10 @@
-export type PageType = 'dashboard' | 'timestamp' | 'storageCleaner' | 'openUrl' | 'qrCode' | 'openUrlViewer';
+export type PageType =
+  | 'dashboard'
+  | 'timestamp'
+  | 'storageCleaner'
+  | 'openUrl'
+  | 'qrCode'
+  | 'openUrlViewer';
 
 export interface StorageSchema {
   'app/currentRoute': PageType;
@@ -11,7 +17,7 @@ export interface StorageSchema {
   'storageCleaner/preferences': StorageCleanerPreferences;
   'openUrl/preferences': OpenUrlPreferences;
   'openUrl/currentUrl': string;
-  'qrCode/expanded': boolean;
+  'qrCode/qrExpanded': boolean;
   'qrCode/urlExpanded': boolean;
 }
 
