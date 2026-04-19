@@ -118,4 +118,6 @@ export const qrCodePageStyles = {
 
 export const dashboardPageStyles = {
   primaryColor: THEME_COLORS.primary,
+  backgroundColor: '#f5f5f5',
+  cardBackgroundColor: '#ffffff',
 } as const;

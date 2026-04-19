@@ -11,15 +11,16 @@ interface ToolCardProps {
   icon: React.ReactNode;
   onClick: () => void;
   hasAI?: boolean;
+  cardBackgroundColor?: string;
 }
 
-export default function ToolCard({ title, description, snapshot, colorCode, icon, onClick, hasAI }: ToolCardProps) {
+export default function ToolCard({ title, description, snapshot, colorCode, icon, onClick, hasAI, cardBackgroundColor = 'background.paper' }: ToolCardProps) {
   return (
     <Box
       onClick={onClick}
       sx={{
         position: 'relative',
-        bgcolor: 'background.paper',
+        bgcolor: cardBackgroundColor,
         borderRadius: 4,
         p: 2.5,
         cursor: 'pointer',

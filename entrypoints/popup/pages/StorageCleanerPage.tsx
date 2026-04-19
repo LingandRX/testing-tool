@@ -389,7 +389,7 @@ export default function StorageCleanerPage() {
   );
 
   return (
-    <Box sx={{ pb: 2 }}>
+    <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100%', pb: 2 }}>
       <Container sx={{ py: 2 }}>
         {/* Domain Header */}
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>

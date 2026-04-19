@@ -13,7 +13,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import { Container } from '@mui/system';
+import { Container, alpha } from '@mui/system';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import ImageIcon from '@mui/icons-material/Image';
 import LinkIcon from '@mui/icons-material/Link';
@@ -24,7 +24,7 @@ import qrcode from 'qrcode';
 import jsQR from 'jsqr';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
-import { qrCodePageStyles } from '@/config/pageTheme';
+import { qrCodePageStyles, dashboardPageStyles } from '@/config/pageTheme';
 
 const QrCodePage = () => {
   const { snackbarProps, showMessage } = useSnackbar();
@@ -256,284 +256,313 @@ const QrCodePage = () => {
   };
 
   return (
-    <Container sx={{ py: 4, maxWidth: 400 }}>
-      <Stack spacing={3}>
-        {/* URL 转二维码 */}
-        <Accordion
-          expanded={urlExpanded}
-          onChange={(_, isExpanded) => setUrlExpanded(isExpanded)}
-          sx={{
-            borderRadius: 4,
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-            '&:before': { display: 'none' },
-          }}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ borderBottom: 'none' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <QrCodeIcon color="primary" />
-              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                URL 转二维码
-              </Typography>
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={3}>
-              <TextField
-                label="输入 URL"
-                placeholder="https://example.com"
-                value={urlInput}
-                onChange={handleUrlInputChange}
-                fullWidth
-                variant="outlined"
-                error={!!urlError}
-                helperText={urlError}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 3,
-                  },
-                }}
-              />
+    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
+      <Container sx={{ py: 2, maxWidth: 400 }}>
+        {/* Header */}
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
+          <Box
+            sx={{
+              p: 1,
+              borderRadius: 2.5,
+              bgcolor: alpha(qrCodePageStyles.successColor, 0.1),
+              color: qrCodePageStyles.successColor,
+              display: 'flex',
+            }}
+          >
+            <QrCodeIcon sx={{ fontSize: 20 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="subtitle1"
+              fontWeight={900}
+              sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}
+            >
+              二维码工具
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+              生成和解析二维码
+            </Typography>
+          </Box>
+        </Stack>
 
-              <Button
-                variant="contained"
-                startIcon={
-                  generating ? <CircularProgress size={16} color="inherit" /> : <QrCodeIcon />
-                }
-                onClick={generateQrCode}
-                disabled={generating}
-                sx={{
-                  py: 1.2,
-                  borderRadius: 3,
-                  bgcolor: qrCodePageStyles.primaryColor,
-                  fontWeight: 700,
-                  '&:hover': {
-                    bgcolor: qrCodePageStyles.primaryDark,
-                  },
-                }}
-              >
-                {generating ? '生成中...' : '生成二维码'}
-              </Button>
-
-              {/* 二维码显示区域 */}
-              <Box
-                ref={qrCodeRef}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  minHeight: 200,
-                  border: '2px dashed',
-                  borderColor: 'grey.200',
-                  borderRadius: 3,
-                  p: 2,
-                  bgcolor: 'grey.50',
-                }}
-              >
-                {qrCodeDataUrl ? (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      width: '100%',
-                    }}
-                  >
-                    <img
-                      src={qrCodeDataUrl}
-                      alt="QR Code"
-                      style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
-                    />
-                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<DownloadIcon />}
-                        onClick={downloadQrCode}
-                        sx={{
-                          borderRadius: 2,
-                          borderColor: qrCodePageStyles.primaryColor,
-                          color: qrCodePageStyles.primaryColor,
-                          '&:hover': {
-                            borderColor: qrCodePageStyles.primaryDark,
-                            bgcolor: 'rgba(33, 150, 243, 0.05)',
-                          },
-                        }}
-                      >
-                        下载二维码
-                      </Button>
-                      <Button
-                        variant="contained"
-                        startIcon={<ContentCopyIcon />}
-                        onClick={copyQrCode}
-                        sx={{
-                          borderRadius: 2,
-                          bgcolor: qrCodePageStyles.primaryColor,
-                          '&:hover': {
-                            bgcolor: qrCodePageStyles.primaryDark,
-                          },
-                        }}
-                      >
-                        复制二维码
-                      </Button>
-                    </Box>
-                  </Box>
-                ) : (
-                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-                    二维码将显示在这里
-                  </Typography>
-                )}
+        <Stack spacing={3}>
+          {/* URL 转二维码 */}
+          <Accordion
+            expanded={urlExpanded}
+            onChange={(_, isExpanded) => setUrlExpanded(isExpanded)}
+            sx={{
+              borderRadius: 4,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              '&:before': { display: 'none' },
+            }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ borderBottom: 'none' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <QrCodeIcon color="primary" />
+                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                  URL 转二维码
+                </Typography>
               </Box>
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* 二维码转 URL */}
-        <Accordion
-          expanded={qrExpanded}
-          onChange={(_, isExpanded) => setQrExpanded(isExpanded)}
-          sx={{
-            borderRadius: 4,
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-            '&:before': { display: 'none' },
-          }}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ borderBottom: 'none' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <LinkIcon color="success" />
-              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                二维码转 URL
-              </Typography>
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={3}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minHeight: 200,
-                  border: '2px dashed',
-                  borderColor: qrCodeFile ? qrCodePageStyles.successColor : 'grey.200',
-                  borderRadius: 3,
-                  p: 4,
-                  bgcolor: qrCodeFile ? 'rgba(76, 175, 80, 0.05)' : 'grey.50',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    borderColor: qrCodePageStyles.successColor,
-                    bgcolor: 'rgba(76, 175, 80, 0.05)',
-                  },
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  style={{
-                    display: 'none',
-                  }}
-                  id="qr-code-upload"
-                />
-                <label
-                  htmlFor="qr-code-upload"
-                  style={{ cursor: 'pointer', textAlign: 'center', width: '100%' }}
-                >
-                  {qrCodeFile ? (
-                    <Box sx={{ textAlign: 'center', width: '100%' }}>
-                      <img
-                        src={URL.createObjectURL(qrCodeFile)}
-                        alt="QR Code Preview"
-                        style={{
-                          maxWidth: '100%',
-                          maxHeight: 160,
-                          borderRadius: 8,
-                          objectFit: 'contain',
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                        {qrCodeFile.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        点击更换图片
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <>
-                      <ImageIcon sx={{ fontSize: 48, color: 'grey.300', mb: 2 }} />
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        点击或拖拽上传二维码图片
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        支持 PNG、JPG、WEBP 格式
-                      </Typography>
-                    </>
-                  )}
-                </label>
-              </Box>
-
-              <Button
-                variant="contained"
-                startIcon={parsing ? <CircularProgress size={16} color="inherit" /> : <LinkIcon />}
-                onClick={parseQrCode}
-                disabled={parsing}
-                sx={{
-                  py: 1.2,
-                  borderRadius: 3,
-                  bgcolor: qrCodePageStyles.successColor,
-                  fontWeight: 700,
-                  '&:hover': {
-                    bgcolor: qrCodePageStyles.successDark,
-                  },
-                }}
-              >
-                {parsing ? '解析中...' : '解析二维码'}
-              </Button>
-
-              {/* 解析结果显示 */}
-              <Box
-                sx={{
-                  position: 'relative',
-                  mt: 2,
-                }}
-              >
+            </AccordionSummary>
+            <AccordionDetails>
+              <Stack spacing={3}>
                 <TextField
-                  label="解析结果"
-                  value={parsedUrl}
+                  label="输入 URL"
+                  placeholder="https://example.com"
+                  value={urlInput}
+                  onChange={handleUrlInputChange}
                   fullWidth
                   variant="outlined"
-                  slotProps={{
-                    input: {
-                      readOnly: true,
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton edge="end" onClick={() => handleCopy(parsedUrl)} size="small">
-                            <ContentCopyIcon sx={{ fontSize: 16 }} />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    },
-                  }}
+                  error={!!urlError}
+                  helperText={urlError}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 3,
                     },
                   }}
                 />
-              </Box>
 
-              {parseError && (
-                <Alert severity="error" sx={{ borderRadius: 3 }}>
-                  {parseError}
-                </Alert>
-              )}
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-      </Stack>
-      <GlobalSnackbar {...snackbarProps} />
-    </Container>
+                <Button
+                  variant="contained"
+                  startIcon={
+                    generating ? <CircularProgress size={16} color="inherit" /> : <QrCodeIcon />
+                  }
+                  onClick={generateQrCode}
+                  disabled={generating}
+                  sx={{
+                    py: 1.2,
+                    borderRadius: 3,
+                    bgcolor: qrCodePageStyles.successColor,
+                    fontWeight: 700,
+                    '&:hover': {
+                      bgcolor: qrCodePageStyles.successDark,
+                    },
+                  }}
+                >
+                  {generating ? '生成中...' : '生成二维码'}
+                </Button>
+
+                {/* 二维码显示区域 */}
+                <Box
+                  ref={qrCodeRef}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minHeight: 200,
+                    border: '2px dashed',
+                    borderColor: 'grey.200',
+                    borderRadius: 3,
+                    p: 2,
+                    bgcolor: 'grey.50',
+                  }}
+                >
+                  {qrCodeDataUrl ? (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        width: '100%',
+                      }}
+                    >
+                      <img
+                        src={qrCodeDataUrl}
+                        alt="QR Code"
+                        style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
+                      />
+                      <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                        <Button
+                          variant="outlined"
+                          startIcon={<DownloadIcon />}
+                          onClick={downloadQrCode}
+                          sx={{
+                            borderRadius: 2,
+                            borderColor: qrCodePageStyles.successColor,
+                            color: qrCodePageStyles.successColor,
+                            '&:hover': {
+                              borderColor: qrCodePageStyles.successDark,
+                              bgcolor: alpha(qrCodePageStyles.successColor, 0.05),
+                            },
+                          }}
+                        >
+                          下载二维码
+                        </Button>
+                        <Button
+                          variant="contained"
+                          startIcon={<ContentCopyIcon />}
+                          onClick={copyQrCode}
+                          sx={{
+                            borderRadius: 2,
+                            bgcolor: qrCodePageStyles.successColor,
+                            '&:hover': {
+                              bgcolor: qrCodePageStyles.successDark,
+                            },
+                          }}
+                        >
+                          复制二维码
+                        </Button>
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                      二维码将显示在这里
+                    </Typography>
+                  )}
+                </Box>
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
+
+          {/* 二维码转 URL */}
+          <Accordion
+            expanded={qrExpanded}
+            onChange={(_, isExpanded) => setQrExpanded(isExpanded)}
+            sx={{
+              borderRadius: 4,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              '&:before': { display: 'none' },
+            }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ borderBottom: 'none' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <LinkIcon color="success" />
+                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                  二维码转 URL
+                </Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Stack spacing={3}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: 200,
+                    border: '2px dashed',
+                    borderColor: qrCodeFile ? qrCodePageStyles.successColor : 'grey.200',
+                    borderRadius: 3,
+                    p: 4,
+                    bgcolor: qrCodeFile ? alpha(qrCodePageStyles.successColor, 0.05) : 'grey.50',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      borderColor: qrCodePageStyles.successColor,
+                      bgcolor: alpha(qrCodePageStyles.successColor, 0.05),
+                    },
+                  }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{
+                      display: 'none',
+                    }}
+                    id="qr-code-upload"
+                  />
+                  <label
+                    htmlFor="qr-code-upload"
+                    style={{ cursor: 'pointer', textAlign: 'center', width: '100%' }}
+                  >
+                    {qrCodeFile ? (
+                      <Box sx={{ textAlign: 'center', width: '100%' }}>
+                        <img
+                          src={URL.createObjectURL(qrCodeFile)}
+                          alt="QR Code Preview"
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: 160,
+                            borderRadius: 8,
+                            objectFit: 'contain',
+                          }}
+                        />
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                          {qrCodeFile.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          点击更换图片
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <>
+                        <ImageIcon sx={{ fontSize: 48, color: 'grey.300', mb: 2 }} />
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                          点击或拖拽上传二维码图片
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          支持 PNG、JPG、WEBP 格式
+                        </Typography>
+                      </>
+                    )}
+                  </label>
+                </Box>
+
+                <Button
+                  variant="contained"
+                  startIcon={parsing ? <CircularProgress size={16} color="inherit" /> : <LinkIcon />}
+                  onClick={parseQrCode}
+                  disabled={parsing}
+                  sx={{
+                    py: 1.2,
+                    borderRadius: 3,
+                    bgcolor: qrCodePageStyles.successColor,
+                    fontWeight: 700,
+                    '&:hover': {
+                      bgcolor: qrCodePageStyles.successDark,
+                    },
+                  }}
+                >
+                  {parsing ? '解析中...' : '解析二维码'}
+                </Button>
+
+                {/* 解析结果显示 */}
+                <Box
+                  sx={{
+                    position: 'relative',
+                    mt: 2,
+                  }}
+                >
+                  <TextField
+                    label="解析结果"
+                    value={parsedUrl}
+                    fullWidth
+                    variant="outlined"
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton edge="end" onClick={() => handleCopy(parsedUrl)} size="small">
+                              <ContentCopyIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 3,
+                      },
+                    }}
+                  />
+                </Box>
+
+                {parseError && (
+                  <Alert severity="error" sx={{ borderRadius: 3 }}>
+                    {parseError}
+                  </Alert>
+                )}
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
+        </Stack>
+        <GlobalSnackbar {...snackbarProps} />
+      </Container>
+    </Box>
   );
 };
 

@@ -376,7 +376,7 @@ export default function TimestampPage() {
   );
 
   return (
-    <Box sx={{ pb: 3 }}>
+    <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100%', pb: 3 }}>
       <Container sx={{ py: 2 }}>
         {/* Header with Icon */}
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>

@@ -32,6 +32,7 @@ export default function DashboardPage() {
             colorCode="#2196f3"
             icon={<AccessTimeIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('timestamp')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
             snapshot={
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography
@@ -60,6 +61,7 @@ export default function DashboardPage() {
             colorCode="#ff9800"
             icon={<StorageIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('storageCleaner')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
       case 'openUrl':
@@ -71,6 +73,7 @@ export default function DashboardPage() {
             colorCode="#9c27b0"
             icon={<LanguageIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('openUrl')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
       case 'qrCode':
@@ -82,6 +85,7 @@ export default function DashboardPage() {
             colorCode="#4caf50"
             icon={<QrCodeIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('qrCode')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
       default:
@@ -90,7 +94,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <Box sx={{ bgcolor: 'grey.50', minHeight: '100%', pb: 4 }}>
+    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 4 }}>
       <Container maxWidth="sm" sx={{ py: 3, px: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {pageOrder.map((key) => (isVisible(key) ? renderCard(key) : null))}

@@ -23,7 +23,7 @@ import Button from '@/components/Button';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
 import type { OpenUrlPreferences, OpenUrlEntry } from '@/types/storage';
-import { openUrlPageStyles } from '@/config/pageTheme';
+import { openUrlPageStyles, dashboardPageStyles } from '@/config/pageTheme';
 
 const THEME_COLOR = openUrlPageStyles.themeColor;
 
@@ -145,7 +145,7 @@ export default function OpenUrlPage() {
   };
 
   return (
-    <Box sx={{ pb: 3 }}>
+    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
       <Container sx={{ py: 2 }}>
         {/* Header */}
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
