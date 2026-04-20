@@ -247,7 +247,17 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
           />
         </Box>
 
-        <Stack spacing={1.2}>
+        <Stack
+          spacing={1.2}
+          sx={{
+            bgcolor: alpha('#2196f3', 0.05),
+            p: 2,
+            borderRadius: 4,
+            border: '1px solid',
+            borderColor: alpha('#2196f3', 0.1),
+            mt: 2,
+          }}
+        >
           {[
             { label: '相对时间', value: extraInfo?.relative },
             { label: 'ISO 8601', value: extraInfo?.iso },
@@ -354,7 +364,7 @@ export default function TimestampPage() {
 
   return (
     <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2 }}>
+      <Container sx={{ py: 2, bgcolor: '#f5f5f5' }}>
         {/* Header with Icon */}
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
           <Box

@@ -62,7 +62,7 @@ const FormRecognizerPage = () => {
 
   return (
     <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 4 }}>
-      <Container maxWidth="sm" sx={{ py: 3, px: 2 }}>
+      <Container maxWidth="sm" sx={{ py: 3, px: 2, bgcolor: '#f5f5f5' }}>
         <Box sx={{ mb: 4 }}>
           <Typography variant="h6" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
             Dummy Data Generator

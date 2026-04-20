@@ -67,6 +67,45 @@ const QrCodePage = () => {
     loadState();
   }, []);
 
+  // 监听粘贴事件
+  useEffect(() => {
+    const handlePaste = async (e: ClipboardEvent) => {
+      // 只有在二维码转 URL 区域展开时才处理粘贴事件
+      if (!qrExpanded) return;
+
+      // 检查剪贴板是否包含图片数据
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          e.preventDefault();
+
+          const file = items[i].getAsFile();
+          if (file) {
+            try {
+              setQrCodeFile(file);
+              setParseError('');
+              setParsedUrl('');
+              showMessage('图片粘贴成功', { severity: 'success', autoHideDuration: 1000 });
+            } catch (error) {
+              console.error('处理粘贴图片失败:', error);
+              showMessage('粘贴图片失败，请重试', { severity: 'error', autoHideDuration: 3000 });
+            }
+          }
+          break;
+        }
+      }
+    };
+
+    // 监听全局粘贴事件
+    document.addEventListener('paste', handlePaste);
+
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+    };
+  }, [qrExpanded, showMessage]);
+
   // 保存状态到存储（仅在初始化完成后保存）
   useEffect(() => {
     if (!isInitialized) return;
@@ -454,17 +493,63 @@ const QrCodePage = () => {
                     style={{ cursor: 'pointer', textAlign: 'center', width: '100%' }}
                   >
                     {qrCodeFile ? (
-                      <Box sx={{ textAlign: 'center', width: '100%' }}>
-                        <img
-                          src={URL.createObjectURL(qrCodeFile)}
-                          alt="QR Code Preview"
-                          style={{
-                            maxWidth: '100%',
-                            maxHeight: 160,
-                            borderRadius: 8,
-                            objectFit: 'contain',
-                          }}
-                        />
+                      <Box sx={{ textAlign: 'center', width: '100%', position: 'relative' }}>
+                        <Box sx={{ position: 'relative', display: 'inline-block' }}>
+                          <img
+                            src={URL.createObjectURL(qrCodeFile)}
+                            alt="QR Code Preview"
+                            style={{
+                              maxWidth: '100%',
+                              maxHeight: 160,
+                              borderRadius: 8,
+                              objectFit: 'contain',
+                            }}
+                          />
+                          <Button
+                            variant="contained"
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setQrCodeFile(null);
+                              setParsedUrl('');
+                              setParseError('');
+                              showMessage('图片已清除', {
+                                severity: 'success',
+                                autoHideDuration: 1000,
+                              });
+                            }}
+                            sx={{
+                              position: 'absolute',
+                              top: -8,
+                              right: -8,
+                              minWidth: '32px',
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              bgcolor: 'rgba(244, 67, 54, 0.9)',
+                              color: 'white',
+                              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                              transition: 'all 0.2s ease-in-out',
+                              '&:hover': {
+                                bgcolor: 'rgba(211, 47, 47, 0.95)',
+                                transform: 'scale(1.1)',
+                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+                              },
+                              '&:active': {
+                                transform: 'scale(0.95)',
+                              },
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 700,
+                              fontSize: '16px',
+                              lineHeight: 1,
+                              padding: 0,
+                            }}
+                          >
+                            ×
+                          </Button>
+                        </Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                           {qrCodeFile.name}
                         </Typography>
@@ -476,7 +561,7 @@ const QrCodePage = () => {
                       <>
                         <ImageIcon sx={{ fontSize: 48, color: 'grey.300', mb: 2 }} />
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          点击或拖拽上传二维码图片
+                          点击、拖拽或粘贴上传二维码图片
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                           支持 PNG、JPG、WEBP 格式
