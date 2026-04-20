@@ -5,6 +5,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
 import LanguageIcon from '@mui/icons-material/Language';
 import QrCodeIcon from '@mui/icons-material/QrCode';
+import DescriptionIcon from '@mui/icons-material/Description';
 import type { PageType } from '@/types/storage';
 import { useEffect, useState } from 'react';
 import dayjs from '@/utils/dayjs';
@@ -85,6 +86,18 @@ export default function DashboardPage() {
             colorCode="#4caf50"
             icon={<QrCodeIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('qrCode')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
+          />
+        );
+      case 'formRecognizer':
+        return (
+          <ToolCard
+            key={key}
+            title="表单识别"
+            description="识别标签页中的表单内容"
+            colorCode="#ff5722"
+            icon={<DescriptionIcon sx={{ fontSize: 20 }} />}
+            onClick={() => navigateTo('formRecognizer')}
             cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
