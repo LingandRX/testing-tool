@@ -55,7 +55,7 @@ export class DummyDataGenerator {
    * 生成有效邮箱
    */
   static generateValidEmail(): string {
-    return faker.internet.email();
+    return fakerZH_CN.internet.email();
   }
 
   /**
@@ -77,14 +77,14 @@ export class DummyDataGenerator {
    * 生成短文本
    */
   static generateShortText(): string {
-    return faker.lorem.sentence({ min: 3, max: 6 });
+    return fakerZH_CN.lorem.sentence({ min: 3, max: 6 });
   }
 
   /**
    * 生成长文本
    */
   static generateLongText(): string {
-    return faker.lorem.paragraphs(5);
+    return fakerZH_CN.lorem.paragraphs(5);
   }
 
   /**
@@ -106,42 +106,42 @@ export class DummyDataGenerator {
    * 生成随机数字
    */
   static generateNumber(): number {
-    return faker.number.int(10000);
+    return fakerZH_CN.number.int(10000);
   }
 
   /**
    * 生成随机浮点数
    */
   static generateFloat(): number {
-    return faker.number.float({ max: 10000 });
+    return fakerZH_CN.number.float({ max: 10000 });
   }
 
   /**
    * 生成随机负数
    */
   static generateNegativeNumber(): number {
-    return -faker.number.int(10000);
+    return -fakerZH_CN.number.int(10000);
   }
 
   /**
    * 生成随机日期
    */
   static generateDate(): string {
-    return faker.date.recent({ days: 365 }).toISOString().split('T')[0];
+    return fakerZH_CN.date.recent({ days: 365 }).toISOString().split('T')[0];
   }
 
   /**
    * 生成过去的日期
    */
   static generatePastDate(): string {
-    return faker.date.past({ years: 1 }).toISOString().split('T')[0];
+    return fakerZH_CN.date.past({ years: 1 }).toISOString().split('T')[0];
   }
 
   /**
    * 生成未来的日期
    */
   static generateFutureDate(): string {
-    return faker.date.future({ years: 1 }).toISOString().split('T')[0];
+    return fakerZH_CN.date.future({ years: 1 }).toISOString().split('T')[0];
   }
 
   /**
