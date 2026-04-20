@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { ROUTES } from '@/config/routes';
+import { ROUTES, getEntryPointType } from '@/config/routes';
 import { useRouter } from '@/providers/RouterProvider';
 import { useMemo } from 'react';
 
@@ -10,11 +10,16 @@ export default function RouterContainer() {
     return currentPage === 'dashboard' ? 'page-transition-dashboard' : 'page-transition-enter';
   }, [currentPage]);
 
+  const entryPointType = useMemo(() => {
+    return getEntryPointType();
+  }, []);
+
   if (!isLoaded) {
     return <div className="app">Loading...</div>;
   }
 
-  const currentRoute = ROUTES.find(route => route.key === currentPage);
+  const currentRoute = ROUTES.find((route) => route.key === currentPage);
+  const Component = currentRoute ? currentRoute.components[entryPointType] : null;
 
   return (
     <Box
@@ -29,7 +34,7 @@ export default function RouterContainer() {
         flexDirection: 'column',
       }}
     >
-      {currentRoute && <currentRoute.component />}
+      {Component && <Component />}
     </Box>
   );
 }
