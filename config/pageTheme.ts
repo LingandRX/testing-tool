@@ -122,3 +122,18 @@ export const dashboardPageStyles = {
   backgroundColor: '#f5f5f5',
   cardBackgroundColor: '#ffffff',
 } as const;
+
+export const formRecognizerPageStyles = {
+  validColor: THEME_COLORS.success,
+  validDark: '#388e3c',
+  invalidColor: THEME_COLORS.warning,
+  invalidDark: '#f57c00',
+  clearColor: THEME_COLORS.error,
+  clearDark: '#d32f2f',
+  clearBg: alpha(THEME_COLORS.error, 0.05),
+  buttonStyle: {
+    py: 1.2,
+    borderRadius: 3,
+    fontWeight: 700,
+  },
+} as const;
