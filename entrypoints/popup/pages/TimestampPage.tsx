@@ -18,7 +18,7 @@ import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
 import CopyButton from '@/components/CopyButton';
-import { DATE_FORMAT, ZONES, timestampPageStyles } from '@/config/pageTheme';
+import { DATE_FORMAT, ZONES, globalStyles, timestampPageStyles } from '@/config/pageTheme';
 import type { UnitType, ZoneType } from '@/config/pageTheme';
 
 // ================= 子组件：实时时钟 (优化交互) =================
@@ -51,7 +51,8 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
 
   const handleUseNow = useCallback(() => {
     onUseNowRef.current(now);
-  }, [now]);
+    showMessageRef.current?.('已使用当前时间戳', { severity: 'success' });
+  }, [now, showMessageRef]);
 
   return (
     <Box
@@ -61,17 +62,17 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
         justifyContent: 'space-between',
         p: 1.8,
         mb: 2.5,
-        bgcolor: alpha('#2196f3', 0.04),
+        bgcolor: alpha(timestampPageStyles.primaryColor, 0.04),
         borderRadius: 4,
         border: '1px solid',
-        borderColor: alpha('#2196f3', 0.1),
+        borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
       }}
     >
       <Stack spacing={0.5}>
         <Typography
           variant="caption"
           sx={{
-            color: 'primary.main',
+            color: timestampPageStyles.primaryColor,
             fontWeight: 800,
             fontSize: '0.6rem',
             textTransform: 'uppercase',
@@ -84,7 +85,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
           variant="subtitle2"
           sx={{
             fontWeight: 800,
-            color: 'text.primary',
+            color: timestampPageStyles.primaryColor,
             fontFamily: 'monospace',
             fontSize: '1.2rem',
             letterSpacing: '-0.5px',
@@ -101,10 +102,10 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
           sx={{
             display: 'flex',
             p: 0.4,
-            bgcolor: alpha('#2196f3', 0.08),
+            bgcolor: alpha(timestampPageStyles.primaryColor, 0.08),
             borderRadius: 2.5,
             border: '1px solid',
-            borderColor: alpha('#2196f3', 0.1),
+            borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
           }}
         >
           {(['ms', 's'] as const).map((u) => (
@@ -120,7 +121,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
                 fontWeight: 900,
                 transition: 'all 0.2s',
                 bgcolor: unit === u ? '#fff' : 'transparent',
-                color: unit === u ? 'primary.main' : alpha('#2196f3', 0.4),
+                color: unit === u ? 'primary.main' : alpha(timestampPageStyles.primaryColor, 0.4),
                 boxShadow: unit === u ? '0 2px 6px rgba(33, 150, 243, 0.2)' : 'none',
               }}
             >
@@ -132,7 +133,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
         <Divider
           orientation="vertical"
           flexItem
-          sx={{ mx: 0.5, my: 1, borderColor: alpha('#2196f3', 0.1) }}
+          sx={{ mx: 0.5, my: 1, borderColor: alpha(timestampPageStyles.primaryColor, 0.1) }}
         />
 
         <Stack direction="row" spacing={0.5}>
@@ -211,13 +212,13 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
 
         <Box
           sx={{
-            bgcolor: alpha('#2196f3', 0.05),
+            bgcolor: alpha(timestampPageStyles.primaryColor, 0.05),
             p: 2,
             borderRadius: 4,
             position: 'relative',
             mb: 2.5,
             border: '1px solid',
-            borderColor: alpha('#2196f3', 0.1),
+            borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
           }}
         >
           <Typography
@@ -225,7 +226,7 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
             sx={{
               fontFamily: 'monospace',
               fontWeight: 700,
-              color: 'primary.main',
+              color: timestampPageStyles.primaryColor,
               wordBreak: 'break-all',
               pr: 4,
               fontSize: '1rem',
@@ -244,17 +245,18 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
               top: '50%',
               transform: 'translateY(-50%)',
             }}
+            showMessage={showMessage}
           />
         </Box>
 
         <Stack
           spacing={1.2}
           sx={{
-            bgcolor: alpha('#2196f3', 0.05),
+            bgcolor: alpha(timestampPageStyles.primaryColor, 0.05),
             p: 2,
             borderRadius: 4,
             border: '1px solid',
-            borderColor: alpha('#2196f3', 0.1),
+            borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
             mt: 2,
           }}
         >
@@ -278,7 +280,7 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
                   variant="caption"
                   sx={{
                     fontFamily: 'monospace',
-                    color: 'text.secondary',
+                    color: timestampPageStyles.primaryColor,
                     fontWeight: 600,
                     fontSize: '0.65rem',
                   }}
@@ -290,7 +292,7 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
                     text={item.value}
                     tooltip="复制"
                     size="small"
-                    color="primary"
+                    color={timestampPageStyles.primaryColor}
                     showMessage={showMessage}
                   />
                 )}
@@ -363,16 +365,16 @@ export default function TimestampPage() {
   );
 
   return (
-    <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2, bgcolor: '#f5f5f5' }}>
+    <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
+      <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
         {/* Header with Icon */}
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
           <Box
             sx={{
               p: 1,
               borderRadius: 2.5,
-              bgcolor: alpha('#2196f3', 0.1),
-              color: 'primary.main',
+              bgcolor: alpha(timestampPageStyles.primaryColor, 0.1),
+              color: timestampPageStyles.primaryColor,
               display: 'flex',
             }}
           >
@@ -543,7 +545,7 @@ export default function TimestampPage() {
             boxShadow: 'none',
             '&:hover': {
               bgcolor: 'primary.dark',
-              boxShadow: `0 8px 24px ${alpha('#2196f3', 0.2)}`,
+              boxShadow: `0 8px 24px ${alpha(timestampPageStyles.primaryColor, 0.2)}`,
             },
           }}
         >

@@ -339,11 +339,7 @@ const QrCodePage = () => {
                   variant="outlined"
                   error={!!urlError}
                   helperText={urlError}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 3,
-                    },
-                  }}
+                  sx={qrCodePageStyles.INPUT_STYLE}
                 />
 
                 <Button
@@ -619,11 +615,7 @@ const QrCodePage = () => {
                         ),
                       },
                     }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 3,
-                      },
-                    }}
+                    sx={qrCodePageStyles.INPUT_STYLE}
                   />
                 </Box>
 
