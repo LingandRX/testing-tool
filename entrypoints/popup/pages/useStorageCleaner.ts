@@ -211,15 +211,24 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       }, 5000);
 
       if (autoRefresh && cleaningResult.success && tab.id !== undefined) {
-        showMessage('清理成功，即将刷新页面');
+        // 延迟显示消息，确保对话框完全关闭和焦点管理完成
+        setTimeout(() => {
+          showMessage('清理成功，即将刷新页面');
+        }, 100);
         // 使用后台脚本执行刷新操作，确保即使弹窗关闭也能正确执行
         reloadTimeoutRef.current = setTimeout(() => {
-          // 使用 fire-and-forget 模式发送消息，不等待响应
-          try {
-            chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id });
-          } catch (err) {
-            console.error('发送刷新请求失败:', err);
-          }
+          // 发送刷新消息到后台脚本
+          chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id }, (response) => {
+            if (chrome.runtime.lastError) {
+              console.error('发送刷新请求失败:', chrome.runtime.lastError.message);
+              showMessage('页面刷新失败，请手动刷新', { severity: 'warning' });
+            } else if (response && !response.success) {
+              console.error('后台刷新失败:', response.message);
+              showMessage('页面刷新失败，请手动刷新', { severity: 'warning' });
+            } else {
+              console.log('刷新请求已发送');
+            }
+          });
         }, 1500);
       } else {
         loadInfo();

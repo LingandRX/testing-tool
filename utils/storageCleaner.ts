@@ -11,26 +11,30 @@ const RESTRICTED_PROTOCOLS = [
 ] as const;
 
 export async function getCurrentTab() {
-  // First, try the active tab in the last focused window (works for standard popups and side panels)
-  const [lastFocusedTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  // For popup pages, we need to get the active tab from the browser window, not the extension popup
+  // Directly query the active tab in normal windows to avoid popup window interference
 
-  // If the tab is valid and NOT an extension page/restricted URL, use it
-  if (lastFocusedTab && !isRestrictedUrl(lastFocusedTab.url)) {
-    return lastFocusedTab;
-  }
-
-  // Fallback: If we're in a standalone extension window (which is focused),
-  // find the active tab in the most recently focused 'normal' browser window.
-  const [normalTab] = await chrome.tabs.query({
+  // First, try to get the active tab from the last focused normal window
+  const [lastFocusedNormalTab] = await chrome.tabs.query({
     active: true,
     windowType: 'normal',
     lastFocusedWindow: true,
   });
-  if (normalTab) return normalTab;
+  if (lastFocusedNormalTab && !isRestrictedUrl(lastFocusedNormalTab.url)) {
+    return lastFocusedNormalTab;
+  }
 
-  // Final fallback: any active normal tab (if multiple windows exist, it returns all active tabs)
-  const normalTabs = await chrome.tabs.query({ active: true, windowType: 'normal' });
-  return normalTabs[0];
+  // Fallback: Get any active tab from normal windows
+  const normalTabs = await chrome.tabs.query({
+    active: true,
+    windowType: 'normal',
+  });
+  const validTab = normalTabs.find((tab) => !isRestrictedUrl(tab.url));
+  if (validTab) return validTab;
+
+  // Final fallback: Any tab from normal windows (even if not active)
+  const allNormalTabs = await chrome.tabs.query({ windowType: 'normal' });
+  return allNormalTabs.find((tab) => !isRestrictedUrl(tab.url));
 }
 
 export function isRestrictedUrl(url?: string): boolean {
@@ -42,7 +46,11 @@ export async function getCookieSize(url: string): Promise<number> {
   try {
     const cookies = await chrome.cookies.getAll({ url });
     // 估算：名称 + 值 + 域名 + 路径 的长度
-    return cookies.reduce((acc, c) => acc + c.name.length + c.value.length + (c.domain?.length || 0) + (c.path?.length || 0), 0);
+    return cookies.reduce(
+      (acc, c) =>
+        acc + c.name.length + c.value.length + (c.domain?.length || 0) + (c.path?.length || 0),
+      0,
+    );
   } catch (error) {
     console.error('Failed to get cookie size:', error);
     return 0;
@@ -74,7 +82,10 @@ export async function getSessionStorageSize(tabId: number): Promise<number> {
       target: { tabId },
       func: () => {
         try {
-          return Object.entries(sessionStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+          return Object.entries(sessionStorage).reduce(
+            (acc, [k, v]) => acc + k.length + v.length,
+            0,
+          );
         } catch {
           return 0;
         }
@@ -287,9 +298,7 @@ export async function injectClearCacheStorage(tabId: number): Promise<StorageCle
   }
 }
 
-export async function injectUnregisterServiceWorkers(
-  tabId: number,
-): Promise<StorageCleanResult> {
+export async function injectUnregisterServiceWorkers(tabId: number): Promise<StorageCleanResult> {
   try {
     const [result] = await chrome.scripting.executeScript({
       target: { tabId },
