@@ -209,8 +209,14 @@ export default function StorageCleanerPage() {
 
       if (autoRefresh && cleaningResult.success && tab.id !== undefined) {
         showMessage('清理成功，即将刷新页面');
+        // 使用后台脚本执行刷新操作，确保即使弹窗关闭也能正确执行
         reloadTimeoutRef.current = setTimeout(() => {
-          chrome.tabs.reload(tab.id!);
+          // 使用 fire-and-forget 模式发送消息，不等待响应
+          try {
+            chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id });
+          } catch (err) {
+            console.error('发送刷新请求失败:', err);
+          }
         }, 1500);
       } else {
         loadInfo();

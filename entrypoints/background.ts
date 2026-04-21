@@ -41,6 +41,23 @@ export default defineBackground(() => {
         } else {
           // 从扩展其他部分发送的消息
           console.log('收到来自扩展的消息:', message.action);
+
+          // 处理刷新标签页请求
+          if (message.action === 'reloadTab' && message.tabId !== undefined) {
+            console.log('后台脚本执行刷新标签页:', message.tabId);
+            chrome.tabs
+              .reload(message.tabId)
+              .then(() => {
+                console.log('标签页刷新成功:', message.tabId);
+                sendResponse({ success: true, message: '刷新成功' });
+              })
+              .catch((err) => {
+                console.error('刷新标签页失败:', err.message);
+                sendResponse({ success: false, message: err.message });
+              });
+            return;
+          }
+
           sendResponse({ success: true, message: '消息已收到' });
         }
       } catch (error) {
