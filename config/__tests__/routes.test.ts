@@ -9,8 +9,8 @@ import {
 
 describe('routes', () => {
   describe('ROUTES', () => {
-    it('should have 6 routes defined', () => {
-      expect(ROUTES).toHaveLength(6);
+    it('should have 7 routes defined', () => {
+      expect(ROUTES).toHaveLength(7);
     });
 
     it('should have all required properties for each route', () => {
@@ -18,11 +18,14 @@ describe('routes', () => {
         expect(route).toHaveProperty('key');
         expect(route).toHaveProperty('label');
         expect(route).toHaveProperty('defaultVisible');
-        expect(route).toHaveProperty('component');
+        expect(route).toHaveProperty('components');
         expect(typeof route.key).toBe('string');
         expect(typeof route.label).toBe('string');
         expect(typeof route.defaultVisible).toBe('boolean');
-        expect(typeof route.component).toBe('function');
+        expect(typeof route.components).toBe('object');
+        expect(route.components).toHaveProperty('popup');
+        expect(route.components).toHaveProperty('sidepanel');
+        expect(route.components).toHaveProperty('detached');
       });
     });
 
@@ -101,12 +104,13 @@ describe('routes', () => {
   describe('getAllRouteKeys', () => {
     it('should return all route keys', () => {
       const allKeys = getAllRouteKeys();
-      expect(allKeys).toHaveLength(6);
+      expect(allKeys).toHaveLength(7);
       expect(allKeys).toContain('dashboard');
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
       expect(allKeys).toContain('openUrl');
       expect(allKeys).toContain('qrCode');
+      expect(allKeys).toContain('formRecognizer');
       expect(allKeys).toContain('openUrlViewer');
     });
   });
@@ -122,17 +126,18 @@ describe('routes', () => {
       expect(pageOrder).not.toContain('openUrlViewer');
     });
 
-    it('should include timestamp, storageCleaner, openUrl, qrCode in page order', () => {
+    it('should include timestamp, storageCleaner, openUrl, qrCode, formRecognizer in page order', () => {
       const pageOrder = getDefaultPageOrder();
       expect(pageOrder).toContain('timestamp');
       expect(pageOrder).toContain('storageCleaner');
       expect(pageOrder).toContain('openUrl');
       expect(pageOrder).toContain('qrCode');
+      expect(pageOrder).toContain('formRecognizer');
     });
 
-    it('should have 4 items in page order', () => {
+    it('should have 5 items in page order', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(4);
+      expect(pageOrder).toHaveLength(5);
     });
   });
 });

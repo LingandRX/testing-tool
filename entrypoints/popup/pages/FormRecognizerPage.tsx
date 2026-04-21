@@ -1,35 +1,16 @@
 import { useState, useRef } from 'react';
-import {
-  Box,
-  Typography,
-  Container,
-  Button,
-  Paper,
-  CircularProgress,
-  Stack,
-  Switch,
-  FormControlLabel,
-  Chip,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Collapse,
-  Divider,
-} from '@mui/material';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import ClearAllIcon from '@mui/icons-material/ClearAll';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { Box, Typography, Container, Button, CircularProgress } from '@mui/material';
 import InputIcon from '@mui/icons-material/Input';
-import FolderIcon from '@mui/icons-material/Folder';
-import DownloadIcon from '@mui/icons-material/Download';
-import UploadIcon from '@mui/icons-material/Upload';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { dashboardPageStyles, formRecognizerPageStyles } from '@/config/pageTheme';
 import { MessageAction, sendMessageToContent, injectContentScript } from '@/utils/messages';
 import { DataTemplateManager, type DataTemplate } from '@/utils/dataTemplate';
+import FieldList from '@/components/FieldList';
+import OperationHistory from '@/components/OperationHistory';
+import TemplateManager from '@/components/TemplateManager';
+import MainActions from '@/components/MainActions';
+import OptionsPanel from '@/components/OptionsPanel';
+import FeatureDescription from '@/components/FeatureDescription';
 
 // 字段数据接口
 interface FieldData {
@@ -42,40 +23,6 @@ interface FieldData {
   isSelected: boolean;
   generatedValue: string;
 }
-
-// 字段类型显示名称映射
-const FIELD_TYPE_NAMES: Record<string, string> = {
-  text: '文本',
-  email: '邮箱',
-  phone: '手机号',
-  number: '数字',
-  date: '日期',
-  textarea: '文本域',
-  radio: '单选框',
-  checkbox: '复选框',
-  select: '下拉框',
-  password: '密码',
-  name: '姓名',
-  id_card: '身份证号',
-  unknown: '未知',
-};
-
-// 字段类型颜色映射
-const FIELD_TYPE_COLORS: Record<
-  string,
-  'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning'
-> = {
-  email: 'primary',
-  phone: 'success',
-  number: 'secondary',
-  date: 'warning',
-  password: 'error',
-  name: 'primary',
-  id_card: 'secondary',
-  text: 'default',
-  textarea: 'default',
-  unknown: 'default',
-};
 
 const FormRecognizerPage = () => {
   const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
@@ -301,285 +248,38 @@ const FormRecognizerPage = () => {
           {scanning ? '扫描中...' : '扫描表单字段'}
         </Button>
 
-        {/* 字段列表 */}
-        {fields.length > 0 && (
-          <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', mb: 2 }}>
-            <Box
-              sx={{
-                borderBottom: 1,
-                borderColor: 'divider',
-                px: 2,
-                py: 1.5,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                cursor: 'pointer',
-              }}
-              onClick={() => setShowFields(!showFields)}
-            >
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                已识别字段 ({fields.length})
-              </Typography>
-              {showFields ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </Box>
-            <Collapse in={showFields}>
-              <List dense sx={{ maxHeight: 300, overflow: 'auto' }}>
-                {fields.map((field, index) => (
-                  <ListItem key={field.id} sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 36 }}>
-                      <InputIcon fontSize="small" color="action" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {field.label || field.name || field.placeholder || `字段 ${index + 1}`}
-                          </Typography>
-                          <Chip
-                            label={FIELD_TYPE_NAMES[field.fieldType] || '未知'}
-                            size="small"
-                            color={FIELD_TYPE_COLORS[field.fieldType] || 'default'}
-                            variant="outlined"
-                          />
-                        </Box>
-                      }
-                      secondary={field.placeholder || field.name}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </Collapse>
-          </Paper>
-        )}
+        <FieldList
+          fields={fields}
+          showFields={showFields}
+          onToggleShowFields={() => setShowFields(!showFields)}
+        />
 
-        {/* 主要操作按钮 */}
-        <Stack spacing={2} sx={{ mb: 4 }}>
-          <Button
-            variant="contained"
-            startIcon={
-              loading ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />
-            }
-            onClick={handleFillValidData}
-            disabled={loading}
-            fullWidth
-            sx={{
-              ...formRecognizerPageStyles.buttonStyle,
-              bgcolor: formRecognizerPageStyles.validColor,
-              '&:hover': {
-                bgcolor: formRecognizerPageStyles.validDark,
-              },
-            }}
-          >
-            {loading ? '填充中...' : '一键填充（有效数据）'}
-          </Button>
+        <MainActions
+          loading={loading}
+          onFillValidData={handleFillValidData}
+          onFillInvalidData={handleFillInvalidData}
+          onClearAllFields={handleClearAllFields}
+        />
 
-          <Button
-            variant="contained"
-            startIcon={
-              loading ? <CircularProgress size={16} color="inherit" /> : <ErrorOutlineIcon />
-            }
-            onClick={handleFillInvalidData}
-            disabled={loading}
-            fullWidth
-            sx={{
-              ...formRecognizerPageStyles.buttonStyle,
-              bgcolor: formRecognizerPageStyles.invalidColor,
-              '&:hover': {
-                bgcolor: formRecognizerPageStyles.invalidDark,
-              },
-            }}
-          >
-            {loading ? '填充中...' : '一键填充（异常数据）'}
-          </Button>
+        <OptionsPanel includeHidden={includeHidden} onIncludeHiddenChange={setIncludeHidden} />
 
-          <Button
-            variant="outlined"
-            startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <ClearAllIcon />}
-            onClick={handleClearAllFields}
-            disabled={loading}
-            fullWidth
-            sx={{
-              ...formRecognizerPageStyles.buttonStyle,
-              borderColor: formRecognizerPageStyles.clearColor,
-              color: formRecognizerPageStyles.clearColor,
-              '&:hover': {
-                borderColor: formRecognizerPageStyles.clearDark,
-                bgcolor: formRecognizerPageStyles.clearBg,
-              },
-            }}
-          >
-            {loading ? '清空中...' : '一键清空所有表单'}
-          </Button>
-        </Stack>
+        <OperationHistory
+          history={operationHistory}
+          showHistory={showHistory}
+          onToggleShowHistory={() => setShowHistory(!showHistory)}
+        />
 
-        {/* 选项设置 */}
-        <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', mb: 4 }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2, py: 1.5 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              填充选项
-            </Typography>
-          </Box>
-          <Box sx={{ p: 2 }}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={includeHidden}
-                  onChange={(e) => setIncludeHidden(e.target.checked)}
-                  color="primary"
-                />
-              }
-              label="包含隐藏字段"
-              sx={{ width: '100%' }}
-            />
-          </Box>
-        </Paper>
+        <TemplateManager
+          templates={templates}
+          showTemplates={showTemplates}
+          templateLoading={templateLoading}
+          onToggleShowTemplates={() => setShowTemplates(!showTemplates)}
+          onLoadTemplates={loadTemplates}
+          onExportTemplates={handleExportTemplates}
+          onImportTemplates={handleImportTemplates}
+        />
 
-        {/* 操作历史记录 */}
-        {operationHistory.length > 0 && (
-          <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', mb: 4 }}>
-            <Box
-              sx={{
-                borderBottom: 1,
-                borderColor: 'divider',
-                px: 2,
-                py: 1.5,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                cursor: 'pointer',
-              }}
-              onClick={() => setShowHistory(!showHistory)}
-            >
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                操作历史 ({operationHistory.length})
-              </Typography>
-              {showHistory ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </Box>
-            <Collapse in={showHistory}>
-              <List dense sx={{ maxHeight: 300, overflow: 'auto' }}>
-                {operationHistory.map((item, index) => (
-                  <Box key={index}>
-                    {index > 0 && <Divider />}
-                    <ListItem>
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Chip
-                              label={item.type}
-                              size="small"
-                              color="primary"
-                              variant="outlined"
-                            />
-                            <Typography variant="body2">{item.content}</Typography>
-                          </Box>
-                        }
-                        secondary={`${item.time} · ${item.result}`}
-                      />
-                    </ListItem>
-                  </Box>
-                ))}
-              </List>
-            </Collapse>
-          </Paper>
-        )}
-
-        {/* 模板管理 */}
-        <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', mb: 4 }}>
-          <Box
-            sx={{
-              borderBottom: 1,
-              borderColor: 'divider',
-              px: 2,
-              py: 1.5,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              cursor: 'pointer',
-            }}
-            onClick={() => {
-              setShowTemplates(!showTemplates);
-              if (!showTemplates) loadTemplates();
-            }}
-          >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              模板管理 ({templates.length})
-            </Typography>
-            {showTemplates ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </Box>
-          <Collapse in={showTemplates}>
-            <Box sx={{ p: 2 }}>
-              <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                <Button
-                  size="small"
-                  startIcon={<DownloadIcon />}
-                  onClick={handleExportTemplates}
-                  variant="outlined"
-                >
-                  导出
-                </Button>
-                <Button
-                  size="small"
-                  startIcon={<UploadIcon />}
-                  onClick={handleImportTemplates}
-                  variant="outlined"
-                >
-                  导入
-                </Button>
-              </Stack>
-              {templateLoading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                  <CircularProgress size={20} />
-                </Box>
-              ) : templates.length === 0 ? (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ textAlign: 'center', py: 2 }}
-                >
-                  暂无模板，请先在其他页面创建模板
-                </Typography>
-              ) : (
-                <List dense sx={{ maxHeight: 200, overflow: 'auto' }}>
-                  {templates.map((template) => (
-                    <ListItem key={template.id} sx={{ py: 0.5 }}>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <FolderIcon fontSize="small" color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={template.name}
-                        secondary={`${template.fields.length} 个字段 · ${new Date(template.updatedAt).toLocaleDateString('zh-CN')}`}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Box>
-          </Collapse>
-        </Paper>
-
-        {/* 功能说明 */}
-        <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden' }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2, py: 1.5 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              功能说明
-            </Typography>
-          </Box>
-          <Box sx={{ p: 2 }}>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              <strong>有效数据模式：</strong>生成符合格式要求的测试数据，适用于正常功能测试。
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              <strong>异常数据模式：</strong>生成边界值或格式错误的数据，适用于异常场景测试。
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              <strong>一键清空：</strong>快速清空当前页面所有表单字段的值。
-            </Typography>
-            <Typography variant="body2">
-              <strong>支持的字段类型：</strong>
-              文本、邮箱、手机号、数字、日期、文本域、密码、身份证号等。
-            </Typography>
-          </Box>
-        </Paper>
+        <FeatureDescription />
 
         <GlobalSnackbar {...snackbarProps} />
       </Container>
