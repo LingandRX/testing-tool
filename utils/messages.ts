@@ -25,8 +25,9 @@ export enum MessageAction {
  * 消息载荷接口
  */
 export interface MessagePayload {
-  action: MessageAction;
+  action: MessageAction | string;
   tabId?: number;
+  delay?: number;
   fields?: Omit<FormFieldInfo, 'element'>[];
   mode?: FillMode;
   includeHidden?: boolean;

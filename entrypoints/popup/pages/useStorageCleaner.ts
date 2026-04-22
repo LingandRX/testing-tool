@@ -70,17 +70,23 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   const { showMessage } = useSnackbar();
   const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const resultTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const requestIdRef = useRef<number>(0);
 
   useEffect(() => {
+    const reloadTimeout = reloadTimeoutRef.current;
+    const resultTimeout = resultTimeoutRef.current;
     return () => {
-      if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
-      if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
+      if (reloadTimeout) clearTimeout(reloadTimeout);
+      if (resultTimeout) clearTimeout(resultTimeout);
     };
   }, []);
 
   const loadInfo = useCallback(async () => {
+    const currentRequestId = ++requestIdRef.current;
     try {
       const tab = await getCurrentTab();
+      if (currentRequestId !== requestIdRef.current) return;
+
       if (!tab || !tab.url) {
         setError('无法获取当前标签页');
         return;
@@ -90,9 +96,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
         return;
       }
 
-      // 重置错误状态
       setError('');
-
       const url = tab.url;
       const tabId = tab.id!;
       setDomain(new URL(url).hostname);
@@ -106,6 +110,8 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
         getCacheStorageSize(tabId),
         getServiceWorkerCount(tabId),
       ]);
+
+      if (currentRequestId !== requestIdRef.current) return;
 
       if (savedPrefs) {
         setAutoRefresh(savedPrefs.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
@@ -121,7 +127,9 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
         serviceWorkers: swCount,
       });
     } finally {
-      setIsInitializing(false);
+      if (currentRequestId === requestIdRef.current) {
+        setIsInitializing(false);
+      }
     }
   }, []);
 
@@ -211,25 +219,10 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       }, 5000);
 
       if (autoRefresh && cleaningResult.success && tab.id !== undefined) {
-        // 延迟显示消息，确保对话框完全关闭和焦点管理完成
-        setTimeout(() => {
-          showMessage('清理成功，即将刷新页面');
-        }, 100);
-        // 使用后台脚本执行刷新操作，确保即使弹窗关闭也能正确执行
-        reloadTimeoutRef.current = setTimeout(() => {
-          // 发送刷新消息到后台脚本
-          chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id }, (response) => {
-            if (chrome.runtime.lastError) {
-              console.error('发送刷新请求失败:', chrome.runtime.lastError.message);
-              showMessage('页面刷新失败，请手动刷新', { severity: 'warning' });
-            } else if (response && !response.success) {
-              console.error('后台刷新失败:', response.message);
-              showMessage('页面刷新失败，请手动刷新', { severity: 'warning' });
-            } else {
-              console.log('刷新请求已发送');
-            }
-          });
-        }, 1500);
+        showMessage('清理成功，即将刷新页面');
+        // 立即发送刷新消息，并在后台处理延迟（或直接刷新）
+        // 这样即使弹窗关闭，后台也能收到指令
+        chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id, delay: 1000 });
       } else {
         loadInfo();
       }
@@ -242,11 +235,9 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   }, [options, autoRefresh, showMessage, loadInfo]);
 
   // Computed values
-  const totalSize =
-    (sizes.cookies || 0) +
-    (sizes.localStorage || 0) +
-    (sizes.sessionStorage || 0) +
-    (sizes.indexedDB || 0);
+  // Note: sizes.indexedDB contains navigator.storage.estimate().usage
+  // which includes IndexedDB, Cache, etc.
+  const totalSize = (sizes.cookies || 0) + (sizes.indexedDB || 0);
 
   const allSelected = Object.values(options).every(Boolean);
   const someSelected = Object.values(options).some(Boolean) && !allSelected;

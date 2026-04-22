@@ -44,17 +44,27 @@ export default defineBackground(() => {
 
           // 处理刷新标签页请求
           if (message.action === 'reloadTab' && message.tabId !== undefined) {
-            console.log('后台脚本执行刷新标签页:', message.tabId);
-            chrome.tabs
-              .reload(message.tabId)
-              .then(() => {
-                console.log('标签页刷新成功:', message.tabId);
-                sendResponse({ success: true, message: '刷新成功' });
-              })
-              .catch((err) => {
-                console.error('刷新标签页失败:', err.message);
-                sendResponse({ success: false, message: err.message });
-              });
+            const tabId = message.tabId;
+            const delay = message.delay || 0;
+
+            const executeReload = () => {
+              chrome.tabs
+                .reload(tabId)
+                .then(() => {
+                  console.log('标签页刷新成功:', tabId);
+                })
+                .catch((err) => {
+                  console.error('刷新标签页失败:', err.message);
+                });
+            };
+
+            if (delay > 0) {
+              setTimeout(executeReload, delay);
+            } else {
+              executeReload();
+            }
+
+            sendResponse({ success: true, message: '刷新请求已接收' });
             return;
           }
 
