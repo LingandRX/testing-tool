@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useSnackbar } from '@/components/GlobalSnackbar';
 import { storageUtil } from '@/utils/chromeStorage';
 import type {
   StorageCleanerOptions,
@@ -57,7 +56,16 @@ export interface UseStorageCleanerReturn {
   handleClean: () => Promise<void>;
 }
 
-export function useStorageCleaner(): UseStorageCleanerReturn {
+export interface UseStorageCleanerOptions {
+  showMessage: (
+    message: string,
+    options?: { severity?: 'success' | 'warning' | 'error' | 'info' },
+  ) => void;
+}
+
+export function useStorageCleaner({
+  showMessage,
+}: UseStorageCleanerOptions): UseStorageCleanerReturn {
   const [domain, setDomain] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
@@ -67,7 +75,6 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
-  const { showMessage } = useSnackbar();
   const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const resultTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const requestIdRef = useRef<number>(0);
@@ -204,7 +211,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   const handleClean = useCallback(async () => {
     const tab = await getCurrentTab();
     if (!tab || !tab.id || !tab.url) {
-      showMessage('无法获取当前标签页');
+      showMessage('无法获取当前标签页', { severity: 'warning' });
       return;
     }
     setLoading(true);
@@ -212,19 +219,11 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       const cleaningResult = await clearStorage(tab.id, tab.url, options);
       setResult(cleaningResult);
 
-      // 5秒后自动清除结果提示
-      if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
-      resultTimeoutRef.current = setTimeout(() => {
-        setResult(null);
-      }, 5000);
-
-      if (autoRefresh && cleaningResult.success && tab.id !== undefined) {
-        showMessage('清理成功，即将刷新页面');
-        // 立即发送刷新消息，并在后台处理延迟（或直接刷新）
-        // 这样即使弹窗关闭，后台也能收到指令
-        chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id, delay: 1000 });
+      if (autoRefresh && cleaningResult.success) {
+        showMessage('清理成功，即将刷新页面', { severity: 'success' });
+        await chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id, delay: 1000 });
       } else {
-        loadInfo();
+        await loadInfo();
       }
     } catch (err) {
       showMessage(`清理失败: ${String(err)}`, { severity: 'error' });
