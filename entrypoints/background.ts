@@ -48,7 +48,7 @@ export default defineBackground(() => {
             const delay = message.delay || 0;
 
             const executeReload = () => {
-              chrome.tabs
+              browser.tabs
                 .reload(tabId)
                 .then(() => {
                   console.log('标签页刷新成功:', tabId);

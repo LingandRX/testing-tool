@@ -28,7 +28,7 @@ describe('StorageCleanerConfirm Component', () => {
         onConfirm={mockOnConfirm}
         options={defaultOptions}
         {...props}
-      />
+      />,
     );
   };
 
@@ -45,9 +45,9 @@ describe('StorageCleanerConfirm Component', () => {
 
     it('should display selected options as chips', () => {
       renderComponent();
-      expect(screen.getByText('localStorage')).toBeInTheDocument();
-      expect(screen.getByText('sessionStorage')).toBeInTheDocument();
-      expect(screen.getByText('cookies')).toBeInTheDocument();
+      expect(screen.getByText('LocalStorage')).toBeInTheDocument();
+      expect(screen.getByText('Session Storage')).toBeInTheDocument();
+      expect(screen.getByText('Cookies')).toBeInTheDocument();
     });
 
     it('should display cancel and confirm buttons', () => {
@@ -88,10 +88,10 @@ describe('StorageCleanerConfirm Component', () => {
 
       renderComponent({ options: partialOptions });
 
-      expect(screen.getByText('localStorage')).toBeInTheDocument();
-      expect(screen.getByText('indexedDB')).toBeInTheDocument();
-      expect(screen.queryByText('sessionStorage')).not.toBeInTheDocument();
-      expect(screen.queryByText('cookies')).not.toBeInTheDocument();
+      expect(screen.getByText('LocalStorage')).toBeInTheDocument();
+      expect(screen.getByText('IndexedDB')).toBeInTheDocument();
+      expect(screen.queryByText('Session Storage')).not.toBeInTheDocument();
+      expect(screen.queryByText('Cookies')).not.toBeInTheDocument();
     });
 
     it('should handle empty options', () => {
@@ -129,8 +129,8 @@ describe('StorageCleanerConfirm Component', () => {
 
       renderComponent({ options: customOptions });
 
-      expect(screen.getByText('sessionStorage')).toBeInTheDocument();
-      expect(screen.getByText('cookies')).toBeInTheDocument();
+      expect(screen.getByText('Session Storage')).toBeInTheDocument();
+      expect(screen.getByText('Cookies')).toBeInTheDocument();
     });
   });
 });

@@ -33,8 +33,8 @@ const QrCodePage = () => {
   }
 
   return (
-    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2, maxWidth: 400 }}>
+    <Box sx={{ minHeight: '100%', pb: 3, bgcolor: dashboardPageStyles.backgroundColor }}>
+      <Container sx={{ py: 2, maxWidth: 400, bgcolor: dashboardPageStyles.backgroundColor }}>
         {/* Header */}
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
           <Box
