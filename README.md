@@ -196,6 +196,35 @@ npm run test:watch        # 运行测试并监听文件变化
 npm run test:coverage     # 运行测试并生成覆盖率报告
 ```
 
+## 持续集成与发布
+
+项目使用 GitHub Actions 实现自动化 CI/CD，无需手动操作。
+
+### CI — 持续集成
+
+在以下场景自动触发：
+
+- push 到 `main` / `develop` / `develop-*` 分支
+- 所有 PR（合并到 `main` 或 `develop`）
+
+自动执行：ESLint 检查 → TypeScript 类型检查 → 单元测试 → Chrome & Firefox 构建验证。
+
+### 发布版本
+
+只需推送符合 `v*` 格式的 Git tag，即可自动完成全量 CI 检查、打包并发布到 GitHub Release：
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+> 含 `-` 的 tag（如 `v1.0.0-beta.1`）会自动标记为预发布版本（prerelease）。
+
+工作流文件位于 `.github/workflows/`：
+
+- `ci.yml` — 持续集成
+- `release.yml` — 自动发布
+
 ## 权限说明
 
 扩展请求以下权限：

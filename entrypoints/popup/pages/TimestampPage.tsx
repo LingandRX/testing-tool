@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import dayjs from '@/utils/dayjs';
 import {
   TextField,
   Select,
@@ -7,362 +5,47 @@ import {
   Stack,
   Typography,
   Box,
-  IconButton,
-  Tooltip,
   Container,
-  Fade,
-  Divider,
   alpha,
 } from '@mui/material';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
-import CopyButton from '@/components/CopyButton';
-import { DATE_FORMAT, ZONES, timestampPageStyles } from '@/config/pageTheme';
-import type { UnitType, ZoneType } from '@/config/pageTheme';
+import { ZONES, globalStyles, timestampPageStyles } from '@/config/pageTheme';
+import LiveClock from './components/LiveClock';
+import ResultView from './components/ResultView';
+import { useTimestampConverter } from './hooks/useTimestampConverter';
 
-// ================= 子组件：实时时钟 (优化交互) =================
-interface LiveClockProps {
-  unit: UnitType;
-  onUseNow: (val: number) => void;
-  onUnitChange: (u: UnitType) => void;
-  showMessage?: (message: string, options?: { severity: 'success' | 'error' }) => void;
-}
-
-const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: LiveClockProps) => {
-  const [now, setNow] = useState(() => Date.now());
-  const onUseNowRef = useRef(onUseNow);
-  const showMessageRef = useRef(showMessage);
-
-  useEffect(() => {
-    onUseNowRef.current = onUseNow;
-    showMessageRef.current = showMessage;
-  }, [onUseNow, showMessage]);
-
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  const displayVal = useMemo(
-    () => String(Math.floor(now / (unit === 'ms' ? 1 : 1000))),
-    [now, unit],
-  );
-
-  const handleUseNow = useCallback(() => {
-    onUseNowRef.current(now);
-  }, [now]);
-
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        p: 1.8,
-        mb: 2.5,
-        bgcolor: alpha('#2196f3', 0.04),
-        borderRadius: 4,
-        border: '1px solid',
-        borderColor: alpha('#2196f3', 0.1),
-      }}
-    >
-      <Stack spacing={0.5}>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'primary.main',
-            fontWeight: 800,
-            fontSize: '0.6rem',
-            textTransform: 'uppercase',
-            letterSpacing: 1,
-          }}
-        >
-          当前时间戳
-        </Typography>
-        <Typography
-          variant="subtitle2"
-          sx={{
-            fontWeight: 800,
-            color: 'text.primary',
-            fontFamily: 'monospace',
-            fontSize: '1.2rem',
-            letterSpacing: '-0.5px',
-            lineHeight: 1.2,
-          }}
-        >
-          {displayVal}
-        </Typography>
-      </Stack>
-
-      <Stack direction="row" spacing={1} alignItems="center">
-        {/* 胶囊式单位切换器 */}
-        <Box
-          sx={{
-            display: 'flex',
-            p: 0.4,
-            bgcolor: alpha('#2196f3', 0.08),
-            borderRadius: 2.5,
-            border: '1px solid',
-            borderColor: alpha('#2196f3', 0.1),
-          }}
-        >
-          {(['ms', 's'] as const).map((u) => (
-            <Box
-              key={u}
-              onClick={() => onUnitChange(u)}
-              sx={{
-                px: 1.2,
-                py: 0.35,
-                borderRadius: 2,
-                cursor: 'pointer',
-                fontSize: '0.65rem',
-                fontWeight: 900,
-                transition: 'all 0.2s',
-                bgcolor: unit === u ? '#fff' : 'transparent',
-                color: unit === u ? 'primary.main' : alpha('#2196f3', 0.4),
-                boxShadow: unit === u ? '0 2px 6px rgba(33, 150, 243, 0.2)' : 'none',
-              }}
-            >
-              {u.toUpperCase()}
-            </Box>
-          ))}
-        </Box>
-
-        <Divider
-          orientation="vertical"
-          flexItem
-          sx={{ mx: 0.5, my: 1, borderColor: alpha('#2196f3', 0.1) }}
-        />
-
-        <Stack direction="row" spacing={0.5}>
-          <Tooltip title="填充到下方">
-            <IconButton
-              size="small"
-              onClick={handleUseNow}
-              sx={{
-                color: timestampPageStyles.primaryColor,
-                bgcolor: '#fff',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                '&:hover': { bgcolor: timestampPageStyles.primaryColor, color: '#fff' },
-              }}
-            >
-              <AccessTimeIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <CopyButton
-            text={displayVal}
-            tooltip="复制时间戳"
-            size="small"
-            color={timestampPageStyles.primaryColor}
-            showMessage={showMessage}
-          />
-        </Stack>
-      </Stack>
-    </Box>
-  );
-});
-
-LiveClock.displayName = 'LiveClock';
-
-// ================= 子组件：多维度结果展示 =================
-interface ResultViewProps {
-  result: string;
-  mode: 'ts2dt' | 'dt2ts';
-  unit: UnitType;
-  zone: string;
-  showMessage?: (message: string, options?: { severity: 'success' | 'error' }) => void;
-}
-
-const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: ResultViewProps) => {
-  const extraInfo = useMemo(() => {
-    if (!result) return null;
-    const d =
-      mode === 'ts2dt'
-        ? dayjs(result, DATE_FORMAT).tz(zone)
-        : unit === 'ms'
-          ? dayjs(Number(result))
-          : dayjs.unix(Number(result));
-
-    return {
-      relative: d.fromNow(),
-      iso: d.toISOString(),
-      utc: d.utc().format(DATE_FORMAT) + ' UTC',
-    };
-  }, [result, mode, zone, unit]);
-
-  if (!result) return null;
-
-  return (
-    <Fade in={!!result}>
-      <Box sx={{ mt: 3, pt: 2.5, borderTop: '1px solid', borderColor: 'grey.50' }}>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.secondary',
-            mb: 1.2,
-            display: 'block',
-            fontWeight: 800,
-            fontSize: '0.7rem',
-          }}
-        >
-          转换结果
-        </Typography>
-
-        <Box
-          sx={{
-            bgcolor: alpha('#2196f3', 0.05),
-            p: 2,
-            borderRadius: 4,
-            position: 'relative',
-            mb: 2.5,
-            border: '1px solid',
-            borderColor: alpha('#2196f3', 0.1),
-          }}
-        >
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              color: 'primary.main',
-              wordBreak: 'break-all',
-              pr: 4,
-              fontSize: '1rem',
-            }}
-          >
-            {result}
-          </Typography>
-          <CopyButton
-            text={result}
-            tooltip="复制结果"
-            size="small"
-            color={timestampPageStyles.primaryColor}
-            style={{
-              position: 'absolute',
-              right: 8,
-              top: '50%',
-              transform: 'translateY(-50%)',
-            }}
-          />
-        </Box>
-
-        <Stack spacing={1.2}>
-          {[
-            { label: '相对时间', value: extraInfo?.relative },
-            { label: 'ISO 8601', value: extraInfo?.iso },
-            { label: 'UTC 时间', value: extraInfo?.utc },
-          ].map((item) => (
-            <Box
-              key={item.label}
-              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 1 }}
-            >
-              <Typography
-                variant="caption"
-                sx={{ color: 'text.disabled', fontWeight: 700, fontSize: '0.65rem' }}
-              >
-                {item.label}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontFamily: 'monospace',
-                    color: 'text.secondary',
-                    fontWeight: 600,
-                    fontSize: '0.65rem',
-                  }}
-                >
-                  {item.value}
-                </Typography>
-                {item.value && (
-                  <CopyButton
-                    text={item.value}
-                    tooltip="复制"
-                    size="small"
-                    color="primary"
-                    showMessage={showMessage}
-                  />
-                )}
-              </Box>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
-    </Fade>
-  );
-});
-
-ResultView.displayName = 'ResultView';
-
-// ================= 主页面组件 =================
 export default function TimestampPage() {
-  const [mode, setMode] = useState<'ts2dt' | 'dt2ts'>('ts2dt');
-  const [tsInput, setTsInput] = useState(() => String(Date.now()));
-  const [dtInput, setDtInput] = useState(() => dayjs().format(DATE_FORMAT));
-  const [unit, setUnit] = useState<UnitType>('ms');
-  const [zone, setZone] = useState<ZoneType>('Asia/Shanghai');
-  const [result, setResult] = useState('');
-  const [error, setError] = useState('');
   const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
-
-  const convert = useCallback(() => {
-    if (mode === 'ts2dt') {
-      const rawInput = tsInput.trim();
-      if (!rawInput) return;
-      const num = Number(rawInput);
-      if (isNaN(num)) {
-        setError('无效数字');
-        return;
-      }
-      const d = unit === 'ms' ? dayjs(num) : dayjs.unix(num);
-      if (!d.isValid()) {
-        setError('无效时间戳');
-        return;
-      }
-      setError('');
-      setResult(d.tz(zone).format(DATE_FORMAT));
-    } else {
-      const rawInput = dtInput.trim();
-      if (!rawInput) return;
-      const d = dayjs.tz(rawInput, DATE_FORMAT, zone);
-      if (!d.isValid()) {
-        setError('格式错误');
-        return;
-      }
-      setError('');
-      const ms = d.valueOf();
-      setResult(unit === 'ms' ? String(ms) : String(Math.floor(ms / 1000)));
-    }
-  }, [mode, tsInput, dtInput, unit, zone]);
-
-  useEffect(() => {
-    const timer = setTimeout(convert, 400);
-    return () => clearTimeout(timer);
-  }, [convert]);
-
-  const handleUseNow = useCallback(
-    (now: number) => {
-      if (mode === 'ts2dt') {
-        setTsInput(String(unit === 'ms' ? now : Math.floor(now / 1000)));
-      } else {
-        setDtInput(dayjs(now).tz(zone).format(DATE_FORMAT));
-      }
-    },
-    [mode, unit, zone],
-  );
+  const {
+    mode,
+    tsInput,
+    dtInput,
+    unit,
+    zone,
+    result,
+    error,
+    setMode,
+    setTsInput,
+    setDtInput,
+    setUnit,
+    setZone,
+    handleUseNow,
+    convert,
+  } = useTimestampConverter();
 
   return (
-    <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2 }}>
+    <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
+      <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
         {/* Header with Icon */}
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
           <Box
             sx={{
               p: 1,
               borderRadius: 2.5,
-              bgcolor: alpha('#2196f3', 0.1),
-              color: 'primary.main',
+              bgcolor: alpha(timestampPageStyles.primaryColor, 0.1),
+              color: timestampPageStyles.primaryColor,
               display: 'flex',
             }}
           >
@@ -420,11 +103,7 @@ export default function TimestampPage() {
           {(['ts2dt', 'dt2ts'] as const).map((m) => (
             <Box
               key={m}
-              onClick={() => {
-                setMode(m);
-                setError('');
-                setResult('');
-              }}
+              onClick={() => setMode(m)}
               sx={{
                 flex: 1,
                 py: 1,
@@ -446,7 +125,7 @@ export default function TimestampPage() {
         {/* Input Area */}
         <Stack spacing={2} sx={{ mb: 3 }}>
           <TextField
-            placeholder={mode === 'ts2dt' ? '输入时间戳...' : DATE_FORMAT}
+            placeholder={mode === 'ts2dt' ? '输入时间戳...' : 'YYYY-MM-DD HH:mm:ss'}
             value={mode === 'ts2dt' ? tsInput : dtInput}
             onChange={(e) => {
               const val = e.target.value;
@@ -455,7 +134,6 @@ export default function TimestampPage() {
               } else {
                 setDtInput(val);
               }
-              setError('');
             }}
             error={!!error}
             helperText={error}
@@ -502,7 +180,7 @@ export default function TimestampPage() {
             <Select
               fullWidth
               value={zone}
-              onChange={(e) => setZone(e.target.value as ZoneType)}
+              onChange={(e) => setZone(e.target.value as typeof zone)}
               sx={{ ...timestampPageStyles.INPUT_STYLE, flex: 1 }}
               MenuProps={{
                 PaperProps: {
@@ -533,7 +211,7 @@ export default function TimestampPage() {
             boxShadow: 'none',
             '&:hover': {
               bgcolor: 'primary.dark',
-              boxShadow: `0 8px 24px ${alpha('#2196f3', 0.2)}`,
+              boxShadow: `0 8px 24px ${alpha(timestampPageStyles.primaryColor, 0.2)}`,
             },
           }}
         >
