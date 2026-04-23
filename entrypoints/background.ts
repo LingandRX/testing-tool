@@ -41,6 +41,33 @@ export default defineBackground(() => {
         } else {
           // 从扩展其他部分发送的消息
           console.log('收到来自扩展的消息:', message.action);
+
+          // 处理刷新标签页请求
+          if (message.action === 'reloadTab' && message.tabId !== undefined) {
+            const tabId = message.tabId;
+            const delay = message.delay || 0;
+
+            const executeReload = () => {
+              chrome.tabs
+                .reload(tabId)
+                .then(() => {
+                  console.log('标签页刷新成功:', tabId);
+                })
+                .catch((err) => {
+                  console.error('刷新标签页失败:', err.message);
+                });
+            };
+
+            if (delay > 0) {
+              setTimeout(executeReload, delay);
+            } else {
+              executeReload();
+            }
+
+            sendResponse({ success: true, message: '刷新请求已接收' });
+            return;
+          }
+
           sendResponse({ success: true, message: '消息已收到' });
         }
       } catch (error) {
