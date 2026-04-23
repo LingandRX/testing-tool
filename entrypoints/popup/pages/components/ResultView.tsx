@@ -4,13 +4,14 @@ import dayjs from '@/utils/dayjs';
 import CopyButton from '@/components/CopyButton';
 import { DATE_FORMAT, timestampPageStyles } from '@/config/pageTheme';
 import type { UnitType } from '@/config/pageTheme';
+import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
 interface ResultViewProps {
   result: string;
   mode: 'ts2dt' | 'dt2ts';
   unit: UnitType;
   zone: string;
-  showMessage?: (message: string, options?: { severity: 'success' | 'error' }) => void;
+  showMessage?: (message: string, options?: SnackbarOptions) => void;
 }
 
 const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: ResultViewProps) => {

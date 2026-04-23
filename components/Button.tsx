@@ -2,6 +2,12 @@ import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/materia
 
 export type ButtonProps = MuiButtonProps;
 
+/**
+ * 按钮组件
+ * @param sx 自定义样式
+ * @param props 其他按钮属性
+ * @returns 按钮组件
+ */
 export function Button({ sx = [], ...props }: ButtonProps) {
   return (
     <MuiButton
