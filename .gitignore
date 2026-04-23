@@ -27,3 +27,4 @@ stats-*.json
 *.sw?
 
 .trae/*
+.workbuddy/*
