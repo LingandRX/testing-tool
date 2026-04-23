@@ -4,6 +4,9 @@ import { FormFieldInfo, FillMode } from './dummyDataGenerator';
  * 消息动作类型
  */
 export enum MessageAction {
+  // 标签页操作
+  RELOAD_TAB = 'reloadTab',
+
   // 表单相关操作
   SCAN_FORM_FIELDS = 'scanFormFields',
   FILL_VALID_DATA = 'fillValidData',
@@ -22,7 +25,9 @@ export enum MessageAction {
  * 消息载荷接口
  */
 export interface MessagePayload {
-  action: MessageAction;
+  action: MessageAction | string;
+  tabId?: number;
+  delay?: number;
   fields?: Omit<FormFieldInfo, 'element'>[];
   mode?: FillMode;
   includeHidden?: boolean;

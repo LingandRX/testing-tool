@@ -11,26 +11,26 @@ const RESTRICTED_PROTOCOLS = [
 ] as const;
 
 export async function getCurrentTab() {
-  // First, try the active tab in the last focused window (works for standard popups and side panels)
-  const [lastFocusedTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  // For popup pages, we need to get the active tab from the browser window that triggered the popup.
+  // We should ONLY care about the currently active tab in the last focused window.
+  // If it's a restricted URL, we return it anyway and let the caller handle the error display.
 
-  // If the tab is valid and NOT an extension page/restricted URL, use it
-  if (lastFocusedTab && !isRestrictedUrl(lastFocusedTab.url)) {
-    return lastFocusedTab;
-  }
-
-  // Fallback: If we're in a standalone extension window (which is focused),
-  // find the active tab in the most recently focused 'normal' browser window.
-  const [normalTab] = await chrome.tabs.query({
+  const [tab] = await chrome.tabs.query({
     active: true,
-    windowType: 'normal',
     lastFocusedWindow: true,
   });
-  if (normalTab) return normalTab;
 
-  // Final fallback: any active normal tab (if multiple windows exist, it returns all active tabs)
-  const normalTabs = await chrome.tabs.query({ active: true, windowType: 'normal' });
-  return normalTabs[0];
+  if (tab) {
+    return tab;
+  }
+
+  // Fallback for cases where lastFocusedWindow might not work as expected (e.g. certain sidepanel scenarios)
+  const [fallbackTab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+
+  return fallbackTab;
 }
 
 export function isRestrictedUrl(url?: string): boolean {
@@ -42,7 +42,11 @@ export async function getCookieSize(url: string): Promise<number> {
   try {
     const cookies = await chrome.cookies.getAll({ url });
     // 估算：名称 + 值 + 域名 + 路径 的长度
-    return cookies.reduce((acc, c) => acc + c.name.length + c.value.length + (c.domain?.length || 0) + (c.path?.length || 0), 0);
+    return cookies.reduce(
+      (acc, c) =>
+        acc + c.name.length + c.value.length + (c.domain?.length || 0) + (c.path?.length || 0),
+      0,
+    );
   } catch (error) {
     console.error('Failed to get cookie size:', error);
     return 0;
@@ -74,7 +78,10 @@ export async function getSessionStorageSize(tabId: number): Promise<number> {
       target: { tabId },
       func: () => {
         try {
-          return Object.entries(sessionStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+          return Object.entries(sessionStorage).reduce(
+            (acc, [k, v]) => acc + k.length + v.length,
+            0,
+          );
         } catch {
           return 0;
         }
@@ -172,8 +179,10 @@ export async function clearCookies(url: string): Promise<StorageCleanResult> {
   try {
     const cookies = await chrome.cookies.getAll({ url });
     for (const cookie of cookies) {
+      const protocol = cookie.secure ? 'https:' : 'http:';
+      const cookieUrl = `${protocol}//${cookie.domain}${cookie.path}`;
       await chrome.cookies.remove({
-        url,
+        url: cookieUrl,
         name: cookie.name,
         storeId: cookie.storeId,
       });
@@ -233,15 +242,32 @@ export async function injectClearIndexedDB(tabId: number): Promise<StorageCleanR
           for (const db of databases) {
             if (db.name) {
               const dbName = db.name as string;
-              await new Promise<void>((resolve, reject) => {
-                const deleteReq = indexedDB.deleteDatabase(dbName);
-                deleteReq.onblocked = () => {
-                  console.warn('IndexedDB delete blocked:', dbName);
-                };
-                deleteReq.onsuccess = () => resolve();
-                deleteReq.onerror = () => reject();
-              });
-              count++;
+              try {
+                await new Promise<void>((resolve, reject) => {
+                  const deleteReq = indexedDB.deleteDatabase(dbName);
+                  const timeout = setTimeout(() => {
+                    console.warn('IndexedDB delete timeout:', dbName);
+                    resolve(); // Timeout, move to next
+                  }, 5000);
+
+                  deleteReq.onblocked = () => {
+                    console.warn('IndexedDB delete blocked:', dbName);
+                    clearTimeout(timeout);
+                    resolve(); // Blocked, move to next
+                  };
+                  deleteReq.onsuccess = () => {
+                    clearTimeout(timeout);
+                    resolve();
+                  };
+                  deleteReq.onerror = () => {
+                    clearTimeout(timeout);
+                    reject(new Error(`Failed to delete ${dbName}`));
+                  };
+                });
+                count++;
+              } catch (e) {
+                console.error('Delete DB error:', e);
+              }
             }
           }
           return { count };
@@ -287,9 +313,7 @@ export async function injectClearCacheStorage(tabId: number): Promise<StorageCle
   }
 }
 
-export async function injectUnregisterServiceWorkers(
-  tabId: number,
-): Promise<StorageCleanResult> {
+export async function injectUnregisterServiceWorkers(tabId: number): Promise<StorageCleanResult> {
   try {
     const [result] = await chrome.scripting.executeScript({
       target: { tabId },
