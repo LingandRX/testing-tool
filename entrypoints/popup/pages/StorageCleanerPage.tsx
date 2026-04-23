@@ -11,7 +11,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 import CleaningResult from './components/CleaningResult';
 
 export default function StorageCleanerPage() {
-  const { snackbarProps } = useSnackbar();
+  const { snackbarProps, showMessage } = useSnackbar();
   const {
     domain,
     error,
@@ -30,7 +30,7 @@ export default function StorageCleanerPage() {
     handleOptionChange,
     handleSelectAll,
     handleClean,
-  } = useStorageCleaner();
+  } = useStorageCleaner({ showMessage });
 
   if (isInitializing) {
     return (

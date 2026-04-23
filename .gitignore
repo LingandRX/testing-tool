@@ -25,3 +25,5 @@ stats-*.json
 *.njsproj
 *.sln
 *.sw?
+
+.trae/*
