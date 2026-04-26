@@ -782,20 +782,58 @@ export function fillFieldWithInjector(
 }
 
 /**
- * 批量填充选中的字段
+ * 批量填充选中的字段（支持单字段模式覆盖）
  */
-export function fillSelectedFields(fields: FormFieldInfo[], mode: FillMode): number {
+export function fillSelectedFields(
+  fields: Array<FormFieldInfo & { useInvalidData?: boolean }>,
+  defaultMode: FillMode,
+): number {
   let filledCount = 0;
 
   fields.forEach((field) => {
     if (field.isSelected) {
-      const value = field.generatedValue || generateValueByFieldType(field.fieldType, mode);
+      const mode = field.useInvalidData
+        ? FillMode.INVALID
+        : field.useInvalidData === false
+          ? FillMode.VALID
+          : defaultMode;
+      // 始终根据当前 fieldType 重新生成值，确保类型变更生效
+      const value = generateValueByFieldType(field.fieldType, mode);
       fillFieldWithInjector(field.element, value);
       filledCount++;
     }
   });
 
   return filledCount;
+}
+
+/**
+ * 闪烁字段（用于定位）
+ */
+export function flashField(element: HTMLElement): void {
+  let flashCount = 0;
+  const maxFlashes = 4;
+  const originalStyle =
+    element.getAttribute('data-original-style') || element.getAttribute('style') || '';
+  element.setAttribute('data-original-style', originalStyle);
+
+  const flash = () => {
+    if (flashCount >= maxFlashes) {
+      unhighlightField(element);
+      return;
+    }
+    if (flashCount % 2 === 0) {
+      element.style.outline = '3px solid #4caf50';
+      element.style.outlineOffset = '2px';
+      element.style.transition = 'outline 0.3s ease-in-out';
+    } else {
+      element.style.outline = '';
+    }
+    flashCount++;
+    setTimeout(flash, 300);
+  };
+
+  flash();
 }
 
 /**
