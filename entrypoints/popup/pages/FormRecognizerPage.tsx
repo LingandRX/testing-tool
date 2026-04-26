@@ -4,13 +4,9 @@ import InputIcon from '@mui/icons-material/Input';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { dashboardPageStyles, formRecognizerPageStyles } from '@/config/pageTheme';
 import { MessageAction, sendMessageToContent, injectContentScript } from '@/utils/messages';
-import { DataTemplateManager, type DataTemplate } from '@/utils/dataTemplate';
 import FieldList from '@/components/FieldList';
-import OperationHistory from '@/components/OperationHistory';
-import TemplateManager from '@/components/TemplateManager';
 import MainActions from '@/components/MainActions';
 import OptionsPanel from '@/components/OptionsPanel';
-import FeatureDescription from '@/components/FeatureDescription';
 
 // 字段数据接口
 interface FieldData {
@@ -32,18 +28,6 @@ const FormRecognizerPage = () => {
   const [fields, setFields] = useState<FieldData[]>([]);
   const [scanning, setScanning] = useState(false);
   const [showFields, setShowFields] = useState(false);
-  const [operationHistory, setOperationHistory] = useState<
-    Array<{
-      time: string;
-      type: string;
-      content: string;
-      result: string;
-    }>
-  >([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [templates, setTemplates] = useState<DataTemplate[]>([]);
-  const [showTemplates, setShowTemplates] = useState(false);
-  const [templateLoading, setTemplateLoading] = useState(false);
 
   // 扫描表单字段
   const handleScanFields = async () => {
@@ -62,7 +46,6 @@ const FormRecognizerPage = () => {
       if (response.success && response.fields) {
         setFields(response.fields as FieldData[]);
         showMessage(`扫描完成，发现 ${response.totalCount} 个可填充字段`, { severity: 'success' });
-        addOperationHistory('扫描', `扫描表单字段，发现 ${response.totalCount} 个字段`, '成功');
       } else {
         showMessage(response.message || '扫描失败', { severity: 'error' });
       }
@@ -72,75 +55,6 @@ const FormRecognizerPage = () => {
     } finally {
       setScanning(false);
     }
-  };
-
-  // 添加操作历史记录
-  const addOperationHistory = (type: string, content: string, result: string) => {
-    const newEntry = {
-      time: new Date().toLocaleString('zh-CN'),
-      type,
-      content,
-      result,
-    };
-    setOperationHistory((prev) => [newEntry, ...prev].slice(0, 50)); // 最多保留50条记录
-  };
-
-  // 加载模板列表
-  const loadTemplates = async () => {
-    setTemplateLoading(true);
-    try {
-      const allTemplates = await DataTemplateManager.getAllTemplates();
-      setTemplates(allTemplates);
-    } catch (error) {
-      console.error('加载模板失败:', error);
-      showMessage('加载模板失败', { severity: 'error' });
-    } finally {
-      setTemplateLoading(false);
-    }
-  };
-
-  // 导出模板
-  const handleExportTemplates = async () => {
-    const allTemplates = await DataTemplateManager.getAllTemplates();
-    if (allTemplates.length === 0) {
-      showMessage('没有可导出的模板', { severity: 'warning' });
-      return;
-    }
-    const jsonStr = DataTemplateManager.exportTemplates(allTemplates);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `templates_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showMessage(`已导出 ${allTemplates.length} 个模板`, { severity: 'success' });
-    addOperationHistory('导出', `导出 ${allTemplates.length} 个模板`, '成功');
-  };
-
-  // 导入模板
-  const handleImportTemplates = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const content = event.target?.result as string;
-        const success = await DataTemplateManager.importTemplates(content);
-        if (success) {
-          showMessage('模板导入成功', { severity: 'success' });
-          addOperationHistory('导入', '导入模板', '成功');
-          loadTemplates();
-        } else {
-          showMessage('模板导入失败，请检查文件格式', { severity: 'error' });
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
   };
 
   const sendMessageWithHandler = async (
@@ -202,17 +116,14 @@ const FormRecognizerPage = () => {
 
   const handleFillValidData = () => {
     sendMessageWithHandler(MessageAction.FILL_VALID_DATA, { includeHidden });
-    addOperationHistory('填充', '填充有效数据', '成功');
   };
 
   const handleFillInvalidData = () => {
     sendMessageWithHandler(MessageAction.FILL_INVALID_DATA, { includeHidden });
-    addOperationHistory('填充', '填充异常数据', '成功');
   };
 
   const handleClearAllFields = () => {
     sendMessageWithHandler(MessageAction.CLEAR_ALL_FIELDS);
-    addOperationHistory('清空', '清空所有表单字段', '成功');
   };
 
   return (
@@ -262,24 +173,6 @@ const FormRecognizerPage = () => {
         />
 
         <OptionsPanel includeHidden={includeHidden} onIncludeHiddenChange={setIncludeHidden} />
-
-        <OperationHistory
-          history={operationHistory}
-          showHistory={showHistory}
-          onToggleShowHistory={() => setShowHistory(!showHistory)}
-        />
-
-        <TemplateManager
-          templates={templates}
-          showTemplates={showTemplates}
-          templateLoading={templateLoading}
-          onToggleShowTemplates={() => setShowTemplates(!showTemplates)}
-          onLoadTemplates={loadTemplates}
-          onExportTemplates={handleExportTemplates}
-          onImportTemplates={handleImportTemplates}
-        />
-
-        <FeatureDescription />
 
         <GlobalSnackbar {...snackbarProps} />
       </Container>
