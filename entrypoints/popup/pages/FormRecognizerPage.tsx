@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   Box,
-  Typography,
   Container,
   Button,
   CircularProgress,
@@ -18,6 +17,7 @@ import { FillMode } from '@/utils/dummyDataGenerator';
 import FieldList from '@/components/FieldList';
 import { useStorageState } from '@/utils/useStorageState';
 import { FieldTypePreferences } from '@/types/storage';
+import PageHeader from '@/components/PageHeader';
 
 // 字段数据接口
 interface FieldData {
@@ -334,34 +334,30 @@ const FormRecognizerPage = () => {
   return (
     <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 4 }}>
       <Container maxWidth="sm" sx={{ py: 3, px: 2, bgcolor: '#f5f5f5' }}>
-        <Box sx={{ mb: 4 }}>
-          <Box
-            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Dummy Data Generator
-            </Typography>
-            <Button
-              size="small"
-              startIcon={<OpenInNewIcon />}
-              onClick={handleOpenSidePanel}
-              sx={{
-                textTransform: 'none',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                opacity: sidePanelOpen ? 0 : 1,
-                transform: sidePanelOpen ? 'scale(0.8)' : 'scale(1)',
-                pointerEvents: sidePanelOpen ? 'none' : 'auto',
-                visibility: sidePanelOpen ? 'hidden' : 'visible',
-                position: 'relative',
-              }}
-            >
-              侧边栏
-            </Button>
-          </Box>
-          <Typography variant="body2" color="text.secondary">
-            一键填充表单测试数据，提升开发和测试效率
-          </Typography>
-        </Box>
+        {/* Header */}
+        <PageHeader
+          title="表单测试数据填充器"
+          subtitle="一键填充表单测试数据，提升开发和测试效率"
+          icon={<InputIcon />}
+          sx={{ mb: 2.5 }}
+        />
+
+        <Button
+          size="small"
+          startIcon={<OpenInNewIcon />}
+          onClick={handleOpenSidePanel}
+          sx={{
+            textTransform: 'none',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            opacity: sidePanelOpen ? 0 : 1,
+            transform: sidePanelOpen ? 'scale(0.8)' : 'scale(1)',
+            pointerEvents: sidePanelOpen ? 'none' : 'auto',
+            visibility: sidePanelOpen ? 'hidden' : 'visible',
+            position: 'relative',
+          }}
+        >
+          侧边栏
+        </Button>
 
         {/* 扫描按钮 */}
         <Button

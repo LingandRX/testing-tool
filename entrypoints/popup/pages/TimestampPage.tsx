@@ -1,16 +1,8 @@
-import {
-  TextField,
-  Select,
-  MenuItem,
-  Stack,
-  Typography,
-  Box,
-  Container,
-  alpha,
-} from '@mui/material';
+import { TextField, Select, MenuItem, Stack, Box, Container, alpha } from '@mui/material';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
+import PageHeader from '@/components/PageHeader';
 import { ZONES, globalStyles, timestampPageStyles } from '@/config/pageTheme';
 import LiveClock from './components/LiveClock';
 import ResultView from './components/ResultView';
@@ -38,32 +30,13 @@ export default function TimestampPage() {
   return (
     <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
       <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
-        {/* Header with Icon */}
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
-          <Box
-            sx={{
-              p: 1,
-              borderRadius: 2.5,
-              bgcolor: alpha(timestampPageStyles.primaryColor, 0.1),
-              color: timestampPageStyles.primaryColor,
-              display: 'flex',
-            }}
-          >
-            <AccessTimeIcon sx={{ fontSize: 20 }} />
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            <Typography
-              variant="subtitle1"
-              fontWeight={900}
-              sx={{ letterSpacing: '-0.5px', lineHeight: 1.2 }}
-            >
-              时间戳转换
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-              Unix 毫秒数转换与格式化
-            </Typography>
-          </Box>
-        </Stack>
+        {/* Header */}
+        <PageHeader
+          title="时间戳转换"
+          subtitle="Unix 毫秒数转换与格式化"
+          icon={<AccessTimeIcon />}
+          sx={{ mb: 2.5 }}
+        />
 
         {/* Live Clock Card */}
         <LiveClock
