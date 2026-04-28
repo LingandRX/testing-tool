@@ -34,7 +34,7 @@ const QrCodePage = () => {
 
   return (
     <Box sx={{ minHeight: '100%', pb: 3, bgcolor: dashboardPageStyles.backgroundColor }}>
-      <Container sx={{ py: 2, maxWidth: 400, bgcolor: dashboardPageStyles.backgroundColor }}>
+      <Container sx={{ py: 2, maxWidth: 400 }}>
         <PageHeader
           title="二维码工具"
           subtitle="生成和解析二维码"

@@ -176,26 +176,7 @@ export const qrCodePageStyles = {
   successDark: THEME_COLORS.successDark,
   white: THEME_COLORS.white,
   black: THEME_COLORS.black,
-  INPUT_STYLE: {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 3,
-      '& fieldset': {
-        borderColor: THEME_COLORS.success,
-      },
-      '&:hover fieldset': {
-        borderColor: THEME_COLORS.success,
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: THEME_COLORS.success,
-      },
-    },
-    '& .MuiInputLabel-root': {
-      fontSize: '0.85rem',
-      fontWeight: 700,
-      color: 'text.secondary',
-      '&.Mui-focused': { color: THEME_COLORS.success },
-    },
-  },
+  INPUT_STYLE: {},
 } as const;
 
 /**
