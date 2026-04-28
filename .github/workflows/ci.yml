@@ -79,7 +79,7 @@ jobs:
     needs: [lint, typecheck, test]
     strategy:
       matrix:
-        browser: [chrome, firefox]
+        browser: [chrome]
       fail-fast: false
     steps:
       - name: Checkout
@@ -97,7 +97,3 @@ jobs:
       - name: Build (Chrome)
         if: matrix.browser == 'chrome'
         run: npm run build
-
-      - name: Build (Firefox)
-        if: matrix.browser == 'firefox'
-        run: npm run build:firefox
