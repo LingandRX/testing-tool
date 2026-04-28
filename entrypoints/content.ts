@@ -6,6 +6,7 @@ import {
   scanFormFields,
   highlightField,
   unhighlightField,
+  flashField,
   FillMode,
   type FormFieldInfo,
 } from '@/utils/dummyDataGenerator';
@@ -54,9 +55,19 @@ export default defineContentScript({
               break;
             case MessageAction.FILL_SELECTED_FIELDS: {
               // 使用之前扫描时存储的字段，因为它们包含element属性
-              const fieldIds = (message.fields || []).filter((f) => f.isSelected).map((f) => f.id);
-              const fieldsToFill = currentFields.filter((f) => fieldIds.includes(f.id));
-              fieldsToFill.forEach((f) => (f.isSelected = true));
+              const incomingFields = message.fields || [];
+              const fieldsToFill = currentFields.map((field) => {
+                const incomingField = incomingFields.find((f) => f.id === field.id);
+                if (incomingField) {
+                  return {
+                    ...field,
+                    fieldType: incomingField.fieldType,
+                    isSelected: incomingField.isSelected,
+                    useInvalidData: (incomingField as { useInvalidData?: boolean }).useInvalidData,
+                  };
+                }
+                return field;
+              });
               const count = fillSelectedFields(fieldsToFill, message.mode || FillMode.VALID);
               sendResponse({ success: true, message: `已填充 ${count} 个字段` });
               break;
@@ -104,6 +115,17 @@ export default defineContentScript({
               });
               sendResponse({ success: true });
               break;
+            case MessageAction.FLASH_FIELD: {
+              const fieldId = message.fieldId;
+              const field = currentFields.find((f) => f.id === fieldId);
+              if (field) {
+                flashField(field.element);
+                sendResponse({ success: true });
+              } else {
+                sendResponse({ success: false, message: '未找到字段' });
+              }
+              break;
+            }
             default:
               sendResponse({ success: false, message: '未知操作' });
           }
