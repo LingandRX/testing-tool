@@ -58,6 +58,9 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
             mb: 2.5,
             border: '1px solid',
             borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
           <Typography
@@ -78,12 +81,6 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
             tooltip="复制结果"
             size="small"
             color={timestampPageStyles.primaryColor}
-            style={{
-              position: 'absolute',
-              right: 8,
-              top: '50%',
-              transform: 'translateY(-50%)',
-            }}
             showMessage={showMessage}
           />
         </Box>
@@ -96,7 +93,6 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
             borderRadius: 4,
             border: '1px solid',
             borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
-            mt: 2,
           }}
         >
           {[
@@ -106,11 +102,11 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
           ].map((item) => (
             <Box
               key={item.label}
-              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 1 }}
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
               <Typography
                 variant="caption"
-                sx={{ color: 'text.disabled', fontWeight: 700, fontSize: '0.65rem' }}
+                sx={{ color: 'text.disabled', fontWeight: 700, fontSize: '0.65rem', pr: 4 }}
               >
                 {item.label}
               </Typography>

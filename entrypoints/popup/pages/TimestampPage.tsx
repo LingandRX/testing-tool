@@ -154,7 +154,7 @@ export default function TimestampPage() {
               fullWidth
               value={zone}
               onChange={(e) => setZone(e.target.value as typeof zone)}
-              sx={{ ...timestampPageStyles.INPUT_STYLE, flex: 1 }}
+              sx={{ ...timestampPageStyles.INPUT_STYLE, flex: 1, borderRadius: 4 }}
               MenuProps={{
                 PaperProps: {
                   sx: { borderRadius: 3, mt: 1, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' },
