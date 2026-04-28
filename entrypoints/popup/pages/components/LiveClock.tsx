@@ -4,12 +4,13 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CopyButton from '@/components/CopyButton';
 import { timestampPageStyles } from '@/config/pageTheme';
 import type { UnitType } from '@/config/pageTheme';
+import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
 interface LiveClockProps {
   unit: UnitType;
   onUseNow: (val: number) => void;
   onUnitChange: (u: UnitType) => void;
-  showMessage?: (message: string, options?: { severity: 'success' | 'error' }) => void;
+  showMessage?: (message: string, options?: SnackbarOptions) => void;
 }
 
 const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: LiveClockProps) => {

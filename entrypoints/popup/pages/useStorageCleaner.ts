@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
+import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 import type {
   StorageCleanerOptions,
   CleaningResult,
@@ -57,10 +58,7 @@ export interface UseStorageCleanerReturn {
 }
 
 export interface UseStorageCleanerOptions {
-  showMessage: (
-    message: string,
-    options?: { severity?: 'success' | 'warning' | 'error' | 'info' },
-  ) => void;
+  showMessage: (message: string, options?: SnackbarOptions) => void;
 }
 
 export function useStorageCleaner({

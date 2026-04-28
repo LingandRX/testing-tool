@@ -1,6 +1,13 @@
 import { FormFieldInfo, FillMode } from './dummyDataGenerator';
 
 /**
+ * 字段数据接口（用于消息传递）
+ */
+interface MessageFieldData extends Omit<FormFieldInfo, 'element'> {
+  useInvalidData?: boolean;
+}
+
+/**
  * 消息动作类型
  */
 export enum MessageAction {
@@ -19,6 +26,9 @@ export enum MessageAction {
   UNHIGHLIGHT_FIELD = 'unhighlightField',
   HIGHLIGHT_ALL_FIELDS = 'highlightAllFields',
   UNHIGHLIGHT_ALL_FIELDS = 'unhighlightAllFields',
+
+  // 字段定位/闪烁
+  FLASH_FIELD = 'flashField',
 }
 
 /**
@@ -28,7 +38,7 @@ export interface MessagePayload {
   action: MessageAction | string;
   tabId?: number;
   delay?: number;
-  fields?: Omit<FormFieldInfo, 'element'>[];
+  fields?: MessageFieldData[];
   mode?: FillMode;
   includeHidden?: boolean;
   fieldId?: string;

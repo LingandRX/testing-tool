@@ -6,7 +6,6 @@ import OpenUrlPage from '@/entrypoints/popup/pages/OpenUrlPage';
 import OpenUrlViewerPage from '@/entrypoints/popup/pages/OpenUrlViewerPage';
 import QrCodePage from '@/entrypoints/popup/pages/QrCodePage';
 import FormRecognizerPage from '@/entrypoints/popup/pages/FormRecognizerPage';
-import FormFillSidePanel from '@/entrypoints/sidepanel/pages/FormFillSidePanel';
 
 export interface RouteConfig {
   key: PageType;
@@ -76,7 +75,7 @@ export const ROUTES: RouteConfig[] = [
     defaultVisible: true,
     components: {
       popup: FormRecognizerPage,
-      sidepanel: FormFillSidePanel,
+      sidepanel: FormRecognizerPage,
       detached: FormRecognizerPage,
     },
   },

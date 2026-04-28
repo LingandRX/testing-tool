@@ -1,4 +1,4 @@
-import { faker, fakerZH_CN } from '@faker-js/faker';
+import { fakerZH_CN as faker } from '@faker-js/faker';
 
 /**
  * 表单字段信息接口
@@ -34,7 +34,7 @@ export class DummyDataGenerator {
    * 生成随机中文姓名
    */
   static generateChineseName(): string {
-    return fakerZH_CN.person.fullName();
+    return faker.person.fullName();
   }
 
   /**
@@ -45,17 +45,20 @@ export class DummyDataGenerator {
   }
 
   /**
-   * 生成随机手机号
+   * 生成随机手机号（中国格式）
    */
   static generatePhoneNumber(): string {
-    return fakerZH_CN.phone.number();
+    const prefix =
+      '1' + faker.string.numeric({ length: 1, allowLeadingZeros: false, exclude: ['0', '1', '2'] });
+    const suffix = faker.string.numeric({ length: 9, allowLeadingZeros: true });
+    return prefix + suffix;
   }
 
   /**
    * 生成有效邮箱
    */
   static generateValidEmail(): string {
-    return fakerZH_CN.internet.email();
+    return faker.internet.email();
   }
 
   /**
@@ -77,14 +80,14 @@ export class DummyDataGenerator {
    * 生成短文本
    */
   static generateShortText(): string {
-    return fakerZH_CN.lorem.sentence({ min: 3, max: 6 });
+    return faker.lorem.sentence({ min: 3, max: 6 });
   }
 
   /**
    * 生成长文本
    */
   static generateLongText(): string {
-    return fakerZH_CN.lorem.paragraphs(5);
+    return faker.lorem.paragraphs(5);
   }
 
   /**
@@ -106,42 +109,42 @@ export class DummyDataGenerator {
    * 生成随机数字
    */
   static generateNumber(): number {
-    return fakerZH_CN.number.int(10000);
+    return faker.number.int(10000);
   }
 
   /**
    * 生成随机浮点数
    */
   static generateFloat(): number {
-    return fakerZH_CN.number.float({ max: 10000 });
+    return faker.number.float({ max: 10000 });
   }
 
   /**
    * 生成随机负数
    */
   static generateNegativeNumber(): number {
-    return -fakerZH_CN.number.int(10000);
+    return -faker.number.int(10000);
   }
 
   /**
    * 生成随机日期
    */
   static generateDate(): string {
-    return fakerZH_CN.date.recent({ days: 365 }).toISOString().split('T')[0];
+    return faker.date.recent({ days: 365 }).toISOString().split('T')[0];
   }
 
   /**
    * 生成过去的日期
    */
   static generatePastDate(): string {
-    return fakerZH_CN.date.past({ years: 1 }).toISOString().split('T')[0];
+    return faker.date.past({ years: 1 }).toISOString().split('T')[0];
   }
 
   /**
    * 生成未来的日期
    */
   static generateFutureDate(): string {
-    return fakerZH_CN.date.future({ years: 1 }).toISOString().split('T')[0];
+    return faker.date.future({ years: 1 }).toISOString().split('T')[0];
   }
 
   /**
@@ -779,20 +782,58 @@ export function fillFieldWithInjector(
 }
 
 /**
- * 批量填充选中的字段
+ * 批量填充选中的字段（支持单字段模式覆盖）
  */
-export function fillSelectedFields(fields: FormFieldInfo[], mode: FillMode): number {
+export function fillSelectedFields(
+  fields: Array<FormFieldInfo & { useInvalidData?: boolean }>,
+  defaultMode: FillMode,
+): number {
   let filledCount = 0;
 
   fields.forEach((field) => {
     if (field.isSelected) {
-      const value = field.generatedValue || generateValueByFieldType(field.fieldType, mode);
+      const mode = field.useInvalidData
+        ? FillMode.INVALID
+        : field.useInvalidData === false
+          ? FillMode.VALID
+          : defaultMode;
+      // 始终根据当前 fieldType 重新生成值，确保类型变更生效
+      const value = generateValueByFieldType(field.fieldType, mode);
       fillFieldWithInjector(field.element, value);
       filledCount++;
     }
   });
 
   return filledCount;
+}
+
+/**
+ * 闪烁字段（用于定位）
+ */
+export function flashField(element: HTMLElement): void {
+  let flashCount = 0;
+  const maxFlashes = 4;
+  const originalStyle =
+    element.getAttribute('data-original-style') || element.getAttribute('style') || '';
+  element.setAttribute('data-original-style', originalStyle);
+
+  const flash = () => {
+    if (flashCount >= maxFlashes) {
+      unhighlightField(element);
+      return;
+    }
+    if (flashCount % 2 === 0) {
+      element.style.outline = '3px solid #4caf50';
+      element.style.outlineOffset = '2px';
+      element.style.transition = 'outline 0.3s ease-in-out';
+    } else {
+      element.style.outline = '';
+    }
+    flashCount++;
+    setTimeout(flash, 300);
+  };
+
+  flash();
 }
 
 /**

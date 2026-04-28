@@ -25,7 +25,7 @@ export default function AutoRefreshToggle({ autoRefresh, onChange }: AutoRefresh
         },
       }}
     >
-      <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.8rem' }}>
+      <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.8rem', px: 1.2 }}>
         清理后自动刷新页面
       </Typography>
       <Switch

@@ -1,3 +1,4 @@
+import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 
 /**
@@ -8,7 +9,7 @@ import { useSnackbar } from '@/components/GlobalSnackbar';
  */
 export const copyToClipboard = async (
   text: string,
-  showMessage?: (message: string, options?: { severity: 'success' | 'error' }) => void,
+  showMessage?: (message: string, options?: SnackbarOptions) => void,
 ): Promise<boolean> => {
   try {
     await navigator.clipboard.writeText(text);

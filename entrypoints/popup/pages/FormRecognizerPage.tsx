@@ -1,16 +1,23 @@
-import { useState, useRef } from 'react';
-import { Box, Typography, Container, Button, CircularProgress } from '@mui/material';
+import { useState, useRef, useEffect } from 'react';
+import {
+  Box,
+  Container,
+  Button,
+  CircularProgress,
+  FormControlLabel,
+  Switch,
+  alpha,
+} from '@mui/material';
 import InputIcon from '@mui/icons-material/Input';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import { dashboardPageStyles, formRecognizerPageStyles } from '@/config/pageTheme';
 import { MessageAction, sendMessageToContent, injectContentScript } from '@/utils/messages';
-import { DataTemplateManager, type DataTemplate } from '@/utils/dataTemplate';
+import { FillMode } from '@/utils/dummyDataGenerator';
 import FieldList from '@/components/FieldList';
-import OperationHistory from '@/components/OperationHistory';
-import TemplateManager from '@/components/TemplateManager';
-import MainActions from '@/components/MainActions';
-import OptionsPanel from '@/components/OptionsPanel';
-import FeatureDescription from '@/components/FeatureDescription';
+import { useStorageState } from '@/utils/useStorageState';
+import { FieldTypePreferences } from '@/types/storage';
+import PageHeader from '@/components/PageHeader';
 
 // 字段数据接口
 interface FieldData {
@@ -22,28 +29,116 @@ interface FieldData {
   value: string;
   isSelected: boolean;
   generatedValue: string;
+  useInvalidData?: boolean;
 }
+
+const DEFAULT_FIELD_TYPE_PREFERENCES: FieldTypePreferences = {};
 
 const FormRecognizerPage = () => {
   const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
-  const [loading, setLoading] = useState(false);
+  const [fillLoading, setFillLoading] = useState(false);
+  const [clearLoading, setClearLoading] = useState(false);
   const [includeHidden, setIncludeHidden] = useState(false);
   const isProcessingRef = useRef(false);
   const [fields, setFields] = useState<FieldData[]>([]);
   const [scanning, setScanning] = useState(false);
   const [showFields, setShowFields] = useState(false);
-  const [operationHistory, setOperationHistory] = useState<
-    Array<{
-      time: string;
-      type: string;
-      content: string;
-      result: string;
-    }>
-  >([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [templates, setTemplates] = useState<DataTemplate[]>([]);
-  const [showTemplates, setShowTemplates] = useState(false);
-  const [templateLoading, setTemplateLoading] = useState(false);
+  const [hoveredFieldId, setHoveredFieldId] = useState<string | null>(null);
+  const [currentDomain, setCurrentDomain] = useState<string>('');
+  const [sidePanelOpen, setSidePanelOpen] = useState(false);
+
+  const [fieldTypePreferences, setFieldTypePreferences] = useStorageState(
+    'formRecognizer/fieldTypePreferences',
+    DEFAULT_FIELD_TYPE_PREFERENCES,
+  );
+
+  // 获取当前域名
+  useEffect(() => {
+    const getActiveTab = async () => {
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab?.url) {
+          const url = new URL(tab.url);
+          setCurrentDomain(url.hostname);
+        }
+      } catch (error) {
+        console.error('获取标签页信息失败:', error);
+      }
+    };
+    getActiveTab();
+  }, []);
+
+  // 检测侧边栏状态
+  useEffect(() => {
+    console.log('开始检测侧边栏状态');
+    const checkSidePanelState = async () => {
+      try {
+        // 检查 chrome.runtime.getContexts 是否可用
+        if (typeof chrome.runtime.getContexts === 'function') {
+          const contexts = await chrome.runtime.getContexts({
+            contextTypes: ['SIDE_PANEL'],
+          });
+          console.log('侧边栏上下文:', contexts);
+          setSidePanelOpen(contexts.length > 0);
+        } else {
+          console.log('chrome.runtime.getContexts 不可用');
+          setSidePanelOpen(false);
+        }
+      } catch (error) {
+        console.error('检测侧边栏状态失败:', error);
+        setSidePanelOpen(false);
+      }
+    };
+
+    // 初始检查
+    checkSidePanelState();
+
+    // 定期检查侧边栏状态（每 500ms）
+    const interval = setInterval(checkSidePanelState, 500);
+
+    console.log('侧边栏状态检测已启动');
+    return () => {
+      console.log('清理侧边栏状态检测');
+      clearInterval(interval);
+    };
+  }, []);
+
+  // 生成字段标识符
+  const getFieldIdentifier = (field: Pick<FieldData, 'label' | 'name' | 'placeholder'>): string => {
+    return field.label || field.name || field.placeholder || 'unknown';
+  };
+
+  // 应用保存的类型偏好
+  const applySavedPreferences = (fields: FieldData[]): FieldData[] => {
+    if (!currentDomain || !(fieldTypePreferences as FieldTypePreferences)[currentDomain]) {
+      return fields;
+    }
+    const prefs = (fieldTypePreferences as FieldTypePreferences)[currentDomain];
+    return fields.map((field) => {
+      const identifier = getFieldIdentifier(field);
+      if (prefs && prefs[identifier]) {
+        return { ...field, fieldType: prefs[identifier] };
+      }
+      return field;
+    });
+  };
+
+  // 保存类型偏好
+  const saveTypePreference = (field: FieldData, newType: string) => {
+    if (!currentDomain) return;
+    const identifier = getFieldIdentifier(field);
+    setFieldTypePreferences((prev) => {
+      const prevPrefs = prev as FieldTypePreferences;
+      const currentDomainPrefs = prevPrefs[currentDomain] || {};
+      return {
+        ...prevPrefs,
+        [currentDomain]: {
+          ...currentDomainPrefs,
+          [identifier]: newType,
+        },
+      } as FieldTypePreferences;
+    });
+  };
 
   // 扫描表单字段
   const handleScanFields = async () => {
@@ -60,9 +155,10 @@ const FormRecognizerPage = () => {
       }
 
       if (response.success && response.fields) {
-        setFields(response.fields as FieldData[]);
+        const fieldsWithPreferences = applySavedPreferences(response.fields as FieldData[]);
+        setFields(fieldsWithPreferences);
+        setShowFields(true);
         showMessage(`扫描完成，发现 ${response.totalCount} 个可填充字段`, { severity: 'success' });
-        addOperationHistory('扫描', `扫描表单字段，发现 ${response.totalCount} 个字段`, '成功');
       } else {
         showMessage(response.message || '扫描失败', { severity: 'error' });
       }
@@ -74,158 +170,194 @@ const FormRecognizerPage = () => {
     }
   };
 
-  // 添加操作历史记录
-  const addOperationHistory = (type: string, content: string, result: string) => {
-    const newEntry = {
-      time: new Date().toLocaleString('zh-CN'),
-      type,
-      content,
-      result,
-    };
-    setOperationHistory((prev) => [newEntry, ...prev].slice(0, 50)); // 最多保留50条记录
-  };
-
-  // 加载模板列表
-  const loadTemplates = async () => {
-    setTemplateLoading(true);
-    try {
-      const allTemplates = await DataTemplateManager.getAllTemplates();
-      setTemplates(allTemplates);
-    } catch (error) {
-      console.error('加载模板失败:', error);
-      showMessage('加载模板失败', { severity: 'error' });
-    } finally {
-      setTemplateLoading(false);
-    }
-  };
-
-  // 导出模板
-  const handleExportTemplates = async () => {
-    const allTemplates = await DataTemplateManager.getAllTemplates();
-    if (allTemplates.length === 0) {
-      showMessage('没有可导出的模板', { severity: 'warning' });
-      return;
-    }
-    const jsonStr = DataTemplateManager.exportTemplates(allTemplates);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `templates_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showMessage(`已导出 ${allTemplates.length} 个模板`, { severity: 'success' });
-    addOperationHistory('导出', `导出 ${allTemplates.length} 个模板`, '成功');
-  };
-
-  // 导入模板
-  const handleImportTemplates = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const content = event.target?.result as string;
-        const success = await DataTemplateManager.importTemplates(content);
-        if (success) {
-          showMessage('模板导入成功', { severity: 'success' });
-          addOperationHistory('导入', '导入模板', '成功');
-          loadTemplates();
-        } else {
-          showMessage('模板导入失败，请检查文件格式', { severity: 'error' });
+  // 更新字段类型
+  const handleFieldTypeChange = (fieldId: string, newType: string) => {
+    setFields((prev) =>
+      prev.map((field) => {
+        if (field.id === fieldId) {
+          const updatedField = {
+            ...field,
+            fieldType: newType,
+            // 清空旧的 generatedValue，保持界面一致性
+            generatedValue: '',
+          };
+          saveTypePreference(field, newType);
+          return updatedField;
         }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
+        return field;
+      }),
+    );
   };
 
-  const sendMessageWithHandler = async (
-    action: MessageAction,
-    payload?: { includeHidden?: boolean },
-  ) => {
-    // 防抖处理：防止快速点击导致多次请求
+  // 切换单个字段的选中状态
+  const handleToggleFieldSelection = (fieldId: string) => {
+    setFields((prev) =>
+      prev.map((field) =>
+        field.id === fieldId ? { ...field, isSelected: !field.isSelected } : field,
+      ),
+    );
+  };
+
+  // 全选/取消全选
+  const handleToggleAllFields = () => {
+    setFields((prev) => {
+      const allSelected = prev.every((f) => f.isSelected);
+      return prev.map((f) => ({ ...f, isSelected: !allSelected }));
+    });
+  };
+
+  // 定位字段（闪烁）
+  const handleLocateField = async (fieldId: string) => {
+    try {
+      const response = await sendMessageToContent(MessageAction.FLASH_FIELD, { fieldId });
+      if (!response.success) {
+        showMessage(response.message || '定位字段失败', { severity: 'error' });
+      }
+    } catch (error) {
+      console.error('定位字段失败:', error);
+    }
+  };
+
+  // 悬停高亮
+  const handleHoverField = async (fieldId: string | null) => {
+    setHoveredFieldId(fieldId);
+    try {
+      if (fieldId) {
+        await sendMessageToContent(MessageAction.HIGHLIGHT_FIELD, { fieldId });
+      } else {
+        await sendMessageToContent(MessageAction.UNHIGHLIGHT_ALL_FIELDS);
+      }
+    } catch (error) {
+      console.error('高亮字段失败:', error);
+    }
+  };
+
+  // 填充选中字段
+  const handleFillSelectedFields = async () => {
     if (isProcessingRef.current) {
       showMessage('操作进行中，请稍候...', { severity: 'warning' });
       return;
     }
 
-    setLoading(true);
+    const selectedCount = fields.filter((f) => f.isSelected).length;
+    if (selectedCount === 0) {
+      showMessage('请先选择要填充的字段', { severity: 'warning' });
+      return;
+    }
+
+    setFillLoading(true);
     isProcessingRef.current = true;
     try {
-      let response = await sendMessageToContent(action, payload);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const messageFields = fields as any;
+      let response = await sendMessageToContent(MessageAction.FILL_SELECTED_FIELDS, {
+        fields: messageFields,
+        mode: FillMode.VALID,
+        includeHidden,
+      });
 
-      // 如果连接失败，尝试注入内容脚本
       if (!response.success && response.message && response.message.includes('无法连接')) {
         showMessage('正在注入内容脚本...', { severity: 'info' });
         const injected = await injectContentScript();
         if (injected) {
-          // 注入成功后再次尝试
-          response = await sendMessageToContent(action, payload);
-        } else {
-          showMessage('内容脚本注入失败，请刷新页面后重试', { severity: 'error' });
-          return;
+          response = await sendMessageToContent(MessageAction.FILL_SELECTED_FIELDS, {
+            fields: messageFields,
+            mode: FillMode.VALID,
+            includeHidden,
+          });
         }
       }
 
       if (response.success) {
-        showMessage(response.message || '操作成功', { severity: 'success' });
+        showMessage(response.message || '填充成功', { severity: 'success' });
       } else {
-        // 增强错误提示信息
-        const errorMsg = response.message || '操作失败';
-        const errorDetails = getErrorDetails(errorMsg);
-        showMessage(errorDetails, { severity: 'error' });
+        showMessage(response.message || '填充失败', { severity: 'error' });
       }
     } catch (error) {
-      console.error('发送消息失败:', error);
+      console.error('填充失败:', error);
       const errorMessage = error instanceof Error ? error.message : '未知错误';
-      showMessage(`操作失败：${errorMessage}，请确保当前页面已加载完成`, { severity: 'error' });
+      showMessage(`填充失败：${errorMessage}，请确保当前页面已加载完成`, { severity: 'error' });
     } finally {
-      setLoading(false);
+      setFillLoading(false);
       isProcessingRef.current = false;
     }
   };
 
-  // 获取详细的错误信息
-  const getErrorDetails = (baseMsg: string): string => {
-    if (baseMsg.includes('标签页')) {
-      return `${baseMsg}，请确保已打开网页页面`;
+  // 清空所有字段
+  const handleClearAllFields = async () => {
+    if (isProcessingRef.current) {
+      showMessage('操作进行中，请稍候...', { severity: 'warning' });
+      return;
     }
-    if (baseMsg.includes('注入')) {
-      return `${baseMsg}，请检查页面是否支持内容脚本`;
+
+    setClearLoading(true);
+    isProcessingRef.current = true;
+    try {
+      let response = await sendMessageToContent(MessageAction.CLEAR_ALL_FIELDS);
+
+      if (!response.success && response.message && response.message.includes('无法连接')) {
+        showMessage('正在注入内容脚本...', { severity: 'info' });
+        const injected = await injectContentScript();
+        if (injected) {
+          response = await sendMessageToContent(MessageAction.CLEAR_ALL_FIELDS);
+        }
+      }
+
+      if (response.success) {
+        showMessage(response.message || '清空成功', { severity: 'success' });
+      } else {
+        showMessage(response.message || '清空失败', { severity: 'error' });
+      }
+    } catch (error) {
+      console.error('清空失败:', error);
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      showMessage(`清空失败：${errorMessage}，请确保当前页面已加载完成`, { severity: 'error' });
+    } finally {
+      setClearLoading(false);
+      isProcessingRef.current = false;
     }
-    return baseMsg;
   };
 
-  const handleFillValidData = () => {
-    sendMessageWithHandler(MessageAction.FILL_VALID_DATA, { includeHidden });
-    addOperationHistory('填充', '填充有效数据', '成功');
+  // 打开侧边栏
+  const handleOpenSidePanel = async () => {
+    try {
+      await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+      showMessage('侧边栏已打开', { severity: 'success' });
+    } catch (error) {
+      console.error('打开侧边栏失败:', error);
+      showMessage('打开侧边栏失败', { severity: 'error' });
+    }
   };
 
-  const handleFillInvalidData = () => {
-    sendMessageWithHandler(MessageAction.FILL_INVALID_DATA, { includeHidden });
-    addOperationHistory('填充', '填充异常数据', '成功');
-  };
-
-  const handleClearAllFields = () => {
-    sendMessageWithHandler(MessageAction.CLEAR_ALL_FIELDS);
-    addOperationHistory('清空', '清空所有表单字段', '成功');
-  };
+  const selectedCount = fields.filter((f) => f.isSelected).length;
 
   return (
     <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 4 }}>
       <Container maxWidth="sm" sx={{ py: 3, px: 2, bgcolor: '#f5f5f5' }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
-            Dummy Data Generator
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            一键填充表单测试数据，提升开发和测试效率
-          </Typography>
-        </Box>
+        {/* Header */}
+        <PageHeader
+          title="表单测试数据填充器"
+          subtitle="一键填充表单测试数据，提升开发和测试效率"
+          icon={<InputIcon />}
+          sx={{ mb: 2.5 }}
+        />
+
+        <Button
+          size="small"
+          startIcon={<OpenInNewIcon />}
+          onClick={handleOpenSidePanel}
+          sx={{
+            textTransform: 'none',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            opacity: sidePanelOpen ? 0 : 1,
+            transform: sidePanelOpen ? 'scale(0.8)' : 'scale(1)',
+            pointerEvents: sidePanelOpen ? 'none' : 'auto',
+            visibility: sidePanelOpen ? 'hidden' : 'visible',
+            position: 'relative',
+          }}
+        >
+          侧边栏
+        </Button>
 
         {/* 扫描按钮 */}
         <Button
@@ -252,34 +384,95 @@ const FormRecognizerPage = () => {
           fields={fields}
           showFields={showFields}
           onToggleShowFields={() => setShowFields(!showFields)}
+          onFieldTypeChange={handleFieldTypeChange}
+          onLocateField={handleLocateField}
+          onHoverField={handleHoverField}
+          onToggleFieldSelection={handleToggleFieldSelection}
+          onToggleAllFields={handleToggleAllFields}
+          hoveredFieldId={hoveredFieldId}
         />
 
-        <MainActions
-          loading={loading}
-          onFillValidData={handleFillValidData}
-          onFillInvalidData={handleFillInvalidData}
-          onClearAllFields={handleClearAllFields}
-        />
+        {/* 操作按钮 */}
+        {fields.length > 0 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Button
+              disableElevation
+              disableRipple
+              variant="contained"
+              onClick={handleFillSelectedFields}
+              disabled={fillLoading || selectedCount === 0}
+              fullWidth
+              sx={{
+                py: 1.6,
+                borderRadius: 4,
+                bgcolor: formRecognizerPageStyles.validColor,
+                fontWeight: 700,
+                fontSize: '1rem',
+                textTransform: 'none',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  bgcolor: formRecognizerPageStyles.validDark,
+                  boxShadow: `0 8px 24px ${alpha(formRecognizerPageStyles.validColor, 0.3)}`,
+                  transform: 'translateY(-1px)',
+                },
+                '&:disabled': {
+                  bgcolor: '#e0e0e0',
+                  color: '#9e9e9e',
+                },
+                '&:active': {
+                  transform: 'translateY(0)',
+                },
+              }}
+            >
+              填充选中字段
+            </Button>
 
-        <OptionsPanel includeHidden={includeHidden} onIncludeHiddenChange={setIncludeHidden} />
+            <Button
+              disableElevation
+              disableRipple
+              variant="outlined"
+              onClick={handleClearAllFields}
+              disabled={clearLoading}
+              fullWidth
+              sx={{
+                py: 1.6,
+                borderRadius: 4,
+                borderColor: formRecognizerPageStyles.clearColor,
+                color: formRecognizerPageStyles.clearColor,
+                fontWeight: 600,
+                fontSize: '1rem',
+                textTransform: 'none',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  borderColor: formRecognizerPageStyles.clearDark,
+                  bgcolor: formRecognizerPageStyles.clearBg,
+                  transform: 'translateY(-1px)',
+                },
+                '&:disabled': {
+                  borderColor: '#e0e0e0',
+                  color: '#9e9e9e',
+                },
+                '&:active': {
+                  transform: 'translateY(0)',
+                },
+              }}
+            >
+              清空所有字段
+            </Button>
+          </Box>
+        )}
 
-        <OperationHistory
-          history={operationHistory}
-          showHistory={showHistory}
-          onToggleShowHistory={() => setShowHistory(!showHistory)}
-        />
-
-        <TemplateManager
-          templates={templates}
-          showTemplates={showTemplates}
-          templateLoading={templateLoading}
-          onToggleShowTemplates={() => setShowTemplates(!showTemplates)}
-          onLoadTemplates={loadTemplates}
-          onExportTemplates={handleExportTemplates}
-          onImportTemplates={handleImportTemplates}
-        />
-
-        <FeatureDescription />
+        <Box sx={{ mt: 3 }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={includeHidden}
+                onChange={(e) => setIncludeHidden(e.target.checked)}
+              />
+            }
+            label="包含隐藏字段"
+          />
+        </Box>
 
         <GlobalSnackbar {...snackbarProps} />
       </Container>

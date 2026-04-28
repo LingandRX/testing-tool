@@ -20,6 +20,13 @@ export interface StorageSchema {
   'openUrl/currentUrl': string;
   'qrCode/qrExpanded': boolean;
   'qrCode/urlExpanded': boolean;
+  'formRecognizer/fieldTypePreferences': FieldTypePreferences;
+}
+
+export interface FieldTypePreferences {
+  [domain: string]: {
+    [fieldIdentifier: string]: string;
+  };
 }
 
 export interface StorageCleanerPreferences {

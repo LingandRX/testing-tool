@@ -5,14 +5,19 @@ import {
   Paper,
   List,
   ListItem,
-  ListItemText,
   ListItemIcon,
   Collapse,
-  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+  Checkbox,
+  Button,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import InputIcon from '@mui/icons-material/Input';
+import { FieldType } from '@/utils/dummyDataGenerator';
 
 // 字段数据接口
 interface FieldData {
@@ -24,50 +29,56 @@ interface FieldData {
   value: string;
   isSelected: boolean;
   generatedValue: string;
+  useInvalidData?: boolean;
 }
 
 // 字段类型显示名称映射
 const FIELD_TYPE_NAMES: Record<string, string> = {
-  text: '文本',
-  email: '邮箱',
-  phone: '手机号',
-  number: '数字',
-  date: '日期',
-  textarea: '文本域',
-  radio: '单选框',
-  checkbox: '复选框',
-  select: '下拉框',
-  password: '密码',
-  name: '姓名',
-  id_card: '身份证号',
-  unknown: '未知',
-};
-
-// 字段类型颜色映射
-const FIELD_TYPE_COLORS: Record<
-  string,
-  'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning'
-> = {
-  email: 'primary',
-  phone: 'success',
-  number: 'secondary',
-  date: 'warning',
-  password: 'error',
-  name: 'primary',
-  id_card: 'secondary',
-  text: 'default',
-  textarea: 'default',
-  unknown: 'default',
+  [FieldType.TEXT]: '文本',
+  [FieldType.EMAIL]: '邮箱',
+  [FieldType.PHONE]: '手机号',
+  [FieldType.NUMBER]: '数字',
+  [FieldType.DATE]: '日期',
+  [FieldType.TEXTarea]: '文本域',
+  [FieldType.RADIO]: '单选框',
+  [FieldType.CHECKBOX]: '复选框',
+  [FieldType.SELECT]: '下拉框',
+  [FieldType.PASSWORD]: '密码',
+  [FieldType.NAME]: '姓名',
+  [FieldType.ID_CARD]: '身份证号',
+  [FieldType.UNKNOWN]: '未知',
 };
 
 interface FieldListProps {
   fields: FieldData[];
   showFields: boolean;
   onToggleShowFields: () => void;
+  onFieldTypeChange: (fieldId: string, newType: string) => void;
+  onLocateField: (fieldId: string) => void;
+  onHoverField: (fieldId: string | null) => void;
+  onToggleFieldSelection: (fieldId: string) => void;
+  onToggleAllFields: () => void;
+  hoveredFieldId: string | null;
 }
 
-const FieldList: React.FC<FieldListProps> = ({ fields, showFields, onToggleShowFields }) => {
+const FieldList: React.FC<FieldListProps> = ({
+  fields,
+  showFields,
+  onToggleShowFields,
+  onFieldTypeChange,
+  onHoverField,
+  onToggleFieldSelection,
+  onToggleAllFields,
+  hoveredFieldId,
+}) => {
   if (fields.length === 0) return null;
+
+  const handleTypeChange = (fieldId: string, event: SelectChangeEvent<string>) => {
+    onFieldTypeChange(fieldId, event.target.value);
+  };
+
+  const allSelected = fields.every((f) => f.isSelected);
+  const selectedCount = fields.filter((f) => f.isSelected).length;
 
   return (
     <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', mb: 2 }}>
@@ -84,34 +95,100 @@ const FieldList: React.FC<FieldListProps> = ({ fields, showFields, onToggleShowF
         }}
         onClick={onToggleShowFields}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-          已识别字段 ({fields.length})
-        </Typography>
-        {showFields ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+            已识别字段 ({fields.length})
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              bgcolor: selectedCount > 0 ? 'primary.main' : 'grey.300',
+              color: selectedCount > 0 ? 'white' : 'text.secondary',
+              px: 1,
+              py: 0.25,
+              borderRadius: 1,
+            }}
+          >
+            {selectedCount} 已选择
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Button
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleAllFields();
+            }}
+          >
+            {allSelected ? '取消全选' : '全选'}
+          </Button>
+          {showFields ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </Box>
       </Box>
       <Collapse in={showFields}>
-        <List dense sx={{ maxHeight: 300, overflow: 'auto' }}>
+        <List dense sx={{ maxHeight: 400, overflow: 'auto' }}>
           {fields.map((field, index) => (
-            <ListItem key={field.id} sx={{ py: 0.5 }}>
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <InputIcon fontSize="small" color="action" />
+            <ListItem
+              key={field.id}
+              sx={{
+                py: 1,
+                px: 2,
+                bgcolor: hoveredFieldId === field.id ? '#e3f2fd' : 'transparent',
+                transition: 'background-color 0.2s ease',
+              }}
+              onMouseEnter={() => onHoverField(field.id)}
+              onMouseLeave={() => onHoverField(null)}
+            >
+              <ListItemIcon sx={{ minWidth: 40 }}>
+                <Checkbox
+                  size="small"
+                  checked={field.isSelected}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    onToggleFieldSelection(field.id);
+                  }}
+                />
               </ListItemIcon>
-              <ListItemText
-                primary={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {field.label || field.name || field.placeholder || `字段 ${index + 1}`}
-                    </Typography>
-                    <Chip
-                      label={FIELD_TYPE_NAMES[field.fieldType] || '未知'}
-                      size="small"
-                      color={FIELD_TYPE_COLORS[field.fieldType] || 'default'}
-                      variant="outlined"
-                    />
-                  </Box>
-                }
-                secondary={field.placeholder || field.name}
-              />
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      flex: 1,
+                      opacity: field.isSelected ? 1 : 0.5,
+                    }}
+                  >
+                    {field.label || field.name || field.placeholder || `字段 ${index + 1}`}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FormControl size="small" sx={{ flex: 1, minWidth: 120 }}>
+                    <InputLabel>类型</InputLabel>
+                    <Select
+                      value={field.fieldType}
+                      label="类型"
+                      onChange={(e) => handleTypeChange(field.id, e)}
+                    >
+                      {Object.values(FieldType).map((type) => (
+                        <MenuItem key={type} value={type}>
+                          {FIELD_TYPE_NAMES[type] || type}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+
+                {field.placeholder && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                    占位符: {field.placeholder}
+                  </Typography>
+                )}
+              </Box>
             </ListItem>
           ))}
         </List>
