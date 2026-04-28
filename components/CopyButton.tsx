@@ -3,14 +3,24 @@ import { IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
 import { copyToClipboard } from '@/utils/clipboard';
+import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
+/**
+ * 复制按钮组件属性
+ * @param text 要复制的文本
+ * @param tooltip 提示信息
+ * @param size 按钮大小
+ * @param color 按钮颜色
+ * @param style 自定义样式
+ * @param showMessage 消息提示函数，用于显示复制成功或失败的消息
+ */
 interface CopyButtonProps {
   text: string;
   tooltip?: string;
   size?: 'small' | 'medium' | 'large';
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' | string;
   style?: React.CSSProperties;
-  showMessage?: (message: string, options?: { severity: 'success' | 'error' }) => void;
+  showMessage?: (message: string, options?: SnackbarOptions) => void;
 }
 
 /**
@@ -19,6 +29,8 @@ interface CopyButtonProps {
  * @param tooltip 提示信息
  * @param size 按钮大小
  * @param color 按钮颜色
+ * @param style 自定义样式
+ * @param showMessage 消息提示函数，用于显示复制成功或失败的消息
  * @returns 复制按钮组件
  */
 export const CopyButton: React.FC<CopyButtonProps> = ({
@@ -56,8 +68,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
           '&:hover': {
             bgcolor: copied
               ? 'success.main'
-              : typeof color === 'string' &&
-                  !['primary', 'secondary', 'success', 'error', 'info', 'warning'].includes(color)
+              : !['primary', 'secondary', 'success', 'error', 'info', 'warning'].includes(color)
                 ? color
                 : `${color}.main`,
             color: '#fff',

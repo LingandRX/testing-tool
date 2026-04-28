@@ -1,28 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
+import type { StorageSchema } from '@/types/storage';
 
-export const useStorageState = (
-  key: 'qrCode/urlExpanded' | 'qrCode/qrExpanded',
-  defaultValue: boolean,
+export const useStorageState = <K extends keyof StorageSchema>(
+  key: K,
+  defaultValue: StorageSchema[K],
 ) => {
   const [value, setValue] = useState(defaultValue);
   const [isInitialized, setIsInitialized] = useState(false);
+  const hasLoadedFromStorage = useRef(false);
 
+  // Only load from storage once on mount
   useEffect(() => {
+    if (hasLoadedFromStorage.current) return;
+
     const loadState = async () => {
       try {
         const savedValue = await storageUtil.get(key, defaultValue);
-        setValue(savedValue ?? defaultValue);
+        if (savedValue !== undefined) {
+          setValue(savedValue);
+        }
       } catch (error) {
         console.error(`加载状态失败 (${key}):`, error);
       } finally {
         setIsInitialized(true);
+        hasLoadedFromStorage.current = true;
       }
     };
 
     loadState();
-  }, [key, defaultValue]);
+  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps -- defaultValue intentionally excluded to prevent infinite loops
 
+  // Save to storage when value changes (after initial load)
   useEffect(() => {
     if (!isInitialized) return;
 
