@@ -111,15 +111,13 @@ export const timestampPageStyles = {
  * 打开 URL 页面样式
  */
 export const openUrlPageStyles = {
+  primaryColor: THEME_COLORS.purple,
+  primaryDark: THEME_COLORS.purpleDark,
   INPUT_STYLE: {
     '& .MuiOutlinedInput-root': {
       bgcolor: 'background.paper',
-      borderRadius: 3,
+      borderRadius: 4,
       transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-      '& fieldset': {
-        border: '1px solid',
-        borderColor: 'grey.100',
-      },
       '&:hover fieldset': {
         borderColor: 'grey.300',
       },
@@ -129,14 +127,14 @@ export const openUrlPageStyles = {
       },
       '&.Mui-focused': {
         bgcolor: '#fff',
-        boxShadow: (_theme: Theme) => `0 0 0 4px ${alpha(THEME_COLORS.purple, 0.1)}`,
       },
     },
     '& .MuiInputBase-input': {
-      py: 1.2,
+      py: '14px',
       px: 2,
       fontSize: '0.85rem',
       fontWeight: 600,
+      lineHeight: 1.4,
     },
     '& .MuiInputLabel-root': {
       fontSize: '0.85rem',
@@ -193,6 +191,7 @@ export const dashboardPageStyles = {
  * 使用语义化的颜色命名：valid（有效）、invalid（无效）、clear（清除）
  */
 export const formRecognizerPageStyles = {
+  primaryColor: '#ff5722',
   validColor: THEME_COLORS.success,
   validDark: THEME_COLORS.successDark,
   invalidColor: THEME_COLORS.warning,
