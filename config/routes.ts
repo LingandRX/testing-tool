@@ -6,6 +6,7 @@ import OpenUrlPage from '@/entrypoints/popup/pages/OpenUrlPage';
 import OpenUrlViewerPage from '@/entrypoints/popup/pages/OpenUrlViewerPage';
 import QrCodePage from '@/entrypoints/popup/pages/QrCodePage';
 import FormRecognizerPage from '@/entrypoints/popup/pages/FormRecognizerPage';
+import FormMappingPage from '@/entrypoints/popup/pages/FormMappingPage';
 
 export interface RouteConfig {
   key: PageType;
@@ -67,6 +68,16 @@ export const ROUTES: RouteConfig[] = [
       popup: QrCodePage,
       sidepanel: QrCodePage,
       detached: QrCodePage,
+    },
+  },
+  {
+    key: 'formMapping',
+    label: '表单映射',
+    defaultVisible: true,
+    components: {
+      popup: FormMappingPage,
+      sidepanel: FormMappingPage,
+      detached: FormMappingPage,
     },
   },
   {

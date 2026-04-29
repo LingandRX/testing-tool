@@ -205,3 +205,10 @@ export const formRecognizerPageStyles = {
     fontWeight: 700,
   },
 } as const;
+
+/**
+ * 表单映射页面样式
+ */
+export const formMappingPageStyles = {
+  secondaryColor: THEME_COLORS.purple,
+} as const;

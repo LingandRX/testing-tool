@@ -12,6 +12,11 @@ import {
 } from '@/utils/dummyDataGenerator';
 import { MessageAction, type MessagePayload, type MessageResponse } from '@/utils/messages';
 
+import { SmartDetector } from '@/utils/formMapping/scanner';
+import { highlighter } from '@/utils/formMapping/highlighter';
+import { storageUtil } from '@/utils/chromeStorage';
+import { FormMapEntry } from '@/types/storage';
+
 // 存储当前扫描到的字段列表，用于高亮联动
 let currentFields: FormFieldInfo[] = [];
 
@@ -19,6 +24,53 @@ export default defineContentScript({
   matches: ['<all_urls>'],
   runAt: 'document_end',
   main() {
+    // === 通用表单映射助手逻辑 ===
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (
+        area === 'local' &&
+        (changes['active_form_map'] || changes['app/formMapping/isPicking'])
+      ) {
+        updateMappingUI();
+      }
+    });
+
+    async function updateMappingUI() {
+      const entries = ((await storageUtil.get('active_form_map')) as FormMapEntry[]) || [];
+      const isPicking = ((await storageUtil.get('app/formMapping/isPicking')) as boolean) || false;
+
+      if (entries.length > 0 || isPicking) {
+        highlighter.show();
+        highlighter.draw(entries);
+
+        if (isPicking) {
+          highlighter.enablePicker(async (el) => {
+            const fingerprint = SmartDetector.generateFingerprint(el);
+            const label = SmartDetector.extractSemanticLabel(el);
+
+            const newEntry: FormMapEntry = {
+              id: Math.random().toString(36).substr(2, 9),
+              label_display: label,
+              fingerprint,
+              action_logic: { type: 'text', strategy: 'fixed', value: '' },
+              ui_state: { is_selected: true },
+            };
+
+            const currentMap = ((await storageUtil.get('active_form_map')) as FormMapEntry[]) || [];
+            await storageUtil.set('active_form_map', [...currentMap, newEntry]);
+            await storageUtil.set('app/formMapping/isPicking', false);
+          });
+        } else {
+          highlighter.disablePicker();
+        }
+      } else {
+        highlighter.hide();
+      }
+    }
+
+    // 初始加载映射 UI
+    updateMappingUI();
+
+    // === 原有表单识别逻辑 ===
     // 监听来自 popup/sidepanel 的消息
     chrome.runtime.onMessage.addListener(
       (message: MessagePayload, _sender, sendResponse: (response: MessageResponse) => void) => {
