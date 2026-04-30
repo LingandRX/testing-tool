@@ -1,4 +1,4 @@
-import { TextField, Select, MenuItem, Stack, Box, Container, alpha } from '@mui/material';
+import { TextField, Select, MenuItem, Stack, Box, Container } from '@mui/material';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
@@ -171,23 +171,7 @@ export default function TimestampPage() {
         </Stack>
 
         {/* Main Action */}
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={convert}
-          sx={{
-            py: 1.4,
-            borderRadius: 4,
-            bgcolor: 'primary.main',
-            fontWeight: 800,
-            fontSize: '0.9rem',
-            boxShadow: 'none',
-            '&:hover': {
-              bgcolor: 'primary.dark',
-              boxShadow: `0 8px 24px ${alpha(timestampPageStyles.primaryColor, 0.2)}`,
-            },
-          }}
-        >
+        <Button fullWidth variant="contained" onClick={convert}>
           立即转换
         </Button>
 

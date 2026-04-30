@@ -9,7 +9,6 @@ import {
   Switch,
   Divider,
   Paper,
-  alpha,
   Snackbar,
   Alert,
 } from '@mui/material';
@@ -22,7 +21,6 @@ import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
 import Button from '@/components/Button';
-import { formMappingPageStyles } from '@/config/pageTheme';
 
 export default function FormMappingPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
@@ -142,17 +140,6 @@ export default function FormMappingPage() {
                   onClick={togglePicking}
                   size="small"
                   startIcon={<AddCircleOutlineIcon />}
-                  sx={{
-                    borderRadius: 3,
-                    px: 2,
-                    fontWeight: 800,
-                    ...(isPicking
-                      ? {
-                          bgcolor: 'secondary.main',
-                          boxShadow: `0 4px 12px ${alpha(formMappingPageStyles.secondaryColor || '#9c27b0', 0.2)}`,
-                        }
-                      : {}),
-                  }}
                 >
                   {isPicking ? '正在拾取...' : '开始拾取'}
                 </Button>
@@ -174,12 +161,7 @@ export default function FormMappingPage() {
               <Typography variant="subtitle2" fontWeight={800} color="text.secondary">
                 已拾取字段 ({entries.length})
               </Typography>
-              <Button
-                size="small"
-                color="error"
-                onClick={clearAll}
-                sx={{ fontWeight: 700, fontSize: '0.75rem' }}
-              >
+              <Button size="small" color="error" onClick={clearAll}>
                 清空全部
               </Button>
             </Box>
@@ -273,7 +255,6 @@ export default function FormMappingPage() {
                     variant="outlined"
                     onClick={exportConfig}
                     startIcon={<FileDownloadIcon />}
-                    sx={{ fontWeight: 700, fontSize: '0.75rem', borderRadius: 3 }}
                   >
                     导出配置
                   </Button>

@@ -1,13 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Button,
-  CircularProgress,
-  FormControlLabel,
-  Switch,
-  alpha,
-} from '@mui/material';
+import { Box, Container, CircularProgress, FormControlLabel, Switch } from '@mui/material';
+import Button from '@/components/Button';
 import InputIcon from '@mui/icons-material/Input';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
@@ -366,16 +359,6 @@ const FormRecognizerPage = () => {
           onClick={handleScanFields}
           disabled={scanning}
           fullWidth
-          sx={{
-            ...formRecognizerPageStyles.buttonStyle,
-            mb: 2,
-            borderColor: formRecognizerPageStyles.validColor,
-            color: formRecognizerPageStyles.validColor,
-            '&:hover': {
-              borderColor: formRecognizerPageStyles.validDark,
-              bgcolor: 'rgba(76, 175, 80, 0.05)',
-            },
-          }}
           startIcon={scanning ? <CircularProgress size={16} color="inherit" /> : <InputIcon />}
         >
           {scanning ? '扫描中...' : '扫描表单字段'}
@@ -403,27 +386,6 @@ const FormRecognizerPage = () => {
               onClick={handleFillSelectedFields}
               disabled={fillLoading || selectedCount === 0}
               fullWidth
-              sx={{
-                py: 1.6,
-                borderRadius: 4,
-                bgcolor: formRecognizerPageStyles.validColor,
-                fontWeight: 700,
-                fontSize: '1rem',
-                textTransform: 'none',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:hover': {
-                  bgcolor: formRecognizerPageStyles.validDark,
-                  boxShadow: `0 8px 24px ${alpha(formRecognizerPageStyles.validColor, 0.3)}`,
-                  transform: 'translateY(-1px)',
-                },
-                '&:disabled': {
-                  bgcolor: '#e0e0e0',
-                  color: '#9e9e9e',
-                },
-                '&:active': {
-                  transform: 'translateY(0)',
-                },
-              }}
             >
               填充选中字段
             </Button>
@@ -435,28 +397,6 @@ const FormRecognizerPage = () => {
               onClick={handleClearAllFields}
               disabled={clearLoading}
               fullWidth
-              sx={{
-                py: 1.6,
-                borderRadius: 4,
-                borderColor: formRecognizerPageStyles.clearColor,
-                color: formRecognizerPageStyles.clearColor,
-                fontWeight: 600,
-                fontSize: '1rem',
-                textTransform: 'none',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:hover': {
-                  borderColor: formRecognizerPageStyles.clearDark,
-                  bgcolor: formRecognizerPageStyles.clearBg,
-                  transform: 'translateY(-1px)',
-                },
-                '&:disabled': {
-                  borderColor: '#e0e0e0',
-                  color: '#9e9e9e',
-                },
-                '&:active': {
-                  transform: 'translateY(0)',
-                },
-              }}
             >
               清空所有字段
             </Button>

@@ -64,20 +64,9 @@ export default function StorageCleanerPage() {
           variant="contained"
           onClick={() => setShowConfirm(true)}
           sx={{
-            py: 1.3,
-            borderRadius: 4,
             bgcolor: storageCleanerPageStyles.warningColor,
-            fontWeight: 800,
-            fontSize: '0.85rem',
-            boxShadow: '0 4px 12px rgba(255, 152, 0, 0.25)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               bgcolor: storageCleanerPageStyles.warningDark,
-              boxShadow: '0 8px 20px rgba(255, 152, 0, 0.35)',
-              transform: 'translateY(-2px)',
-            },
-            '&:active': {
-              transform: 'translateY(0)',
             },
           }}
           disabled={loading}

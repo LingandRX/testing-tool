@@ -9,11 +9,9 @@ import {
   Switch,
   Divider,
   Paper,
-  Button,
   Chip,
   Snackbar,
   Alert,
-  alpha,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -26,6 +24,7 @@ import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
 import { formMappingPageStyles } from '@/config/pageTheme.ts';
 import { MockDataGenerator } from '@/utils/formMapping/smartInjector';
+import { Button } from '@/components/Button';
 
 export default function FormFillPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
@@ -177,7 +176,6 @@ export default function FormFillPage() {
                   onClick={refreshPreview}
                   size="small"
                   startIcon={<RefreshIcon />}
-                  sx={{ borderRadius: 3 }}
                 >
                   刷新预览
                 </Button>
@@ -188,9 +186,7 @@ export default function FormFillPage() {
                   startIcon={<PlayArrowIcon />}
                   disabled={isInjecting || entries.length === 0}
                   sx={{
-                    borderRadius: 3,
                     bgcolor: formMappingPageStyles.secondaryColor || '#9c27b0',
-                    boxShadow: `0 4px 12px ${alpha(formMappingPageStyles.secondaryColor || '#9c27b0', 0.2)}`,
                   }}
                 >
                   {isInjecting ? '注入中...' : '开始填充'}
