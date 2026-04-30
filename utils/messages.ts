@@ -43,6 +43,7 @@ export interface MessagePayload {
   includeHidden?: boolean;
   fieldId?: string;
   fieldIds?: string[];
+  data?: unknown;
 }
 
 /**
@@ -55,6 +56,8 @@ export interface MessageResponse {
   totalCount?: number;
   validCount?: number;
   hasModal?: boolean;
+  results?: unknown[];
+  error?: string;
 }
 
 /**

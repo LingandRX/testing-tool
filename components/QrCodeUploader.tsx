@@ -13,9 +13,9 @@ import ImageIcon from '@mui/icons-material/Image';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import jsQR from 'jsqr';
 import GlobalSnackbar, { useSnackbar } from './GlobalSnackbar';
 import CopyButton from './CopyButton';
+import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 
 interface QrCodeUploaderProps {
   onQrCodeDetected?: (data: string) => void;
@@ -67,7 +67,6 @@ const QrCodeUploader: React.FC<QrCodeUploaderProps> = ({
       setProgress(0);
 
       try {
-        // 模拟上传进度
         const progressInterval = setInterval(() => {
           setProgress((prev) => {
             if (prev >= 90) {
@@ -78,51 +77,20 @@ const QrCodeUploader: React.FC<QrCodeUploaderProps> = ({
           });
         }, 200);
 
-        // 读取文件并解析二维码
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        if (!ctx) {
-          throw new Error('无法创建 canvas 上下文');
-        }
-
-        const image = new Image();
-        image.src = URL.createObjectURL(file);
-
-        await new Promise<void>((resolve, reject) => {
-          const timeoutId = setTimeout(() => {
-            reject(new Error('图片加载超时'));
-          }, timeout);
-
-          image.onload = () => {
-            clearTimeout(timeoutId);
-            canvas.width = image.width;
-            canvas.height = image.height;
-            ctx.drawImage(image, 0, 0);
-            resolve();
-          };
-
-          image.onerror = () => {
-            clearTimeout(timeoutId);
-            reject(new Error('图片加载失败'));
-          };
-        });
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        const result = await parseQrCodeFromFile(file, timeout);
 
         clearInterval(progressInterval);
         setProgress(100);
 
-        if (code) {
-          setResult(code.data);
+        if (result.success && result.data) {
+          setResult(result.data);
           showMessage('二维码解析成功', { severity: 'success' });
           if (onQrCodeDetected) {
-            onQrCodeDetected(code.data);
+            onQrCodeDetected(result.data);
           }
         } else {
-          setError('未检测到二维码');
-          showMessage('未检测到二维码', { severity: 'error' });
+          setError(result.error || '未检测到二维码');
+          showMessage(result.error || '未检测到二维码', { severity: 'error' });
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : '解析失败');
@@ -131,7 +99,6 @@ const QrCodeUploader: React.FC<QrCodeUploaderProps> = ({
         });
       } finally {
         setUploading(false);
-        // 延迟清除进度，让用户看到完成状态
         setTimeout(() => setProgress(0), 500);
       }
     },

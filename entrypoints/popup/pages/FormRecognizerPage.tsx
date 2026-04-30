@@ -339,6 +339,7 @@ const FormRecognizerPage = () => {
           title="表单测试数据填充器"
           subtitle="一键填充表单测试数据，提升开发和测试效率"
           icon={<InputIcon />}
+          iconColor={formRecognizerPageStyles.primaryColor}
           sx={{ mb: 2.5 }}
         />
 

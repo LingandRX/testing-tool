@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -11,14 +11,16 @@ import {
   AccordionDetails,
   CircularProgress,
   InputAdornment,
+  IconButton,
 } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import ImageIcon from '@mui/icons-material/Image';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import jsQR from 'jsqr';
+import ClearIcon from '@mui/icons-material/Clear';
 import CopyButton from '@/components/CopyButton';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
+import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 
 interface QrCodeToUrlSectionProps {
   expanded: boolean;
@@ -35,13 +37,37 @@ const QrCodeToUrlSection = ({
   const [parsedUrl, setParsedUrl] = useState('');
   const [parseError, setParseError] = useState('');
   const [parsing, setParsing] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = useCallback((file: File) => {
+    setQrCodeFile(file);
+    setParseError('');
+    setParsedUrl('');
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setQrCodeFile(file);
-      setParseError('');
-      setParsedUrl('');
+      handleFileChange(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragging(false);
+    const droppedFile = e.dataTransfer.files?.[0];
+    if (droppedFile) {
+      handleFileChange(droppedFile);
     }
   };
 
@@ -56,34 +82,16 @@ const QrCodeToUrlSection = ({
       setParseError('');
       setParsedUrl('');
 
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const result = await parseQrCodeFromFile(qrCodeFile);
 
-      if (!ctx) {
-        throw new Error('无法创建 canvas 上下文');
-      }
-
-      const image = new Image();
-      image.src = URL.createObjectURL(qrCodeFile);
-
-      await new Promise<void>((resolve, reject) => {
-        image.onload = () => {
-          canvas.width = image.width;
-          canvas.height = image.height;
-          ctx.drawImage(image, 0, 0);
-          resolve();
-        };
-        image.onerror = () => reject(new Error('图片加载失败'));
-      });
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-      if (code) {
-        setParsedUrl(code.data);
+      if (result.success && result.data) {
+        setParsedUrl(result.data);
         showMessage('二维码解析成功', { severity: 'success', autoHideDuration: 1000 });
       } else {
-        showMessage('未检测到二维码', { severity: 'error', autoHideDuration: 1000 });
+        showMessage(result.error || '未检测到二维码', {
+          severity: 'error',
+          autoHideDuration: 1000,
+        });
       }
     } catch (error) {
       console.error('解析二维码失败:', error);
@@ -108,9 +116,7 @@ const QrCodeToUrlSection = ({
           const file = items[i].getAsFile();
           if (file) {
             try {
-              setQrCodeFile(file);
-              setParseError('');
-              setParsedUrl('');
+              handleFileChange(file);
               showMessage('图片粘贴成功', { severity: 'success', autoHideDuration: 1000 });
             } catch (error) {
               console.error('处理粘贴图片失败:', error);
@@ -127,7 +133,7 @@ const QrCodeToUrlSection = ({
     return () => {
       document.removeEventListener('paste', handlePaste);
     };
-  }, [expanded, showMessage]);
+  }, [expanded, showMessage, handleFileChange]);
 
   return (
     <Accordion
@@ -157,10 +163,18 @@ const QrCodeToUrlSection = ({
               justifyContent: 'center',
               minHeight: 200,
               border: '2px dashed',
-              borderColor: qrCodeFile ? qrCodePageStyles.successColor : 'grey.200',
+              borderColor: dragging
+                ? qrCodePageStyles.successColor
+                : qrCodeFile
+                  ? qrCodePageStyles.successColor
+                  : 'grey.200',
               borderRadius: 3,
               p: 4,
-              bgcolor: qrCodeFile ? 'rgba(76, 175, 80, 0.05)' : 'grey.50',
+              bgcolor: dragging
+                ? 'rgba(76, 175, 80, 0.1)'
+                : qrCodeFile
+                  ? 'rgba(76, 175, 80, 0.05)'
+                  : 'grey.50',
               cursor: 'pointer',
               transition: 'all 0.2s',
               '&:hover': {
@@ -168,11 +182,15 @@ const QrCodeToUrlSection = ({
                 bgcolor: 'rgba(76, 175, 80, 0.05)',
               },
             }}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
           >
             <input
+              ref={fileInputRef}
               type="file"
               accept="image/*"
-              onChange={handleFileChange}
+              onChange={handleInputChange}
               style={{
                 display: 'none',
               }}
@@ -195,8 +213,7 @@ const QrCodeToUrlSection = ({
                         objectFit: 'contain',
                       }}
                     />
-                    <Button
-                      variant="contained"
+                    <IconButton
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -212,33 +229,15 @@ const QrCodeToUrlSection = ({
                         position: 'absolute',
                         top: -8,
                         right: -8,
-                        minWidth: '32px',
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
                         bgcolor: 'rgba(244, 67, 54, 0.9)',
                         color: 'white',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                        transition: 'all 0.2s ease-in-out',
                         '&:hover': {
                           bgcolor: 'rgba(211, 47, 47, 0.95)',
-                          transform: 'scale(1.1)',
-                          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
                         },
-                        '&:active': {
-                          transform: 'scale(0.95)',
-                        },
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 700,
-                        fontSize: '16px',
-                        lineHeight: 1,
-                        padding: 0,
                       }}
                     >
-                      ×
-                    </Button>
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                     {qrCodeFile.name}
