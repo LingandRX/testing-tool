@@ -6,6 +6,7 @@ import StorageIcon from '@mui/icons-material/Storage';
 import LanguageIcon from '@mui/icons-material/Language';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import DescriptionIcon from '@mui/icons-material/Description';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import type { PageType } from '@/types/storage';
 import { useEffect, useState } from 'react';
 import dayjs from '@/utils/dayjs';
@@ -89,6 +90,18 @@ export default function DashboardPage() {
             cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
+      case 'formMapping':
+        return (
+          <ToolCard
+            key={key}
+            title="通用表单映射助手"
+            description="智能识别表单指纹，自定义填充逻辑"
+            colorCode="#3f51b5"
+            icon={<AutoFixHighIcon sx={{ fontSize: 20 }} />}
+            onClick={() => navigateTo('formMapping')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
+          />
+        );
       case 'formRecognizer':
         return (
           <ToolCard
@@ -98,6 +111,18 @@ export default function DashboardPage() {
             colorCode="#ff5722"
             icon={<DescriptionIcon sx={{ fontSize: 20 }} />}
             onClick={() => navigateTo('formRecognizer')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
+          />
+        );
+      case 'formFill':
+        return (
+          <ToolCard
+            key={key}
+            title="智能填充"
+            description="根据表单指纹智能填充表单内容"
+            colorCode="#2196f3"
+            icon={<AutoFixHighIcon sx={{ fontSize: 20 }} />}
+            onClick={() => navigateTo('formFill')}
             cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );

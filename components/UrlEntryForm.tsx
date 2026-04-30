@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, TextField, Alert, Stack } from '@mui/material';
+import { Box, TextField, Alert, Stack, alpha } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@/components/Button';
 import type { OpenUrlEntry } from '@/types/storage';
@@ -65,11 +65,6 @@ const UrlEntryForm = ({ onAddEntry, showMessage }: UrlEntryFormProps) => {
           fullWidth
           variant="outlined"
           sx={openUrlPageStyles.INPUT_STYLE}
-          slotProps={{
-            inputLabel: {
-              shrink: true,
-            },
-          }}
         />
         <TextField
           label="目标 URL"
@@ -79,11 +74,6 @@ const UrlEntryForm = ({ onAddEntry, showMessage }: UrlEntryFormProps) => {
           fullWidth
           variant="outlined"
           sx={openUrlPageStyles.INPUT_STYLE}
-          slotProps={{
-            inputLabel: {
-              shrink: true,
-            },
-          }}
         />
 
         {showMixedContentWarning && (
@@ -111,8 +101,8 @@ const UrlEntryForm = ({ onAddEntry, showMessage }: UrlEntryFormProps) => {
             fontWeight: 800,
             boxShadow: 'none',
             '&:hover': {
-              bgcolor: 'rgba(25, 118, 210, 0.85)',
-              boxShadow: '0 8px 24px rgba(25, 118, 210, 0.2)',
+              bgcolor: openUrlPageStyles.primaryDark,
+              boxShadow: `0 8px 24px ${alpha(openUrlPageStyles.primaryColor, 0.2)}`,
             },
           }}
         >
