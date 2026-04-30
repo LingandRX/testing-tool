@@ -5,7 +5,27 @@ export type PageType =
   | 'openUrl'
   | 'qrCode'
   | 'formRecognizer'
+  | 'formMapping'
+  | 'formFill'
   | 'openUrlViewer';
+
+export interface FormMapEntry {
+  id: string;
+  label_display: string;
+  fingerprint: {
+    selector: string;
+    name_attr: string;
+    placeholder: string;
+  };
+  action_logic: {
+    type: 'text' | 'select' | 'checkbox';
+    strategy: 'fixed' | 'random' | 'sequence';
+    value: string;
+  };
+  ui_state: {
+    is_selected: boolean;
+  };
+}
 
 export interface StorageSchema {
   'app/currentRoute': PageType;
@@ -15,6 +35,8 @@ export interface StorageSchema {
   'app/pageOrder': PageType[];
   'app/lastRoute': string;
   'app/theme': string;
+  'app/formMapping/isPicking': boolean;
+  active_form_map: FormMapEntry[];
   'storageCleaner/preferences': StorageCleanerPreferences;
   'openUrl/preferences': OpenUrlPreferences;
   'openUrl/currentUrl': string;

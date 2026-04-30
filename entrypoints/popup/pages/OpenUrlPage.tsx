@@ -5,7 +5,7 @@ import UrlEntryForm from '@/components/UrlEntryForm';
 import UrlEntryList from '@/components/UrlEntryList';
 import { useUrlPreferences } from '@/utils/useUrlPreferences';
 import type { OpenUrlEntry } from '@/types/storage';
-import { dashboardPageStyles } from '@/config/pageTheme';
+import { dashboardPageStyles, openUrlPageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
 
 export default function OpenUrlPage() {
@@ -41,6 +41,7 @@ export default function OpenUrlPage() {
           title="URL 工具"
           subtitle="快速打开 URL 或复制链接"
           icon={<LanguageIcon />}
+          iconColor={openUrlPageStyles.primaryColor}
           sx={{ mb: 2.5 }}
         />
 
