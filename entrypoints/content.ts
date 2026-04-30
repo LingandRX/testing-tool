@@ -14,6 +14,11 @@ import { MessageAction, type MessagePayload, type MessageResponse } from '@/util
 
 import { SmartDetector } from '@/utils/formMapping/scanner';
 import { highlighter } from '@/utils/formMapping/highlighter';
+import {
+  FuzzyMatcher,
+  SmartInjectionEngine,
+  FeedbackRenderer,
+} from '@/utils/formMapping/smartInjector';
 import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 
@@ -175,6 +180,38 @@ export default defineContentScript({
                 sendResponse({ success: true });
               } else {
                 sendResponse({ success: false, message: '未找到字段' });
+              }
+              break;
+            }
+            case 'FORM_INJECT': {
+              try {
+                const injectData =
+                  (message.data as Array<{ entry: FormMapEntry; mockValue: string }>) || [];
+                const results = injectData.map((item) => {
+                  const matchResult = FuzzyMatcher.findTargetElement(item.entry.fingerprint);
+                  if (matchResult.element) {
+                    const injectResult = SmartInjectionEngine.inject(
+                      matchResult.element,
+                      item.entry,
+                      item.mockValue,
+                    );
+                    if (injectResult.success) {
+                      FeedbackRenderer.renderSuccess(matchResult.element);
+                    } else {
+                      FeedbackRenderer.renderError(matchResult.element);
+                    }
+                    return { id: item.entry.id, success: injectResult.success };
+                  } else {
+                    return { id: item.entry.id, success: false };
+                  }
+                });
+                sendResponse({ success: true, results });
+              } catch (error) {
+                console.error('智能注入失败:', error);
+                sendResponse({
+                  success: false,
+                  error: error instanceof Error ? error.message : '注入失败',
+                });
               }
               break;
             }

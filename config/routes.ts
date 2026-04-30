@@ -7,6 +7,7 @@ import OpenUrlViewerPage from '@/entrypoints/popup/pages/OpenUrlViewerPage';
 import QrCodePage from '@/entrypoints/popup/pages/QrCodePage';
 import FormRecognizerPage from '@/entrypoints/popup/pages/FormRecognizerPage';
 import FormMappingPage from '@/entrypoints/popup/pages/FormMappingPage';
+import FormFillPage from '@/entrypoints/popup/pages/FormFillPage';
 
 export interface RouteConfig {
   key: PageType;
@@ -78,6 +79,16 @@ export const ROUTES: RouteConfig[] = [
       popup: FormMappingPage,
       sidepanel: FormMappingPage,
       detached: FormMappingPage,
+    },
+  },
+  {
+    key: 'formFill',
+    label: '智能填充',
+    defaultVisible: true,
+    components: {
+      popup: FormFillPage,
+      sidepanel: FormFillPage,
+      detached: FormFillPage,
     },
   },
   {

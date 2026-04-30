@@ -6,6 +6,7 @@ export type PageType =
   | 'qrCode'
   | 'formRecognizer'
   | 'formMapping'
+  | 'formFill'
   | 'openUrlViewer';
 
 export interface FormMapEntry {

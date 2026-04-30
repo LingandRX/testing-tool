@@ -114,6 +114,18 @@ export default function DashboardPage() {
             cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
+      case 'formFill':
+        return (
+          <ToolCard
+            key={key}
+            title="智能填充"
+            description="根据表单指纹智能填充表单内容"
+            colorCode="#2196f3"
+            icon={<AutoFixHighIcon sx={{ fontSize: 20 }} />}
+            onClick={() => navigateTo('formFill')}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
+          />
+        );
       default:
         return null;
     }
