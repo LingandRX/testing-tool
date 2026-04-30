@@ -1,14 +1,9 @@
-import { Box, Typography, Container } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useRouter } from '@/providers/RouterProvider';
-import ToolCard from '@/components/ToolCard';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import StorageIcon from '@mui/icons-material/Storage';
-import LanguageIcon from '@mui/icons-material/Language';
-import QrCodeIcon from '@mui/icons-material/QrCode';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import DashboardCard from '@/components/DashboardCard';
+import { cardConfigs } from '@/config/dashboardCards';
 import type { PageType } from '@/types/storage';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import dayjs from '@/utils/dayjs';
 import { dashboardPageStyles } from '@/config/pageTheme';
 
@@ -23,121 +18,50 @@ export default function DashboardPage() {
 
   const isVisible = (key: string) => visiblePages.includes(key as PageType);
 
-  const renderCard = (key: PageType) => {
-    switch (key) {
-      case 'timestamp':
-        return (
-          <ToolCard
-            key={key}
-            title="时间戳"
-            description="Unix 毫秒数转换与格式化"
-            colorCode="#2196f3"
-            icon={<AccessTimeIcon sx={{ fontSize: 20 }} />}
-            onClick={() => navigateTo('timestamp')}
-            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
-            snapshot={
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography
-                  sx={{
-                    fontFamily: 'monospace',
-                    fontWeight: 600,
-                    color: dashboardPageStyles.primaryColor,
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  {now.valueOf()}
-                </Typography>
-                <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
-                  {now.format('HH:mm:ss')}
-                </Typography>
-              </Box>
-            }
-          />
-        );
-      case 'storageCleaner':
-        return (
-          <ToolCard
-            key={key}
-            title="存储管理"
-            description="清理缓存、Cookies 及本地存储"
-            colorCode="#ff9800"
-            icon={<StorageIcon sx={{ fontSize: 20 }} />}
-            onClick={() => navigateTo('storageCleaner')}
-            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
-          />
-        );
-      case 'openUrl':
-        return (
-          <ToolCard
-            key={key}
-            title="URL 工具"
-            description="快速打开 URL 或复制链接"
-            colorCode="#9c27b0"
-            icon={<LanguageIcon sx={{ fontSize: 20 }} />}
-            onClick={() => navigateTo('openUrl')}
-            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
-          />
-        );
-      case 'qrCode':
-        return (
-          <ToolCard
-            key={key}
-            title="二维码工具"
-            description="URL 转二维码与二维码解析"
-            colorCode="#4caf50"
-            icon={<QrCodeIcon sx={{ fontSize: 20 }} />}
-            onClick={() => navigateTo('qrCode')}
-            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
-          />
-        );
-      case 'formMapping':
-        return (
-          <ToolCard
-            key={key}
-            title="通用表单映射助手"
-            description="智能识别表单指纹，自定义填充逻辑"
-            colorCode="#3f51b5"
-            icon={<AutoFixHighIcon sx={{ fontSize: 20 }} />}
-            onClick={() => navigateTo('formMapping')}
-            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
-          />
-        );
-      case 'formRecognizer':
-        return (
-          <ToolCard
-            key={key}
-            title="表单识别"
-            description="识别标签页中的表单内容"
-            colorCode="#ff5722"
-            icon={<DescriptionIcon sx={{ fontSize: 20 }} />}
-            onClick={() => navigateTo('formRecognizer')}
-            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
-          />
-        );
-      case 'formFill':
-        return (
-          <ToolCard
-            key={key}
-            title="智能填充"
-            description="根据表单指纹智能填充表单内容"
-            colorCode="#2196f3"
-            icon={<AutoFixHighIcon sx={{ fontSize: 20 }} />}
-            onClick={() => navigateTo('formFill')}
-            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
-          />
-        );
-      default:
-        return null;
-    }
-  };
+  const handleCardClick = useCallback(
+    (page: PageType) => {
+      navigateTo(page);
+    },
+    [navigateTo],
+  );
 
   return (
-    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 4 }}>
-      <Container maxWidth="sm" sx={{ py: 3, px: 2 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {pageOrder.map((key) => (isVisible(key) ? renderCard(key) : null))}
-        </Box>
-      </Container>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
+      {pageOrder.map((key) => {
+        if (!isVisible(key)) return null;
+
+        const config = cardConfigs[key];
+        if (!config) return null;
+
+        const snapshot =
+          key === 'timestamp' ? (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography
+                sx={{
+                  fontFamily: 'monospace',
+                  fontWeight: 600,
+                  color: dashboardPageStyles.primaryColor,
+                  fontSize: '0.85rem',
+                }}
+              >
+                {now.valueOf()}
+              </Typography>
+              <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
+                {now.format('HH:mm:ss')}
+              </Typography>
+            </Box>
+          ) : undefined;
+
+        return (
+          <DashboardCard
+            key={key}
+            config={config}
+            onClick={() => handleCardClick(key)}
+            snapshot={snapshot}
+            cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
+          />
+        );
+      })}
     </Box>
   );
 }

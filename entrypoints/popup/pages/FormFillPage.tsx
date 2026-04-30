@@ -24,7 +24,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
-import { globalStyles, formMappingPageStyles } from '@/config/pageTheme.ts';
+import { formMappingPageStyles } from '@/config/pageTheme.ts';
 import { MockDataGenerator } from '@/utils/formMapping/smartInjector';
 
 export default function FormFillPage() {
@@ -141,8 +141,8 @@ export default function FormFillPage() {
   };
 
   return (
-    <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
+    <Box>
+      <Container sx={{ py: 2 }}>
         <PageHeader
           title="智能表单填充"
           subtitle="基于指纹识别的精准数据注入"

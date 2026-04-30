@@ -22,7 +22,7 @@ import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
 import Button from '@/components/Button';
-import { globalStyles, formMappingPageStyles } from '@/config/pageTheme.ts';
+import { formMappingPageStyles } from '@/config/pageTheme';
 
 export default function FormMappingPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
@@ -108,8 +108,8 @@ export default function FormMappingPage() {
 
   return (
     <Box>
-      <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
-        <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
+      <Box>
+        <Container sx={{ py: 2 }}>
           <PageHeader
             title="通用表单映射助手"
             subtitle="智能识别表单指纹，自定义填充逻辑"

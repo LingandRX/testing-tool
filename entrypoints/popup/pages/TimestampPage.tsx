@@ -3,7 +3,7 @@ import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';
-import { ZONES, globalStyles, timestampPageStyles } from '@/config/pageTheme';
+import { ZONES, timestampPageStyles } from '@/config/pageTheme';
 import LiveClock from './components/LiveClock';
 import ResultView from './components/ResultView';
 import { useTimestampConverter } from './hooks/useTimestampConverter';
@@ -28,8 +28,8 @@ export default function TimestampPage() {
   } = useTimestampConverter();
 
   return (
-    <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
+    <Box>
+      <Container sx={{ py: 2 }}>
         {/* Header */}
         <PageHeader
           title="时间戳转换"

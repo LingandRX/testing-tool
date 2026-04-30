@@ -4,7 +4,7 @@ import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 import UrlToQrCodeSection from '@/components/UrlToQrCodeSection';
 import QrCodeToUrlSection from '@/components/QrCodeToUrlSection';
 import { useStorageState } from '@/utils/useStorageState';
-import { dashboardPageStyles, qrCodePageStyles } from '@/config/pageTheme';
+import { qrCodePageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
 
 const QrCodePage = () => {
@@ -33,8 +33,8 @@ const QrCodePage = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2, maxWidth: 400, bgcolor: dashboardPageStyles.backgroundColor }}>
+    <Box>
+      <Container sx={{ py: 2, maxWidth: 400 }}>
         <PageHeader
           title="二维码工具"
           subtitle="生成和解析二维码"

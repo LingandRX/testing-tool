@@ -5,7 +5,7 @@ import UrlEntryForm from '@/components/UrlEntryForm';
 import UrlEntryList from '@/components/UrlEntryList';
 import { useUrlPreferences } from '@/utils/useUrlPreferences';
 import type { OpenUrlEntry } from '@/types/storage';
-import { dashboardPageStyles, openUrlPageStyles } from '@/config/pageTheme';
+import { openUrlPageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
 
 export default function OpenUrlPage() {
@@ -25,7 +25,7 @@ export default function OpenUrlPage() {
 
   if (!isLoaded) {
     return (
-      <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
+      <Box sx={{ minHeight: '100%', pb: 3 }}>
         <Container sx={{ py: 2 }}>
           <Typography>加载中...</Typography>
         </Container>
@@ -34,7 +34,7 @@ export default function OpenUrlPage() {
   }
 
   return (
-    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
+    <Box>
       <Container sx={{ py: 2 }}>
         {/* Header */}
         <PageHeader

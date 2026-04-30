@@ -11,7 +11,7 @@ import {
 import InputIcon from '@mui/icons-material/Input';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
-import { dashboardPageStyles, formRecognizerPageStyles } from '@/config/pageTheme';
+import { formRecognizerPageStyles } from '@/config/pageTheme';
 import { MessageAction, sendMessageToContent, injectContentScript } from '@/utils/messages';
 import { FillMode } from '@/utils/dummyDataGenerator';
 import FieldList from '@/components/FieldList';
@@ -332,8 +332,8 @@ const FormRecognizerPage = () => {
   const selectedCount = fields.filter((f) => f.isSelected).length;
 
   return (
-    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 4 }}>
-      <Container maxWidth="sm" sx={{ py: 3, px: 2, bgcolor: '#f5f5f5' }}>
+    <Box>
+      <Container maxWidth="sm" sx={{ py: 3, px: 2 }}>
         {/* Header */}
         <PageHeader
           title="表单测试数据填充器"

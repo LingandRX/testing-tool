@@ -9,13 +9,25 @@ import FormRecognizerPage from '@/entrypoints/popup/pages/FormRecognizerPage';
 import FormMappingPage from '@/entrypoints/popup/pages/FormMappingPage';
 import FormFillPage from '@/entrypoints/popup/pages/FormFillPage';
 
+/**
+ * 路由配置接口
+ *
+ * 定义每个页面路由的配置信息，支持多种显示模式（popup、sidepanel、detached）
+ */
 export interface RouteConfig {
+  /** 页面类型标识 */
   key: PageType;
+  /** 页面显示标签 */
   label: string;
+  /** 默认是否在仪表盘显示 */
   defaultVisible: boolean;
+  /** 不同显示模式对应的组件 */
   components: {
+    /** 弹窗模式组件 */
     popup: React.ComponentType;
+    /** 侧边栏模式组件 */
     sidepanel: React.ComponentType;
+    /** 独立窗口模式组件 */
     detached: React.ComponentType;
   };
 }

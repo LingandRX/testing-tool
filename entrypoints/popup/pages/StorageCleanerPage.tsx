@@ -45,7 +45,7 @@ export default function StorageCleanerPage() {
   }
 
   return (
-    <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100%', pb: 2 }}>
+    <Box>
       <Container sx={{ py: 2 }}>
         <DomainHeader domain={domain} totalSize={totalSize} />
 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import { storageUtil } from '@/utils/chromeStorage';
-import { dashboardPageStyles } from '@/config/pageTheme';
 
 // 只允许 HTTP/HTTPS 协议，阻止危险协议
 const ALLOWED_PROTOCOLS = ['http:', 'https:'];
@@ -112,7 +111,6 @@ export default function OpenUrlViewerPage() {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        bgcolor: dashboardPageStyles.backgroundColor,
       }}
     >
       {/* 加载状态指示器 */}
