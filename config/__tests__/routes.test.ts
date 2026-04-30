@@ -9,8 +9,8 @@ import {
 
 describe('routes', () => {
   describe('ROUTES', () => {
-    it('should have 7 routes defined', () => {
-      expect(ROUTES).toHaveLength(7);
+    it('should have 9 routes defined', () => {
+      expect(ROUTES).toHaveLength(9);
     });
 
     it('should have all required properties for each route', () => {
@@ -104,7 +104,7 @@ describe('routes', () => {
   describe('getAllRouteKeys', () => {
     it('should return all route keys', () => {
       const allKeys = getAllRouteKeys();
-      expect(allKeys).toHaveLength(7);
+      expect(allKeys).toHaveLength(9);
       expect(allKeys).toContain('dashboard');
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
@@ -135,9 +135,9 @@ describe('routes', () => {
       expect(pageOrder).toContain('formRecognizer');
     });
 
-    it('should have 5 items in page order', () => {
+    it('should have 7 items in page order', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(5);
+      expect(pageOrder).toHaveLength(7);
     });
   });
 });
