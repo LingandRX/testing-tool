@@ -1,12 +1,23 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import * as reactHooks from 'eslint-plugin-react-hooks';
-import * as reactPlugin from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactPlugin from 'eslint-plugin-react';
 import globals from 'globals';
 
-export default tseslint.config(
-  { ignores: ['dist', '.wxt', 'node_modules', 'eslint.config.ts', '**/*.test.tsx', '**/*.test.ts', '**/__tests__/**'] },
-
+export default [
+  {
+    ignores: [
+      'dist',
+      '.wxt',
+      'node_modules',
+      'eslint.config.ts',
+      '**/*.test.tsx',
+      '**/*.test.ts',
+      '**/__tests__/**',
+    ],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
   {
     files: [
       'hooks/**/*.{ts,tsx}',
@@ -16,7 +27,6 @@ export default tseslint.config(
       'components/**/*.{ts,tsx}',
       'services/**/*.{ts,tsx}',
     ],
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -29,7 +39,7 @@ export default tseslint.config(
       },
     },
     plugins: {
-      react: reactPlugin as any, // 现在这里就算写 TS 语法也没事了，因为文件被忽略了
+      react: reactPlugin as any,
       'react-hooks': reactHooks as any,
     },
     rules: {
@@ -42,4 +52,4 @@ export default tseslint.config(
       'react/react-in-jsx-scope': 'off',
     },
   },
-);
+];

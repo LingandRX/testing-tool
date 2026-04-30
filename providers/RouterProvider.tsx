@@ -42,7 +42,7 @@ export function RouterProvider({
 
   useEffect(() => {
     if (isLoaded && syncRoute) {
-      storageUtil.set(syncKey, currentPage as any);
+      storageUtil.set(syncKey, currentPage as never);
     }
   }, [currentPage, isLoaded, syncRoute, syncKey]);
 
@@ -105,7 +105,7 @@ export function RouterProvider({
   };
 
   const syncNavigation = (page: PageType) => {
-    storageUtil.set(syncKey, page as any);
+    storageUtil.set(syncKey, page as never);
   };
 
   const goBack = () => {

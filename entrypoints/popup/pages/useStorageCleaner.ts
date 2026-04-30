@@ -142,12 +142,12 @@ export function useStorageCleaner({
   loadInfoRef.current = loadInfo;
 
   useEffect(() => {
-    loadInfoRef.current();
+    loadInfoRef.current().then((r) => console.info(r));
 
     const handleTabChange = () => loadInfoRef.current();
     const handleTabUpdated = (_tabId: number, changeInfo: { status?: string; url?: string }) => {
       if (changeInfo.status === 'complete' || changeInfo.url) {
-        loadInfoRef.current();
+        loadInfoRef.current().then((r) => console.info(r));
       }
     };
 

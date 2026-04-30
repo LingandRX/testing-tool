@@ -29,13 +29,12 @@ export default function TimestampPage() {
 
   return (
     <Box>
-      <Container sx={{ py: 2 }}>
+      <Container sx={{ p: 2 }}>
         {/* Header */}
         <PageHeader
           title="时间戳转换"
           subtitle="Unix 毫秒数转换与格式化"
           icon={<AccessTimeIcon />}
-          sx={{ mb: 2.5 }}
         />
 
         {/* Live Clock Card */}
