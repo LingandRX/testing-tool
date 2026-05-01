@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import { getDefaultVisibleRoutes, getDefaultPageOrder } from '@/config/routes';
@@ -36,13 +36,37 @@ export function RouterProvider({
   const [pageOrder, setPageOrder] = useState<PageType[]>(getDefaultPageOrder());
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const loadInitialData = useCallback(async () => {
+    try {
+      const [savedRoute, savedVisiblePages, savedPageOrder] = await Promise.all([
+        storageUtil.get(syncKey, defaultRoute),
+        storageUtil.get('app/visiblePages', getDefaultVisibleRoutes()),
+        storageUtil.get('app/pageOrder', getDefaultPageOrder()),
+      ]);
+
+      if (savedRoute && syncRoute) {
+        setCurrentPage(savedRoute as PageType);
+      }
+      if (savedVisiblePages) {
+        setVisiblePages(savedVisiblePages);
+      }
+      if (savedPageOrder && savedPageOrder.length > 0) {
+        setPageOrder(savedPageOrder);
+      }
+    } catch (error) {
+      console.error('Failed to load initial routing data:', error);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, [defaultRoute, syncKey, syncRoute]);
+
   useEffect(() => {
     loadInitialData();
-  }, [syncKey]);
+  }, [loadInitialData]);
 
   useEffect(() => {
     if (isLoaded && syncRoute) {
-      storageUtil.set(syncKey, currentPage as never);
+      storageUtil.set(syncKey, currentPage as PageType);
     }
   }, [currentPage, isLoaded, syncRoute, syncKey]);
 
@@ -71,30 +95,6 @@ export function RouterProvider({
     chrome.storage.onChanged.addListener(handleStorageChange);
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
   }, [syncRoute, currentPage, syncKey]);
-
-  const loadInitialData = async () => {
-    try {
-      const [savedRoute, savedVisiblePages, savedPageOrder] = await Promise.all([
-        storageUtil.get(syncKey, defaultRoute),
-        storageUtil.get('app/visiblePages', getDefaultVisibleRoutes()),
-        storageUtil.get('app/pageOrder', getDefaultPageOrder()),
-      ]);
-
-      if (savedRoute && syncRoute) {
-        setCurrentPage(savedRoute as PageType);
-      }
-      if (savedVisiblePages) {
-        setVisiblePages(savedVisiblePages);
-      }
-      if (savedPageOrder && savedPageOrder.length > 0) {
-        setPageOrder(savedPageOrder);
-      }
-    } catch (error) {
-      console.error('Failed to load initial routing data:', error);
-    } finally {
-      setIsLoaded(true);
-    }
-  };
 
   const navigateTo = (page: PageType) => {
     setCurrentPage(page);

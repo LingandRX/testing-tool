@@ -29,7 +29,7 @@ export const useStorageState = <K extends keyof StorageSchema>(
     };
 
     loadState();
-  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps -- defaultValue intentionally excluded to prevent infinite loops
+  }, [defaultValue, key]);
 
   // Save to storage when value changes (after initial load)
   useEffect(() => {
