@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import './App.css';
 import RouterProvider from '@/providers/RouterProvider';
 import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import { MessageAction, sendMessage } from '@/utils/messages';
+import { Box } from '@mui/material';
 
 export default function App() {
   const handleOpenOptions = () => {
@@ -21,13 +21,19 @@ export default function App() {
 
   return (
     <RouterProvider defaultRoute="dashboard" syncKey="app/sidepanelRoute">
-      <div
+      <Box
         className="app"
-        style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',
+          width: '100%',
+          overflow: 'hidden',
+        }}
       >
         <TopBar onOpenOptions={handleOpenOptions} />
         <RouterContainer />
-      </div>
+      </Box>
     </RouterProvider>
   );
 }

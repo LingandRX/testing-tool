@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { MessageAction, sendMessageToContent, injectContentScript } from '@/utils/messages';
 import { FillMode } from '@/utils/dummyDataGenerator';
 import { useStorageState } from '@/utils/useStorageState';
 import { FieldTypePreferences } from '@/types/storage';
+import { useActiveTabDomain } from './useActiveTabDomain';
+import { useSidePanelState } from './useSidePanelState';
 
 // 字段数据接口
 export interface FieldData {
@@ -30,59 +32,14 @@ export function useFormRecognizer() {
   const [scanning, setScanning] = useState(false);
   const [showFields, setShowFields] = useState(false);
   const [hoveredFieldId, setHoveredFieldId] = useState<string | null>(null);
-  const [currentDomain, setCurrentDomain] = useState<string>('');
-  const [sidePanelOpen, setSidePanelOpen] = useState(false);
+
+  const currentDomain = useActiveTabDomain();
+  const { sidePanelOpen, handleOpenSidePanel } = useSidePanelState();
 
   const [fieldTypePreferences, setFieldTypePreferences] = useStorageState(
     'formRecognizer/fieldTypePreferences',
     DEFAULT_FIELD_TYPE_PREFERENCES,
   );
-
-  // 获取当前域名
-  useEffect(() => {
-    const getActiveTab = async () => {
-      try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (tab?.url) {
-          const url = new URL(tab.url);
-          setCurrentDomain(url.hostname);
-        }
-      } catch (error) {
-        console.error('获取标签页信息失败:', error);
-      }
-    };
-    getActiveTab();
-  }, []);
-
-  // 检测侧边栏状态
-  useEffect(() => {
-    const checkSidePanelState = async () => {
-      try {
-        if (typeof chrome.runtime.getContexts === 'function') {
-          const contexts = await chrome.runtime.getContexts({
-            contextTypes: ['SIDE_PANEL'],
-          });
-          setSidePanelOpen(contexts.length > 0);
-        } else {
-          setSidePanelOpen(false);
-        }
-      } catch (error) {
-        console.error('检测侧边栏状态失败:', error);
-        setSidePanelOpen(false);
-      }
-    };
-
-    checkSidePanelState();
-
-    // 监听侧边栏状态变化消息
-    const removeListener = onMessage(MessageAction.SIDE_PANEL_STATE_CHANGED, (message) => {
-      setSidePanelOpen(message.data.isOpen);
-    });
-
-    return () => {
-      removeListener();
-    };
-  }, []);
 
   // 生成字段标识符
   const getFieldIdentifier = useCallback(
@@ -307,18 +264,6 @@ export function useFormRecognizer() {
     } finally {
       setClearLoading(false);
       isProcessingRef.current = false;
-    }
-  };
-
-  // 打开侧边栏
-  const handleOpenSidePanel = async () => {
-    try {
-      await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-      setSidePanelOpen(true);
-      showMessage('侧边栏已打开', { severity: 'success' });
-    } catch (error) {
-      console.error('打开侧边栏失败:', error);
-      showMessage('打开侧边栏失败', { severity: 'error' });
     }
   };
 
