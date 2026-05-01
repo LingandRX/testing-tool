@@ -33,6 +33,9 @@ export enum MessageAction {
 
   // 智能表单注入
   FORM_INJECT = 'FORM_INJECT',
+
+  // 侧边栏状态变化
+  SIDE_PANEL_STATE_CHANGED = 'sidePanelStateChanged',
 }
 
 /**
@@ -48,6 +51,7 @@ export interface MessagePayload {
   fieldId?: string;
   fieldIds?: string[];
   data?: unknown;
+  isOpen?: boolean;
 }
 
 /**
@@ -95,6 +99,7 @@ export interface ProtocolMap {
   [MessageAction.UNHIGHLIGHT_ALL_FIELDS](): MessageResponse;
   [MessageAction.FLASH_FIELD](data: { fieldId: string }): MessageResponse;
   [MessageAction.FORM_INJECT](data: { data: FormInjectItem[] }): MessageResponse;
+  [MessageAction.SIDE_PANEL_STATE_CHANGED](data: { isOpen: boolean }): void;
 }
 
 export const { sendMessage, onMessage } = defineExtensionMessaging<ProtocolMap>();

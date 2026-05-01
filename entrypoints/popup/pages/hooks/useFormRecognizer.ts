@@ -73,8 +73,15 @@ export function useFormRecognizer() {
     };
 
     checkSidePanelState();
-    const interval = setInterval(checkSidePanelState, 500);
-    return () => clearInterval(interval);
+
+    // 监听侧边栏状态变化消息
+    const removeListener = onMessage(MessageAction.SIDE_PANEL_STATE_CHANGED, (message) => {
+      setSidePanelOpen(message.data.isOpen);
+    });
+
+    return () => {
+      removeListener();
+    };
   }, []);
 
   // 生成字段标识符
@@ -307,6 +314,7 @@ export function useFormRecognizer() {
   const handleOpenSidePanel = async () => {
     try {
       await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+      setSidePanelOpen(true);
       showMessage('侧边栏已打开', { severity: 'success' });
     } catch (error) {
       console.error('打开侧边栏失败:', error);
