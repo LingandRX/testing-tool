@@ -19,12 +19,12 @@ import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
 import Button from '@/components/Button';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 
 export default function FormMappingPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
   const [isPicking, setIsPicking] = useState(false);
-  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 3000 });
+  const { showMessage } = useGlobalSnackbar({ autoHideDuration: 3000 });
 
   useEffect(() => {
     const loadData = async () => {
@@ -34,7 +34,7 @@ export default function FormMappingPage() {
       setIsPicking(picking || false);
     };
 
-    loadData();
+    loadData().catch((r) => console.error(r));
 
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }, area: string) => {
       if (area === 'local') {
@@ -280,7 +280,6 @@ export default function FormMappingPage() {
           </Container>
         </Container>
       </Box>
-      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

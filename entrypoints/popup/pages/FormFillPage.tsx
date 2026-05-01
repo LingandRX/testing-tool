@@ -24,14 +24,14 @@ import { formMappingPageStyles } from '@/config/pageTheme.ts';
 import { MockDataGenerator } from '@/utils/formMapping/smartInjector';
 import { Button } from '@/components/Button';
 import { FormInjectResult, MessageAction, sendMessage } from '@/utils/messages';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 
 export default function FormFillPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
   const [previewData, setPreviewData] = useState<Map<string, string>>(new Map());
   const [injectResults, setInjectResults] = useState<Map<string, boolean>>(new Map());
   const [isInjecting, setIsInjecting] = useState(false);
-  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 3000 });
+  const { showMessage } = useGlobalSnackbar({ autoHideDuration: 3000 });
 
   const generatePreviewData = useCallback((items: FormMapEntry[]) => {
     const preview = new Map<string, string>();
@@ -50,10 +50,10 @@ export default function FormFillPage() {
       generatePreviewData(data || []);
     };
 
-    loadEntries();
+    loadEntries().catch((r) => console.error(r));
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }, area: string) => {
       if (area === 'local' && changes['active_form_map']) {
-        loadEntries();
+        loadEntries().catch((r) => console.error(r));
       }
     };
     chrome.storage.onChanged.addListener(listener);
@@ -359,9 +359,6 @@ export default function FormFillPage() {
           )}
         </Container>
       </Container>
-
-      {/* 提示消息 */}
-      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

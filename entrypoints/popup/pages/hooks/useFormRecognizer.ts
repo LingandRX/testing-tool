@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 import { MessageAction, sendMessageToContent, injectContentScript } from '@/utils/messages';
 import { FillMode } from '@/utils/dummyDataGenerator';
 import { useStorageState } from '@/utils/useStorageState';
@@ -23,7 +23,7 @@ export interface FieldData {
 const DEFAULT_FIELD_TYPE_PREFERENCES: FieldTypePreferences = {};
 
 export function useFormRecognizer() {
-  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
+  const { showMessage } = useGlobalSnackbar({ autoHideDuration: 1500 });
   const [fillLoading, setFillLoading] = useState(false);
   const [clearLoading, setClearLoading] = useState(false);
   const [includeHidden, setIncludeHidden] = useState(false);
@@ -268,7 +268,6 @@ export function useFormRecognizer() {
   };
 
   return {
-    snackbarProps,
     fillLoading,
     clearLoading,
     includeHidden,

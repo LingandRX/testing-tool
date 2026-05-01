@@ -1,6 +1,6 @@
 import { Box, Container, CircularProgress } from '@mui/material';
 import Button from '@/components/Button';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useStorageCleaner } from './useStorageCleaner';
@@ -11,7 +11,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 import CleaningResult from './components/CleaningResult';
 
 export default function StorageCleanerPage() {
-  const { snackbarProps, showMessage } = useSnackbar();
+  const { showMessage } = useGlobalSnackbar();
   const {
     domain,
     error,
@@ -84,7 +84,6 @@ export default function StorageCleanerPage() {
         onConfirm={handleClean}
         options={options}
       />
-      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

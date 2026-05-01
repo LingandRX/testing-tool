@@ -1,6 +1,6 @@
 import { Box, Stack, Container, CircularProgress } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 import UrlToQrCodeSection from '@/components/UrlToQrCodeSection';
 import QrCodeToUrlSection from '@/components/QrCodeToUrlSection';
 import { useStorageState } from '@/utils/useStorageState';
@@ -8,7 +8,7 @@ import { qrCodePageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
 
 export default function QrCodePage() {
-  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
+  const { showMessage } = useGlobalSnackbar({ autoHideDuration: 1500 });
 
   // 使用自定义钩子管理展开状态
   const [urlExpanded, setUrlExpanded, urlInitialized] = useStorageState('qrCode/urlExpanded', true);
@@ -56,7 +56,6 @@ export default function QrCodePage() {
             showMessage={showMessage}
           />
         </Stack>
-        <GlobalSnackbar {...snackbarProps} />
       </Container>
     </Box>
   );

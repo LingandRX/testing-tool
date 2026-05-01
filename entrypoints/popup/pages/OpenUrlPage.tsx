@@ -1,6 +1,6 @@
 import { Box, Typography, Container } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 import UrlEntryForm from '@/components/UrlEntryForm';
 import UrlEntryList from '@/components/UrlEntryList';
 import { useUrlPreferences } from '@/utils/useUrlPreferences';
@@ -10,7 +10,7 @@ import PageHeader from '@/components/PageHeader';
 
 export default function OpenUrlPage() {
   const { entries, setEntries, isLoaded } = useUrlPreferences();
-  const { snackbarProps, showMessage } = useSnackbar();
+  const { showMessage } = useGlobalSnackbar();
 
   const handleAddEntry = (entry: OpenUrlEntry) => {
     setEntries([...entries, entry]);
@@ -64,7 +64,6 @@ export default function OpenUrlPage() {
           />
         </Box>
       </Container>
-      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

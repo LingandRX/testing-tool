@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MessageAction, onMessage } from '@/utils/messages';
-import { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar } from '@/components/SnackbarProvider';
 
 /**
  * 管理侧边栏状态检测与开启逻辑的 Hook

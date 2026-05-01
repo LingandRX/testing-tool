@@ -3,46 +3,41 @@ import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { globalStyles } from '@/config/pageTheme';
+import { SnackbarProvider } from '@/components/GlobalSnackbar';
 import { Box } from '@mui/material';
 
 export default function App() {
   // 打开Chrome扩展选项页面，需确保manifest中已配置options_page或options_ui
   const handleOpenOptions = () => {
-    chrome.runtime
-      .openOptionsPage()
-      .then(() => {
-        console.log('Options page opened.');
-      })
-      .catch(() => {
-        console.error('Failed to open options page.');
-      });
+    chrome.runtime.openOptionsPage().catch((r) => console.error(r));
   };
 
   return (
-    <RouterProvider defaultRoute="dashboard" syncRoute={true} syncKey="app/popupRoute">
-      <Box
-        className="app"
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '400px',
-          height: '600px',
-          overflow: 'hidden',
-          backgroundColor: globalStyles.backgroundColor,
-          // 独立窗口全屏自适应
-          '@media screen and (min-width: 401px), screen and (min-height: 601px)': {
-            width: '100vw',
-            height: '100vh',
-            minWidth: '400px',
-            minHeight: '600px',
-          },
-        }}
-      >
-        <TopBar onOpenOptions={handleOpenOptions} />
-        <ErrorBoundary>
-          <RouterContainer />
-        </ErrorBoundary>
-      </Box>
+    <RouterProvider syncKey="app/popupRoute">
+      <SnackbarProvider>
+        <Box
+          className="app"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '400px',
+            height: '600px',
+            overflow: 'hidden',
+            backgroundColor: globalStyles.backgroundColor,
+            '@media screen and (min-width: 401px), screen and (min-height: 601px)': {
+              width: '100vw',
+              height: '100vh',
+              minWidth: '400px',
+              minHeight: '600px',
+            },
+          }}
+        >
+          <TopBar onOpenOptions={handleOpenOptions} />
+          <ErrorBoundary>
+            <RouterContainer />
+          </ErrorBoundary>
+        </Box>
+      </SnackbarProvider>
     </RouterProvider>
   );
 }

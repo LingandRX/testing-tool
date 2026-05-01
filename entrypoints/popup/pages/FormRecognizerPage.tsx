@@ -2,7 +2,6 @@ import { Box, Container, CircularProgress, FormControlLabel, Switch } from '@mui
 import Button from '@/components/Button';
 import InputIcon from '@mui/icons-material/Input';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import GlobalSnackbar from '@/components/GlobalSnackbar';
 import { formRecognizerPageStyles } from '@/config/pageTheme';
 import FieldList from '@/components/FieldList';
 import PageHeader from '@/components/PageHeader';
@@ -10,7 +9,6 @@ import { useFormRecognizer } from './hooks/useFormRecognizer';
 
 export default function FormRecognizerPage() {
   const {
-    snackbarProps,
     fillLoading,
     clearLoading,
     includeHidden,
@@ -123,8 +121,6 @@ export default function FormRecognizerPage() {
             label="包含隐藏字段"
           />
         </Box>
-
-        <GlobalSnackbar {...snackbarProps} />
       </Container>
     </Box>
   );

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Snackbar, Alert, type SxProps, type Theme, alpha, Portal } from '@mui/material';
 
 export type SnackbarSeverity = 'success' | 'info' | 'warning' | 'error';
+export { SnackbarProvider } from './SnackbarProvider';
 
 export interface GlobalSnackbarProps {
   /** 消息内容 */
