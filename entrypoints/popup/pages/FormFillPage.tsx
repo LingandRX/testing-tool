@@ -10,8 +10,6 @@ import {
   Divider,
   Paper,
   Chip,
-  Snackbar,
-  Alert,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -26,15 +24,14 @@ import { formMappingPageStyles } from '@/config/pageTheme.ts';
 import { MockDataGenerator } from '@/utils/formMapping/smartInjector';
 import { Button } from '@/components/Button';
 import { FormInjectResult, MessageAction, sendMessage } from '@/utils/messages';
+import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 
 export default function FormFillPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
   const [previewData, setPreviewData] = useState<Map<string, string>>(new Map());
   const [injectResults, setInjectResults] = useState<Map<string, boolean>>(new Map());
   const [isInjecting, setIsInjecting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 3000 });
 
   const generatePreviewData = useCallback((items: FormMapEntry[]) => {
     const preview = new Map<string, string>();
@@ -69,8 +66,7 @@ export default function FormFillPage() {
 
   const injectAllFields = async () => {
     if (entries.length === 0) {
-      setErrorMessage('没有可填充的字段');
-      setShowError(true);
+      showMessage('没有可填充的字段', { severity: 'error' });
       return;
     }
 
@@ -103,16 +99,16 @@ export default function FormFillPage() {
           results.set(r.id, r.success);
         });
         setInjectResults(results);
-        setShowSuccess(true);
+        showMessage('填充成功！', { severity: 'success' });
       } else {
         throw new Error(result?.error || result?.message || '注入失败');
       }
     } catch (error) {
       console.error('注入失败:', error);
-      setErrorMessage(
-        error instanceof Error ? error.message : '注入失败，请确保已在网页中打开表单',
-      );
-      setShowError(true);
+      showMessage(error instanceof Error ? error.message : '注入失败，请确保已在网页中打开表单');
+      showMessage(error instanceof Error ? error.message : '注入失败，请确保已在网页中打开表单', {
+        severity: 'error',
+      });
     } finally {
       setIsInjecting(false);
     }
@@ -255,6 +251,14 @@ export default function FormFillPage() {
                       sx={{ mr: 2 }}
                     />
                     <ListItemText
+                      slotProps={{
+                        primary: {
+                          component: 'div',
+                        },
+                        secondary: {
+                          component: 'div',
+                        },
+                      }}
                       primary={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                           <span style={{ fontWeight: 500 }}>{entry.label_display}</span>
@@ -357,22 +361,7 @@ export default function FormFillPage() {
       </Container>
 
       {/* 提示消息 */}
-      <Snackbar
-        open={showSuccess}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccess(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success">填充完成！</Alert>
-      </Snackbar>
-      <Snackbar
-        open={showError}
-        autoHideDuration={4000}
-        onClose={() => setShowError(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="error">{errorMessage}</Alert>
-      </Snackbar>
+      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

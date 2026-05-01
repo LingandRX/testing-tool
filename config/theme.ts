@@ -67,8 +67,8 @@ const theme = createTheme({
         // 针对 Popup 的特殊处理（如果需要固定宽高，可以在具体入口点或容器中处理，
         // 这里提供全局基础，具体尺寸在 App 容器中限制）
         body: {
-          '-webkit-font-smoothing': 'antialiased',
-          '-moz-osx-font-smoothing': 'grayscale',
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
         },
         code: {
           fontFamily: 'source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace',

@@ -9,8 +9,6 @@ import {
   Switch,
   Divider,
   Paper,
-  Snackbar,
-  Alert,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
@@ -21,12 +19,12 @@ import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
 import Button from '@/components/Button';
+import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 
 export default function FormMappingPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
   const [isPicking, setIsPicking] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null);
-  const [showExportSuccess, setShowExportSuccess] = useState(false);
+  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 3000 });
 
   useEffect(() => {
     const loadData = async () => {
@@ -77,7 +75,7 @@ export default function FormMappingPage() {
   const exportConfig = () => {
     try {
       if (entries.length === 0) {
-        setExportError('没有可导出的配置数据');
+        showMessage('没有可导出的配置数据', { severity: 'warning' });
         return;
       }
 
@@ -97,10 +95,12 @@ export default function FormMappingPage() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      setShowExportSuccess(true);
+      showMessage('配置导出成功！', { severity: 'success' });
     } catch (error) {
       console.error('导出配置失败:', error);
-      setExportError(error instanceof Error ? error.message : '导出失败，请重试');
+      showMessage(error instanceof Error ? error.message : '导出失败，请重试', {
+        severity: 'error',
+      });
     }
   };
 
@@ -280,26 +280,7 @@ export default function FormMappingPage() {
           </Container>
         </Container>
       </Box>
-      <Snackbar
-        open={!!exportError}
-        autoHideDuration={4000}
-        onClose={() => setExportError(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="error" onClose={() => setExportError(null)}>
-          {exportError}
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={showExportSuccess}
-        autoHideDuration={3000}
-        onClose={() => setShowExportSuccess(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" onClose={() => setShowExportSuccess(false)}>
-          配置导出成功！
-        </Alert>
-      </Snackbar>
+      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }
