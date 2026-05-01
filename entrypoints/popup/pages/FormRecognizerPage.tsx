@@ -8,7 +8,7 @@ import FieldList from '@/components/FieldList';
 import PageHeader from '@/components/PageHeader';
 import { useFormRecognizer } from './hooks/useFormRecognizer';
 
-const FormRecognizerPage = () => {
+export default function FormRecognizerPage() {
   const {
     snackbarProps,
     fillLoading,
@@ -128,6 +128,4 @@ const FormRecognizerPage = () => {
       </Container>
     </Box>
   );
-};
-
-export default FormRecognizerPage;
+}

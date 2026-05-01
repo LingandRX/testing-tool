@@ -17,7 +17,7 @@ import { storageUtil } from '@/utils/chromeStorage';
 import { getRouteByKey, getDefaultPageOrder, getDefaultVisibleRoutes } from '@/config/routes';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
 
-function App() {
+export default function App() {
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
   const [pageOrder, setPageOrder] = useState<PageType[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -208,5 +208,3 @@ function App() {
     </Box>
   );
 }
-
-export default App;

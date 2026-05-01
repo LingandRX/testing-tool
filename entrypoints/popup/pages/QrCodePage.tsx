@@ -7,7 +7,7 @@ import { useStorageState } from '@/utils/useStorageState';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
 
-const QrCodePage = () => {
+export default function QrCodePage() {
   const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
 
   // 使用自定义钩子管理展开状态
@@ -60,6 +60,4 @@ const QrCodePage = () => {
       </Container>
     </Box>
   );
-};
-
-export default QrCodePage;
+}

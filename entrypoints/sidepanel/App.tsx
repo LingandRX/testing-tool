@@ -5,7 +5,7 @@ import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import { MessageAction, sendMessage } from '@/utils/messages';
 
-function App() {
+export default function App() {
   const handleOpenOptions = () => {
     chrome.runtime.openOptionsPage();
   };
@@ -31,5 +31,3 @@ function App() {
     </RouterProvider>
   );
 }
-
-export default App;

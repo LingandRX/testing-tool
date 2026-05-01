@@ -4,7 +4,7 @@ import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import { globalStyles } from '@/config/pageTheme';
 
-function App() {
+export default function App() {
   // 打开Chrome扩展选项页面，需确保manifest中已配置options_page或options_ui
   const handleOpenOptions = () => {
     chrome.runtime
@@ -35,5 +35,3 @@ function App() {
     </RouterProvider>
   );
 }
-
-export default App;
