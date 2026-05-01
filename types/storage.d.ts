@@ -1,92 +1,169 @@
+/**
+ * 应用页面类型定义
+ */
 export type PageType =
-  | 'dashboard'
-  | 'timestamp'
-  | 'storageCleaner'
-  | 'openUrl'
-  | 'qrCode'
-  | 'formRecognizer'
-  | 'formMapping'
-  | 'formFill'
-  | 'openUrlViewer';
+  | 'dashboard' // 仪表盘/首页
+  | 'timestamp' // 时间戳转换工具
+  | 'storageCleaner' // 存储清理工具
+  | 'openUrl' // 快捷链接工具
+  | 'qrCode' // 二维码工具
+  | 'formRecognizer' // 表单识别工具
+  | 'formMapping' // 表单映射配置
+  | 'formFill' // 表单填充工具
+  | 'openUrlViewer'; // 快捷链接查看页面
 
+/**
+ * 表单映射条目定义
+ */
 export interface FormMapEntry {
+  /** 条目唯一 ID */
   id: string;
+  /** 在 UI 中显示的名称 */
   label_display: string;
+  /** 字段特征，用于在页面中定位字段 */
   fingerprint: {
+    /** CSS 选择器 */
     selector: string;
+    /** name 属性 */
     name_attr: string;
+    /** 占位符文本 */
     placeholder: string;
   };
+  /** 填充逻辑配置 */
   action_logic: {
+    /** 字段类型 */
     type: 'text' | 'select' | 'checkbox';
+    /** 填充策略：固定值、随机值或序列值 */
     strategy: 'fixed' | 'random' | 'sequence';
+    /** 填充的具体值或配置 */
     value: string;
   };
+  /** UI 状态 */
   ui_state: {
+    /** 是否被选中 */
     is_selected: boolean;
   };
 }
 
+/**
+ * Chrome Storage 存储模式定义
+ * 定义了所有持久化在客户端的数据结构
+ */
 export interface StorageSchema {
+  /** 全局当前路由 */
   'app/currentRoute': PageType;
+  /** Popup 窗口的当前路由 */
   'app/popupRoute': PageType;
+  /** 侧边栏的当前路由 */
   'app/sidepanelRoute': PageType;
+  /** 在菜单中可见的页面列表 */
   'app/visiblePages': PageType[];
+  /** 菜单页面的显示顺序 */
   'app/pageOrder': PageType[];
+  /** 上一次访问的路由路径（备用） */
   'app/lastRoute': string;
+  /** 应用主题配置 */
   'app/theme': string;
+  /** 表单映射工具是否正处于“元素拾取”模式 */
   'app/formMapping/isPicking': boolean;
+  /** 当前激活的表单映射条目列表 */
   active_form_map: FormMapEntry[];
+  /** 存储清理工具的偏好设置 */
   'storageCleaner/preferences': StorageCleanerPreferences;
+  /** 快捷链接工具的偏好设置 */
   'openUrl/preferences': OpenUrlPreferences;
+  /** 快捷链接工具当前操作的 URL */
   'openUrl/currentUrl': string;
+  /** 二维码工具中二维码部分是否展开 */
   'qrCode/qrExpanded': boolean;
+  /** 二维码工具中 URL 部分是否展开 */
   'qrCode/urlExpanded': boolean;
+  /** 表单识别工具的字段类型偏好（按域名存储） */
   'formRecognizer/fieldTypePreferences': FieldTypePreferences;
 }
 
+/**
+ * 字段类型偏好定义
+ * 结构：{ [域名]: { [字段标识符]: 类型名称 } }
+ */
 export interface FieldTypePreferences {
   [domain: string]: {
     [fieldIdentifier: string]: string;
   };
 }
 
+/**
+ * 存储清理工具偏好设置
+ */
 export interface StorageCleanerPreferences {
+  /** 是否在清理后自动刷新页面 */
   autoRefresh: boolean;
+  /** 默认勾选的清理类型 */
   selectedTypes: StorageCleanerOptions;
 }
 
+/**
+ * 快捷链接条目定义
+ */
 export interface OpenUrlEntry {
+  /** 链接名称 */
   name: string;
+  /** 链接地址 */
   url: string;
 }
 
+/**
+ * 快捷链接工具偏好设置
+ */
 export interface OpenUrlPreferences {
+  /** 链接列表 */
   entries: OpenUrlEntry[];
 }
 
+/**
+ * 存储清理选项配置
+ */
 export interface StorageCleanerOptions {
+  /** Local Storage */
   localStorage: boolean;
+  /** Session Storage */
   sessionStorage: boolean;
+  /** IndexedDB */
   indexedDB: boolean;
+  /** Cookies */
   cookies: boolean;
+  /** Cache Storage */
   cacheStorage: boolean;
+  /** Service Workers */
   serviceWorkers: boolean;
 }
 
+/**
+ * 单项存储清理结果
+ */
 export type StorageCleanResult =
   | {
+      /** 是否清理成功 */
       success: true;
+      /** 清理的数量/条数 */
       count: number;
     }
   | {
+      /** 是否清理成功 */
       success: false;
+      /** 错误信息 */
       error: string;
     };
 
+/**
+ * 存储清理任务汇总结果
+ */
 export interface CleaningResult {
+  /** 整体操作是否成功 */
   success: boolean;
+  /** 整体错误信息（如果有） */
   error?: string;
+  /** 各项清理的具体结果 */
   localStorage?: StorageCleanResult;
   sessionStorage?: StorageCleanResult;
   indexedDB?: StorageCleanResult;

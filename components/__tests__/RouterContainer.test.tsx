@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import RouterContainer from '../RouterContainer';
 import { RouterProvider } from '@/providers/RouterProvider';
+import { SnackbarProvider } from '@/components/SnackbarProvider';
 import type { PageType } from '@/types/storage';
+import React from 'react';
 
 const mockRouterValue = {
   currentPage: 'dashboard' as PageType,
@@ -28,7 +30,11 @@ describe('RouterContainer 组件', () => {
   });
 
   const renderWithProvider = (ui: React.ReactElement) => {
-    return render(<RouterProvider>{ui}</RouterProvider>);
+    return render(
+      <SnackbarProvider>
+        <RouterProvider>{ui}</RouterProvider>
+      </SnackbarProvider>,
+    );
   };
 
   describe('渲染测试', () => {
@@ -67,7 +73,11 @@ describe('RouterContainer 组件', () => {
       const { rerender } = renderWithProvider(<RouterContainer />);
 
       mockRouterValue.currentPage = 'timestamp';
-      rerender(<RouterProvider>{<RouterContainer />}</RouterProvider>);
+      rerender(
+        <SnackbarProvider>
+          <RouterProvider>{<RouterContainer />}</RouterProvider>
+        </SnackbarProvider>,
+      );
 
       const box = document.querySelector('.page-transition-enter');
       expect(box).toBeInTheDocument();

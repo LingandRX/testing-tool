@@ -28,7 +28,7 @@ export function useSidePanelState() {
   useEffect(() => {
     // 使用 requestAnimationFrame 避免同步调用 setState
     requestAnimationFrame(() => {
-      checkSidePanelState();
+      checkSidePanelState().catch(console.error);
     });
 
     // 监听侧边栏状态变化消息

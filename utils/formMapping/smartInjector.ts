@@ -205,6 +205,7 @@ export class SmartInjectionEngine {
    * 注入数据到目标元素
    * @param element - 目标 DOM 元素
    * @param entry - 表单映射条目
+   * @param mockValue - mock数据
    * @returns 注入结果
    */
   public static inject(element: HTMLElement, entry: FormMapEntry, mockValue: string): InjectResult {
@@ -274,8 +275,7 @@ export class SmartInjectionEngine {
       // 随机选择
       const options = Array.from(element.options).filter((opt) => !opt.disabled);
       if (options.length > 0) {
-        const randomIndex = Math.floor(Math.random() * options.length);
-        element.selectedIndex = randomIndex;
+        element.selectedIndex = Math.floor(Math.random() * options.length);
       }
     } else {
       // 使用固定值

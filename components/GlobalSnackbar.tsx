@@ -3,7 +3,7 @@
  *
  * 提供可复用的 Toast 消息提示功能，支持两种使用方式：
  * 1. 作为受控组件使用：通过 props 控制显示状态
- * 2. 通过 useSnackbar Hook 使用：自动管理状态
+ * 2. 通过 useSnackbarState Hook 使用：自动管理状态
  *
  * @module GlobalSnackbar
  * @version 1.0.0
@@ -19,7 +19,7 @@
  * />
  *
  * // 方式二：Hook 方式
- * const { snackbarProps, showMessage } = useSnackbar();
+ * const { snackbarProps, showMessage } = useSnackbarState();
  * showMessage('Hello!', { severity: 'info' });
  * ```
  */
@@ -89,10 +89,10 @@ export interface SnackbarOptions {
 }
 
 /**
- * useSnackbar Hook 的返回值类型
- * @interface UseSnackbarResult
+ * useSnackbarState Hook 的返回值类型
+ * @interface UseSnackbarStateResult
  */
-export interface UseSnackbarResult {
+export interface UseSnackbarStateResult {
   /** 传递给 GlobalSnackbar 组件的属性对象 */
   snackbarProps: GlobalSnackbarProps;
   /** 显示消息的方法 */
@@ -218,13 +218,13 @@ export function GlobalSnackbar({
 }
 
 /**
- * useSnackbar - 消息提示的 Hook 方式
+ * useSnackbarState - 消息提示的 Hook 方式
  *
  * 提供状态管理的 Snackbar 功能，自动处理 open、message 等状态。
  * 适合在组件内部使用，无需额外的状态管理代码。
  *
  * @param {SnackbarOptions} [initialOptions] - 初始配置选项
- * @returns {UseSnackbarResult} 包含 snackbarProps 和操作方法的对象
+ * @returns {UseSnackbarStateResult} 包含 snackbarProps 和操作方法的对象
  *
  * @description
  * - 自动管理 Snackbar 的显示/隐藏状态
@@ -234,7 +234,7 @@ export function GlobalSnackbar({
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { snackbarProps, showMessage, closeMessage } = useSnackbar({
+ *   const { snackbarProps, showMessage, closeMessage } = useSnackbarState({
  *     severity: 'info',
  *     autoHideDuration: 3000,
  *   });
@@ -253,7 +253,7 @@ export function GlobalSnackbar({
  * }
  * ```
  */
-export function useSnackbar(initialOptions?: SnackbarOptions): UseSnackbarResult {
+export function useSnackbarState(initialOptions?: SnackbarOptions): UseSnackbarStateResult {
   // Snackbar 显示状态
   const [open, setOpen] = useState(false);
   // 当前显示的消息内容

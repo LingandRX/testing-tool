@@ -14,31 +14,35 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
-import { getRouteByKey, getDefaultPageOrder, getDefaultVisibleRoutes } from '@/config/routes';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import {
+  getFeatureByKey,
+  getDefaultPageOrder,
+  getDefaultVisibleFeatureKeys,
+} from '@/config/features';
+import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function App() {
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
   const [pageOrder, setPageOrder] = useState<PageType[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const { snackbarProps, showMessage } = useSnackbar();
+  const { snackbarProps, showMessage } = useSnackbarState();
 
   useEffect(() => {
-    loadConfig();
+    loadConfig().catch(console.error);
   }, []);
 
   const loadConfig = async () => {
     try {
       const [savedVisible, savedOrder] = await Promise.all([
-        storageUtil.get('app/visiblePages', getDefaultVisibleRoutes()),
+        storageUtil.get('app/visiblePages', getDefaultVisibleFeatureKeys()),
         storageUtil.get('app/pageOrder', getDefaultPageOrder()),
       ]);
-      setVisiblePages(savedVisible ?? getDefaultVisibleRoutes());
+      setVisiblePages(savedVisible ?? getDefaultVisibleFeatureKeys());
       setPageOrder(savedOrder && savedOrder.length > 0 ? savedOrder : getDefaultPageOrder());
     } catch (error) {
       console.error('Failed to load config:', error);
-      setVisiblePages(getDefaultVisibleRoutes());
+      setVisiblePages(getDefaultVisibleFeatureKeys());
       setPageOrder(getDefaultPageOrder());
     } finally {
       setIsLoaded(true);
@@ -62,8 +66,8 @@ export default function App() {
     try {
       await storageUtil.set('app/visiblePages', newPages);
       setVisiblePages(newPages);
-      const route = getRouteByKey(page);
-      showToast(`已${isCurrentlyVisible ? '隐藏' : '显示'} ${route?.label || page}`, 'success');
+      const feature = getFeatureByKey(page);
+      showToast(`已${isCurrentlyVisible ? '隐藏' : '显示'} ${feature?.label || page}`, 'success');
     } catch (error) {
       console.error('Failed to save config:', error);
       showToast('保存失败', 'warning');
@@ -89,8 +93,8 @@ export default function App() {
 
   const handleRestoreDefaults = async () => {
     try {
-      const { getDefaultVisibleRoutes } = await import('@/config/routes');
-      const defaults = getDefaultVisibleRoutes();
+      const { getDefaultVisibleFeatureKeys } = await import('@/config/features');
+      const defaults = getDefaultVisibleFeatureKeys();
       const defaultOrder = getDefaultPageOrder();
 
       await Promise.all([
@@ -157,8 +161,8 @@ export default function App() {
           >
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               {pageOrder.map((key, index, array) => {
-                const route = getRouteByKey(key);
-                if (!route) return null;
+                const feature = getFeatureByKey(key);
+                if (!feature) return null;
 
                 const isChecked = visiblePages.includes(key);
                 const isDisabled = isChecked && visiblePages.length === 1;
@@ -179,7 +183,7 @@ export default function App() {
                   >
                     <Box>
                       <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                        {route.label}
+                        {feature.label}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}

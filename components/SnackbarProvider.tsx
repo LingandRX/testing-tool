@@ -13,7 +13,7 @@
  */
 
 import { createContext, useContext, type ReactNode } from 'react';
-import GlobalSnackbar, { useSnackbar as useGlobalSnackbar } from './GlobalSnackbar';
+import GlobalSnackbar, { useSnackbarState } from './GlobalSnackbar';
 import type { SnackbarOptions } from './GlobalSnackbar';
 
 /**
@@ -93,7 +93,7 @@ export function SnackbarProvider({ children, initialOptions }: SnackbarProviderP
    * - showMessage: 显示消息的方法
    * - closeMessage: 关闭消息的方法
    */
-  const { snackbarProps, showMessage, closeMessage } = useGlobalSnackbar(initialOptions);
+  const { snackbarProps, showMessage, closeMessage } = useSnackbarState(initialOptions);
 
   /**
    * 通过 Context.Provider 向下传递 snackbar 操作方法

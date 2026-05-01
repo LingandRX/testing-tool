@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { useRouter } from '@/providers/RouterProvider';
 import DashboardCard from '@/components/DashboardCard';
-import { cardConfigs } from '@/config/dashboardCards';
+import { getFeatureByKey } from '@/config/features';
 import type { PageType } from '@/types/storage';
 import { useCallback } from 'react';
 
@@ -24,13 +24,21 @@ export default function DashboardPage() {
       {pageOrder.map((key) => {
         if (!isVisible(key)) return null;
 
-        const config = cardConfigs[key];
-        if (!config) return null;
+        const feature = getFeatureByKey(key);
+        if (!feature || !feature.icon || !feature.themeColor) return null;
+
+        // 适配 DashboardCard 组件，将 themeColor 映射到 colorCode
+        const cardConfig = {
+          title: feature.label,
+          description: feature.description,
+          colorCode: feature.themeColor,
+          icon: feature.icon,
+        };
 
         return (
           <DashboardCard
             key={key}
-            config={config}
+            config={cardConfig}
             onClick={() => handleCardClick(key)}
             cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />

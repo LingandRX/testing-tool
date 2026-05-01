@@ -208,150 +208,74 @@ export enum FillMode {
 }
 
 /**
+ * 关键词与字段类型映射
+ */
+const FIELD_TYPE_KEYWORDS: Record<
+  Exclude<
+    FieldType,
+    | FieldType.UNKNOWN
+    | FieldType.TEXT
+    | FieldType.TEXTarea
+    | FieldType.SELECT
+    | FieldType.RADIO
+    | FieldType.CHECKBOX
+  >,
+  string[]
+> = {
+  [FieldType.EMAIL]: ['email', 'mail', '邮箱'],
+  [FieldType.PHONE]: ['phone', 'tel', 'mobile', '手机', '电话'],
+  [FieldType.NAME]: ['name', 'user', 'username', '姓名', '名字'],
+  [FieldType.ID_CARD]: ['id', 'card', 'identity', '身份证'],
+  [FieldType.PASSWORD]: ['password', 'pass', '密码'],
+  [FieldType.NUMBER]: ['number', 'num', '数字'],
+  [FieldType.DATE]: ['date', 'time', '日期', '时间'],
+};
+
+/**
+ * 根据文本识别字段类型
+ */
+function detectTypeFromText(text: string): FieldType | null {
+  const lowerText = text.toLowerCase();
+  for (const [type, keywords] of Object.entries(FIELD_TYPE_KEYWORDS)) {
+    if (keywords.some((kw) => lowerText.includes(kw))) {
+      return type as FieldType;
+    }
+  }
+  return null;
+}
+
+/**
  * 识别表单字段类型
  */
 export function recognizeFieldType(
   element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
 ): FieldType {
-  // 基于 type 属性识别
+  // 1. 基于 HTML5 type 属性识别
   if (element instanceof HTMLInputElement) {
-    switch (element.type) {
-      case 'email':
-        return FieldType.EMAIL;
-      case 'tel':
-        return FieldType.PHONE;
-      case 'number':
-        return FieldType.NUMBER;
-      case 'date':
-        return FieldType.DATE;
-      case 'password':
-        return FieldType.PASSWORD;
-      case 'radio':
-        return FieldType.RADIO;
-      case 'checkbox':
-        return FieldType.CHECKBOX;
-      case 'text':
-        break;
-    }
+    const typeMap: Record<string, FieldType> = {
+      email: FieldType.EMAIL,
+      tel: FieldType.PHONE,
+      number: FieldType.NUMBER,
+      date: FieldType.DATE,
+      password: FieldType.PASSWORD,
+      radio: FieldType.RADIO,
+      checkbox: FieldType.CHECKBOX,
+    };
+    if (typeMap[element.type]) return typeMap[element.type];
   }
 
-  // 基于 name 或 id 识别
-  const name = (element.name || element.id || '').toLowerCase();
-  if (name.includes('email') || name.includes('mail')) {
-    return FieldType.EMAIL;
-  }
-  if (name.includes('phone') || name.includes('tel') || name.includes('mobile')) {
-    return FieldType.PHONE;
-  }
-  if (name.includes('name') || name.includes('user') || name.includes('username')) {
-    return FieldType.NAME;
-  }
-  if (name.includes('id') || name.includes('card') || name.includes('identity')) {
-    return FieldType.ID_CARD;
-  }
-  if (name.includes('password') || name.includes('pass')) {
-    return FieldType.PASSWORD;
-  }
-  if (name.includes('number') || name.includes('num')) {
-    return FieldType.NUMBER;
-  }
-  if (name.includes('date') || name.includes('time')) {
-    return FieldType.DATE;
-  }
+  // 2. 基于 name/id, placeholder, label 文本识别
+  const name = element.name || element.id || '';
+  const placeholder = 'placeholder' in element ? element.placeholder || '' : '';
+  const label = getFieldLabel(element) || '';
 
-  // 基于 placeholder 识别
-  if ('placeholder' in element) {
-    const placeholder = (element.placeholder || '').toLowerCase();
-    if (placeholder.includes('email') || placeholder.includes('mail')) {
-      return FieldType.EMAIL;
-    }
-    if (
-      placeholder.includes('phone') ||
-      placeholder.includes('tel') ||
-      placeholder.includes('mobile')
-    ) {
-      return FieldType.PHONE;
-    }
-    if (
-      placeholder.includes('name') ||
-      placeholder.includes('user') ||
-      placeholder.includes('username')
-    ) {
-      return FieldType.NAME;
-    }
-    if (
-      placeholder.includes('id') ||
-      placeholder.includes('card') ||
-      placeholder.includes('identity')
-    ) {
-      return FieldType.ID_CARD;
-    }
-    if (placeholder.includes('password') || placeholder.includes('pass')) {
-      return FieldType.PASSWORD;
-    }
-    if (placeholder.includes('number') || placeholder.includes('num')) {
-      return FieldType.NUMBER;
-    }
-    if (placeholder.includes('date') || placeholder.includes('time')) {
-      return FieldType.DATE;
-    }
-  }
+  const detected =
+    detectTypeFromText(name) || detectTypeFromText(placeholder) || detectTypeFromText(label);
+  if (detected) return detected;
 
-  // 基于标签识别
-  const label = getFieldLabel(element);
-  if (label) {
-    const labelText = label.toLowerCase();
-    if (labelText.includes('邮箱') || labelText.includes('email') || labelText.includes('mail')) {
-      return FieldType.EMAIL;
-    }
-    if (
-      labelText.includes('手机') ||
-      labelText.includes('电话') ||
-      labelText.includes('tel') ||
-      labelText.includes('mobile')
-    ) {
-      return FieldType.PHONE;
-    }
-    if (
-      labelText.includes('姓名') ||
-      labelText.includes('名字') ||
-      labelText.includes('name') ||
-      labelText.includes('user') ||
-      labelText.includes('username')
-    ) {
-      return FieldType.NAME;
-    }
-    if (
-      labelText.includes('身份证') ||
-      labelText.includes('id') ||
-      labelText.includes('card') ||
-      labelText.includes('identity')
-    ) {
-      return FieldType.ID_CARD;
-    }
-    if (labelText.includes('密码') || labelText.includes('pass')) {
-      return FieldType.PASSWORD;
-    }
-    if (labelText.includes('数字') || labelText.includes('number') || labelText.includes('num')) {
-      return FieldType.NUMBER;
-    }
-    if (
-      labelText.includes('日期') ||
-      labelText.includes('时间') ||
-      labelText.includes('date') ||
-      labelText.includes('time')
-    ) {
-      return FieldType.DATE;
-    }
-  }
-
-  // 基于元素类型识别
-  if (element instanceof HTMLTextAreaElement) {
-    return FieldType.TEXTarea;
-  }
-  if (element instanceof HTMLSelectElement) {
-    return FieldType.SELECT;
-  }
+  // 3. 基于元素标签识别
+  if (element instanceof HTMLTextAreaElement) return FieldType.TEXTarea;
+  if (element instanceof HTMLSelectElement) return FieldType.SELECT;
 
   return FieldType.TEXT;
 }
@@ -382,6 +306,49 @@ function getFieldLabel(element: HTMLElement): string | null {
 }
 
 /**
+ * 批量遍历并过滤表单元素
+ */
+function forEachFormElement(
+  container: ParentNode,
+  callback: (element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => void,
+  options: { includeHidden?: boolean } = {},
+): void {
+  const inputs = container.querySelectorAll('input, textarea, select');
+  inputs.forEach((el) => {
+    if (
+      (el instanceof HTMLInputElement ||
+        el instanceof HTMLTextAreaElement ||
+        el instanceof HTMLSelectElement) &&
+      isElementValidForFill(el)
+    ) {
+      if (!options.includeHidden && el instanceof HTMLInputElement && el.type === 'hidden') {
+        return;
+      }
+      callback(el);
+    }
+  });
+}
+
+/**
+ * 清空单个字段
+ */
+export function clearField(
+  element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
+): void {
+  if (
+    element instanceof HTMLInputElement &&
+    (element.type === 'checkbox' || element.type === 'radio')
+  ) {
+    element.checked = false;
+  } else if (element instanceof HTMLSelectElement) {
+    element.selectedIndex = 0;
+  } else {
+    setInputValue(element, '');
+  }
+  triggerEvents(element);
+}
+
+/**
  * 填充表单字段
  */
 export function fillField(
@@ -389,74 +356,8 @@ export function fillField(
   mode: FillMode,
 ): void {
   const fieldType = recognizeFieldType(element);
-  let value: string | number | boolean = '';
-
-  switch (fieldType) {
-    case FieldType.NAME:
-      value =
-        Math.random() > 0.5
-          ? DummyDataGenerator.generateChineseName()
-          : DummyDataGenerator.generateEnglishName();
-      break;
-    case FieldType.EMAIL:
-      value =
-        mode === FillMode.VALID
-          ? DummyDataGenerator.generateValidEmail()
-          : DummyDataGenerator.generateInvalidEmail();
-      break;
-    case FieldType.PHONE:
-      value = DummyDataGenerator.generatePhoneNumber();
-      break;
-    case FieldType.NUMBER:
-      value =
-        mode === FillMode.VALID
-          ? DummyDataGenerator.generateNumber()
-          : DummyDataGenerator.generateNegativeNumber();
-      break;
-    case FieldType.DATE:
-      value = DummyDataGenerator.generateDate();
-      break;
-    case FieldType.TEXTarea:
-      value =
-        mode === FillMode.VALID
-          ? DummyDataGenerator.generateLongText()
-          : DummyDataGenerator.generateBoundaryText();
-      break;
-    case FieldType.PASSWORD:
-      value = 'password123';
-      break;
-    case FieldType.ID_CARD:
-      value = DummyDataGenerator.generateIdCard();
-      break;
-    case FieldType.TEXT:
-    default:
-      value =
-        mode === FillMode.VALID
-          ? DummyDataGenerator.generateShortText()
-          : DummyDataGenerator.generateBoundaryText();
-      break;
-  }
-
-  // 填充值
-  if (element instanceof HTMLInputElement) {
-    if (element.type === 'checkbox' || element.type === 'radio') {
-      element.checked = Math.random() > 0.5;
-    } else {
-      element.value = String(value);
-    }
-  } else if (element instanceof HTMLTextAreaElement) {
-    element.value = String(value);
-  } else if (element instanceof HTMLSelectElement) {
-    // 随机选择一个非禁用的选项
-    const options = Array.from(element.options).filter((option) => !option.disabled);
-    if (options.length > 0) {
-      const randomIndex = Math.floor(Math.random() * options.length);
-      element.selectedIndex = randomIndex;
-    }
-  }
-
-  // 触发事件，确保前端框架能够监听到变化
-  triggerEvents(element);
+  const value = generateValueByFieldType(fieldType, mode);
+  fillFieldWithInjector(element, value);
 }
 
 /**
@@ -512,16 +413,12 @@ function isElementVisible(element: HTMLElement): boolean {
 
   // 3. 检查计算样式 (兜底检查 css 隐藏手段)
   const style = window.getComputedStyle(element);
-  if (
+  return !(
     style.display === 'none' ||
     style.visibility === 'hidden' ||
     style.opacity === '0' ||
     style.visibility === 'collapse'
-  ) {
-    return false;
-  }
-
-  return true;
+  );
 }
 
 /**
@@ -605,11 +502,7 @@ function isElementValidForFill(element: HTMLElement): boolean {
   }
 
   // 5. Z轴穿透验证（最后一步，最耗时，放最后）
-  if (!isElementNotObscured(element)) {
-    return false;
-  }
-
-  return true;
+  return isElementNotObscured(element);
 }
 
 /**
@@ -667,7 +560,7 @@ export function scanFormFields(): ScanResult {
         const name = input.name || input.id || '';
 
         fields.push({
-          id: `field-${Math.random().toString(36).substr(2, 9)}`,
+          id: `field-${Math.random().toString(36).substring(2, 9)}`,
           element: input,
           fieldType,
           label,
@@ -888,29 +781,15 @@ export function unhighlightAllFields(fields: FormFieldInfo[]): void {
  * 填充所有表单字段
  */
 export function fillAllFields(mode: FillMode, includeHidden: boolean = false): void {
-  const inputs = document.querySelectorAll('input, textarea, select');
-
-  inputs.forEach((element) => {
-    if (
-      element instanceof HTMLInputElement ||
-      element instanceof HTMLTextAreaElement ||
-      element instanceof HTMLSelectElement
-    ) {
-      if (!isElementValidForFill(element)) {
-        return;
-      }
-
-      if (!includeHidden) {
-        if (element instanceof HTMLInputElement && element.type === 'hidden') {
-          return;
-        }
-      }
-
-      const fieldType = recognizeFieldType(element);
+  forEachFormElement(
+    document,
+    (el) => {
+      const fieldType = recognizeFieldType(el);
       const value = generateValueByFieldType(fieldType, mode);
-      fillFieldWithInjector(element, value);
-    }
-  });
+      fillFieldWithInjector(el, value);
+    },
+    { includeHidden },
+  );
 }
 
 /**
@@ -921,29 +800,15 @@ export function fillFieldsInContainer(
   container: HTMLElement,
   includeHidden: boolean = false,
 ): void {
-  const inputs = container.querySelectorAll('input, textarea, select');
-
-  inputs.forEach((element) => {
-    if (
-      element instanceof HTMLInputElement ||
-      element instanceof HTMLTextAreaElement ||
-      element instanceof HTMLSelectElement
-    ) {
-      if (!isElementValidForFill(element)) {
-        return;
-      }
-
-      if (!includeHidden) {
-        if (element instanceof HTMLInputElement && element.type === 'hidden') {
-          return;
-        }
-      }
-
-      const fieldType = recognizeFieldType(element);
+  forEachFormElement(
+    container,
+    (el) => {
+      const fieldType = recognizeFieldType(el);
       const value = generateValueByFieldType(fieldType, mode);
-      fillFieldWithInjector(element, value);
-    }
-  });
+      fillFieldWithInjector(el, value);
+    },
+    { includeHidden },
+  );
 }
 
 /**
@@ -962,64 +827,12 @@ export function fillFieldsInActiveModal(mode: FillMode, includeHidden: boolean =
  * 清空所有表单字段
  */
 export function clearAllFields(): void {
-  const inputs = document.querySelectorAll('input, textarea, select');
-
-  inputs.forEach((element) => {
-    if (
-      element instanceof HTMLInputElement ||
-      element instanceof HTMLTextAreaElement ||
-      element instanceof HTMLSelectElement
-    ) {
-      if (!isElementValidForFill(element)) {
-        return;
-      }
-
-      if (element instanceof HTMLInputElement) {
-        if (element.type === 'checkbox' || element.type === 'radio') {
-          element.checked = false;
-        } else {
-          setInputValue(element, '');
-        }
-      } else if (element instanceof HTMLTextAreaElement) {
-        setInputValue(element, '');
-      } else if (element instanceof HTMLSelectElement) {
-        element.selectedIndex = 0;
-      }
-
-      triggerEvents(element);
-    }
-  });
+  forEachFormElement(document, (el) => clearField(el));
 }
 
 /**
  * 清空指定容器内的表单字段
  */
 export function clearFieldsInContainer(container: HTMLElement): void {
-  const inputs = container.querySelectorAll('input, textarea, select');
-
-  inputs.forEach((element) => {
-    if (
-      element instanceof HTMLInputElement ||
-      element instanceof HTMLTextAreaElement ||
-      element instanceof HTMLSelectElement
-    ) {
-      if (!isElementValidForFill(element)) {
-        return;
-      }
-
-      if (element instanceof HTMLInputElement) {
-        if (element.type === 'checkbox' || element.type === 'radio') {
-          element.checked = false;
-        } else {
-          setInputValue(element, '');
-        }
-      } else if (element instanceof HTMLTextAreaElement) {
-        setInputValue(element, '');
-      } else if (element instanceof HTMLSelectElement) {
-        element.selectedIndex = 0;
-      }
-
-      triggerEvents(element);
-    }
-  });
+  forEachFormElement(container, (el) => clearField(el));
 }

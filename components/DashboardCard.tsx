@@ -1,10 +1,20 @@
 import React from 'react';
 import ToolCard from './ToolCard';
-import type { ToolCardConfig } from '@/config/dashboardCards';
+
+export interface DashboardCardConfig {
+  /** 卡片标题 */
+  title: string;
+  /** 卡片描述文字 */
+  description: string;
+  /** 主题颜色代码 */
+  colorCode: string;
+  /** 图标组件 */
+  icon: React.ReactNode;
+}
 
 interface DashboardCardProps {
   /** 卡片配置数据 */
-  config: ToolCardConfig;
+  config: DashboardCardConfig;
   /** 点击卡片时的回调函数 */
   onClick: () => void;
   /** 卡片右侧的实时预览内容（如时间戳显示） */

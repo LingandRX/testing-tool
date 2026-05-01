@@ -13,7 +13,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import GlobalSnackbar, { useSnackbar } from './GlobalSnackbar';
+import GlobalSnackbar, { useSnackbarState } from './GlobalSnackbar';
 import CopyButton from './CopyButton';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 
@@ -36,7 +36,7 @@ const QrCodeUploader: React.FC<QrCodeUploaderProps> = ({
   showProgress = true,
   className,
 }) => {
-  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 3000 });
+  const { snackbarProps, showMessage } = useSnackbarState({ autoHideDuration: 3000 });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -137,7 +137,7 @@ const QrCodeUploader: React.FC<QrCodeUploaderProps> = ({
       }
 
       // 开始处理
-      processFile(selectedFile);
+      processFile(selectedFile).catch(console.error);
     },
     [supportedFormats, maxFileSize, showPreview, showMessage, processFile],
   );

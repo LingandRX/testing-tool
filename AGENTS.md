@@ -216,7 +216,7 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 #### 6. 仪表盘系统
 
 - 位置: `entrypoints/popup/pages/DashboardPage.tsx`
-- 配置: `config/dashboardCards.tsx`
+- 配置: `config/features.tsx`
 - 组件: `components/DashboardCard.tsx`, `components/ToolCard.tsx`
 - 功能: 统一工具入口，可自定义显示的工具卡片
 
@@ -226,7 +226,7 @@ npx vitest run components/__tests__/CopyButton.test.tsx
   - **popup** - 扩展弹窗（点击图标显示）
   - **sidepanel** - 浏览器侧边栏
   - **detached** - 独立窗口模式
-- 路由配置: `config/routes.ts`
+- 路由配置: `config/features.tsx`
 - 路由容器: `components/RouterContainer.tsx`
 - Provider: `providers/RouterProvider.tsx`
 
@@ -267,7 +267,7 @@ permissions: [
   'cookies',           // Cookies 管理
   'sidePanel',         // 侧边栏
 ],
-host_permissions: ['<all_urls>']  // 访问所有网站
+host_permissions:['<all_urls>']  // 访问所有网站
 ```
 
 #### CI/CD 配置
@@ -288,7 +288,7 @@ host_permissions: ['<all_urls>']  // 访问所有网站
 ### 路由系统
 
 - 使用自定义路由系统，支持多种显示模式
-- 路由配置在 `config/routes.ts`
+- 路由配置在 `config/features.tsx`
 - 通过 `getEntryPointType()` 判断当前入口点类型
 - 支持页面可见性配置（`defaultVisible`）
 

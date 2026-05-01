@@ -1,4 +1,11 @@
+import React, { ReactNode } from 'react';
 import type { PageType } from '@/types/storage';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import StorageIcon from '@mui/icons-material/Storage';
+import LanguageIcon from '@mui/icons-material/Language';
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import DescriptionIcon from '@mui/icons-material/Description';
+
 import DashboardPage from '@/entrypoints/popup/pages/DashboardPage';
 import TimestampPage from '@/entrypoints/popup/pages/TimestampPage';
 import StorageCleanerPage from '@/entrypoints/popup/pages/StorageCleanerPage';
@@ -9,16 +16,24 @@ import FormRecognizerPage from '@/entrypoints/popup/pages/FormRecognizerPage';
 import FormMappingPage from '@/entrypoints/popup/pages/FormMappingPage';
 import FormFillPage from '@/entrypoints/popup/pages/FormFillPage';
 
+import { THEME_COLORS } from './pageTheme';
+
 /**
- * 路由配置接口
+ * 功能配置接口
  *
- * 定义每个页面路由的配置信息，支持多种显示模式（popup、sidepanel、detached）
+ * 整合了路由信息和仪表盘卡片元数据，作为功能的单一事实来源
  */
-export interface RouteConfig {
+export interface FeatureConfig {
   /** 页面类型标识 */
   key: PageType;
-  /** 页面显示标签 */
+  /** 功能名称（用于路由标签和卡片标题） */
   label: string;
+  /** 功能描述（用于仪表盘卡片） */
+  description: string;
+  /** 主题颜色（用于仪表盘卡片） */
+  themeColor?: string;
+  /** 图标组件（用于仪表盘卡片） */
+  icon?: ReactNode;
   /** 默认是否在仪表盘显示 */
   defaultVisible: boolean;
   /** 不同显示模式对应的组件 */
@@ -32,10 +47,11 @@ export interface RouteConfig {
   };
 }
 
-export const ROUTES: RouteConfig[] = [
+export const FEATURES: FeatureConfig[] = [
   {
     key: 'dashboard',
     label: 'Dashboard',
+    description: '',
     defaultVisible: true,
     components: {
       popup: DashboardPage,
@@ -46,6 +62,9 @@ export const ROUTES: RouteConfig[] = [
   {
     key: 'timestamp',
     label: '时间戳',
+    description: 'Unix 毫秒数转换与格式化',
+    themeColor: THEME_COLORS.primary,
+    icon: <AccessTimeIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
       popup: TimestampPage,
@@ -56,6 +75,9 @@ export const ROUTES: RouteConfig[] = [
   {
     key: 'storageCleaner',
     label: '存储清理',
+    description: '清理缓存、Cookies 及本地存储',
+    themeColor: THEME_COLORS.warning,
+    icon: <StorageIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
       popup: StorageCleanerPage,
@@ -66,6 +88,9 @@ export const ROUTES: RouteConfig[] = [
   {
     key: 'openUrl',
     label: 'Open Url',
+    description: '打开当前选中的 URL',
+    themeColor: THEME_COLORS.purple,
+    icon: <LanguageIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
       popup: OpenUrlPage,
@@ -76,6 +101,9 @@ export const ROUTES: RouteConfig[] = [
   {
     key: 'qrCode',
     label: '二维码工具',
+    description: '生成当前选中的 URL 的二维码',
+    themeColor: THEME_COLORS.success,
+    icon: <QrCodeIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
       popup: QrCodePage,
@@ -86,6 +114,9 @@ export const ROUTES: RouteConfig[] = [
   {
     key: 'formMapping',
     label: '表单映射',
+    description: '智能识别表单指纹，自定义填充逻辑',
+    themeColor: THEME_COLORS.primary,
+    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
       popup: FormMappingPage,
@@ -96,6 +127,9 @@ export const ROUTES: RouteConfig[] = [
   {
     key: 'formFill',
     label: '智能填充',
+    description: '根据表单指纹填充表单数据',
+    themeColor: THEME_COLORS.primary,
+    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
       popup: FormFillPage,
@@ -106,6 +140,9 @@ export const ROUTES: RouteConfig[] = [
   {
     key: 'formRecognizer',
     label: '表单识别',
+    description: '智能识别表单指纹',
+    themeColor: THEME_COLORS.primary,
+    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
       popup: FormRecognizerPage,
@@ -116,6 +153,7 @@ export const ROUTES: RouteConfig[] = [
   {
     key: 'openUrlViewer',
     label: '查看',
+    description: '',
     defaultVisible: false,
     components: {
       popup: OpenUrlViewerPage,
@@ -125,21 +163,21 @@ export const ROUTES: RouteConfig[] = [
   },
 ];
 
-export function getRouteByKey(key: PageType): RouteConfig | undefined {
-  return ROUTES.find((route) => route.key === key);
+export function getFeatureByKey(key: PageType): FeatureConfig | undefined {
+  return FEATURES.find((f) => f.key === key);
 }
 
-export function getDefaultVisibleRoutes(): PageType[] {
-  return ROUTES.filter((route) => route.defaultVisible).map((route) => route.key);
+export function getDefaultVisibleFeatureKeys(): PageType[] {
+  return FEATURES.filter((f) => f.defaultVisible).map((f) => f.key);
 }
 
-export function getAllRouteKeys(): PageType[] {
-  return ROUTES.map((route) => route.key);
+export function getAllFeatureKeys(): PageType[] {
+  return FEATURES.map((f) => f.key);
 }
 
 export function getDefaultPageOrder(): PageType[] {
-  return ROUTES.filter((route) => route.key !== 'dashboard' && route.key !== 'openUrlViewer').map(
-    (route) => route.key,
+  return FEATURES.filter((f) => f.key !== 'dashboard' && f.key !== 'openUrlViewer').map(
+    (f) => f.key,
   );
 }
 

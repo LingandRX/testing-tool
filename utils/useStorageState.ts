@@ -28,7 +28,7 @@ export const useStorageState = <K extends keyof StorageSchema>(
       }
     };
 
-    loadState();
+    loadState().catch(console.error);
   }, [defaultValue, key]);
 
   // Save to storage when value changes (after initial load)
@@ -43,7 +43,7 @@ export const useStorageState = <K extends keyof StorageSchema>(
       }
     };
 
-    saveState();
+    saveState().catch(console.error);
   }, [value, isInitialized, key]);
 
   return [value, setValue, isInitialized] as const;

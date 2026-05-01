@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, renderHook } from '@testing-library/react';
-import { GlobalSnackbar, useSnackbar, type GlobalSnackbarProps } from '../GlobalSnackbar';
+import { GlobalSnackbar, useSnackbarState, type GlobalSnackbarProps } from '../GlobalSnackbar';
 
 describe('GlobalSnackbar 组件系统', () => {
   const mockOnClose = vi.fn();
@@ -50,9 +50,9 @@ describe('GlobalSnackbar 组件系统', () => {
     });
   });
 
-  describe('useSnackbar Hook 逻辑', () => {
+  describe('useSnackbarState Hook 逻辑', () => {
     it('应能正确初始化并更新状态', () => {
-      const { result } = renderHook(() => useSnackbar({ severity: 'warning' }));
+      const { result } = renderHook(() => useSnackbarState({ severity: 'warning' }));
 
       expect(result.current.snackbarProps.open).toBe(false);
 
@@ -66,7 +66,7 @@ describe('GlobalSnackbar 组件系统', () => {
     });
 
     it('closeMessage 应立即关闭 Snackbar', () => {
-      const { result } = renderHook(() => useSnackbar());
+      const { result } = renderHook(() => useSnackbarState());
 
       act(() => {
         result.current.showMessage('测试');
@@ -92,7 +92,7 @@ describe('GlobalSnackbar 组件系统', () => {
     });
 
     it('当 reason 为 clickaway 时不应调用 onClose (源码逻辑验证)', () => {
-      const { result } = renderHook(() => useSnackbar());
+      const { result } = renderHook(() => useSnackbarState());
 
       // 模拟 MUI 的 handleClose 被 clickaway 触发
       act(() => {
@@ -101,7 +101,7 @@ describe('GlobalSnackbar 组件系统', () => {
 
       // 状态应该保持 open: true
       expect(result.current.snackbarProps.open).toBe(false);
-      // 注意：此处取决于你对 useSnackbar 的期望。
+      // 注意：此处取决于你对 useSnackbarState 的期望。
       // 源码中 handleClose 拦截了 clickaway，所以 open 不会变为 false。
     });
   });

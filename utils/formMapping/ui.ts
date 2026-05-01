@@ -20,7 +20,7 @@ export async function updateMappingUI() {
         const label = SmartDetector.extractSemanticLabel(el);
 
         const newEntry: FormMapEntry = {
-          id: Math.random().toString(36).substr(2, 9),
+          id: Math.random().toString(36).substring(2, 9),
           label_display: label,
           fingerprint,
           action_logic: { type: 'text', strategy: 'fixed', value: '' },
@@ -45,10 +45,10 @@ export async function updateMappingUI() {
 export function initFormMappingHelper() {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && (changes['active_form_map'] || changes['app/formMapping/isPicking'])) {
-      updateMappingUI();
+      updateMappingUI().catch(console.error);
     }
   });
 
   // 初始加载
-  updateMappingUI();
+  updateMappingUI().catch(console.error);
 }
