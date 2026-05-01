@@ -23,7 +23,7 @@ export const useUrlPreferences = () => {
         setIsLoaded(true);
       }
     };
-    loadPreferences();
+    loadPreferences().catch(console.error);
   }, []);
 
   const savePreferences = useCallback(() => {

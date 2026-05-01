@@ -9,9 +9,6 @@ import {
   Switch,
   Divider,
   Paper,
-  alpha,
-  Snackbar,
-  Alert,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
@@ -22,13 +19,12 @@ import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
 import Button from '@/components/Button';
-import { globalStyles, formMappingPageStyles } from '@/config/pageTheme.ts';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 
 export default function FormMappingPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
   const [isPicking, setIsPicking] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null);
-  const [showExportSuccess, setShowExportSuccess] = useState(false);
+  const { showMessage } = useGlobalSnackbar({ autoHideDuration: 3000 });
 
   useEffect(() => {
     const loadData = async () => {
@@ -38,7 +34,7 @@ export default function FormMappingPage() {
       setIsPicking(picking || false);
     };
 
-    loadData();
+    loadData().catch((r) => console.error(r));
 
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }, area: string) => {
       if (area === 'local') {
@@ -79,7 +75,7 @@ export default function FormMappingPage() {
   const exportConfig = () => {
     try {
       if (entries.length === 0) {
-        setExportError('没有可导出的配置数据');
+        showMessage('没有可导出的配置数据', { severity: 'warning' });
         return;
       }
 
@@ -99,17 +95,19 @@ export default function FormMappingPage() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      setShowExportSuccess(true);
+      showMessage('配置导出成功！', { severity: 'success' });
     } catch (error) {
       console.error('导出配置失败:', error);
-      setExportError(error instanceof Error ? error.message : '导出失败，请重试');
+      showMessage(error instanceof Error ? error.message : '导出失败，请重试', {
+        severity: 'error',
+      });
     }
   };
 
   return (
     <Box>
-      <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
-        <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
+      <Box>
+        <Container sx={{ py: 2 }}>
           <PageHeader
             title="通用表单映射助手"
             subtitle="智能识别表单指纹，自定义填充逻辑"
@@ -142,17 +140,6 @@ export default function FormMappingPage() {
                   onClick={togglePicking}
                   size="small"
                   startIcon={<AddCircleOutlineIcon />}
-                  sx={{
-                    borderRadius: 3,
-                    px: 2,
-                    fontWeight: 800,
-                    ...(isPicking
-                      ? {
-                          bgcolor: 'secondary.main',
-                          boxShadow: `0 4px 12px ${alpha(formMappingPageStyles.secondaryColor || '#9c27b0', 0.2)}`,
-                        }
-                      : {}),
-                  }}
                 >
                   {isPicking ? '正在拾取...' : '开始拾取'}
                 </Button>
@@ -174,12 +161,7 @@ export default function FormMappingPage() {
               <Typography variant="subtitle2" fontWeight={800} color="text.secondary">
                 已拾取字段 ({entries.length})
               </Typography>
-              <Button
-                size="small"
-                color="error"
-                onClick={clearAll}
-                sx={{ fontWeight: 700, fontSize: '0.75rem' }}
-              >
+              <Button size="small" color="error" onClick={clearAll}>
                 清空全部
               </Button>
             </Box>
@@ -273,7 +255,6 @@ export default function FormMappingPage() {
                     variant="outlined"
                     onClick={exportConfig}
                     startIcon={<FileDownloadIcon />}
-                    sx={{ fontWeight: 700, fontSize: '0.75rem', borderRadius: 3 }}
                   >
                     导出配置
                   </Button>
@@ -299,26 +280,6 @@ export default function FormMappingPage() {
           </Container>
         </Container>
       </Box>
-      <Snackbar
-        open={!!exportError}
-        autoHideDuration={4000}
-        onClose={() => setExportError(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="error" onClose={() => setExportError(null)}>
-          {exportError}
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={showExportSuccess}
-        autoHideDuration={3000}
-        onClose={() => setShowExportSuccess(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" onClose={() => setShowExportSuccess(false)}>
-          配置导出成功！
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

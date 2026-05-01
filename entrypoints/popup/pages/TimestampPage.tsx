@@ -1,15 +1,15 @@
-import { TextField, Select, MenuItem, Stack, Box, Container, alpha } from '@mui/material';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import { TextField, Select, MenuItem, Stack, Box, Container } from '@mui/material';
+import { useSnackbar } from '@/components/SnackbarProvider';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';
-import { ZONES, globalStyles, timestampPageStyles } from '@/config/pageTheme';
+import { ZONES, timestampPageStyles } from '@/config/pageTheme';
 import LiveClock from './components/LiveClock';
 import ResultView from './components/ResultView';
 import { useTimestampConverter } from './hooks/useTimestampConverter';
 
 export default function TimestampPage() {
-  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
+  const { showMessage } = useSnackbar();
   const {
     mode,
     tsInput,
@@ -28,14 +28,13 @@ export default function TimestampPage() {
   } = useTimestampConverter();
 
   return (
-    <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
+    <Box>
+      <Container sx={{ p: 2 }}>
         {/* Header */}
         <PageHeader
           title="时间戳转换"
           subtitle="Unix 毫秒数转换与格式化"
           icon={<AccessTimeIcon />}
-          sx={{ mb: 2.5 }}
         />
 
         {/* Live Clock Card */}
@@ -66,7 +65,7 @@ export default function TimestampPage() {
               width: 'calc(50% - 5px)',
               bgcolor: '#fff',
               borderRadius: 3.5,
-              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
               transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               transform: mode === 'ts2dt' ? 'translateX(0)' : 'translateX(100%)',
               top: 5,
@@ -171,31 +170,13 @@ export default function TimestampPage() {
         </Stack>
 
         {/* Main Action */}
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={convert}
-          sx={{
-            py: 1.4,
-            borderRadius: 4,
-            bgcolor: 'primary.main',
-            fontWeight: 800,
-            fontSize: '0.9rem',
-            boxShadow: 'none',
-            '&:hover': {
-              bgcolor: 'primary.dark',
-              boxShadow: `0 8px 24px ${alpha(timestampPageStyles.primaryColor, 0.2)}`,
-            },
-          }}
-        >
+        <Button fullWidth variant="contained" onClick={convert}>
           立即转换
         </Button>
 
         {/* Result View */}
         <ResultView result={result} mode={mode} unit={unit} zone={zone} showMessage={showMessage} />
       </Container>
-
-      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

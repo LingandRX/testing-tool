@@ -1,5 +1,5 @@
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
-import { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbarState } from '@/components/GlobalSnackbar';
 
 /**
  * 复制文本到剪贴板
@@ -27,7 +27,7 @@ export const copyToClipboard = async (
  * @returns 包含复制函数和 snackbarProps 的对象
  */
 export const useClipboard = () => {
-  const { snackbarProps, showMessage } = useSnackbar({ autoHideDuration: 1500 });
+  const { snackbarProps, showMessage } = useSnackbarState({ autoHideDuration: 1500 });
 
   const copy = async (text: string): Promise<boolean> => {
     return copyToClipboard(text, showMessage);

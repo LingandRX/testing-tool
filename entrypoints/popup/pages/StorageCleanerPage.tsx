@@ -1,6 +1,6 @@
 import { Box, Container, CircularProgress } from '@mui/material';
 import Button from '@/components/Button';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useStorageCleaner } from './useStorageCleaner';
@@ -11,7 +11,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 import CleaningResult from './components/CleaningResult';
 
 export default function StorageCleanerPage() {
-  const { snackbarProps, showMessage } = useSnackbar();
+  const { showMessage } = useGlobalSnackbar();
   const {
     domain,
     error,
@@ -45,7 +45,7 @@ export default function StorageCleanerPage() {
   }
 
   return (
-    <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100%', pb: 2 }}>
+    <Box>
       <Container sx={{ py: 2 }}>
         <DomainHeader domain={domain} totalSize={totalSize} />
 
@@ -64,20 +64,9 @@ export default function StorageCleanerPage() {
           variant="contained"
           onClick={() => setShowConfirm(true)}
           sx={{
-            py: 1.3,
-            borderRadius: 4,
             bgcolor: storageCleanerPageStyles.warningColor,
-            fontWeight: 800,
-            fontSize: '0.85rem',
-            boxShadow: '0 4px 12px rgba(255, 152, 0, 0.25)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               bgcolor: storageCleanerPageStyles.warningDark,
-              boxShadow: '0 8px 20px rgba(255, 152, 0, 0.35)',
-              transform: 'translateY(-2px)',
-            },
-            '&:active': {
-              transform: 'translateY(0)',
             },
           }}
           disabled={loading}
@@ -95,7 +84,6 @@ export default function StorageCleanerPage() {
         onConfirm={handleClean}
         options={options}
       />
-      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, TextField, Alert, Stack, alpha } from '@mui/material';
+import { Box, TextField, Alert, Stack } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@/components/Button';
 import type { OpenUrlEntry } from '@/types/storage';
@@ -95,14 +95,9 @@ const UrlEntryForm = ({ onAddEntry, showMessage }: UrlEntryFormProps) => {
           fullWidth
           startIcon={<AddIcon />}
           sx={{
-            py: 1.2,
-            borderRadius: 4,
             bgcolor: openUrlPageStyles.themeColor,
-            fontWeight: 800,
-            boxShadow: 'none',
             '&:hover': {
               bgcolor: openUrlPageStyles.primaryDark,
-              boxShadow: `0 8px 24px ${alpha(openUrlPageStyles.primaryColor, 0.2)}`,
             },
           }}
         >

@@ -9,11 +9,7 @@ import {
   Switch,
   Divider,
   Paper,
-  Button,
   Chip,
-  Snackbar,
-  Alert,
-  alpha,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -24,17 +20,18 @@ import { useEffect, useState, useCallback } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
-import { globalStyles, formMappingPageStyles } from '@/config/pageTheme.ts';
+import { formMappingPageStyles } from '@/config/pageTheme.ts';
 import { MockDataGenerator } from '@/utils/formMapping/smartInjector';
+import { Button } from '@/components/Button';
+import { FormInjectResult, MessageAction, sendMessage } from '@/utils/messages';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 
 export default function FormFillPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
   const [previewData, setPreviewData] = useState<Map<string, string>>(new Map());
   const [injectResults, setInjectResults] = useState<Map<string, boolean>>(new Map());
   const [isInjecting, setIsInjecting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showMessage } = useGlobalSnackbar({ autoHideDuration: 3000 });
 
   const generatePreviewData = useCallback((items: FormMapEntry[]) => {
     const preview = new Map<string, string>();
@@ -53,10 +50,10 @@ export default function FormFillPage() {
       generatePreviewData(data || []);
     };
 
-    loadEntries();
+    loadEntries().catch((r) => console.error(r));
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }, area: string) => {
       if (area === 'local' && changes['active_form_map']) {
-        loadEntries();
+        loadEntries().catch((r) => console.error(r));
       }
     };
     chrome.storage.onChanged.addListener(listener);
@@ -69,8 +66,7 @@ export default function FormFillPage() {
 
   const injectAllFields = async () => {
     if (entries.length === 0) {
-      setErrorMessage('没有可填充的字段');
-      setShowError(true);
+      showMessage('没有可填充的字段', { severity: 'error' });
       return;
     }
 
@@ -95,27 +91,24 @@ export default function FormFillPage() {
         mockValue: previewData.get(entry.id) || '',
       }));
 
-      // 执行注入
-      const result = await chrome.tabs.sendMessage(tabId, {
-        type: 'FORM_INJECT',
-        data: injectData,
-      });
+      // 执行注入 (使用 type-safe sendMessage)
+      const result = await sendMessage(MessageAction.FORM_INJECT, { data: injectData }, tabId);
 
       if (result && result.success) {
-        result.results.forEach((r: { id: string; success: boolean }) => {
+        result.results?.forEach((r: FormInjectResult) => {
           results.set(r.id, r.success);
         });
         setInjectResults(results);
-        setShowSuccess(true);
+        showMessage('填充成功！', { severity: 'success' });
       } else {
-        throw new Error(result?.error || '注入失败');
+        throw new Error(result?.error || result?.message || '注入失败');
       }
     } catch (error) {
       console.error('注入失败:', error);
-      setErrorMessage(
-        error instanceof Error ? error.message : '注入失败，请确保已在网页中打开表单',
-      );
-      setShowError(true);
+      showMessage(error instanceof Error ? error.message : '注入失败，请确保已在网页中打开表单');
+      showMessage(error instanceof Error ? error.message : '注入失败，请确保已在网页中打开表单', {
+        severity: 'error',
+      });
     } finally {
       setIsInjecting(false);
     }
@@ -141,8 +134,8 @@ export default function FormFillPage() {
   };
 
   return (
-    <Box sx={{ bgcolor: globalStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
-      <Container sx={{ py: 2, bgcolor: globalStyles.backgroundColor }}>
+    <Box>
+      <Container sx={{ py: 2 }}>
         <PageHeader
           title="智能表单填充"
           subtitle="基于指纹识别的精准数据注入"
@@ -177,7 +170,6 @@ export default function FormFillPage() {
                   onClick={refreshPreview}
                   size="small"
                   startIcon={<RefreshIcon />}
-                  sx={{ borderRadius: 3 }}
                 >
                   刷新预览
                 </Button>
@@ -188,9 +180,7 @@ export default function FormFillPage() {
                   startIcon={<PlayArrowIcon />}
                   disabled={isInjecting || entries.length === 0}
                   sx={{
-                    borderRadius: 3,
                     bgcolor: formMappingPageStyles.secondaryColor || '#9c27b0',
-                    boxShadow: `0 4px 12px ${alpha(formMappingPageStyles.secondaryColor || '#9c27b0', 0.2)}`,
                   }}
                 >
                   {isInjecting ? '注入中...' : '开始填充'}
@@ -261,6 +251,14 @@ export default function FormFillPage() {
                       sx={{ mr: 2 }}
                     />
                     <ListItemText
+                      slotProps={{
+                        primary: {
+                          component: 'div',
+                        },
+                        secondary: {
+                          component: 'div',
+                        },
+                      }}
                       primary={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                           <span style={{ fontWeight: 500 }}>{entry.label_display}</span>
@@ -361,24 +359,6 @@ export default function FormFillPage() {
           )}
         </Container>
       </Container>
-
-      {/* 提示消息 */}
-      <Snackbar
-        open={showSuccess}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccess(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success">填充完成！</Alert>
-      </Snackbar>
-      <Snackbar
-        open={showError}
-        autoHideDuration={4000}
-        onClose={() => setShowError(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="error">{errorMessage}</Alert>
-      </Snackbar>
     </Box>
   );
 }
