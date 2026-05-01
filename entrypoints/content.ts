@@ -10,7 +10,7 @@ import {
   FillMode,
   type FormFieldInfo,
 } from '@/utils/dummyDataGenerator';
-import { MessageAction, type MessagePayload, type MessageResponse } from '@/utils/messages';
+import { MessageAction, onMessage } from '@/utils/messages';
 
 import { SmartDetector } from '@/utils/formMapping/scanner';
 import { highlighter } from '@/utils/formMapping/highlighter';
@@ -76,153 +76,139 @@ export default defineContentScript({
     updateMappingUI();
 
     // === 原有表单识别逻辑 ===
-    // 监听来自 popup/sidepanel 的消息
-    chrome.runtime.onMessage.addListener(
-      (message: MessagePayload, _sender, sendResponse: (response: MessageResponse) => void) => {
-        try {
-          switch (message.action) {
-            case MessageAction.SCAN_FORM_FIELDS: {
-              const result = scanFormFields();
-              currentFields = result.fields;
-              sendResponse({
-                success: true,
-                fields: result.fields.map((f) => ({
-                  id: f.id,
-                  fieldType: f.fieldType,
-                  label: f.label,
-                  placeholder: f.placeholder,
-                  name: f.name,
-                  value: f.value,
-                  isSelected: f.isSelected,
-                  generatedValue: f.generatedValue,
-                })),
-                totalCount: result.totalCount,
-                validCount: result.validCount,
-                hasModal: !!result.modalContainer,
-              });
-              break;
-            }
-            case MessageAction.FILL_VALID_DATA:
-              fillAllFields(FillMode.VALID, message.includeHidden || false);
-              sendResponse({ success: true, message: '已填充有效数据' });
-              break;
-            case MessageAction.FILL_INVALID_DATA:
-              fillAllFields(FillMode.INVALID, message.includeHidden || false);
-              sendResponse({ success: true, message: '已填充无效数据' });
-              break;
-            case MessageAction.FILL_SELECTED_FIELDS: {
-              // 使用之前扫描时存储的字段，因为它们包含element属性
-              const incomingFields = message.fields || [];
-              const fieldsToFill = currentFields.map((field) => {
-                const incomingField = incomingFields.find((f) => f.id === field.id);
-                if (incomingField) {
-                  return {
-                    ...field,
-                    fieldType: incomingField.fieldType,
-                    isSelected: incomingField.isSelected,
-                    useInvalidData: (incomingField as { useInvalidData?: boolean }).useInvalidData,
-                  };
-                }
-                return field;
-              });
-              const count = fillSelectedFields(fieldsToFill, message.mode || FillMode.VALID);
-              sendResponse({ success: true, message: `已填充 ${count} 个字段` });
-              break;
-            }
-            case MessageAction.CLEAR_ALL_FIELDS:
-              clearAllFields();
-              sendResponse({ success: true, message: '已清空所有字段' });
-              break;
-            case MessageAction.HIGHLIGHT_FIELD: {
-              const fieldId = message.fieldId;
-              const field = currentFields.find((f) => f.id === fieldId);
-              if (field) {
-                highlightField(field.element);
-                sendResponse({ success: true });
-              } else {
-                sendResponse({ success: false, message: '未找到字段' });
-              }
-              break;
-            }
-            case MessageAction.UNHIGHLIGHT_FIELD: {
-              const fieldId = message.fieldId;
-              const field = currentFields.find((f) => f.id === fieldId);
-              if (field) {
-                unhighlightField(field.element);
-                sendResponse({ success: true });
-              } else {
-                sendResponse({ success: false, message: '未找到字段' });
-              }
-              break;
-            }
-            case MessageAction.HIGHLIGHT_ALL_FIELDS: {
-              const fieldIds = message.fieldIds || [];
-              fieldIds.forEach((id) => {
-                const field = currentFields.find((f) => f.id === id);
-                if (field) {
-                  highlightField(field.element);
-                }
-              });
-              sendResponse({ success: true });
-              break;
-            }
-            case MessageAction.UNHIGHLIGHT_ALL_FIELDS:
-              currentFields.forEach((field) => {
-                unhighlightField(field.element);
-              });
-              sendResponse({ success: true });
-              break;
-            case MessageAction.FLASH_FIELD: {
-              const fieldId = message.fieldId;
-              const field = currentFields.find((f) => f.id === fieldId);
-              if (field) {
-                flashField(field.element);
-                sendResponse({ success: true });
-              } else {
-                sendResponse({ success: false, message: '未找到字段' });
-              }
-              break;
-            }
-            case 'FORM_INJECT': {
-              try {
-                const injectData =
-                  (message.data as Array<{ entry: FormMapEntry; mockValue: string }>) || [];
-                const results = injectData.map((item) => {
-                  const matchResult = FuzzyMatcher.findTargetElement(item.entry.fingerprint);
-                  if (matchResult.element) {
-                    const injectResult = SmartInjectionEngine.inject(
-                      matchResult.element,
-                      item.entry,
-                      item.mockValue,
-                    );
-                    if (injectResult.success) {
-                      FeedbackRenderer.renderSuccess(matchResult.element);
-                    } else {
-                      FeedbackRenderer.renderError(matchResult.element);
-                    }
-                    return { id: item.entry.id, success: injectResult.success };
-                  } else {
-                    return { id: item.entry.id, success: false };
-                  }
-                });
-                sendResponse({ success: true, results });
-              } catch (error) {
-                console.error('智能注入失败:', error);
-                sendResponse({
-                  success: false,
-                  error: error instanceof Error ? error.message : '注入失败',
-                });
-              }
-              break;
-            }
-            default:
-              sendResponse({ success: false, message: '未知操作' });
-          }
-        } catch (error) {
-          console.error('执行操作失败:', error);
-          sendResponse({ success: false, message: '执行操作失败' });
+    // 使用 @webext-core/messaging 监听消息
+    onMessage(MessageAction.SCAN_FORM_FIELDS, async () => {
+      const result = scanFormFields();
+      currentFields = result.fields;
+      return {
+        success: true,
+        fields: result.fields.map((f) => ({
+          id: f.id,
+          fieldType: f.fieldType,
+          label: f.label,
+          placeholder: f.placeholder,
+          name: f.name,
+          value: f.value,
+          isSelected: f.isSelected,
+          generatedValue: f.generatedValue,
+        })),
+        totalCount: result.totalCount,
+        validCount: result.validCount,
+        hasModal: !!result.modalContainer,
+      };
+    });
+
+    onMessage(MessageAction.FILL_VALID_DATA, async (message) => {
+      fillAllFields(FillMode.VALID, message.data.includeHidden || false);
+      return { success: true, message: '已填充有效数据' };
+    });
+
+    onMessage(MessageAction.FILL_INVALID_DATA, async (message) => {
+      fillAllFields(FillMode.INVALID, message.data.includeHidden || false);
+      return { success: true, message: '已填充无效数据' };
+    });
+
+    onMessage(MessageAction.FILL_SELECTED_FIELDS, async (message) => {
+      const { fields: incomingFields, mode } = message.data;
+      const fieldsToFill = currentFields.map((field) => {
+        const incomingField = incomingFields.find((f) => f.id === field.id);
+        if (incomingField) {
+          return {
+            ...field,
+            fieldType: incomingField.fieldType,
+            isSelected: incomingField.isSelected,
+            useInvalidData: incomingField.useInvalidData,
+          };
         }
-      },
-    );
+        return field;
+      });
+      const count = fillSelectedFields(fieldsToFill, mode || FillMode.VALID);
+      return { success: true, message: `已填充 ${count} 个字段` };
+    });
+
+    onMessage(MessageAction.CLEAR_ALL_FIELDS, async () => {
+      clearAllFields();
+      return { success: true, message: '已清空所有字段' };
+    });
+
+    onMessage(MessageAction.HIGHLIGHT_FIELD, async (message) => {
+      const { fieldId } = message.data;
+      const field = currentFields.find((f) => f.id === fieldId);
+      if (field) {
+        highlightField(field.element);
+        return { success: true };
+      }
+      return { success: false, message: '未找到字段' };
+    });
+
+    onMessage(MessageAction.UNHIGHLIGHT_FIELD, async (message) => {
+      const { fieldId } = message.data;
+      const field = currentFields.find((f) => f.id === fieldId);
+      if (field) {
+        unhighlightField(field.element);
+        return { success: true };
+      }
+      return { success: false, message: '未找到字段' };
+    });
+
+    onMessage(MessageAction.HIGHLIGHT_ALL_FIELDS, async (message) => {
+      const { fieldIds } = message.data;
+      fieldIds.forEach((id) => {
+        const field = currentFields.find((f) => f.id === id);
+        if (field) {
+          highlightField(field.element);
+        }
+      });
+      return { success: true };
+    });
+
+    onMessage(MessageAction.UNHIGHLIGHT_ALL_FIELDS, async () => {
+      currentFields.forEach((field) => {
+        unhighlightField(field.element);
+      });
+      return { success: true };
+    });
+
+    onMessage(MessageAction.FLASH_FIELD, async (message) => {
+      const { fieldId } = message.data;
+      const field = currentFields.find((f) => f.id === fieldId);
+      if (field) {
+        flashField(field.element);
+        return { success: true };
+      }
+      return { success: false, message: '未找到字段' };
+    });
+
+    onMessage(MessageAction.FORM_INJECT, async (message) => {
+      try {
+        const injectData =
+          (message.data.data as Array<{ entry: FormMapEntry; mockValue: string }>) || [];
+        const results = injectData.map((item) => {
+          const matchResult = FuzzyMatcher.findTargetElement(item.entry.fingerprint);
+          if (matchResult.element) {
+            const injectResult = SmartInjectionEngine.inject(
+              matchResult.element,
+              item.entry,
+              item.mockValue,
+            );
+            if (injectResult.success) {
+              FeedbackRenderer.renderSuccess(matchResult.element);
+            } else {
+              FeedbackRenderer.renderError(matchResult.element);
+            }
+            return { id: item.entry.id, success: injectResult.success };
+          } else {
+            return { id: item.entry.id, success: false };
+          }
+        });
+        return { success: true, results };
+      } catch (error) {
+        console.error('智能注入失败:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : '注入失败',
+        };
+      }
+    });
   },
 });

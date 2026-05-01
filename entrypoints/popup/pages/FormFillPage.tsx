@@ -25,6 +25,7 @@ import PageHeader from '@/components/PageHeader';
 import { formMappingPageStyles } from '@/config/pageTheme.ts';
 import { MockDataGenerator } from '@/utils/formMapping/smartInjector';
 import { Button } from '@/components/Button';
+import { FormInjectResult, MessageAction, sendMessage } from '@/utils/messages';
 
 export default function FormFillPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
@@ -94,20 +95,17 @@ export default function FormFillPage() {
         mockValue: previewData.get(entry.id) || '',
       }));
 
-      // 执行注入
-      const result = await chrome.tabs.sendMessage(tabId, {
-        type: 'FORM_INJECT',
-        data: injectData,
-      });
+      // 执行注入 (使用 type-safe sendMessage)
+      const result = await sendMessage(MessageAction.FORM_INJECT, { data: injectData }, tabId);
 
       if (result && result.success) {
-        result.results.forEach((r: { id: string; success: boolean }) => {
+        result.results?.forEach((r: FormInjectResult) => {
           results.set(r.id, r.success);
         });
         setInjectResults(results);
         setShowSuccess(true);
       } else {
-        throw new Error(result?.error || '注入失败');
+        throw new Error(result?.error || result?.message || '注入失败');
       }
     } catch (error) {
       console.error('注入失败:', error);

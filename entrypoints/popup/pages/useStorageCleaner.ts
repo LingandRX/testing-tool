@@ -17,6 +17,7 @@ import {
   getCacheStorageSize,
   getServiceWorkerCount,
 } from '@/utils/storageCleaner';
+import { MessageAction, sendMessage } from '@/utils/messages';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
   localStorage: true,
@@ -219,7 +220,7 @@ export function useStorageCleaner({
 
       if (autoRefresh && cleaningResult.success) {
         showMessage('清理成功，即将刷新页面', { severity: 'success' });
-        await chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id, delay: 1000 });
+        await sendMessage(MessageAction.RELOAD_TAB, { tabId: tab.id, delay: 1000 });
       } else {
         await loadInfo();
       }
