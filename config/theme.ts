@@ -59,8 +59,8 @@ const theme = createTheme({
         'html, body, #root': {
           margin: 0,
           padding: 0,
-          width: '400px',
-          height: '600px',
+          minWidth: '400px',
+          minHeight: '600px',
           overflow: 'hidden',
           backgroundColor: '#f5f5f5',
         },

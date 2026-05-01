@@ -14,7 +14,7 @@ export default function App() {
 
   return (
     <RouterProvider syncKey="app/popupRoute">
-      <SnackbarProvider>
+      <SnackbarProvider initialOptions={{ autoHideDuration: 1500000 }}>
         <Box
           className="app"
           sx={{

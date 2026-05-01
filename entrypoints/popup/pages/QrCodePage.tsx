@@ -8,7 +8,7 @@ import { qrCodePageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
 
 export default function QrCodePage() {
-  const { showMessage } = useGlobalSnackbar({ autoHideDuration: 1500 });
+  const { showMessage } = useGlobalSnackbar();
 
   // 使用自定义钩子管理展开状态
   const [urlExpanded, setUrlExpanded, urlInitialized] = useStorageState('qrCode/urlExpanded', true);

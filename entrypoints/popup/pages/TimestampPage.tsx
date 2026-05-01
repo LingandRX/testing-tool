@@ -1,5 +1,5 @@
 import { TextField, Select, MenuItem, Stack, Box, Container } from '@mui/material';
-import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
+import { useSnackbar } from '@/components/SnackbarProvider';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';
@@ -9,7 +9,7 @@ import ResultView from './components/ResultView';
 import { useTimestampConverter } from './hooks/useTimestampConverter';
 
 export default function TimestampPage() {
-  const { showMessage } = useGlobalSnackbar({ autoHideDuration: 1500 });
+  const { showMessage } = useSnackbar();
   const {
     mode,
     tsInput,
@@ -65,7 +65,7 @@ export default function TimestampPage() {
               width: 'calc(50% - 5px)',
               bgcolor: '#fff',
               borderRadius: 3.5,
-              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
               transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               transform: mode === 'ts2dt' ? 'translateX(0)' : 'translateX(100%)',
               top: 5,
