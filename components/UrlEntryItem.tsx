@@ -53,7 +53,7 @@ const UrlEntryItem = ({ entry, index, isLast, onDelete, showMessage }: UrlEntryI
   };
 
   const handleOpenInNewTab = (entry: OpenUrlEntry) => {
-    chrome.tabs.create({ url: entry.url });
+    chrome.tabs.create({ url: entry.url }).catch(console.error);
     window.close();
   };
 

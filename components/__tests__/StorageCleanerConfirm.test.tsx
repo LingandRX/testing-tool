@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { StorageCleanerConfirm } from '../StorageCleanerConfirm';
 import type { StorageCleanerOptions } from '@/types/storage';
 
-describe('StorageCleanerConfirm Component', () => {
+describe('StorageCleanerConfirm 组件', () => {
   const mockOnClose = vi.fn();
   const mockOnConfirm = vi.fn();
 
@@ -32,33 +32,33 @@ describe('StorageCleanerConfirm Component', () => {
     );
   };
 
-  describe('Rendering', () => {
-    it('should render dialog when open', () => {
+  describe('渲染测试', () => {
+    it('open 为 true 时应渲染对话框', () => {
       renderComponent();
       expect(screen.getByText('确认清理数据？')).toBeInTheDocument();
     });
 
-    it('should display warning message', () => {
+    it('应显示警告信息', () => {
       renderComponent();
       expect(screen.getByText(/此操作不可撤销/i)).toBeInTheDocument();
     });
 
-    it('should display selected options as chips', () => {
+    it('应将选中的选项显示为标签', () => {
       renderComponent();
       expect(screen.getByText('LocalStorage')).toBeInTheDocument();
       expect(screen.getByText('Session Storage')).toBeInTheDocument();
       expect(screen.getByText('Cookies')).toBeInTheDocument();
     });
 
-    it('should display cancel and confirm buttons', () => {
+    it('应显示取消和确认按钮', () => {
       renderComponent();
       expect(screen.getByRole('button', { name: /取消/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /确认清理/i })).toBeInTheDocument();
     });
   });
 
-  describe('Interaction', () => {
-    it('should call onClose when cancel is clicked', () => {
+  describe('交互测试', () => {
+    it('点击取消时应调用 onClose', () => {
       renderComponent();
 
       fireEvent.click(screen.getByRole('button', { name: /取消/i }));
@@ -66,7 +66,7 @@ describe('StorageCleanerConfirm Component', () => {
       expect(mockOnConfirm).not.toHaveBeenCalled();
     });
 
-    it('should call onConfirm when confirm is clicked', () => {
+    it('点击确认时应调用 onConfirm', () => {
       renderComponent();
 
       fireEvent.click(screen.getByRole('button', { name: /确认清理/i }));
@@ -75,8 +75,8 @@ describe('StorageCleanerConfirm Component', () => {
     });
   });
 
-  describe('Options filtering', () => {
-    it('should only show selected options', () => {
+  describe('选项过滤测试', () => {
+    it('应仅显示选中的选项', () => {
       const partialOptions: StorageCleanerOptions = {
         localStorage: true,
         sessionStorage: false,
@@ -94,7 +94,7 @@ describe('StorageCleanerConfirm Component', () => {
       expect(screen.queryByText('Cookies')).not.toBeInTheDocument();
     });
 
-    it('should handle empty options', () => {
+    it('应处理空选项', () => {
       const emptyOptions: StorageCleanerOptions = {
         localStorage: false,
         sessionStorage: false,
@@ -111,13 +111,13 @@ describe('StorageCleanerConfirm Component', () => {
     });
   });
 
-  describe('Dialog behavior', () => {
-    it('should not render when open is false', () => {
+  describe('对话框行为测试', () => {
+    it('open 为 false 时不应渲染', () => {
       renderComponent({ open: false });
       expect(screen.queryByText('确认清理数据？')).not.toBeInTheDocument();
     });
 
-    it('should render with different options', () => {
+    it('应使用不同选项渲染', () => {
       const customOptions: StorageCleanerOptions = {
         localStorage: false,
         sessionStorage: true,

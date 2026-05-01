@@ -7,9 +7,12 @@ export class VisualHighlighter {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
   private isVisible = false;
+  private currentEntries: FormMapEntry[] = [];
+  private animationFrameId: number | null = null;
 
   constructor() {
     this.handleResize = this.handleResize.bind(this);
+    this.render = this.render.bind(this);
   }
 
   public init() {
@@ -37,29 +40,47 @@ export class VisualHighlighter {
     if (!this.canvas) this.init();
     this.isVisible = true;
     this.canvas!.style.display = 'block';
-    this.handleResize();
+    this.requestUpdate();
   }
 
   public hide() {
     this.isVisible = false;
     if (this.canvas) this.canvas.style.display = 'none';
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
   }
 
   private handleResize() {
     if (!this.isVisible || !this.canvas || !this.ctx) return;
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-    this.draw();
+    this.requestUpdate();
   }
 
   /**
-   * 核心渲染循环
+   * 核心更新请求，使用 requestAnimationFrame 节流
    */
-  public draw(entries: FormMapEntry[] = []) {
-    if (!this.ctx || !this.isVisible) return;
-    this.ctx.clearRect(0, 0, this.canvas!.width, this.canvas!.height);
+  private requestUpdate() {
+    if (this.animationFrameId !== null) return;
+    this.animationFrameId = requestAnimationFrame(this.render);
+  }
 
-    entries.forEach((entry) => {
+  /**
+   * 核心渲染逻辑
+   */
+  private render() {
+    this.animationFrameId = null;
+    if (!this.ctx || !this.isVisible || !this.canvas) return;
+
+    // 适配分辨率
+    if (this.canvas.width !== window.innerWidth || this.canvas.height !== window.innerHeight) {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+    }
+
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.currentEntries.forEach((entry) => {
       const el = document.querySelector<HTMLElement>(entry.fingerprint.selector);
       if (!el) return;
 
@@ -101,6 +122,16 @@ export class VisualHighlighter {
         this.ctx!.fillText(entry.label_display, rect.left, rect.top - 5);
       }
     });
+  }
+
+  /**
+   * 公共 draw 方法，仅更新数据并触发渲染请求
+   */
+  public draw(entries: FormMapEntry[] = []) {
+    this.currentEntries = entries;
+    if (this.isVisible) {
+      this.requestUpdate();
+    }
   }
 
   /**

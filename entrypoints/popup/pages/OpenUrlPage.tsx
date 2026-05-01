@@ -1,16 +1,16 @@
 import { Box, Typography, Container } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
 import UrlEntryForm from '@/components/UrlEntryForm';
 import UrlEntryList from '@/components/UrlEntryList';
 import { useUrlPreferences } from '@/utils/useUrlPreferences';
 import type { OpenUrlEntry } from '@/types/storage';
-import { dashboardPageStyles, openUrlPageStyles } from '@/config/pageTheme';
+import { openUrlPageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
 
 export default function OpenUrlPage() {
   const { entries, setEntries, isLoaded } = useUrlPreferences();
-  const { snackbarProps, showMessage } = useSnackbar();
+  const { showMessage } = useGlobalSnackbar();
 
   const handleAddEntry = (entry: OpenUrlEntry) => {
     setEntries([...entries, entry]);
@@ -25,7 +25,7 @@ export default function OpenUrlPage() {
 
   if (!isLoaded) {
     return (
-      <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
+      <Box sx={{ minHeight: '100%', pb: 3 }}>
         <Container sx={{ py: 2 }}>
           <Typography>加载中...</Typography>
         </Container>
@@ -34,7 +34,7 @@ export default function OpenUrlPage() {
   }
 
   return (
-    <Box sx={{ bgcolor: dashboardPageStyles.backgroundColor, minHeight: '100%', pb: 3 }}>
+    <Box>
       <Container sx={{ py: 2 }}>
         {/* Header */}
         <PageHeader
@@ -64,7 +64,6 @@ export default function OpenUrlPage() {
           />
         </Box>
       </Container>
-      <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }

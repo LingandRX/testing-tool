@@ -70,12 +70,15 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 ├── components/           # 可复用 UI 组件
 │   ├── Button.tsx
 │   ├── CopyButton.tsx
+│   ├── DashboardCard.tsx      # 仪表盘卡片组件（React.memo 优化）
 │   ├── GlobalSnackbar.tsx
+│   ├── PageHeader.tsx         # 页面标题栏组件
 │   ├── RouterContainer.tsx
 │   ├── StorageCleanerConfirm.tsx
 │   ├── ToolCard.tsx
 │   └── TopBar.tsx
-├── config/              # 路由配置
+├── config/              # 配置文件
+│   ├── dashboardCards.tsx    # 仪表盘卡片配置数据
 │   └── routes.ts        # 页面路由定义
 ├── entrypoints/         # 浏览器扩展入口点
 │   ├── popup/          # 扩展弹窗界面

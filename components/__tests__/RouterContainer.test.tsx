@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import RouterContainer from '../RouterContainer';
 import { RouterProvider } from '@/providers/RouterProvider';
+import { SnackbarProvider } from '@/components/SnackbarProvider';
 import type { PageType } from '@/types/storage';
+import React from 'react';
 
 const mockRouterValue = {
   currentPage: 'dashboard' as PageType,
@@ -22,23 +24,27 @@ vi.mock('@/providers/RouterProvider', () => ({
   RouterProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-describe('RouterContainer Component', () => {
+describe('RouterContainer 组件', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   const renderWithProvider = (ui: React.ReactElement) => {
-    return render(<RouterProvider>{ui}</RouterProvider>);
+    return render(
+      <SnackbarProvider>
+        <RouterProvider>{ui}</RouterProvider>
+      </SnackbarProvider>,
+    );
   };
 
-  describe('Rendering', () => {
-    it('should render loading state when isLoaded is false', () => {
+  describe('渲染测试', () => {
+    it('isLoaded 为 false 时应渲染加载状态', () => {
       mockRouterValue.isLoaded = false;
       renderWithProvider(<RouterContainer />);
       expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
 
-    it('should render page content when isLoaded is true', () => {
+    it('isLoaded 为 true 时应渲染页面内容', () => {
       mockRouterValue.isLoaded = true;
       mockRouterValue.currentPage = 'dashboard';
       const { container } = renderWithProvider(<RouterContainer />);
@@ -46,15 +52,15 @@ describe('RouterContainer Component', () => {
     });
   });
 
-  describe('Animation classes', () => {
-    it('should apply dashboard animation class on dashboard page', () => {
+  describe('动画类测试', () => {
+    it('在 dashboard 页面应应用 dashboard 动画类', () => {
       mockRouterValue.currentPage = 'dashboard';
       renderWithProvider(<RouterContainer />);
       const box = document.querySelector('.page-transition-dashboard');
       expect(box).toBeInTheDocument();
     });
 
-    it('should apply enter animation class on non-dashboard page', () => {
+    it('在非 dashboard 页面应应用 enter 动画类', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<RouterContainer />);
       const box = document.querySelector('.page-transition-enter');
@@ -62,12 +68,16 @@ describe('RouterContainer Component', () => {
     });
   });
 
-  describe('Route handling', () => {
-    it('should update when currentPage changes', () => {
+  describe('路由处理测试', () => {
+    it('currentPage 变化时应更新', () => {
       const { rerender } = renderWithProvider(<RouterContainer />);
 
       mockRouterValue.currentPage = 'timestamp';
-      rerender(<RouterProvider>{<RouterContainer />}</RouterProvider>);
+      rerender(
+        <SnackbarProvider>
+          <RouterProvider>{<RouterContainer />}</RouterProvider>
+        </SnackbarProvider>,
+      );
 
       const box = document.querySelector('.page-transition-enter');
       expect(box).toBeInTheDocument();
