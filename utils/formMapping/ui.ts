@@ -6,15 +6,15 @@ import { FormMapEntry } from '@/types/storage';
 /**
  * 更新表单映射辅助 UI
  */
-export async function updateMappingUI() {
-  const entries = ((await storageUtil.get('active_form_map')) as FormMapEntry[]) || [];
+export async function updateMappingUI(forcePickerUpdate = false) {
   const isPicking = ((await storageUtil.get('app/formMapping/isPicking')) as boolean) || false;
+  const entries = ((await storageUtil.get('active_form_map')) as FormMapEntry[]) || [];
 
-  if (entries.length > 0 || isPicking) {
+  if (isPicking) {
     highlighter.show();
     highlighter.draw(entries);
 
-    if (isPicking) {
+    if (forcePickerUpdate) {
       highlighter.enablePicker(async (el) => {
         const fingerprint = SmartDetector.generateFingerprint(el);
         const label = SmartDetector.extractSemanticLabel(el);
@@ -29,13 +29,17 @@ export async function updateMappingUI() {
 
         const currentMap = ((await storageUtil.get('active_form_map')) as FormMapEntry[]) || [];
         await storageUtil.set('active_form_map', [...currentMap, newEntry]);
-        await storageUtil.set('app/formMapping/isPicking', false);
+
+        // 拾取成功后，如果是“单次拾取”逻辑，可以自动关闭
+        // await storageUtil.set('app/formMapping/isPicking', false);
+
+        // 如果是“连续拾取”，由于 active_form_map 变化会触发 updateMappingUI，
+        // 我们需要确保它不会因为 storage 变化而反复调用 enablePicker。
       });
-    } else {
-      highlighter.disablePicker();
     }
   } else {
     highlighter.hide();
+    highlighter.disablePicker();
   }
 }
 
@@ -44,11 +48,17 @@ export async function updateMappingUI() {
  */
 export function initFormMappingHelper() {
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && (changes['active_form_map'] || changes['app/formMapping/isPicking'])) {
-      updateMappingUI().catch(console.error);
+    if (area === 'local') {
+      if (changes['app/formMapping/isPicking']) {
+        // 当拾取状态变化时，强制更新 Picker 逻辑
+        updateMappingUI(true).catch(console.error);
+      } else if (changes['active_form_map']) {
+        // 当数据变化时，仅更新绘制内容，不重新绑定 Picker
+        updateMappingUI(false).catch(console.error);
+      }
     }
   });
 
   // 初始加载
-  updateMappingUI().catch(console.error);
+  updateMappingUI(true).catch(console.error);
 }

@@ -66,6 +66,8 @@ export interface StorageSchema {
   'app/theme': string;
   /** 表单映射工具是否正处于“元素拾取”模式 */
   'app/formMapping/isPicking': boolean;
+  /** 高亮显示的持续时间（毫秒） */
+  'app/formMapping/highlightDuration': number;
   /** 当前激活的表单映射条目列表 */
   active_form_map: FormMapEntry[];
   /** 存储清理工具的偏好设置 */

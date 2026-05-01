@@ -14,21 +14,22 @@ export default function App() {
 
   return (
     <RouterProvider syncKey="app/popupRoute">
-      <SnackbarProvider initialOptions={{ autoHideDuration: 1500000 }}>
+      <SnackbarProvider initialOptions={{ autoHideDuration: 1500 }}>
         <Box
           className="app"
           sx={{
             display: 'flex',
             flexDirection: 'column',
             width: '400px',
+            maxWidth: '400px',
             height: '600px',
             overflow: 'hidden',
             backgroundColor: globalStyles.backgroundColor,
-            '@media screen and (min-width: 401px), screen and (min-height: 601px)': {
+            // 仅在明确的大屏幕（如独立页面或侧边栏拉伸）下才允许扩展
+            '@media screen and (min-width: 600px)': {
               width: '100vw',
+              maxWidth: 'none',
               height: '100vh',
-              minWidth: '400px',
-              minHeight: '600px',
             },
           }}
         >

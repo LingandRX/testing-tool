@@ -270,16 +270,37 @@ export function SnackbarProvider({ children, initialOptions }: SnackbarProviderP
 /**
  * useSnackbar - 在子组件中获取 Snackbar 上下文的 Hook
  *
- * @param {SnackbarOptions} [_options] - 可选的配置项（保留向后兼容性，不实际使用）
+ * @param {SnackbarOptions} [options] - 钩子级别的默认配置（如 autoHideDuration）
  * @returns {SnackbarContextValue} - 包含 showMessage 和 closeMessage 的对象
  * @throws {Error} - 如果不在 SnackbarProvider 内部调用，抛出错误
+ *
+ * @description
+ * 选项合并策略：
+ * 1. 调用 showMessage 时传入的 callOptions 优先级最高
+ * 2. useSnackbar(options) 传入的 Hook 级别配置次之
+ * 3. SnackbarProvider(initialOptions) 传入的全局配置优先级最低
  */
-export function useSnackbar(_options?: SnackbarOptions): SnackbarContextValue {
+export function useSnackbar(options?: SnackbarOptions): SnackbarContextValue {
   const context = useContext(SnackbarContext);
   if (!context) {
     throw new Error('useSnackbar must be used within SnackbarProvider');
   }
-  return context;
+
+  // 包装 showMessage 以支持 Hook 级别的 initialOptions
+  const wrappedShowMessage = (message: string, callOptions?: SnackbarOptions) => {
+    // 采用防御性编程，确保 options 和 callOptions 为空时也能正常工作
+    // 优先级：callOptions > options
+    const mergedOptions: SnackbarOptions = {
+      ...(options || {}),
+      ...(callOptions || {}),
+    };
+    context.showMessage(message, mergedOptions);
+  };
+
+  return {
+    ...context,
+    showMessage: wrappedShowMessage,
+  };
 }
 
 export default GlobalSnackbar;

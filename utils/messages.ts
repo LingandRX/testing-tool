@@ -30,6 +30,8 @@ export enum MessageAction {
 
   // 字段定位/闪烁
   FLASH_FIELD = 'flashField',
+  FLASH_SELECTOR = 'flashSelector',
+  FLASH_MULTIPLE_SELECTORS = 'flashMultipleSelectors',
 
   // 智能表单注入
   FORM_INJECT = 'FORM_INJECT',
@@ -98,6 +100,14 @@ export interface ProtocolMap {
   [MessageAction.HIGHLIGHT_ALL_FIELDS](data: { fieldIds: string[] }): MessageResponse;
   [MessageAction.UNHIGHLIGHT_ALL_FIELDS](): MessageResponse;
   [MessageAction.FLASH_FIELD](data: { fieldId: string }): MessageResponse;
+  [MessageAction.FLASH_SELECTOR](data: {
+    entry: import('@/types/storage').FormMapEntry;
+    duration?: number;
+  }): MessageResponse;
+  [MessageAction.FLASH_MULTIPLE_SELECTORS](data: {
+    entries: import('@/types/storage').FormMapEntry[];
+    duration?: number;
+  }): MessageResponse;
   [MessageAction.FORM_INJECT](data: { data: FormInjectItem[] }): MessageResponse;
   [MessageAction.SIDE_PANEL_STATE_CHANGED](data: { isOpen: boolean }): void;
 }
@@ -118,16 +128,31 @@ export async function sendMessageToContent<K extends keyof ProtocolMap>(
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id) {
+      console.warn(`[Messaging] 无法获取当前标签页，无法发送动作: ${action}`);
       return { success: false, message: '无法获取当前标签页' } as ProtocolReturn<K>;
     }
 
     const data = args.length > 0 ? args[0] : undefined;
-    return await (
+
+    // 增加超时处理提示的逻辑（如果底层支持）
+    const response = await (
       sendMessage as (type: K, data: ProtocolData<K>, arg?: number) => Promise<ProtocolReturn<K>>
     )(action, data as ProtocolData<K>, tab.id);
+
+    return response;
   } catch (error) {
-    console.error('发送消息失败:', error);
-    return { success: false, message: '发送消息失败' } as ProtocolReturn<K>;
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error(`[Messaging] 向内容脚本发送消息失败 [Action: ${action}]:`, errorMsg);
+
+    // 针对常见错误进行友好提示
+    if (errorMsg.includes('Could not establish connection')) {
+      return { success: false, message: '无法连接到网页，请刷新页面后再试' } as ProtocolReturn<K>;
+    }
+    if (errorMsg.includes('No response')) {
+      return { success: false, message: '网页响应超时，请重试' } as ProtocolReturn<K>;
+    }
+
+    return { success: false, message: `通信失败: ${errorMsg}` } as ProtocolReturn<K>;
   }
 }
 
