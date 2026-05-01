@@ -4,17 +4,12 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
 import LanguageIcon from '@mui/icons-material/Language';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import DescriptionIcon from '@mui/icons-material/Description';
 
 import DashboardPage from '@/entrypoints/popup/pages/DashboardPage';
 import TimestampPage from '@/entrypoints/popup/pages/TimestampPage';
 import StorageCleanerPage from '@/entrypoints/popup/pages/StorageCleanerPage';
 import OpenUrlPage from '@/entrypoints/popup/pages/OpenUrlPage';
-import OpenUrlViewerPage from '@/entrypoints/popup/pages/OpenUrlViewerPage';
 import QrCodePage from '@/entrypoints/popup/pages/QrCodePage';
-import FormRecognizerPage from '@/entrypoints/popup/pages/FormRecognizerPage';
-import FormMappingPage from '@/entrypoints/popup/pages/FormMappingPage';
-import FormFillPage from '@/entrypoints/popup/pages/FormFillPage';
 
 import { THEME_COLORS } from './pageTheme';
 
@@ -109,56 +104,6 @@ export const FEATURES: FeatureConfig[] = [
       popup: QrCodePage,
       sidepanel: QrCodePage,
       detached: QrCodePage,
-    },
-  },
-  {
-    key: 'formMapping',
-    label: '表单映射',
-    description: '智能识别表单指纹，自定义填充逻辑',
-    themeColor: THEME_COLORS.primary,
-    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
-    defaultVisible: true,
-    components: {
-      popup: FormMappingPage,
-      sidepanel: FormMappingPage,
-      detached: FormMappingPage,
-    },
-  },
-  {
-    key: 'formFill',
-    label: '智能填充',
-    description: '根据表单指纹填充表单数据',
-    themeColor: THEME_COLORS.primary,
-    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
-    defaultVisible: true,
-    components: {
-      popup: FormFillPage,
-      sidepanel: FormFillPage,
-      detached: FormFillPage,
-    },
-  },
-  {
-    key: 'formRecognizer',
-    label: '表单识别',
-    description: '智能识别表单指纹',
-    themeColor: THEME_COLORS.primary,
-    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
-    defaultVisible: true,
-    components: {
-      popup: FormRecognizerPage,
-      sidepanel: FormRecognizerPage,
-      detached: FormRecognizerPage,
-    },
-  },
-  {
-    key: 'openUrlViewer',
-    label: '查看',
-    description: '',
-    defaultVisible: false,
-    components: {
-      popup: OpenUrlViewerPage,
-      sidepanel: OpenUrlViewerPage,
-      detached: OpenUrlViewerPage,
     },
   },
 ];
