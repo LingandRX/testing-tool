@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { StorageCleanerConfirm } from '../StorageCleanerConfirm';
 import type { StorageCleanerOptions } from '@/types/storage';
+import React from 'react';
 
 describe('StorageCleanerConfirm 组件', () => {
   const mockOnClose = vi.fn();

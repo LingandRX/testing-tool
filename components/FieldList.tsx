@@ -73,7 +73,7 @@ const FieldList: React.FC<FieldListProps> = ({
 }) => {
   if (fields.length === 0) return null;
 
-  const handleTypeChange = (fieldId: string, event: SelectChangeEvent<string>) => {
+  const handleTypeChange = (fieldId: string, event: SelectChangeEvent) => {
     onFieldTypeChange(fieldId, event.target.value);
   };
 

@@ -1,6 +1,6 @@
 import { Box, Typography, Container } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
-import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
+import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 import UrlEntryForm from '@/components/UrlEntryForm';
 import UrlEntryList from '@/components/UrlEntryList';
 import { useUrlPreferences } from '@/utils/useUrlPreferences';

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
+import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 import { MessageAction, sendMessageToContent, injectContentScript } from '@/utils/messages';
 import { FillMode } from '@/utils/dummyDataGenerator';
 import { useStorageState } from '@/utils/useStorageState';

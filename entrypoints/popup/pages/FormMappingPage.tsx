@@ -19,7 +19,7 @@ import { storageUtil } from '@/utils/chromeStorage';
 import { FormMapEntry } from '@/types/storage';
 import PageHeader from '@/components/PageHeader';
 import Button from '@/components/Button';
-import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
+import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 
 export default function FormMappingPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);

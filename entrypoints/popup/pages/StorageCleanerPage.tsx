@@ -1,6 +1,6 @@
 import { Box, Container, CircularProgress } from '@mui/material';
 import Button from '@/components/Button';
-import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
+import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useStorageCleaner } from './useStorageCleaner';
@@ -31,6 +31,8 @@ export default function StorageCleanerPage() {
     handleSelectAll,
     handleClean,
   } = useStorageCleaner({ showMessage });
+
+  const isDisabled = (!someSelected && !allSelected) || loading;
 
   if (isInitializing) {
     return (
@@ -69,7 +71,7 @@ export default function StorageCleanerPage() {
               bgcolor: storageCleanerPageStyles.warningDark,
             },
           }}
-          disabled={loading}
+          disabled={isDisabled}
           fullWidth
         >
           {loading ? '正在清理...' : '立即清理'}

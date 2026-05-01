@@ -24,7 +24,7 @@ import { formMappingPageStyles } from '@/config/pageTheme.ts';
 import { MockDataGenerator } from '@/utils/formMapping/smartInjector';
 import { Button } from '@/components/Button';
 import { FormInjectResult, MessageAction, sendMessage } from '@/utils/messages';
-import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
+import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 
 export default function FormFillPage() {
   const [entries, setEntries] = useState<FormMapEntry[]>([]);
