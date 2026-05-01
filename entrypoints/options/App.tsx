@@ -16,6 +16,7 @@ import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import { getRouteByKey, getDefaultPageOrder, getDefaultVisibleRoutes } from '@/config/routes';
 import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function App() {
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
@@ -125,94 +126,96 @@ export default function App() {
       className="app"
       sx={{ p: 4, minHeight: '100vh', bgcolor: 'grey.50', display: 'block', overflowY: 'auto' }}
     >
-      <Box sx={{ maxWidth: 600, mx: 'auto' }}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="flex-start"
-          sx={{ mb: 4 }}
-        >
-          <Button
-            variant="text"
-            size="small"
-            onClick={handleRestoreDefaults}
-            startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
-            sx={{ color: 'text.secondary', fontWeight: 600 }}
+      <ErrorBoundary>
+        <Box sx={{ maxWidth: 600, mx: 'auto' }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            sx={{ mb: 4 }}
           >
-            恢复默认
-          </Button>
-        </Stack>
+            <Button
+              variant="text"
+              size="small"
+              onClick={handleRestoreDefaults}
+              startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
+              sx={{ color: 'text.secondary', fontWeight: 600 }}
+            >
+              恢复默认
+            </Button>
+          </Stack>
 
-        <Paper
-          elevation={0}
-          sx={{
-            borderRadius: 4,
-            border: '1px solid',
-            borderColor: 'grey.200',
-            overflow: 'hidden',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            {pageOrder.map((key, index, array) => {
-              const route = getRouteByKey(key);
-              if (!route) return null;
+          <Paper
+            elevation={0}
+            sx={{
+              borderRadius: 4,
+              border: '1px solid',
+              borderColor: 'grey.200',
+              overflow: 'hidden',
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {pageOrder.map((key, index, array) => {
+                const route = getRouteByKey(key);
+                if (!route) return null;
 
-              const isChecked = visiblePages.includes(key);
-              const isDisabled = isChecked && visiblePages.length === 1;
+                const isChecked = visiblePages.includes(key);
+                const isDisabled = isChecked && visiblePages.length === 1;
 
-              return (
-                <Box
-                  key={key}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    p: 2.5,
-                    borderBottom: index === array.length - 1 ? 'none' : '1px solid',
-                    borderColor: 'grey.100',
-                    transition: 'all 0.2s',
-                    '&:hover': { bgcolor: 'grey.50' },
-                  }}
-                >
-                  <Box>
-                    <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                      {route.label}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}
-                    </Typography>
+                return (
+                  <Box
+                    key={key}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      p: 2.5,
+                      borderBottom: index === array.length - 1 ? 'none' : '1px solid',
+                      borderColor: 'grey.100',
+                      transition: 'all 0.2s',
+                      '&:hover': { bgcolor: 'grey.50' },
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                        {route.label}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleMove(index, 'up')}
+                        disabled={index === 0}
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        <KeyboardArrowUpIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleMove(index, 'down')}
+                        disabled={index === array.length - 1}
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        <KeyboardArrowDownIcon fontSize="small" />
+                      </IconButton>
+                      <Switch
+                        size="small"
+                        checked={isChecked}
+                        onChange={() => handlePageToggle(key)}
+                        disabled={isDisabled}
+                      />
+                    </Box>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleMove(index, 'up')}
-                      disabled={index === 0}
-                      sx={{ color: 'text.secondary' }}
-                    >
-                      <KeyboardArrowUpIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleMove(index, 'down')}
-                      disabled={index === array.length - 1}
-                      sx={{ color: 'text.secondary' }}
-                    >
-                      <KeyboardArrowDownIcon fontSize="small" />
-                    </IconButton>
-                    <Switch
-                      size="small"
-                      checked={isChecked}
-                      onChange={() => handlePageToggle(key)}
-                      disabled={isDisabled}
-                    />
-                  </Box>
-                </Box>
-              );
-            })}
-          </Box>
-        </Paper>
-      </Box>
+                );
+              })}
+            </Box>
+          </Paper>
+        </Box>
+      </ErrorBoundary>
 
       <GlobalSnackbar {...snackbarProps} />
     </Box>

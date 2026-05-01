@@ -1,6 +1,7 @@
 import RouterProvider from '@/providers/RouterProvider';
 import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { globalStyles } from '@/config/pageTheme';
 import { Box } from '@mui/material';
 
@@ -38,7 +39,9 @@ export default function App() {
         }}
       >
         <TopBar onOpenOptions={handleOpenOptions} />
-        <RouterContainer />
+        <ErrorBoundary>
+          <RouterContainer />
+        </ErrorBoundary>
       </Box>
     </RouterProvider>
   );
