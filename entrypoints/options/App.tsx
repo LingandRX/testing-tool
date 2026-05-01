@@ -14,30 +14,35 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { PageType } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
-import { getRouteByKey, getDefaultPageOrder, getDefaultVisibleRoutes } from '@/config/routes';
-import GlobalSnackbar, { useSnackbar } from '@/components/GlobalSnackbar';
+import {
+  getFeatureByKey,
+  getDefaultPageOrder,
+  getDefaultVisibleFeatureKeys,
+} from '@/config/features';
+import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
-function App() {
+export default function App() {
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
   const [pageOrder, setPageOrder] = useState<PageType[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const { snackbarProps, showMessage } = useSnackbar();
+  const { snackbarProps, showMessage } = useSnackbarState();
 
   useEffect(() => {
-    loadConfig();
+    loadConfig().catch(console.error);
   }, []);
 
   const loadConfig = async () => {
     try {
       const [savedVisible, savedOrder] = await Promise.all([
-        storageUtil.get('app/visiblePages', getDefaultVisibleRoutes()),
+        storageUtil.get('app/visiblePages', getDefaultVisibleFeatureKeys()),
         storageUtil.get('app/pageOrder', getDefaultPageOrder()),
       ]);
-      setVisiblePages(savedVisible ?? getDefaultVisibleRoutes());
+      setVisiblePages(savedVisible ?? getDefaultVisibleFeatureKeys());
       setPageOrder(savedOrder && savedOrder.length > 0 ? savedOrder : getDefaultPageOrder());
     } catch (error) {
       console.error('Failed to load config:', error);
-      setVisiblePages(getDefaultVisibleRoutes());
+      setVisiblePages(getDefaultVisibleFeatureKeys());
       setPageOrder(getDefaultPageOrder());
     } finally {
       setIsLoaded(true);
@@ -61,8 +66,8 @@ function App() {
     try {
       await storageUtil.set('app/visiblePages', newPages);
       setVisiblePages(newPages);
-      const route = getRouteByKey(page);
-      showToast(`已${isCurrentlyVisible ? '隐藏' : '显示'} ${route?.label || page}`, 'success');
+      const feature = getFeatureByKey(page);
+      showToast(`已${isCurrentlyVisible ? '隐藏' : '显示'} ${feature?.label || page}`, 'success');
     } catch (error) {
       console.error('Failed to save config:', error);
       showToast('保存失败', 'warning');
@@ -88,8 +93,8 @@ function App() {
 
   const handleRestoreDefaults = async () => {
     try {
-      const { getDefaultVisibleRoutes } = await import('@/config/routes');
-      const defaults = getDefaultVisibleRoutes();
+      const { getDefaultVisibleFeatureKeys } = await import('@/config/features');
+      const defaults = getDefaultVisibleFeatureKeys();
       const defaultOrder = getDefaultPageOrder();
 
       await Promise.all([
@@ -121,92 +126,102 @@ function App() {
   }
 
   return (
-    <Box sx={{ p: 4, maxWidth: 600, mx: 'auto', minHeight: '100vh', bgcolor: 'grey.50' }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 4 }}>
-        <Button
-          variant="text"
-          size="small"
-          onClick={handleRestoreDefaults}
-          startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
-          sx={{ color: 'text.secondary', fontWeight: 600 }}
-        >
-          恢复默认
-        </Button>
-      </Stack>
+    <Box
+      className="app"
+      sx={{ p: 4, minHeight: '100vh', bgcolor: 'grey.50', display: 'block', overflowY: 'auto' }}
+    >
+      <ErrorBoundary>
+        <Box sx={{ maxWidth: 600, mx: 'auto' }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            sx={{ mb: 4 }}
+          >
+            <Button
+              variant="text"
+              size="small"
+              onClick={handleRestoreDefaults}
+              startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
+              sx={{ color: 'text.secondary', fontWeight: 600 }}
+            >
+              恢复默认
+            </Button>
+          </Stack>
 
-      <Paper
-        elevation={0}
-        sx={{
-          borderRadius: 4,
-          border: '1px solid',
-          borderColor: 'grey.200',
-          overflow: 'hidden',
-          bgcolor: 'background.paper',
-        }}
-      >
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          {pageOrder.map((key, index, array) => {
-            const route = getRouteByKey(key);
-            if (!route) return null;
+          <Paper
+            elevation={0}
+            sx={{
+              borderRadius: 4,
+              border: '1px solid',
+              borderColor: 'grey.200',
+              overflow: 'hidden',
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {pageOrder.map((key, index, array) => {
+                const feature = getFeatureByKey(key);
+                if (!feature) return null;
 
-            const isChecked = visiblePages.includes(key);
-            const isDisabled = isChecked && visiblePages.length === 1;
+                const isChecked = visiblePages.includes(key);
+                const isDisabled = isChecked && visiblePages.length === 1;
 
-            return (
-              <Box
-                key={key}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  p: 2.5,
-                  borderBottom: index === array.length - 1 ? 'none' : '1px solid',
-                  borderColor: 'grey.100',
-                  transition: 'all 0.2s',
-                  '&:hover': { bgcolor: 'grey.50' },
-                }}
-              >
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                    {route.label}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleMove(index, 'up')}
-                    disabled={index === 0}
-                    sx={{ color: 'text.secondary' }}
+                return (
+                  <Box
+                    key={key}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      p: 2.5,
+                      borderBottom: index === array.length - 1 ? 'none' : '1px solid',
+                      borderColor: 'grey.100',
+                      transition: 'all 0.2s',
+                      '&:hover': { bgcolor: 'grey.50' },
+                    }}
                   >
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleMove(index, 'down')}
-                    disabled={index === array.length - 1}
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                  <Switch
-                    size="small"
-                    checked={isChecked}
-                    onChange={() => handlePageToggle(key)}
-                    disabled={isDisabled}
-                  />
-                </Box>
-              </Box>
-            );
-          })}
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                        {feature.label}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleMove(index, 'up')}
+                        disabled={index === 0}
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        <KeyboardArrowUpIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleMove(index, 'down')}
+                        disabled={index === array.length - 1}
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        <KeyboardArrowDownIcon fontSize="small" />
+                      </IconButton>
+                      <Switch
+                        size="small"
+                        checked={isChecked}
+                        onChange={() => handlePageToggle(key)}
+                        disabled={isDisabled}
+                      />
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          </Paper>
         </Box>
-      </Paper>
+      </ErrorBoundary>
 
       <GlobalSnackbar {...snackbarProps} />
     </Box>
   );
 }
-
-export default App;

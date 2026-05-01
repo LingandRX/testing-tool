@@ -152,6 +152,13 @@ export const openUrlPageStyles = {
 } as const;
 
 /**
+ * 查看 URL 页面样式
+ */
+export const openUrlViewerPageStyles = {
+  backgroundColor: '#ffffff',
+} as const;
+
+/**
  * 存储清理页面样式
  */
 export const storageCleanerPageStyles = {

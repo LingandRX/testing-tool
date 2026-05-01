@@ -17,6 +17,7 @@ import {
   getCacheStorageSize,
   getServiceWorkerCount,
 } from '@/utils/storageCleaner';
+import { MessageAction, sendMessage } from '@/utils/messages';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
   localStorage: true,
@@ -73,16 +74,15 @@ export function useStorageCleaner({
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
-  const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const resultTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const requestIdRef = useRef<number>(0);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const reloadTimeout = reloadTimeoutRef.current;
     const resultTimeout = resultTimeoutRef.current;
     return () => {
-      if (reloadTimeout) clearTimeout(reloadTimeout);
       if (resultTimeout) clearTimeout(resultTimeout);
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
   }, []);
 
@@ -141,13 +141,23 @@ export function useStorageCleaner({
   const loadInfoRef = useRef(loadInfo);
   loadInfoRef.current = loadInfo;
 
-  useEffect(() => {
-    loadInfoRef.current();
+  const debouncedLoadInfo = useCallback(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      loadInfoRef.current().then((r) => console.info(r));
+    }, 300);
+  }, []);
 
-    const handleTabChange = () => loadInfoRef.current();
+  useEffect(() => {
+    // 首次加载不防抖
+    loadInfoRef.current().then((r) => console.info(r));
+
+    const handleTabChange = () => debouncedLoadInfo();
     const handleTabUpdated = (_tabId: number, changeInfo: { status?: string; url?: string }) => {
       if (changeInfo.status === 'complete' || changeInfo.url) {
-        loadInfoRef.current();
+        debouncedLoadInfo();
       }
     };
 
@@ -159,8 +169,11 @@ export function useStorageCleaner({
       chrome.tabs.onActivated.removeListener(handleTabChange);
       chrome.tabs.onUpdated.removeListener(handleTabUpdated);
       chrome.windows.onFocusChanged.removeListener(handleTabChange);
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
-  }, []);
+  }, [debouncedLoadInfo]);
 
   const handleAutoRefreshChange = useCallback(
     async (checked: boolean) => {
@@ -219,7 +232,7 @@ export function useStorageCleaner({
 
       if (autoRefresh && cleaningResult.success) {
         showMessage('清理成功，即将刷新页面', { severity: 'success' });
-        await chrome.runtime.sendMessage({ action: 'reloadTab', tabId: tab.id, delay: 1000 });
+        await sendMessage(MessageAction.RELOAD_TAB, { tabId: tab.id, delay: 1000 });
       } else {
         await loadInfo();
       }

@@ -2,75 +2,75 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Button from '../Button';
 
-describe('Button Component', () => {
+describe('Button 组件', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(<Button>Click Me</Button>);
-      const button = screen.getByRole('button', { name: /click me/i });
+  describe('渲染测试', () => {
+    it('应使用默认属性渲染', () => {
+      render(<Button>点击我</Button>);
+      const button = screen.getByRole('button', { name: /点击我/i });
       expect(button).toBeInTheDocument();
     });
 
-    it('should render with custom text', () => {
-      render(<Button>Submit</Button>);
-      expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
+    it('应渲染自定义文本', () => {
+      render(<Button>提交</Button>);
+      expect(screen.getByRole('button', { name: /提交/i })).toBeInTheDocument();
     });
 
-    it('should render with different variants', () => {
-      const { rerender } = render(<Button variant="contained">Contained</Button>);
-      expect(screen.getByRole('button', { name: /contained/i })).toBeInTheDocument();
+    it('应渲染不同变体', () => {
+      const { rerender } = render(<Button variant="contained">填充</Button>);
+      expect(screen.getByRole('button', { name: /填充/i })).toBeInTheDocument();
 
-      rerender(<Button variant="outlined">Outlined</Button>);
-      expect(screen.getByRole('button', { name: /outlined/i })).toBeInTheDocument();
+      rerender(<Button variant="outlined">描边</Button>);
+      expect(screen.getByRole('button', { name: /描边/i })).toBeInTheDocument();
 
-      rerender(<Button variant="text">Text</Button>);
-      expect(screen.getByRole('button', { name: /text/i })).toBeInTheDocument();
+      rerender(<Button variant="text">文本</Button>);
+      expect(screen.getByRole('button', { name: /文本/i })).toBeInTheDocument();
     });
   });
 
-  describe('Interaction', () => {
-    it('should call onClick when clicked', () => {
+  describe('交互测试', () => {
+    it('点击时应调用 onClick', () => {
       const handleClick = vi.fn();
-      render(<Button onClick={handleClick}>Click Me</Button>);
+      render(<Button onClick={handleClick}>点击我</Button>);
 
-      fireEvent.click(screen.getByRole('button', { name: /click me/i }));
+      fireEvent.click(screen.getByRole('button', { name: /点击我/i }));
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
-    it('should not call onClick when disabled', () => {
+    it('禁用状态下点击不应调用 onClick', () => {
       const handleClick = vi.fn();
       render(
         <Button onClick={handleClick} disabled>
-          Disabled Button
+          禁用按钮
         </Button>,
       );
 
-      fireEvent.click(screen.getByRole('button', { name: /disabled button/i }));
+      fireEvent.click(screen.getByRole('button', { name: /禁用按钮/i }));
       expect(handleClick).not.toHaveBeenCalled();
     });
   });
 
-  describe('Styling', () => {
-    it('should apply fullWidth prop', () => {
-      render(<Button fullWidth>Full Width</Button>);
-      const button = screen.getByRole('button', { name: /full width/i });
+  describe('样式测试', () => {
+    it('应应用 fullWidth 属性', () => {
+      render(<Button fullWidth>全宽</Button>);
+      const button = screen.getByRole('button', { name: /全宽/i });
       expect(button).toHaveClass('MuiButton-fullWidth');
     });
   });
 
-  describe('States', () => {
-    it('should render in loading state', () => {
-      render(<Button loading>Loading</Button>);
-      const button = screen.getByRole('button', { name: /loading/i });
+  describe('状态测试', () => {
+    it('应渲染加载状态', () => {
+      render(<Button loading>加载中</Button>);
+      const button = screen.getByRole('button', { name: /加载中/i });
       expect(button).toHaveClass('MuiButton-loading');
     });
 
-    it('should render as disabled', () => {
-      render(<Button disabled>Disabled</Button>);
-      const button = screen.getByRole('button', { name: /disabled/i });
+    it('应渲染为禁用状态', () => {
+      render(<Button disabled>禁用</Button>);
+      const button = screen.getByRole('button', { name: /禁用/i });
       expect(button).toBeDisabled();
     });
   });

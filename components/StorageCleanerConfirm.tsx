@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import type { StorageCleanerOptions } from '@/types/storage';
 import Button from '@/components/Button';
-import { THEME_COLORS } from '@/config/pageTheme';
+import { storageCleanerPageStyles, THEME_COLORS } from '@/config/pageTheme';
 
 export interface StorageCleanerConfirmProps {
   open: boolean;
@@ -138,10 +138,8 @@ export function StorageCleanerConfirm({
           onClick={onClose}
           fullWidth
           sx={{
-            fontWeight: 700,
+            boxShadow: '0 0 1px 1px rgba(0, 0, 0, 0.1)',
             color: 'text.secondary',
-            borderRadius: 4,
-            fontSize: '0.95rem',
             '&:hover': {
               bgcolor: 'grey.100',
               color: 'text.primary',
@@ -155,18 +153,9 @@ export function StorageCleanerConfirm({
           onClick={onConfirm}
           fullWidth
           sx={{
-            bgcolor: THEME_COLORS.warning,
-            fontWeight: 800,
-            borderRadius: 4,
-            fontSize: '0.95rem',
-            boxShadow: `0 8px 20px ${alpha(THEME_COLORS.warning, 0.25)}`,
+            bgcolor: storageCleanerPageStyles.warningColor,
             '&:hover': {
-              bgcolor: THEME_COLORS.warningDark,
-              boxShadow: `0 12px 28px ${alpha(THEME_COLORS.warning, 0.35)}`,
-              transform: 'translateY(-2px)',
-            },
-            '&:active': {
-              transform: 'translateY(0)',
+              bgcolor: storageCleanerPageStyles.warningDark,
             },
           }}
         >

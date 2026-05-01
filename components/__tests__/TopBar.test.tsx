@@ -22,7 +22,7 @@ vi.mock('@/providers/RouterProvider', () => ({
   RouterProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-describe('TopBar Component', () => {
+describe('TopBar 组件', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -31,32 +31,32 @@ describe('TopBar Component', () => {
     return render(<RouterProvider>{ui}</RouterProvider>);
   };
 
-  describe('Rendering', () => {
-    it('should render with default title', () => {
+  describe('渲染测试', () => {
+    it('应使用默认标题渲染', () => {
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
       expect(screen.getByText('Testing Tools')).toBeInTheDocument();
     });
 
-    it('should render back button when not on dashboard', () => {
+    it('不在 dashboard 时应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
       expect(screen.getByTestId('ArrowBackIosNewIcon')).toBeInTheDocument();
     });
 
-    it('should not render back button on dashboard', () => {
+    it('在 dashboard 上不应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'dashboard';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
       expect(screen.queryByTestId('ArrowBackIosNewIcon')).not.toBeInTheDocument();
     });
 
-    it('should render settings button', () => {
+    it('应渲染设置按钮', () => {
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
       expect(screen.getByTestId('SettingsIcon')).toBeInTheDocument();
     });
   });
 
-  describe('Interaction', () => {
-    it('should call onOpenOptions when settings button is clicked', () => {
+  describe('交互测试', () => {
+    it('点击设置按钮时应调用 onOpenOptions', () => {
       const handleOpenOptions = vi.fn();
       renderWithProvider(<TopBar onOpenOptions={handleOpenOptions} />);
 
@@ -64,7 +64,7 @@ describe('TopBar Component', () => {
       expect(handleOpenOptions).toHaveBeenCalledTimes(1);
     });
 
-    it('should call goBack when back button is clicked', () => {
+    it('点击返回按钮时应调用 goBack', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
 

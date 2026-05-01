@@ -28,8 +28,8 @@ export const useStorageState = <K extends keyof StorageSchema>(
       }
     };
 
-    loadState();
-  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps -- defaultValue intentionally excluded to prevent infinite loops
+    loadState().catch(console.error);
+  }, [defaultValue, key]);
 
   // Save to storage when value changes (after initial load)
   useEffect(() => {
@@ -43,7 +43,7 @@ export const useStorageState = <K extends keyof StorageSchema>(
       }
     };
 
-    saveState();
+    saveState().catch(console.error);
   }, [value, isInitialized, key]);
 
   return [value, setValue, isInitialized] as const;

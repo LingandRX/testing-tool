@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { ROUTES, getEntryPointType } from '@/config/routes';
+import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
 import { useMemo } from 'react';
 
@@ -18,8 +18,8 @@ export default function RouterContainer() {
     return <div className="app">Loading...</div>;
   }
 
-  const currentRoute = ROUTES.find((route) => route.key === currentPage);
-  const Component = currentRoute ? currentRoute.components[entryPointType] : null;
+  const currentFeature = FEATURES.find((f) => f.key === currentPage);
+  const Component = currentFeature ? currentFeature.components[entryPointType] : null;
 
   return (
     <Box
