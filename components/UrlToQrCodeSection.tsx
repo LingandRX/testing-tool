@@ -14,7 +14,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import DownloadIcon from '@mui/icons-material/Download';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import qrcode from 'qrcode';
+import QRious from 'qrious';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
@@ -54,16 +54,16 @@ const UrlToQrCodeSection = ({
         url = 'https://' + url;
       }
 
-      const dataUrl = await qrcode.toDataURL(url, {
-        width: 200,
-        margin: 2,
-        color: {
-          dark: qrCodePageStyles.black,
-          light: qrCodePageStyles.white,
-        },
+      // 使用 QRious 替代 qrcode 库，体积更小
+      const qr = new QRious({
+        value: url,
+        size: 250,
+        level: 'H',
+        foreground: qrCodePageStyles.black,
+        background: qrCodePageStyles.white,
       });
 
-      setQrCodeDataUrl(dataUrl);
+      setQrCodeDataUrl(qr.toDataURL());
       showMessage('二维码生成成功', { severity: 'success', autoHideDuration: 1000 });
     } catch (error) {
       console.error('生成二维码失败:', error);

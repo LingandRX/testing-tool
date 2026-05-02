@@ -27,8 +27,8 @@
     "@mui/material": "^7.3.8",
     "@webext-core/messaging": "^2.3.0",
     "dayjs": "^1.11.19",
-    "jsqr": "^1.4.0",
-    "qrcode": "^1.5.4",
+    "qr-scanner": "^1.4.2",
+    "qrious": "^4.0.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },
