@@ -8,12 +8,16 @@ import {
   CircularProgress,
   Stack,
   IconButton,
-  ToggleButtonGroup,
-  ToggleButton,
+  Tabs,
+  Tab,
+  alpha,
+  Divider,
 } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
@@ -23,16 +27,34 @@ import {
 } from '@/config/features';
 import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import PageHeader from '@/components/PageHeader';
+import { THEME_COLORS } from '@/config/pageTheme';
 
 type WindowType = 'popup' | 'sidepanel' | 'tab';
 
+/**
+ * Options 设置页面主组件
+ * 支持对不同窗口入口的功能显示和排序进行独立配置
+ */
 export default function App() {
-  const [windowType, setWindowType] = useState<WindowType>('popup');
+  // 从 URL 参数中初始化当前的 Tab 类型
+  const initialWindowType = useMemo(() => {
+    if (typeof window === 'undefined') return 'popup';
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab === 'popup' || tab === 'sidepanel' || tab === 'tab') {
+      return tab as WindowType;
+    }
+    return 'popup';
+  }, []);
+
+  const [windowType, setWindowType] = useState<WindowType>(initialWindowType);
   const [visiblePages, setVisiblePages] = useState<PageType[]>([]);
   const [pageOrder, setPageOrder] = useState<PageType[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const { snackbarProps, showMessage } = useSnackbarState();
 
+  // 根据当前选择的窗口类型确定对应的 Storage Key
   const configKeys = useMemo(() => {
     switch (windowType) {
       case 'sidepanel':
@@ -54,6 +76,14 @@ export default function App() {
     }
   }, [windowType]);
 
+  // 当 windowType 改变时，同步更新 URL 参数
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', windowType);
+    window.history.replaceState({}, '', url.toString());
+  }, [windowType]);
+
+  // 加载配置数据
   useEffect(() => {
     const loadConfig = async () => {
       setIsLoaded(false);
@@ -76,6 +106,9 @@ export default function App() {
     loadConfig().catch(console.error);
   }, [configKeys]);
 
+  /**
+   * 切换页面可见性
+   */
   const handlePageToggle = async (page: PageType) => {
     const isCurrentlyVisible = visiblePages.includes(page);
     let newPages: PageType[];
@@ -101,6 +134,9 @@ export default function App() {
     }
   };
 
+  /**
+   * 调整页面显示顺序
+   */
   const handleMove = async (index: number, direction: 'up' | 'down') => {
     if (direction === 'up' && index === 0) return;
     if (direction === 'down' && index === pageOrder.length - 1) return;
@@ -118,6 +154,9 @@ export default function App() {
     }
   };
 
+  /**
+   * 恢复默认设置
+   */
   const handleRestoreDefaults = async () => {
     try {
       const defaults = getDefaultVisibleFeatureKeys();
@@ -130,17 +169,14 @@ export default function App() {
 
       setVisiblePages(defaults);
       setPageOrder(defaultOrder);
-      showToast('已恢复默认', 'success');
+      showToast('已恢复当前模式默认设置', 'success');
     } catch (error) {
       console.error('Failed to restore defaults:', error);
       showToast('恢复失败', 'warning');
     }
   };
 
-  const handleWindowTypeChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newType: WindowType | null,
-  ) => {
+  const handleWindowTypeChange = (_event: React.SyntheticEvent, newType: WindowType) => {
     if (newType !== null) {
       setWindowType(newType);
     }
@@ -153,127 +189,251 @@ export default function App() {
   return (
     <Box
       className="app"
-      sx={{ p: 4, minHeight: '100vh', bgcolor: 'grey.50', display: 'block', overflowY: 'auto' }}
+      sx={{
+        minHeight: '100vh',
+        bgcolor: 'grey.50',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
     >
       <ErrorBoundary>
-        <Box sx={{ maxWidth: 600, mx: 'auto' }}>
-          <Stack spacing={3} sx={{ mb: 4 }}>
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
-                功能显示配置
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                针对不同窗口类型独立配置 Dashboard 中显示的功能及其排序
-              </Typography>
-            </Box>
-
-            <ToggleButtonGroup
+        {/* 顶部标题与导航栏 */}
+        <Box
+          sx={{
+            width: '100%',
+            bgcolor: 'background.paper',
+            borderBottom: '1px solid',
+            borderColor: 'grey.200',
+            pt: { xs: 3, sm: 5 },
+            pb: 0,
+            px: { xs: 2, sm: 4 },
+          }}
+        >
+          <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+            <PageHeader
+              icon={<SettingsIcon />}
+              iconColor={THEME_COLORS.primary}
+              title="应用设置"
+              subtitle="针对不同窗口类型独立配置 Dashboard 中显示的功能及其排序"
+              sx={{ mb: 4 }}
+            />
+            <Tabs
               value={windowType}
-              exclusive
               onChange={handleWindowTypeChange}
-              size="small"
-              color="primary"
-              sx={{ bgcolor: 'background.paper' }}
-            >
-              <ToggleButton value="popup" sx={{ px: 3 }}>
-                Popup 窗口
-              </ToggleButton>
-              <ToggleButton value="sidepanel" sx={{ px: 3 }}>
-                侧边栏
-              </ToggleButton>
-              <ToggleButton value="tab" sx={{ px: 3 }}>
-                标签页
-              </ToggleButton>
-            </ToggleButtonGroup>
-
-            <Stack direction="row" justifyContent="flex-end">
-              <Button
-                variant="text"
-                size="small"
-                onClick={handleRestoreDefaults}
-                startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
-                sx={{ color: 'text.secondary', fontWeight: 600 }}
-              >
-                恢复默认
-              </Button>
-            </Stack>
-          </Stack>
-
-          {!isLoaded ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-              <CircularProgress size={32} />
-            </Box>
-          ) : (
-            <Paper
-              elevation={0}
+              indicatorColor="primary"
+              textColor="primary"
               sx={{
-                borderRadius: 4,
-                border: '1px solid',
-                borderColor: 'grey.200',
-                overflow: 'hidden',
-                bgcolor: 'background.paper',
+                '& .MuiTab-root': {
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  textTransform: 'none',
+                  minWidth: { xs: 100, sm: 140 },
+                  letterSpacing: '0.3px',
+                },
+                '& .MuiTabs-indicator': {
+                  height: 3,
+                  borderRadius: '3px 3px 0 0',
+                },
               }}
             >
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                {pageOrder.map((key, index, array) => {
-                  const feature = getFeatureByKey(key);
-                  if (!feature) return null;
+              <Tab value="popup" label="Popup 窗口" />
+              <Tab value="sidepanel" label="侧边栏" />
+              <Tab value="tab" label="标签页" />
+            </Tabs>
+          </Box>
+        </Box>
 
-                  const isChecked = visiblePages.includes(key);
-                  const isDisabled = isChecked && visiblePages.length === 1;
+        {/* 主内容区域 */}
+        <Box sx={{ flex: 1, p: { xs: 2, sm: 4 } }}>
+          <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+            <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2.5 }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                onClick={handleRestoreDefaults}
+                startIcon={<RefreshIcon sx={{ fontSize: 18 }} />}
+                sx={{
+                  borderRadius: 2.5,
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  borderColor: 'grey.200',
+                  color: 'text.secondary',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    color: 'primary.main',
+                    bgcolor: alpha(THEME_COLORS.primary, 0.04),
+                  },
+                }}
+              >
+                恢复当前模式默认
+              </Button>
+            </Stack>
 
-                  return (
-                    <Box
-                      key={key}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        p: 2.5,
-                        borderBottom: index === array.length - 1 ? 'none' : '1px solid',
-                        borderColor: 'grey.100',
-                        transition: 'all 0.2s',
-                        '&:hover': { bgcolor: 'grey.50' },
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                          {feature.label}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {isChecked ? '已在 Dashboard 启用' : '已在 Dashboard 隐藏'}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleMove(index, 'up')}
-                          disabled={index === 0}
-                          sx={{ color: 'text.secondary' }}
-                        >
-                          <KeyboardArrowUpIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleMove(index, 'down')}
-                          disabled={index === array.length - 1}
-                          sx={{ color: 'text.secondary' }}
-                        >
-                          <KeyboardArrowDownIcon fontSize="small" />
-                        </IconButton>
-                        <Switch
-                          size="small"
-                          checked={isChecked}
-                          onChange={() => handlePageToggle(key)}
-                          disabled={isDisabled}
-                        />
-                      </Box>
-                    </Box>
-                  );
-                })}
+            {!isLoaded ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}>
+                <CircularProgress size={32} thickness={5} />
               </Box>
-            </Paper>
-          )}
+            ) : (
+              <Paper
+                elevation={0}
+                sx={{
+                  borderRadius: 4,
+                  border: '1px solid',
+                  borderColor: 'grey.200',
+                  overflow: 'hidden',
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.03)',
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  {pageOrder.map((key, index, array) => {
+                    const feature = getFeatureByKey(key);
+                    if (!feature) return null;
+
+                    const isChecked = visiblePages.includes(key);
+                    const isDisabled = isChecked && visiblePages.length === 1;
+
+                    return (
+                      <Box
+                        key={key}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          p: { xs: 2, sm: 2.5 },
+                          borderBottom: index === array.length - 1 ? 'none' : '1px solid',
+                          borderColor: 'grey.100',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                          '&:hover': {
+                            bgcolor: alpha(feature.themeColor || THEME_COLORS.primary, 0.02),
+                          },
+                        }}
+                      >
+                        <Stack
+                          direction="row"
+                          spacing={{ xs: 1.5, sm: 2.5 }}
+                          alignItems="center"
+                          sx={{ flex: 1, minWidth: 0 }}
+                        >
+                          {/* 拖拽/排序暗示图标 */}
+                          <Box sx={{ color: 'grey.300', display: 'flex' }}>
+                            <DragIndicatorIcon fontSize="small" />
+                          </Box>
+
+                          {/* 功能图标容器 */}
+                          <Box
+                            sx={{
+                              p: 1.2,
+                              borderRadius: 2.5,
+                              bgcolor: alpha(feature.themeColor || THEME_COLORS.primary, 0.1),
+                              color: feature.themeColor || THEME_COLORS.primary,
+                              display: 'flex',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {feature.icon}
+                          </Box>
+
+                          {/* 文本信息 */}
+                          <Box sx={{ minWidth: 0 }}>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{
+                                fontWeight: 800,
+                                color: 'text.primary',
+                                fontSize: '0.95rem',
+                                lineHeight: 1.2,
+                                mb: 0.5,
+                              }}
+                            >
+                              {feature.label}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                fontWeight: 600,
+                                display: 'block',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {feature.description || '暂无描述'}
+                            </Typography>
+                          </Box>
+                        </Stack>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', ml: { xs: 1, sm: 2 } }}>
+                          {/* 移动操作按钮 */}
+                          <Stack direction="row" sx={{ display: 'flex', mr: { xs: 0, sm: 1 } }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleMove(index, 'up')}
+                              disabled={index === 0}
+                              sx={{
+                                color: 'grey.400',
+                                p: { xs: 0.5, sm: 1 },
+                                '&:hover': {
+                                  color: 'primary.main',
+                                  bgcolor: alpha(THEME_COLORS.primary, 0.08),
+                                },
+                              }}
+                            >
+                              <KeyboardArrowUpIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleMove(index, 'down')}
+                              disabled={index === array.length - 1}
+                              sx={{
+                                color: 'grey.400',
+                                p: { xs: 0.5, sm: 1 },
+                                '&:hover': {
+                                  color: 'primary.main',
+                                  bgcolor: alpha(THEME_COLORS.primary, 0.08),
+                                },
+                              }}
+                            >
+                              <KeyboardArrowDownIcon fontSize="small" />
+                            </IconButton>
+                          </Stack>
+
+                          <Divider
+                            orientation="vertical"
+                            flexItem
+                            sx={{
+                              mx: { xs: 0.5, sm: 1 },
+                              display: 'block',
+                              height: 24,
+                              alignSelf: 'center',
+                            }}
+                          />
+
+                          {/* 显示切换开关 */}
+                          <Switch
+                            color="primary"
+                            checked={isChecked}
+                            onChange={() => handlePageToggle(key)}
+                            disabled={isDisabled}
+                            sx={{
+                              '& .MuiSwitch-switchBase.Mui-checked': {
+                                color: feature.themeColor || THEME_COLORS.primary,
+                              },
+                              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                backgroundColor: feature.themeColor || THEME_COLORS.primary,
+                              },
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Paper>
+            )}
+          </Box>
         </Box>
       </ErrorBoundary>
 

@@ -21,7 +21,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
       justifyContent="space-between"
       alignItems="center"
       sx={{
-        px: 2,
+        px: { xs: 1.5, sm: 2 },
         py: 1.5,
         borderBottom: '1px solid',
         borderColor: 'grey.100',
@@ -29,7 +29,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         zIndex: 1100,
       }}
     >
-      <Box sx={{ width: 40 }}>
+      <Box sx={{ width: { xs: 32, sm: 40 } }}>
         {!isDashboard && (
           <IconButton
             size="small"
@@ -57,7 +57,11 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         Testing Tools
       </Typography>
 
-      <Stack direction="row" spacing={1} sx={{ width: 120, justifyContent: 'flex-end' }}>
+      <Stack
+        direction="row"
+        spacing={0.5}
+        sx={{ width: { xs: 80, sm: 120 }, justifyContent: 'flex-end' }}
+      >
         <Tooltip title="在标签页打开">
           <IconButton size="small" onClick={handleOpenInTab}>
             <OpenInNewIcon sx={{ fontSize: 18 }} />

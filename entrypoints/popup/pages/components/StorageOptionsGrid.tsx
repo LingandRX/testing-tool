@@ -35,9 +35,9 @@ export default function StorageOptionsGrid({
         },
       }}
     >
-      <Box sx={{ p: 1.2 }}>
+      <Box sx={{ p: { xs: 0.8, sm: 1.2 } }}>
         <Grid container spacing={1.5}>
-          <Grid size={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <OptionItem
               label="LocalStorage"
               checked={options.localStorage}
@@ -45,7 +45,7 @@ export default function StorageOptionsGrid({
               onChange={() => onOptionChange('localStorage')}
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <OptionItem
               label="Session Storage"
               checked={options.sessionStorage}
@@ -53,7 +53,7 @@ export default function StorageOptionsGrid({
               onChange={() => onOptionChange('sessionStorage')}
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <OptionItem
               label="IndexedDB"
               checked={options.indexedDB}
@@ -61,7 +61,7 @@ export default function StorageOptionsGrid({
               onChange={() => onOptionChange('indexedDB')}
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <OptionItem
               label="Cookies"
               checked={options.cookies}
@@ -69,7 +69,7 @@ export default function StorageOptionsGrid({
               onChange={() => onOptionChange('cookies')}
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <OptionItem
               label="Cache Storage"
               checked={options.cacheStorage}
@@ -78,7 +78,7 @@ export default function StorageOptionsGrid({
               onChange={() => onOptionChange('cacheStorage')}
             />
           </Grid>
-          <Grid size={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <OptionItem
               label="Service Workers"
               checked={options.serviceWorkers}
@@ -95,7 +95,7 @@ export default function StorageOptionsGrid({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          px: 2.7,
+          px: { xs: 1.5, sm: 2.7 },
           py: 0.8,
           borderBottomLeftRadius: 4,
           borderBottomRightRadius: 4,
@@ -119,8 +119,8 @@ export default function StorageOptionsGrid({
           onChange={(e) => onSelectAll(e.target.checked)}
           color="warning"
           sx={{
-            p: 0.6,
-            mr: 0,
+            p: 0.5,
+            mr: -0.5,
             '& .MuiSvgIcon-root': {
               fontSize: 18,
               transition: 'transform 0.2s',

@@ -45,14 +45,18 @@ export default function App() {
             flexDirection: 'column',
             width: '400px',
             maxWidth: '400px',
+            minWidth: '400px',
             height: '600px',
+            minHeight: '600px',
             overflow: 'hidden',
             backgroundColor: globalStyles.backgroundColor,
             // 仅在明确的大屏幕（如独立页面或侧边栏拉伸）下才允许扩展
             '@media screen and (min-width: 600px)': {
               width: '100vw',
               maxWidth: 'none',
+              minWidth: 'none',
               height: '100vh',
+              minHeight: 'none',
             },
           }}
         >
