@@ -38,8 +38,8 @@ export interface FeatureConfig {
     popup: React.ComponentType;
     /** 侧边栏模式组件 */
     sidepanel: React.ComponentType;
-    /** 独立窗口模式组件 */
-    detached: React.ComponentType;
+    /** 标签页模式组件 */
+    tab: React.ComponentType;
   };
 }
 
@@ -52,7 +52,7 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: DashboardPage,
       sidepanel: DashboardPage,
-      detached: DashboardPage,
+      tab: DashboardPage,
     },
   },
   {
@@ -65,7 +65,7 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: TimestampPage,
       sidepanel: TimestampPage,
-      detached: TimestampPage,
+      tab: TimestampPage,
     },
   },
   {
@@ -78,7 +78,7 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: StorageCleanerPage,
       sidepanel: StorageCleanerPage,
-      detached: StorageCleanerPage,
+      tab: StorageCleanerPage,
     },
   },
   {
@@ -91,7 +91,7 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: OpenUrlPage,
       sidepanel: OpenUrlPage,
-      detached: OpenUrlPage,
+      tab: OpenUrlPage,
     },
   },
   {
@@ -104,7 +104,7 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: QrCodePage,
       sidepanel: QrCodePage,
-      detached: QrCodePage,
+      tab: QrCodePage,
     },
   },
 ];
@@ -127,13 +127,13 @@ export function getDefaultPageOrder(): PageType[] {
   );
 }
 
-export function getEntryPointType(): 'popup' | 'sidepanel' | 'detached' {
+export function getEntryPointType(): 'popup' | 'sidepanel' | 'tab' {
   const pathname = window.location.pathname;
   if (pathname.includes('sidepanel')) {
     return 'sidepanel';
   }
-  if (new URLSearchParams(window.location.search).get('mode') === 'detached') {
-    return 'detached';
+  if (new URLSearchParams(window.location.search).get('mode') === 'tab') {
+    return 'tab';
   }
   return 'popup';
 }

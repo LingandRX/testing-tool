@@ -56,10 +56,24 @@ export interface StorageSchema {
   'app/popupRoute': PageType;
   /** 侧边栏的当前路由 */
   'app/sidepanelRoute': PageType;
-  /** 在菜单中可见的页面列表 */
+  /** 标签页的当前路由 */
+  'app/tabRoute': PageType;
+  /** 在菜单中可见的页面列表 (通用/旧版) */
   'app/visiblePages': PageType[];
-  /** 菜单页面的显示顺序 */
+  /** 菜单页面的显示顺序 (通用/旧版) */
   'app/pageOrder': PageType[];
+  /** Popup 窗口可见的页面列表 */
+  'app/popupVisiblePages': PageType[];
+  /** Popup 窗口页面的显示顺序 */
+  'app/popupPageOrder': PageType[];
+  /** 侧边栏可见的页面列表 */
+  'app/sidepanelVisiblePages': PageType[];
+  /** 侧边栏页面的显示顺序 */
+  'app/sidepanelPageOrder': PageType[];
+  /** 标签页可见的页面列表 */
+  'app/tabVisiblePages': PageType[];
+  /** 标签页页面的显示顺序 */
+  'app/tabPageOrder': PageType[];
   /** 上一次访问的路由路径（备用） */
   'app/lastRoute': string;
   /** 应用主题配置 */

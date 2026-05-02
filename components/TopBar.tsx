@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Box, IconButton, Typography, Stack, Tooltip } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -8,26 +7,9 @@ import { useRouter } from '@/providers/RouterProvider';
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack } = useRouter();
 
-  const isDetachedMode = useMemo(() => {
-    return new URLSearchParams(window.location.search).get('mode') === 'detached';
-  }, []);
-
-  const handleDetach = () => {
-    // 弹出脱离窗口 (以独立面板形式打开当前 URL，并标记 mode=detached)
-    const url = new URL(window.location.href);
-    url.searchParams.set('mode', 'detached');
-
-    chrome.windows.create({
-      url: url.toString(),
-      type: 'panel',
-      width: 420,
-      height: 600,
-    });
-  };
-
   const handleOpenInTab = () => {
     // 在新标签页中打开扩展页面
-    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') }).catch(console.error);
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html?mode=tab') }).catch(console.error);
     window.close();
   };
 
@@ -81,13 +63,6 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
             <OpenInNewIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
-        {!isDetachedMode && (
-          <Tooltip title="独立窗口模式">
-            <IconButton size="small" onClick={handleDetach}>
-              <OpenInNewIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-          </Tooltip>
-        )}
         <Tooltip title="设置">
           <IconButton size="small" onClick={onOpenOptions}>
             <SettingsIcon sx={{ fontSize: 18 }} />

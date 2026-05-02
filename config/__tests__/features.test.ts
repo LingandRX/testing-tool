@@ -27,7 +27,7 @@ describe('features', () => {
         expect(typeof feature.components).toBe('object');
         expect(feature.components).toHaveProperty('popup');
         expect(feature.components).toHaveProperty('sidepanel');
-        expect(feature.components).toHaveProperty('detached');
+        expect(feature.components).toHaveProperty('tab');
 
         // Optional UI properties for non-hidden features
         if (feature.key !== 'dashboard' && feature.key !== 'openUrlViewer') {
