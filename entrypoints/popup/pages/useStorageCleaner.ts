@@ -146,13 +146,13 @@ export function useStorageCleaner({
       clearTimeout(debounceTimerRef.current);
     }
     debounceTimerRef.current = setTimeout(() => {
-      loadInfoRef.current().then((r) => console.info(r));
+      loadInfoRef.current().catch(console.error);
     }, 300);
   }, []);
 
   useEffect(() => {
     // 首次加载不防抖
-    loadInfoRef.current().then((r) => console.info(r));
+    loadInfoRef.current().catch(console.error);
 
     const handleTabChange = () => debouncedLoadInfo();
     const handleTabUpdated = (_tabId: number, changeInfo: { status?: string; url?: string }) => {

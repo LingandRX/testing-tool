@@ -41,7 +41,7 @@ describe('RouterContainer 组件', () => {
     it('isLoaded 为 false 时应渲染加载状态', () => {
       mockRouterValue.isLoaded = false;
       renderWithProvider(<RouterContainer />);
-      expect(screen.getByText('Loading...')).toBeInTheDocument();
+      expect(screen.getByRole('progressbar')).toBeInTheDocument();
     });
 
     it('isLoaded 为 true 时应渲染页面内容', () => {
