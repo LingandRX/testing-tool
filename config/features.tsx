@@ -1,17 +1,18 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, lazy } from 'react';
 import type { PageType } from '@/types/storage';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
 import LanguageIcon from '@mui/icons-material/Language';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 
-import DashboardPage from '@/entrypoints/popup/pages/DashboardPage';
-import TimestampPage from '@/entrypoints/popup/pages/TimestampPage';
-import StorageCleanerPage from '@/entrypoints/popup/pages/StorageCleanerPage';
-import OpenUrlPage from '@/entrypoints/popup/pages/OpenUrlPage';
-import QrCodePage from '@/entrypoints/popup/pages/QrCodePage';
-
 import { THEME_COLORS } from './pageTheme';
+
+// 懒加载页面组件
+const DashboardPage = lazy(() => import('@/entrypoints/popup/pages/DashboardPage'));
+const TimestampPage = lazy(() => import('@/entrypoints/popup/pages/TimestampPage'));
+const StorageCleanerPage = lazy(() => import('@/entrypoints/popup/pages/StorageCleanerPage'));
+const OpenUrlPage = lazy(() => import('@/entrypoints/popup/pages/OpenUrlPage'));
+const QrCodePage = lazy(() => import('@/entrypoints/popup/pages/QrCodePage'));
 
 /**
  * 功能配置接口
