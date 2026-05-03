@@ -20,7 +20,17 @@ export default function DashboardPage() {
   );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr', // 弹出窗口或小屏幕保持单列
+          sm: 'repeat(auto-fill, minmax(300px, 1fr))', // 标签页大屏幕自适应多列
+        },
+        gap: 2,
+        p: 2,
+      }}
+    >
       {pageOrder.map((key) => {
         if (!isVisible(key)) return null;
 
