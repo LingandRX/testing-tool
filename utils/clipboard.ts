@@ -1,37 +1,39 @@
-import type { SnackbarOptions } from '@/components/GlobalSnackbar';
-import { useSnackbarState } from '@/components/GlobalSnackbar';
-
 /**
  * 复制文本到剪贴板
  * @param text 要复制的文本
- * @param showMessage 显示消息的函数
  * @returns Promise<boolean> 是否复制成功
  */
-export const copyToClipboard = async (
-  text: string,
-  showMessage?: (message: string, options?: SnackbarOptions) => void,
-): Promise<boolean> => {
-  try {
-    await navigator.clipboard.writeText(text);
-    showMessage?.('已复制', { severity: 'success' });
-    return true;
-  } catch (error) {
-    console.error('复制失败:', error);
-    showMessage?.('复制失败', { severity: 'error' });
-    return false;
-  }
+export const copyTextToClipboard = async (text: string): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        resolve(true);
+      })
+      .catch(() => {
+        reject(false);
+      });
+  });
 };
 
 /**
- * 自定义 Hook: 用于处理剪贴板操作
- * @returns 包含复制函数和 snackbarProps 的对象
+ * 复制图片到剪贴板
+ * @param blob 要复制的图片
+ * @returns Promise<boolean> 是否复制成功
  */
-export const useClipboard = () => {
-  const { snackbarProps, showMessage } = useSnackbarState({ autoHideDuration: 1500 });
-
-  const copy = async (text: string): Promise<boolean> => {
-    return copyToClipboard(text, showMessage);
-  };
-
-  return { copy, snackbarProps };
+export const copyImageToClipboard = async (blob: Blob): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    navigator.clipboard
+      .write([
+        new ClipboardItem({
+          'image/png': blob,
+        }),
+      ])
+      .then(() => {
+        resolve(true);
+      })
+      .catch(() => {
+        reject(false);
+      });
+  });
 };

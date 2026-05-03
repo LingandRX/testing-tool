@@ -17,6 +17,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import QRious from 'qrious';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
+import { copyImageToClipboard } from '@/utils/clipboard';
 
 interface UrlToQrCodeSectionProps {
   expanded: boolean;
@@ -80,27 +81,21 @@ const UrlToQrCodeSection = ({
     link.href = qrCodeDataUrl;
     link.download = 'qrcode.png';
     link.click();
-    showMessage('二维码下载成功', { severity: 'success', autoHideDuration: 300 });
+    showMessage('二维码下载成功', { severity: 'success' });
   };
 
   const copyQrCode = async () => {
     if (!qrCodeDataUrl) return;
 
-    try {
-      const response = await fetch(qrCodeDataUrl);
-      const blob = await response.blob();
-
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'image/png': blob,
-        }),
-      ]);
-
-      showMessage('二维码已复制到剪贴板', { severity: 'success', autoHideDuration: 1000 });
-    } catch (error) {
-      console.error('复制二维码失败:', error);
-      showMessage('复制二维码失败，请重试', { severity: 'error', autoHideDuration: 300 });
-    }
+    const response = await fetch(qrCodeDataUrl);
+    const blob = await response.blob();
+    await copyImageToClipboard(blob)
+      .then(() => {
+        showMessage('二维码已复制到剪贴板', { severity: 'success' });
+      })
+      .catch(() => {
+        showMessage('复制二维码失败，请重试', { severity: 'error' });
+      });
   };
 
   return (
