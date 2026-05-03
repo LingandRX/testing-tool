@@ -78,23 +78,13 @@ export default function PageHeader({
         {icon}
       </Box>
       {/* 标题区域 */}
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box sx={{ flex: 1 }}>
         {/* 标题行（含徽章） */}
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', sm: 'center' }}
-          spacing={{ xs: 0.5, sm: 0 }}
-        >
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography
             variant="subtitle1"
             fontWeight={900}
-            sx={{
-              letterSpacing: '-0.5px',
-              lineHeight: 1.2,
-              wordBreak: 'break-word',
-              ...titleSx,
-            }}
+            sx={{ letterSpacing: '-0.5px', lineHeight: 1.2, ...titleSx }}
           >
             {title}
           </Typography>
