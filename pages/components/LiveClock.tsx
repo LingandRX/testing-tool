@@ -44,6 +44,8 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 1.5,
         p: 1.8,
         mb: 2.5,
         bgcolor: alpha(timestampPageStyles.primaryColor, 0.04),
@@ -52,7 +54,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
         borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
       }}
     >
-      <Stack spacing={0.5}>
+      <Stack spacing={0.5} sx={{ minWidth: { xs: 100, sm: 120 } }}>
         <Typography
           variant="caption"
           sx={{
@@ -71,7 +73,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
             fontWeight: 800,
             color: timestampPageStyles.primaryColor,
             fontFamily: 'monospace',
-            fontSize: '1.2rem',
+            fontSize: { xs: '1.1rem', sm: '1.2rem' },
             letterSpacing: '-0.5px',
             lineHeight: 1.2,
           }}
@@ -80,7 +82,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
         </Typography>
       </Stack>
 
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
         {/* 胶囊式单位切换器 */}
         <Box
           sx={{
@@ -97,7 +99,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
               key={u}
               onClick={() => onUnitChange(u)}
               sx={{
-                px: 1.2,
+                px: { xs: 1, sm: 1.2 },
                 py: 0.35,
                 borderRadius: 2,
                 cursor: 'pointer',

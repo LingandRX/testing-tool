@@ -1,5 +1,5 @@
 import { TextField, Select, MenuItem, Stack, Box, Container } from '@mui/material';
-import { useSnackbar } from '@/components/SnackbarProvider';
+import { useSnackbar } from '@/components/GlobalSnackbar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';

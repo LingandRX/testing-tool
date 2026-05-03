@@ -5,12 +5,9 @@ export type PageType =
   | 'dashboard' // 仪表盘/首页
   | 'timestamp' // 时间戳转换工具
   | 'storageCleaner' // 存储清理工具
-  | 'openUrl' // 快捷链接工具
   | 'qrCode' // 二维码工具
-  | 'formRecognizer' // 表单识别工具
-  | 'formMapping' // 表单映射配置
-  | 'formFill' // 表单填充工具
-  | 'openUrlViewer'; // 快捷链接查看页面
+  | 'textStatistics' // 文本统计工具
+  | 'jwt'; // JWT 解析工具
 
 /**
  * 表单映射条目定义
@@ -56,30 +53,34 @@ export interface StorageSchema {
   'app/popupRoute': PageType;
   /** 侧边栏的当前路由 */
   'app/sidepanelRoute': PageType;
-  /** 在菜单中可见的页面列表 */
+  /** 标签页的当前路由 */
+  'app/tabRoute': PageType;
+  /** 在菜单中可见的页面列表 (通用/旧版) */
   'app/visiblePages': PageType[];
-  /** 菜单页面的显示顺序 */
+  /** 菜单页面的显示顺序 (通用/旧版) */
   'app/pageOrder': PageType[];
+  /** Popup 窗口可见的页面列表 */
+  'app/popupVisiblePages': PageType[];
+  /** Popup 窗口页面的显示顺序 */
+  'app/popupPageOrder': PageType[];
+  /** 侧边栏可见的页面列表 */
+  'app/sidepanelVisiblePages': PageType[];
+  /** 侧边栏页面的显示顺序 */
+  'app/sidepanelPageOrder': PageType[];
+  /** 标签页可见的页面列表 */
+  'app/tabVisiblePages': PageType[];
+  /** 标签页页面的显示顺序 */
+  'app/tabPageOrder': PageType[];
   /** 上一次访问的路由路径（备用） */
   'app/lastRoute': string;
   /** 应用主题配置 */
   'app/theme': string;
-  /** 表单映射工具是否正处于“元素拾取”模式 */
-  'app/formMapping/isPicking': boolean;
-  /** 当前激活的表单映射条目列表 */
-  active_form_map: FormMapEntry[];
   /** 存储清理工具的偏好设置 */
   'storageCleaner/preferences': StorageCleanerPreferences;
-  /** 快捷链接工具的偏好设置 */
-  'openUrl/preferences': OpenUrlPreferences;
-  /** 快捷链接工具当前操作的 URL */
-  'openUrl/currentUrl': string;
   /** 二维码工具中二维码部分是否展开 */
   'qrCode/qrExpanded': boolean;
   /** 二维码工具中 URL 部分是否展开 */
   'qrCode/urlExpanded': boolean;
-  /** 表单识别工具的字段类型偏好（按域名存储） */
-  'formRecognizer/fieldTypePreferences': FieldTypePreferences;
 }
 
 /**
@@ -100,24 +101,6 @@ export interface StorageCleanerPreferences {
   autoRefresh: boolean;
   /** 默认勾选的清理类型 */
   selectedTypes: StorageCleanerOptions;
-}
-
-/**
- * 快捷链接条目定义
- */
-export interface OpenUrlEntry {
-  /** 链接名称 */
-  name: string;
-  /** 链接地址 */
-  url: string;
-}
-
-/**
- * 快捷链接工具偏好设置
- */
-export interface OpenUrlPreferences {
-  /** 链接列表 */
-  entries: OpenUrlEntry[];
 }
 
 /**

@@ -146,13 +146,13 @@ export function useStorageCleaner({
       clearTimeout(debounceTimerRef.current);
     }
     debounceTimerRef.current = setTimeout(() => {
-      loadInfoRef.current().then((r) => console.info(r));
+      loadInfoRef.current().catch(console.error);
     }, 300);
   }, []);
 
   useEffect(() => {
     // 首次加载不防抖
-    loadInfoRef.current().then((r) => console.info(r));
+    loadInfoRef.current().catch(console.error);
 
     const handleTabChange = () => debouncedLoadInfo();
     const handleTabUpdated = (_tabId: number, changeInfo: { status?: string; url?: string }) => {
@@ -220,6 +220,9 @@ export function useStorageCleaner({
   );
 
   const handleClean = useCallback(async () => {
+    if (loading) {
+      return;
+    }
     const tab = await getCurrentTab();
     if (!tab || !tab.id || !tab.url) {
       showMessage('无法获取当前标签页', { severity: 'warning' });
@@ -242,11 +245,8 @@ export function useStorageCleaner({
       setLoading(false);
       setShowConfirm(false);
     }
-  }, [options, autoRefresh, showMessage, loadInfo]);
+  }, [loading, options, autoRefresh, showMessage, loadInfo]);
 
-  // Computed values
-  // Note: sizes.indexedDB contains navigator.storage.estimate().usage
-  // which includes IndexedDB, Cache, etc.
   const totalSize = (sizes.cookies || 0) + (sizes.indexedDB || 0);
 
   const allSelected = Object.values(options).every(Boolean);

@@ -43,6 +43,12 @@ export const THEME_COLORS = {
   purpleDark: '#4a148c',
   purpleLight: '#9c27b0',
 
+  // 靛蓝色系
+  // #303f9f 在白底对比度 7.01:1 ✓
+  indigo: '#303f9f',
+  indigoDark: '#1a237e',
+  indigoLight: '#7986cb',
+
   // 中性色
   white: '#FFFFFF',
   black: '#000000',
@@ -108,57 +114,6 @@ export const timestampPageStyles = {
 } as const;
 
 /**
- * 打开 URL 页面样式
- */
-export const openUrlPageStyles = {
-  primaryColor: THEME_COLORS.purple,
-  primaryDark: THEME_COLORS.purpleDark,
-  INPUT_STYLE: {
-    '& .MuiOutlinedInput-root': {
-      bgcolor: 'background.paper',
-      borderRadius: 4,
-      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-      '&:hover fieldset': {
-        borderColor: 'grey.300',
-      },
-      '&:hover': { bgcolor: 'grey.50' },
-      '&.Mui-focused fieldset': {
-        borderColor: THEME_COLORS.purple,
-      },
-      '&.Mui-focused': {
-        bgcolor: '#fff',
-      },
-    },
-    '& .MuiInputBase-input': {
-      py: '14px',
-      px: 2,
-      fontSize: '0.85rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
-    },
-    '& .MuiInputLabel-root': {
-      fontSize: '0.85rem',
-      fontWeight: 700,
-      color: 'text.secondary',
-      '&.Mui-focused': { color: THEME_COLORS.purple },
-    },
-  },
-  themeColor: THEME_COLORS.purple,
-  themeBg: alpha(THEME_COLORS.purple, 0.1),
-  buttonBg: alpha(THEME_COLORS.purple, 0.85),
-  buttonHover: `0 8px 24px ${alpha(THEME_COLORS.purple, 0.2)}`,
-  errorColor: THEME_COLORS.error,
-  errorBg: alpha(THEME_COLORS.error, 0.05),
-} as const;
-
-/**
- * 查看 URL 页面样式
- */
-export const openUrlViewerPageStyles = {
-  backgroundColor: '#ffffff',
-} as const;
-
-/**
  * 存储清理页面样式
  */
 export const storageCleanerPageStyles = {
@@ -218,4 +173,33 @@ export const formRecognizerPageStyles = {
  */
 export const formMappingPageStyles = {
   secondaryColor: THEME_COLORS.purple,
+} as const;
+
+/**
+ * 文本统计页面样式
+ */
+export const textStatisticsPageStyles = {
+  primaryColor: THEME_COLORS.purple,
+  cardBg: alpha(THEME_COLORS.purple, 0.04),
+  cardBorder: alpha(THEME_COLORS.purple, 0.1),
+} as const;
+
+/**
+ * JWT 解析工具页面样式
+ */
+export const jwtPageStyles = {
+  primaryColor: THEME_COLORS.indigo,
+  cardBg: alpha(THEME_COLORS.indigo, 0.04),
+  cardBorder: alpha(THEME_COLORS.indigo, 0.1),
+  INPUT_STYLE: {
+    '& .MuiOutlinedInput-root': {
+      bgcolor: 'background.paper',
+      borderRadius: 4,
+      fontSize: '0.85rem',
+      fontFamily: 'monospace',
+      transition: 'all 0.2s',
+      '&:hover': { bgcolor: 'grey.50' },
+      '&.Mui-focused': { bgcolor: '#fff' },
+    },
+  },
 } as const;

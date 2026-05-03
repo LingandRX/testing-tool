@@ -1,22 +1,20 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, lazy } from 'react';
 import type { PageType } from '@/types/storage';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
-import LanguageIcon from '@mui/icons-material/Language';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import DescriptionIcon from '@mui/icons-material/Description';
-
-import DashboardPage from '@/entrypoints/popup/pages/DashboardPage';
-import TimestampPage from '@/entrypoints/popup/pages/TimestampPage';
-import StorageCleanerPage from '@/entrypoints/popup/pages/StorageCleanerPage';
-import OpenUrlPage from '@/entrypoints/popup/pages/OpenUrlPage';
-import OpenUrlViewerPage from '@/entrypoints/popup/pages/OpenUrlViewerPage';
-import QrCodePage from '@/entrypoints/popup/pages/QrCodePage';
-import FormRecognizerPage from '@/entrypoints/popup/pages/FormRecognizerPage';
-import FormMappingPage from '@/entrypoints/popup/pages/FormMappingPage';
-import FormFillPage from '@/entrypoints/popup/pages/FormFillPage';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 import { THEME_COLORS } from './pageTheme';
+
+// 懒加载页面组件
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const TimestampPage = lazy(() => import('@/pages/TimestampPage'));
+const StorageCleanerPage = lazy(() => import('@/pages/StorageCleanerPage'));
+const QrCodePage = lazy(() => import('@/pages/QrCodePage'));
+const TextStatisticsPage = lazy(() => import('@/pages/TextStatisticsPage'));
+const JwtPage = lazy(() => import('@/pages/JwtPage'));
 
 /**
  * 功能配置接口
@@ -42,8 +40,8 @@ export interface FeatureConfig {
     popup: React.ComponentType;
     /** 侧边栏模式组件 */
     sidepanel: React.ComponentType;
-    /** 独立窗口模式组件 */
-    detached: React.ComponentType;
+    /** 标签页模式组件 */
+    tab: React.ComponentType;
   };
 }
 
@@ -56,7 +54,7 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: DashboardPage,
       sidepanel: DashboardPage,
-      detached: DashboardPage,
+      tab: DashboardPage,
     },
   },
   {
@@ -69,7 +67,7 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: TimestampPage,
       sidepanel: TimestampPage,
-      detached: TimestampPage,
+      tab: TimestampPage,
     },
   },
   {
@@ -82,20 +80,7 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: StorageCleanerPage,
       sidepanel: StorageCleanerPage,
-      detached: StorageCleanerPage,
-    },
-  },
-  {
-    key: 'openUrl',
-    label: 'Open Url',
-    description: '打开当前选中的 URL',
-    themeColor: THEME_COLORS.purple,
-    icon: <LanguageIcon sx={{ fontSize: 20 }} />,
-    defaultVisible: true,
-    components: {
-      popup: OpenUrlPage,
-      sidepanel: OpenUrlPage,
-      detached: OpenUrlPage,
+      tab: StorageCleanerPage,
     },
   },
   {
@@ -108,57 +93,33 @@ export const FEATURES: FeatureConfig[] = [
     components: {
       popup: QrCodePage,
       sidepanel: QrCodePage,
-      detached: QrCodePage,
+      tab: QrCodePage,
     },
   },
   {
-    key: 'formMapping',
-    label: '表单映射',
-    description: '智能识别表单指纹，自定义填充逻辑',
-    themeColor: THEME_COLORS.primary,
+    key: 'textStatistics',
+    label: '文本统计',
+    description: '实时分析文本字符、单词及字节',
+    themeColor: THEME_COLORS.purple,
     icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
-      popup: FormMappingPage,
-      sidepanel: FormMappingPage,
-      detached: FormMappingPage,
+      popup: TextStatisticsPage,
+      sidepanel: TextStatisticsPage,
+      tab: TextStatisticsPage,
     },
   },
   {
-    key: 'formFill',
-    label: '智能填充',
-    description: '根据表单指纹填充表单数据',
-    themeColor: THEME_COLORS.primary,
-    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
+    key: 'jwt',
+    label: 'JWT 解析',
+    description: 'JSON Web Token 解码与查看',
+    themeColor: THEME_COLORS.indigo,
+    icon: <VpnKeyIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
-      popup: FormFillPage,
-      sidepanel: FormFillPage,
-      detached: FormFillPage,
-    },
-  },
-  {
-    key: 'formRecognizer',
-    label: '表单识别',
-    description: '智能识别表单指纹',
-    themeColor: THEME_COLORS.primary,
-    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
-    defaultVisible: true,
-    components: {
-      popup: FormRecognizerPage,
-      sidepanel: FormRecognizerPage,
-      detached: FormRecognizerPage,
-    },
-  },
-  {
-    key: 'openUrlViewer',
-    label: '查看',
-    description: '',
-    defaultVisible: false,
-    components: {
-      popup: OpenUrlViewerPage,
-      sidepanel: OpenUrlViewerPage,
-      detached: OpenUrlViewerPage,
+      popup: JwtPage,
+      sidepanel: JwtPage,
+      tab: JwtPage,
     },
   },
 ];
@@ -176,18 +137,16 @@ export function getAllFeatureKeys(): PageType[] {
 }
 
 export function getDefaultPageOrder(): PageType[] {
-  return FEATURES.filter((f) => f.key !== 'dashboard' && f.key !== 'openUrlViewer').map(
-    (f) => f.key,
-  );
+  return FEATURES.filter((f) => f.key !== 'dashboard').map((f) => f.key);
 }
 
-export function getEntryPointType(): 'popup' | 'sidepanel' | 'detached' {
+export function getEntryPointType(): 'popup' | 'sidepanel' | 'tab' {
   const pathname = window.location.pathname;
   if (pathname.includes('sidepanel')) {
     return 'sidepanel';
   }
-  if (new URLSearchParams(window.location.search).get('mode') === 'detached') {
-    return 'detached';
+  if (new URLSearchParams(window.location.search).get('mode') === 'tab') {
+    return 'tab';
   }
   return 'popup';
 }

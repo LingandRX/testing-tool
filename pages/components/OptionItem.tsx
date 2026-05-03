@@ -24,7 +24,7 @@ export default function OptionItem({
         justifyContent: 'space-between',
         alignItems: 'center',
         py: 1,
-        px: 1.5,
+        px: { xs: 1, sm: 1.5 },
         borderRadius: 3,
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         bgcolor: checked ? 'rgba(255, 152, 0, 0.05)' : 'transparent',

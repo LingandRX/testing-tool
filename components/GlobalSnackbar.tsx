@@ -1,12 +1,13 @@
 /**
- * GlobalSnackbar - 全局 Snackbar 消息提示组件
+ * GlobalSnackbar - 全局 Snackbar 消息提示组件及 Provider
  *
- * 提供可复用的 Toast 消息提示功能，支持两种使用方式：
+ * 提供可复用的 Toast 消息提示功能，支持三种使用方式：
  * 1. 作为受控组件使用：通过 props 控制显示状态
- * 2. 通过 useSnackbarState Hook 使用：自动管理状态
+ * 2. 通过 useSnackbarState Hook 使用：在组件内部自动管理状态
+ * 3. 通过 SnackbarProvider 和 useSnackbar Hook 使用：全局单例模式
  *
  * @module GlobalSnackbar
- * @version 1.0.0
+ * @version 1.1.0
  *
  * @example
  * ```tsx
@@ -18,13 +19,23 @@
  *   severity="success"
  * />
  *
- * // 方式二：Hook 方式
+ * // 方式二：Hook 方式 (局部状态)
  * const { snackbarProps, showMessage } = useSnackbarState();
  * showMessage('Hello!', { severity: 'info' });
+ *
+ * // 方式三：Context 方式 (全局状态)
+ * // 在根组件包裹 Provider
+ * <SnackbarProvider>
+ *   <App />
+ * </SnackbarProvider>
+ *
+ * // 在子组件中使用
+ * const { showMessage } = useSnackbar();
+ * showMessage('Global Message');
  * ```
  */
 
-import React, { JSX, useState } from 'react';
+import React, { JSX, useState, createContext, useContext, type ReactNode } from 'react';
 import { Snackbar, Alert, type SxProps, type Theme, alpha, Portal } from '@mui/material';
 
 /**
@@ -36,12 +47,6 @@ import { Snackbar, Alert, type SxProps, type Theme, alpha, Portal } from '@mui/m
  * - error: 红色，错误提示
  */
 export type SnackbarSeverity = 'success' | 'info' | 'warning' | 'error';
-
-/**
- * 重新导出 SnackbarProvider 组件
- * @description 提供 Context 方式的全局 Snackbar 功能
- */
-export { SnackbarProvider } from './SnackbarProvider';
 
 /**
  * GlobalSnackbar 组件的属性接口
@@ -126,23 +131,6 @@ const defaultProps: Required<
  *
  * @param {GlobalSnackbarProps} props - 组件属性
  * @returns {JSX.Element}
- *
- * @remarks
- * - 使用 Portal 组件将 Snackbar 渲染到 body 末尾，避免 z-index 问题
- * - 默认位置在屏幕底部居中
- * - 自动设置高 z-index 确保显示在其他内容之上
- *
- * @example
- * ```tsx
- * // 受控模式
- * const [open, setOpen] = useState(false);
- * <GlobalSnackbar
- *   message="保存成功"
- *   open={open}
- *   onClose={() => setOpen(false)}
- *   severity="success"
- * />
- * ```
  */
 export function GlobalSnackbar({
   message,
@@ -153,15 +141,6 @@ export function GlobalSnackbar({
   showAlert = defaultProps.showAlert,
   hideIcon = defaultProps.hideIcon,
 }: GlobalSnackbarProps): JSX.Element {
-  /**
-   * 使用 Portal 将 Snackbar 传送到 DOM 顶层 (body 标签下)
-   *
-   * @description
-   * Portal 的优势：
-   * - 避免父容器 overflow、z-index 等样式影响
-   * - 确保 Snackbar 始终显示在最顶层
-   * - 避免与其他组件的样式冲突
-   */
   return (
     <Portal>
       <Snackbar
@@ -172,9 +151,7 @@ export function GlobalSnackbar({
         disableWindowBlurListener
         sx={{
           zIndex: 999999,
-          // 确保距离底部的间距，响应式设计适配不同屏幕
           bottom: { xs: '24px', sm: '24px' },
-          // 固定宽度时使用 transform 实现真正的居中
           left: '50%',
           transform: 'translateX(-50%)',
           minWidth: '140px',
@@ -186,26 +163,19 @@ export function GlobalSnackbar({
             variant="filled"
             icon={hideIcon ? false : undefined}
             sx={{
-              // 胶囊形状，现代化的设计风格
               borderRadius: '50px',
               px: 2.5,
               py: 0.2,
               minWidth: '140px',
-              // 居中内容
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              // 粗体小字
               fontWeight: 800,
               fontSize: '0.75rem',
-              // 移除默认渐变背景
               backgroundImage: 'none',
-              // 添加阴影效果，颜色根据 severity 自动匹配主题色
               boxShadow: (theme: Theme) =>
                 `0 12px 32px ${alpha(theme.palette[severity].main, 0.35)}`,
-              // 图标样式：白色、稍大
               '& .MuiAlert-icon': { mr: 0.5, fontSize: '1.1rem', color: '#fff' },
-              // 消息文字样式：白色、适当内边距
               '& .MuiAlert-message': { color: '#fff', padding: '6px 0' },
             }}
           >
@@ -218,97 +188,33 @@ export function GlobalSnackbar({
 }
 
 /**
- * useSnackbarState - 消息提示的 Hook 方式
+ * useSnackbarState - 消息提示的状态管理 Hook
  *
  * 提供状态管理的 Snackbar 功能，自动处理 open、message 等状态。
- * 适合在组件内部使用，无需额外的状态管理代码。
  *
  * @param {SnackbarOptions} [initialOptions] - 初始配置选项
  * @returns {UseSnackbarStateResult} 包含 snackbarProps 和操作方法的对象
- *
- * @description
- * - 自动管理 Snackbar 的显示/隐藏状态
- * - 支持链式调用 showMessage
- * - 合并初始选项和调用时选项
- *
- * @example
- * ```tsx
- * function MyComponent() {
- *   const { snackbarProps, showMessage, closeMessage } = useSnackbarState({
- *     severity: 'info',
- *     autoHideDuration: 3000,
- *   });
- *
- *   const handleSave = () => {
- *     // 业务逻辑...
- *     showMessage('保存成功！', { severity: 'success' });
- *   };
- *
- *   return (
- *     <>
- *       <button onClick={handleSave}>保存</button>
- *       <GlobalSnackbar {...snackbarProps} />
- *     </>
- *   );
- * }
- * ```
  */
 export function useSnackbarState(initialOptions?: SnackbarOptions): UseSnackbarStateResult {
-  // Snackbar 显示状态
   const [open, setOpen] = useState(false);
-  // 当前显示的消息内容
   const [message, setMessage] = useState('');
-  // 消息配置选项
   const [options, setOptions] = useState<SnackbarOptions>(initialOptions || {});
 
-  /**
-   * 显示消息
-   *
-   * @param {string} newMessage - 要显示的消息文本
-   * @param {SnackbarOptions} [newOptions={}] - 新的配置选项
-   *
-   * @description
-   * - 合并初始选项和新的调用选项
-   * - 新选项会覆盖初始选项
-   */
   const showMessage = (newMessage: string, newOptions: SnackbarOptions = {}) => {
     setMessage(newMessage);
     setOptions({ ...initialOptions, ...newOptions });
     setOpen(true);
   };
 
-  /**
-   * 关闭消息
-   *
-   * @description
-   * - 直接将 open 状态设置为 false
-   */
   const closeMessage = () => {
     setOpen(false);
   };
 
-  /**
-   * 处理 Snackbar 关闭事件
-   *
-   * @param {React.SyntheticEvent | Event} [_event] - 关闭事件
-   * @param {string} [reason] - 关闭原因：timeout | clickaway | escapeKeyDown
-   *
-   * @description
-   * - 忽略 clickaway 原因（用户点击其他区域），防止误关闭
-   * - 其他情况调用 closeMessage 关闭
-   */
   const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     closeMessage();
   };
 
-  /**
-   * 传递给 GlobalSnackbar 组件的属性
-   *
-   * @description
-   * - 组合当前状态和选项为完整的组件 props
-   * - onClose 使用 handleClose 包装后的版本
-   */
   const snackbarProps: GlobalSnackbarProps = {
     message,
     open,
@@ -325,8 +231,76 @@ export function useSnackbarState(initialOptions?: SnackbarOptions): UseSnackbarS
   };
 }
 
+// --- Context & Provider ---
+
 /**
- * GlobalSnackbar 组件的默认导出
- * @description 方便使用 `import GlobalSnackbar from './GlobalSnackbar'` 方式导入
+ * Snackbar Context 的值类型定义
  */
+interface SnackbarContextValue {
+  showMessage: (message: string, options?: SnackbarOptions) => void;
+  closeMessage: () => void;
+}
+
+const SnackbarContext = createContext<SnackbarContextValue | null>(null);
+
+/**
+ * SnackbarProvider 组件的 props 类型
+ */
+interface SnackbarProviderProps {
+  children: ReactNode;
+  initialOptions?: SnackbarOptions;
+}
+
+/**
+ * SnackbarProvider 组件
+ *
+ * 全局消息提示的 Provider 组件，需要包裹在应用根组件外层。
+ */
+export function SnackbarProvider({ children, initialOptions }: SnackbarProviderProps): JSX.Element {
+  const { snackbarProps, showMessage, closeMessage } = useSnackbarState(initialOptions);
+
+  return (
+    <SnackbarContext.Provider value={{ showMessage, closeMessage }}>
+      {children}
+      <GlobalSnackbar {...snackbarProps} />
+    </SnackbarContext.Provider>
+  );
+}
+
+/**
+ * useSnackbar - 在子组件中获取 Snackbar 上下文的 Hook
+ *
+ * @param {SnackbarOptions} [options] - 钩子级别的默认配置（如 autoHideDuration）
+ * @returns {SnackbarContextValue} - 包含 showMessage 和 closeMessage 的对象
+ * @throws {Error} - 如果不在 SnackbarProvider 内部调用，抛出错误
+ *
+ * @description
+ * 选项合并策略：
+ * 1. 调用 showMessage 时传入的 callOptions 优先级最高
+ * 2. useSnackbar(options) 传入的 Hook 级别配置次之
+ * 3. SnackbarProvider(initialOptions) 传入的全局配置优先级最低
+ */
+export function useSnackbar(options?: SnackbarOptions): SnackbarContextValue {
+  const context = useContext(SnackbarContext);
+  if (!context) {
+    throw new Error('useSnackbar must be used within SnackbarProvider');
+  }
+
+  // 包装 showMessage 以支持 Hook 级别的 initialOptions
+  const wrappedShowMessage = (message: string, callOptions?: SnackbarOptions) => {
+    // 采用防御性编程，确保 options 和 callOptions 为空时也能正常工作
+    // 优先级：callOptions > options
+    const mergedOptions: SnackbarOptions = {
+      ...(options || {}),
+      ...(callOptions || {}),
+    };
+    context.showMessage(message, mergedOptions);
+  };
+
+  return {
+    ...context,
+    showMessage: wrappedShowMessage,
+  };
+}
+
 export default GlobalSnackbar;

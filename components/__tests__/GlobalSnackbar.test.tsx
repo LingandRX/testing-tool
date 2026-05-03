@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, renderHook } from '@testing-library/react';
-import { GlobalSnackbar, useSnackbarState, type GlobalSnackbarProps } from '../GlobalSnackbar';
+import React from 'react';
+import {
+  GlobalSnackbar,
+  useSnackbarState,
+  useSnackbar,
+  SnackbarProvider,
+  type GlobalSnackbarProps,
+} from '../GlobalSnackbar';
 
 describe('GlobalSnackbar 组件系统', () => {
   const mockOnClose = vi.fn();
@@ -103,6 +110,53 @@ describe('GlobalSnackbar 组件系统', () => {
       expect(result.current.snackbarProps.open).toBe(false);
       // 注意：此处取决于你对 useSnackbarState 的期望。
       // 源码中 handleClose 拦截了 clickaway，所以 open 不会变为 false。
+    });
+  });
+
+  describe('useSnackbar Context Hook 优先级', () => {
+    it('优先级验证: Call Options > Hook Options > Provider Options', () => {
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <SnackbarProvider initialOptions={{ severity: 'error', autoHideDuration: 1000 }}>
+          {children}
+        </SnackbarProvider>
+      );
+
+      // 1. 测试 Hook Options 覆盖 Provider Options
+      const { result: hookResult } = renderHook(() => useSnackbar({ severity: 'warning' }), {
+        wrapper,
+      });
+
+      act(() => {
+        hookResult.current.showMessage('消息 1');
+      });
+
+      // 我们需要通过某种方式检查当前活跃的 Snackbar 属性
+      // 由于 GlobalSnackbar 是在 Provider 内部渲染的，我们可以检查 DOM
+      expect(screen.getByText('消息 1')).toBeInTheDocument();
+      const alert1 = document.querySelector('.MuiAlert-filledWarning');
+      expect(alert1).toBeInTheDocument(); // Hook 配置 (warning) 覆盖了 Provider 配置 (error)
+
+      // 2. 测试 Call Options 覆盖 Hook Options
+      act(() => {
+        hookResult.current.showMessage('消息 2', { severity: 'success' });
+      });
+
+      expect(screen.getByText('消息 2')).toBeInTheDocument();
+      const alert2 = document.querySelector('.MuiAlert-filledSuccess');
+      expect(alert2).toBeInTheDocument(); // Call 配置 (success) 覆盖了 Hook 配置 (warning)
+    });
+
+    it('防御性测试: 当 options 为 undefined 时不应崩溃', () => {
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <SnackbarProvider>{children}</SnackbarProvider>
+      );
+
+      const { result } = renderHook(() => useSnackbar(), { wrapper });
+
+      act(() => {
+        expect(() => result.current.showMessage('测试')).not.toThrow();
+      });
+      expect(screen.getByText('测试')).toBeInTheDocument();
     });
   });
 });

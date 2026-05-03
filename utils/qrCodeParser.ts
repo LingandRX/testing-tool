@@ -1,4 +1,4 @@
-import jsQR from 'jsqr';
+import QrScanner from 'qr-scanner';
 
 export interface QrCodeParseResult {
   success: boolean;
@@ -6,49 +6,32 @@ export interface QrCodeParseResult {
   error?: string;
 }
 
-export async function parseQrCodeFromFile(
-  file: File,
-  timeout: number = 10000,
-): Promise<QrCodeParseResult> {
+/**
+ * 从文件中解析二维码
+ * 使用 qr-scanner 替代 jsqr 以减小体积并提高性能
+ */
+export async function parseQrCodeFromFile(file: File): Promise<QrCodeParseResult> {
   try {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-      return { success: false, error: '无法创建 canvas 上下文' };
-    }
-
-    const image = new Image();
-    image.src = URL.createObjectURL(file);
-
-    await new Promise<void>((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        reject(new Error('图片加载超时'));
-      }, timeout);
-
-      image.onload = () => {
-        clearTimeout(timeoutId);
-        canvas.width = image.width;
-        canvas.height = image.height;
-        ctx.drawImage(image, 0, 0);
-        resolve();
-      };
-
-      image.onerror = () => {
-        clearTimeout(timeoutId);
-        reject(new Error('图片加载失败'));
-      };
+    // qr-scanner 的 scanImage 方法支持直接传入 File 对象
+    // 它会自动处理图片加载、Canvas 绘制和解析过程
+    // 并且在支持的浏览器中会优先使用原生的 BarcodeDetector API
+    const result = await QrScanner.scanImage(file, {
+      returnDetailedScanResult: true,
     });
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-    if (code) {
-      return { success: true, data: code.data };
+    if (result && result.data) {
+      return { success: true, data: result.data };
     } else {
       return { success: false, error: '未检测到二维码' };
     }
   } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : '解析失败' };
+    // qr-scanner 在未发现二维码时会抛出 "No QR code found"
+    const errorMsg =
+      err === 'No QR code found'
+        ? '未检测到二维码'
+        : err instanceof Error
+          ? err.message
+          : String(err);
+    return { success: false, error: errorMsg };
   }
 }
