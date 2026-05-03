@@ -43,6 +43,12 @@ export const THEME_COLORS = {
   purpleDark: '#4a148c',
   purpleLight: '#9c27b0',
 
+  // 靛蓝色系
+  // #303f9f 在白底对比度 7.01:1 ✓
+  indigo: '#303f9f',
+  indigoDark: '#1a237e',
+  indigoLight: '#7986cb',
+
   // 中性色
   white: '#FFFFFF',
   black: '#000000',
@@ -176,4 +182,24 @@ export const textStatisticsPageStyles = {
   primaryColor: THEME_COLORS.purple,
   cardBg: alpha(THEME_COLORS.purple, 0.04),
   cardBorder: alpha(THEME_COLORS.purple, 0.1),
+} as const;
+
+/**
+ * JWT 解析工具页面样式
+ */
+export const jwtPageStyles = {
+  primaryColor: THEME_COLORS.indigo,
+  cardBg: alpha(THEME_COLORS.indigo, 0.04),
+  cardBorder: alpha(THEME_COLORS.indigo, 0.1),
+  INPUT_STYLE: {
+    '& .MuiOutlinedInput-root': {
+      bgcolor: 'background.paper',
+      borderRadius: 4,
+      fontSize: '0.85rem',
+      fontFamily: 'monospace',
+      transition: 'all 0.2s',
+      '&:hover': { bgcolor: 'grey.50' },
+      '&.Mui-focused': { bgcolor: '#fff' },
+    },
+  },
 } as const;

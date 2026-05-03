@@ -4,6 +4,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import DescriptionIcon from '@mui/icons-material/Description';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 import { THEME_COLORS } from './pageTheme';
 
@@ -13,6 +14,7 @@ const TimestampPage = lazy(() => import('@/pages/TimestampPage'));
 const StorageCleanerPage = lazy(() => import('@/pages/StorageCleanerPage'));
 const QrCodePage = lazy(() => import('@/pages/QrCodePage'));
 const TextStatisticsPage = lazy(() => import('@/pages/TextStatisticsPage'));
+const JwtPage = lazy(() => import('@/pages/JwtPage'));
 
 /**
  * 功能配置接口
@@ -105,6 +107,19 @@ export const FEATURES: FeatureConfig[] = [
       popup: TextStatisticsPage,
       sidepanel: TextStatisticsPage,
       tab: TextStatisticsPage,
+    },
+  },
+  {
+    key: 'jwt',
+    label: 'JWT 解析',
+    description: 'JSON Web Token 解码与查看',
+    themeColor: THEME_COLORS.indigo,
+    icon: <VpnKeyIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: JwtPage,
+      sidepanel: JwtPage,
+      tab: JwtPage,
     },
   },
 ];
