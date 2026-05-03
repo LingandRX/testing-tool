@@ -56,13 +56,18 @@ const theme = createTheme({
           '--sb-thumb-hover': 'rgba(0, 0, 0, 0.2)',
           '--sb-track-color': 'transparent',
         },
-        'html, body, #root': {
+        html: {
           margin: 0,
           padding: 0,
           width: '100%',
-          height: '100%',
-          overflow: 'hidden',
+          minHeight: '100%',
           backgroundColor: '#f5f5f5',
+        },
+        'body, #root': {
+          margin: 0,
+          padding: 0,
+          width: '100%',
+          minHeight: '100%',
         },
         // 针对 Popup 的特殊处理（如果需要固定宽高，可以在具体入口点或容器中处理，
         // 这里提供全局基础，具体尺寸在 App 容器中限制）

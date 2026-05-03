@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 export default function App() {
   // 打开Chrome扩展选项页面，需确保manifest中已配置options_page或options_ui
   const handleOpenOptions = () => {
-    chrome.runtime.openOptionsPage().catch((r) => console.error(r));
+    chrome.runtime.openOptionsPage().catch(console.error);
   };
 
   const entryType = useMemo(() => getEntryPointType(), []);
