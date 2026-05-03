@@ -5,12 +5,10 @@ export type PageType =
   | 'dashboard' // 仪表盘/首页
   | 'timestamp' // 时间戳转换工具
   | 'storageCleaner' // 存储清理工具
-  | 'openUrl' // 快捷链接工具
   | 'qrCode' // 二维码工具
   | 'formRecognizer' // 表单识别工具
   | 'formMapping' // 表单映射配置
-  | 'formFill' // 表单填充工具
-  | 'openUrlViewer'; // 快捷链接查看页面
+  | 'formFill'; // 表单填充工具
 
 /**
  * 表单映射条目定义
@@ -86,10 +84,6 @@ export interface StorageSchema {
   active_form_map: FormMapEntry[];
   /** 存储清理工具的偏好设置 */
   'storageCleaner/preferences': StorageCleanerPreferences;
-  /** 快捷链接工具的偏好设置 */
-  'openUrl/preferences': OpenUrlPreferences;
-  /** 快捷链接工具当前操作的 URL */
-  'openUrl/currentUrl': string;
   /** 二维码工具中二维码部分是否展开 */
   'qrCode/qrExpanded': boolean;
   /** 二维码工具中 URL 部分是否展开 */
@@ -116,24 +110,6 @@ export interface StorageCleanerPreferences {
   autoRefresh: boolean;
   /** 默认勾选的清理类型 */
   selectedTypes: StorageCleanerOptions;
-}
-
-/**
- * 快捷链接条目定义
- */
-export interface OpenUrlEntry {
-  /** 链接名称 */
-  name: string;
-  /** 链接地址 */
-  url: string;
-}
-
-/**
- * 快捷链接工具偏好设置
- */
-export interface OpenUrlPreferences {
-  /** 链接列表 */
-  entries: OpenUrlEntry[];
 }
 
 /**

@@ -1,10 +1,10 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## 项目概述
 
-这是一个基于 WXT 框架的浏览器扩展项目，提供多种测试工具功能，包括时间戳转换、存储管理、URL 管理、二维码生成、表单识别与填充等。
+这是一个基于 WXT 框架的浏览器扩展项目，提供多种测试工具功能，包括时间戳转换、存储管理、二维码生成、表单识别与填充等。
 
 ## 核心命令
 
@@ -73,9 +73,6 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 │   ├── StorageCleanerConfirm.tsx  # 存储清理确认组件
 │   ├── ToolCard.tsx               # 工具卡片组件
 │   ├── TopBar.tsx                 # 顶部导航栏组件
-│   ├── UrlEntryForm.tsx           # URL 录入表单组件
-│   ├── UrlEntryItem.tsx           # URL 条目组件
-│   ├── UrlEntryList.tsx           # URL 列表组件
 │   └── UrlToQrCodeSection.tsx     # URL 转二维码组件
 ├── config/                        # 配置文件
 │   ├── __tests__/                 # 配置测试文件
@@ -115,8 +112,6 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 │   │   │   ├── FormFillPage.tsx             # 表单填充页面
 │   │   │   ├── FormMappingPage.tsx          # 表单映射页面
 │   │   │   ├── FormRecognizerPage.tsx          # 表单识别页面
-│   │   │   ├── OpenUrlPage.tsx              # 打开 URL 页面
-│   │   │   ├── OpenUrlViewerPage.tsx        # URL 查看页面
 │   │   │   ├── QrCodePage.tsx               # 二维码页面
 │   │   │   ├── StorageCleanerPage.tsx       # 存储清理页面
 │   │   │   ├── TimestampPage.tsx            # 时间戳页面
@@ -144,8 +139,7 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 │   ├── messages.ts                # 消息通信工具
 │   ├── qrCodeParser.ts            # 二维码解析器
 │   ├── storageCleaner.ts          # 存储清理工具
-│   ├── useStorageState.ts         # 存储状态 Hook
-│   └── useUrlPreferences.ts       # URL 偏好设置 Hook
+│   └── useStorageState.ts         # 存储状态 Hook
 ├── types/                         # 类型定义
 │   └── storage.d.ts               # 存储相关类型
 ├── docs/                          # 文档
@@ -174,14 +168,7 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 - 工具: `utils/storageCleaner.ts`
 - 功能: 清理缓存、Cookies、本地存储，支持按域名筛选，自动刷新功能
 
-#### 3. URL 管理工具
-
-- 打开 URL: `entrypoints/popup/pages/OpenUrlPage.tsx`
-- 查看 URL: `entrypoints/popup/pages/OpenUrlViewerPage.tsx`
-- 组件: `components/UrlEntryForm.tsx`, `components/UrlEntryList.tsx`
-- 功能: 批量打开多个 URL，URL 列表管理
-
-#### 4. 二维码工具
+#### 3. 二维码工具
 
 - 位置: `entrypoints/popup/pages/QrCodePage.tsx`
 - 组件: `components/QrCodeUploader.tsx`, `components/QrCodeToUrlSection.tsx`, `components/UrlToQrCodeSection.tsx`
@@ -189,7 +176,7 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 - 依赖: qrcode, jsqr 库
 - 功能: URL 转二维码生成，二维码图片解析为 URL
 
-#### 5. 表单工具套件
+#### 4. 表单工具套件
 
 **表单识别 (Form Recognizer)**
 
@@ -201,10 +188,6 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 
 - 位置: `entrypoints/popup/pages/FormMappingPage.tsx`
 - 工具: `utils/formMapping/` 目录
-  - `scanner.ts` - 表单扫描器
-  - `highlighter.ts` - 表单高亮器
-  - `smartInjector.ts` - 智能注入器
-  - `ui.ts` - UI 工具
 - 功能: 表单指纹识别与自定义映射规则配置
 
 **表单填充 (Form Fill)**
@@ -213,14 +196,14 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 - 工具: `utils/dummyDataGenerator.ts` (基于 @faker-js/faker)
 - 功能: 根据表单指纹智能填充表单数据
 
-#### 6. 仪表盘系统
+#### 5. 仪表盘系统
 
 - 位置: `entrypoints/popup/pages/DashboardPage.tsx`
 - 配置: `config/features.tsx`
 - 组件: `components/DashboardCard.tsx`, `components/ToolCard.tsx`
 - 功能: 统一工具入口，可自定义显示的工具卡片
 
-#### 7. 多模式显示系统
+#### 6. 多模式显示系统
 
 - 支持三种显示模式:
   - **popup** - 扩展弹窗（点击图标显示）
@@ -230,18 +213,17 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 - 路由容器: `components/RouterContainer.tsx`
 - Provider: `providers/RouterProvider.tsx`
 
-#### 8. 通信系统
+#### 7. 通信系统
 
 - 位置: `utils/messages.ts`
 - 机制: 使用 `@webext-core/messaging` 库实现
 - 内容脚本消息处理: `entrypoints/content/messageHandler.ts`
 - 通信通道: 后台脚本 ↔ 内容脚本 ↔ 弹窗/侧边栏
 
-#### 9. 数据存储
+#### 8. 数据存储
 
 - Chrome Storage API: `utils/chromeStorage.ts`
 - 存储状态 Hook: `utils/useStorageState.ts`
-- URL 偏好设置: `utils/useUrlPreferences.ts`
 - 类型定义: `types/storage.d.ts`
 
 ### 关键配置文件

@@ -1,10 +1,10 @@
-# Testing Tools Browser Extension
+﻿# Testing Tools Browser Extension
 
-这是一个基于 WXT 框架的浏览器扩展项目，提供实用的测试工具功能。
+这是一个基于 WXT 框架的浏览器扩展项目，提供实用的测试工具功能.
 
 ## 项目概述
 
-Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试工具功能。项目采用现代化的技术栈，包括 React 19、TypeScript 和 Material UI，并利用 WXT 框架简化浏览器扩展的开发流程。
+Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试工具功能. 项目采用现代化的技术栈，包括 React 19、TypeScript 和 Material UI，并利用 WXT 框架简化浏览器扩展的开发流程.
 
 ## 功能特性
 
@@ -36,13 +36,6 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 - 确认对话框防止误操作
 - 清理结果统计
 - 自动刷新页面选项
-
-### URL 工具
-
-- 保存常用 URL 列表
-- 快速打开保存的 URL
-- 支持 URL 验证和安全检查
-- 内置 URL 查看器（iframe 沙箱模式）
 
 ### 二维码工具
 
@@ -86,8 +79,6 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 │   │   ├── main.tsx
 │   │   └── pages/      # 页面组件
 │   │       ├── DashboardPage.tsx
-│   │       ├── OpenUrlPage.tsx
-│   │       ├── OpenUrlViewerPage.tsx
 │   │       ├── QrCodePage.tsx
 │   │       ├── StorageCleanerPage.tsx
 │   │       └── TimestampPage.tsx
@@ -127,9 +118,7 @@ Testing Tools 是一个轻量级的浏览器扩展，提供多种实用的测试
 | `dashboard`      | 首页       | ✓        |
 | `timestamp`      | 时间戳转换 | ✓        |
 | `storageCleaner` | 存储清理   | ✓        |
-| `openUrl`        | URL 工具   | ✓        |
 | `qrCode`         | 二维码工具 | ✓        |
-| `openUrlViewer`  | URL 查看器 | ✗        |
 
 ## 扩展入口点
 
@@ -201,7 +190,7 @@ npm run test:coverage     # 运行测试并生成覆盖率报告
 
 ## 持续集成与发布
 
-项目使用 GitHub Actions 实现自动化 CI/CD，无需手动操作。
+项目使用 GitHub Actions 实现自动化 CI/CD，无需手动操作.
 
 ### CI — 持续集成
 
@@ -210,7 +199,7 @@ npm run test:coverage     # 运行测试并生成覆盖率报告
 - push 到 `main` / `develop` / `develop-*` 分支
 - 所有 PR（合并到 `main` 或 `develop`）
 
-自动执行：ESLint 检查 → TypeScript 类型检查 → 单元测试 → Chrome & Firefox 构建验证。
+自动执行：ESLint 检查 → TypeScript 类型检查 → 单元测试 → Chrome & Firefox 构建验证.
 
 ### 发布版本
 
@@ -221,7 +210,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-> 含 `-` 的 tag（如 `v1.0.0-beta.1`）会自动标记为预发布版本（prerelease）。
+> 含 `-` 的 tag（如 `v1.0.0-beta.1`）会自动标记为预发布版本（prerelease）.
 
 工作流文件位于 `.github/workflows/`：
 
@@ -255,4 +244,4 @@ git push origin v1.0.0
 
 ## 许可证
 
-此项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
+此项目采用 MIT 许可证. 详见 [LICENSE](LICENSE) 文件.

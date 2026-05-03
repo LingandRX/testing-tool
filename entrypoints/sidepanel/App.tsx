@@ -22,12 +22,7 @@ export default function App() {
   }, []);
 
   return (
-    <RouterProvider
-      defaultRoute="dashboard"
-      syncKey="app/sidepanelRoute"
-      visiblePagesKey="app/sidepanelVisiblePages"
-      pageOrderKey="app/sidepanelPageOrder"
-    >
+    <RouterProvider defaultRoute="dashboard" syncKey="app/sidepanelRoute">
       <SnackbarProvider initialOptions={{ autoHideDuration: 1500 }}>
         <Box
           className="app"

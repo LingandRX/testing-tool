@@ -2,7 +2,6 @@ import React, { ReactNode, lazy } from 'react';
 import type { PageType } from '@/types/storage';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
-import LanguageIcon from '@mui/icons-material/Language';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 
 import { THEME_COLORS } from './pageTheme';
@@ -11,7 +10,6 @@ import { THEME_COLORS } from './pageTheme';
 const DashboardPage = lazy(() => import('@/entrypoints/popup/pages/DashboardPage'));
 const TimestampPage = lazy(() => import('@/entrypoints/popup/pages/TimestampPage'));
 const StorageCleanerPage = lazy(() => import('@/entrypoints/popup/pages/StorageCleanerPage'));
-const OpenUrlPage = lazy(() => import('@/entrypoints/popup/pages/OpenUrlPage'));
 const QrCodePage = lazy(() => import('@/entrypoints/popup/pages/QrCodePage'));
 
 /**
@@ -82,19 +80,6 @@ export const FEATURES: FeatureConfig[] = [
     },
   },
   {
-    key: 'openUrl',
-    label: 'Open Url',
-    description: '打开当前选中的 URL',
-    themeColor: THEME_COLORS.purple,
-    icon: <LanguageIcon sx={{ fontSize: 20 }} />,
-    defaultVisible: true,
-    components: {
-      popup: OpenUrlPage,
-      sidepanel: OpenUrlPage,
-      tab: OpenUrlPage,
-    },
-  },
-  {
     key: 'qrCode',
     label: '二维码工具',
     description: '生成当前选中的 URL 的二维码',
@@ -122,9 +107,7 @@ export function getAllFeatureKeys(): PageType[] {
 }
 
 export function getDefaultPageOrder(): PageType[] {
-  return FEATURES.filter((f) => f.key !== 'dashboard' && f.key !== 'openUrlViewer').map(
-    (f) => f.key,
-  );
+  return FEATURES.filter((f) => f.key !== 'dashboard').map((f) => f.key);
 }
 
 export function getEntryPointType(): 'popup' | 'sidepanel' | 'tab' {

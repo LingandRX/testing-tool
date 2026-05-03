@@ -108,57 +108,6 @@ export const timestampPageStyles = {
 } as const;
 
 /**
- * 打开 URL 页面样式
- */
-export const openUrlPageStyles = {
-  primaryColor: THEME_COLORS.purple,
-  primaryDark: THEME_COLORS.purpleDark,
-  INPUT_STYLE: {
-    '& .MuiOutlinedInput-root': {
-      bgcolor: 'background.paper',
-      borderRadius: 4,
-      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-      '&:hover fieldset': {
-        borderColor: 'grey.300',
-      },
-      '&:hover': { bgcolor: 'grey.50' },
-      '&.Mui-focused fieldset': {
-        borderColor: THEME_COLORS.purple,
-      },
-      '&.Mui-focused': {
-        bgcolor: '#fff',
-      },
-    },
-    '& .MuiInputBase-input': {
-      py: '14px',
-      px: 2,
-      fontSize: '0.85rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
-    },
-    '& .MuiInputLabel-root': {
-      fontSize: '0.85rem',
-      fontWeight: 700,
-      color: 'text.secondary',
-      '&.Mui-focused': { color: THEME_COLORS.purple },
-    },
-  },
-  themeColor: THEME_COLORS.purple,
-  themeBg: alpha(THEME_COLORS.purple, 0.1),
-  buttonBg: alpha(THEME_COLORS.purple, 0.85),
-  buttonHover: `0 8px 24px ${alpha(THEME_COLORS.purple, 0.2)}`,
-  errorColor: THEME_COLORS.error,
-  errorBg: alpha(THEME_COLORS.error, 0.05),
-} as const;
-
-/**
- * 查看 URL 页面样式
- */
-export const openUrlViewerPageStyles = {
-  backgroundColor: '#ffffff',
-} as const;
-
-/**
  * 存储清理页面样式
  */
 export const storageCleanerPageStyles = {
