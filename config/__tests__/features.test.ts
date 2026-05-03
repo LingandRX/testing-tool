@@ -1,16 +1,16 @@
-﻿import { describe, it, expect } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import {
   FEATURES,
-  getFeatureByKey,
-  getDefaultVisibleFeatureKeys,
   getAllFeatureKeys,
   getDefaultPageOrder,
+  getDefaultVisibleFeatureKeys,
+  getFeatureByKey,
 } from '../features';
 
 describe('features', () => {
   describe('FEATURES', () => {
-    it('should have 4 features defined', () => {
-      expect(FEATURES).toHaveLength(4);
+    it('should have 6 features defined', () => {
+      expect(FEATURES).toHaveLength(6);
     });
 
     it('should have all required properties for each feature', () => {
@@ -95,11 +95,13 @@ describe('features', () => {
   describe('getAllFeatureKeys', () => {
     it('should return all feature keys', () => {
       const allKeys = getAllFeatureKeys();
-      expect(allKeys).toHaveLength(4);
+      expect(allKeys).toHaveLength(6);
       expect(allKeys).toContain('dashboard');
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
       expect(allKeys).toContain('qrCode');
+      expect(allKeys).toContain('textStatistics');
+      expect(allKeys).toContain('jwt');
     });
   });
 
@@ -116,9 +118,9 @@ describe('features', () => {
       expect(pageOrder).toContain('qrCode');
     });
 
-    it('should have 3 items in page order', () => {
+    it('should have 5 items in page order', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(3);
+      expect(pageOrder).toHaveLength(5);
     });
   });
 });
