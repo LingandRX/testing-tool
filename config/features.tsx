@@ -7,10 +7,10 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import { THEME_COLORS } from './pageTheme';
 
 // 懒加载页面组件
-const DashboardPage = lazy(() => import('@/entrypoints/popup/pages/DashboardPage'));
-const TimestampPage = lazy(() => import('@/entrypoints/popup/pages/TimestampPage'));
-const StorageCleanerPage = lazy(() => import('@/entrypoints/popup/pages/StorageCleanerPage'));
-const QrCodePage = lazy(() => import('@/entrypoints/popup/pages/QrCodePage'));
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const TimestampPage = lazy(() => import('@/pages/TimestampPage'));
+const StorageCleanerPage = lazy(() => import('@/pages/StorageCleanerPage'));
+const QrCodePage = lazy(() => import('@/pages/QrCodePage'));
 
 /**
  * 功能配置接口

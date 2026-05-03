@@ -156,21 +156,21 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 
 #### 1. 时间戳转换工具
 
-- 位置: `entrypoints/popup/pages/TimestampPage.tsx`
-- Hook: `entrypoints/popup/pages/hooks/useTimestampConverter.ts`
+- 位置: `pages/TimestampPage.tsx`
+- Hook: `pages/hooks/useTimestampConverter.ts`
 - 依赖: dayjs 库进行日期处理
 - 功能: 支持日期与时间戳的双向转换，支持多种格式，实时时钟显示
 
 #### 2. 存储清理工具
 
-- 位置: `entrypoints/popup/pages/StorageCleanerPage.tsx`
-- Hook: `entrypoints/popup/pages/useStorageCleaner.ts`
+- 位置: `pages/StorageCleanerPage.tsx`
+- Hook: `pages/useStorageCleaner.ts`
 - 工具: `utils/storageCleaner.ts`
 - 功能: 清理缓存、Cookies、本地存储，支持按域名筛选，自动刷新功能
 
 #### 3. 二维码工具
 
-- 位置: `entrypoints/popup/pages/QrCodePage.tsx`
+- 位置: `pages/QrCodePage.tsx`
 - 组件: `components/QrCodeUploader.tsx`, `components/QrCodeToUrlSection.tsx`, `components/UrlToQrCodeSection.tsx`
 - 工具: `utils/qrCodeParser.ts`
 - 依赖: qrcode, jsqr 库
@@ -180,25 +180,25 @@ npx vitest run components/__tests__/CopyButton.test.tsx
 
 **表单识别 (Form Recognizer)**
 
-- 位置: `entrypoints/popup/pages/FormRecognizerPage.tsx`
-- Hook: `entrypoints/popup/pages/hooks/useFormRecognizer.ts`
+- 位置: `pages/FormRecognizerPage.tsx`
+- Hook: `pages/hooks/useFormRecognizer.ts`
 - 功能: 智能识别页面表单指纹
 
 **表单映射 (Form Mapping)**
 
-- 位置: `entrypoints/popup/pages/FormMappingPage.tsx`
+- 位置: `pages/FormMappingPage.tsx`
 - 工具: `utils/formMapping/` 目录
 - 功能: 表单指纹识别与自定义映射规则配置
 
 **表单填充 (Form Fill)**
 
-- 位置: `entrypoints/popup/pages/FormFillPage.tsx`
+- 位置: `pages/FormFillPage.tsx`
 - 工具: `utils/dummyDataGenerator.ts` (基于 @faker-js/faker)
 - 功能: 根据表单指纹智能填充表单数据
 
 #### 5. 仪表盘系统
 
-- 位置: `entrypoints/popup/pages/DashboardPage.tsx`
+- 位置: `pages/DashboardPage.tsx`
 - 配置: `config/features.tsx`
 - 组件: `components/DashboardCard.tsx`, `components/ToolCard.tsx`
 - 功能: 统一工具入口，可自定义显示的工具卡片
