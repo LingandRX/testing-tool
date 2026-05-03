@@ -31,7 +31,6 @@ const QrCodeUploader: React.FC<QrCodeUploaderProps> = ({
   onQrCodeDetected,
   supportedFormats = ['image/png', 'image/jpeg', 'image/webp'],
   maxFileSize = 5 * 1024 * 1024, // 5MB
-  timeout = 10000, // 10 seconds
   showPreview = true,
   showProgress = true,
   className,
@@ -77,7 +76,7 @@ const QrCodeUploader: React.FC<QrCodeUploaderProps> = ({
           });
         }, 200);
 
-        const result = await parseQrCodeFromFile(file, timeout);
+        const result = await parseQrCodeFromFile(file);
 
         clearInterval(progressInterval);
         setProgress(100);
@@ -102,7 +101,7 @@ const QrCodeUploader: React.FC<QrCodeUploaderProps> = ({
         setTimeout(() => setProgress(0), 500);
       }
     },
-    [timeout, showMessage, onQrCodeDetected],
+    [showMessage, onQrCodeDetected],
   );
 
   // 处理文件

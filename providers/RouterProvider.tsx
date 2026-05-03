@@ -64,6 +64,10 @@ interface RouterProviderProps {
   syncRoute?: boolean;
   /** 存储路由状态的键名，默认为 'app/currentRoute' */
   syncKey?: keyof StorageSchema;
+  /** 可见页面列表的键名，默认为 'app/visiblePages' */
+  visiblePagesKey?: keyof StorageSchema;
+  /** 页面排序的键名，默认为 'app/pageOrder' */
+  pageOrderKey?: keyof StorageSchema;
 }
 
 /**
@@ -97,6 +101,8 @@ export function RouterProvider({
   defaultRoute = 'dashboard',
   syncRoute = true,
   syncKey = 'app/currentRoute',
+  visiblePagesKey = 'app/visiblePages',
+  pageOrderKey = 'app/pageOrder',
 }: RouterProviderProps) {
   // 当前页面状态：优先从同步快照加载，并进行合法性校验
   const [currentPage, setCurrentPage] = useState<PageType>(() =>
@@ -104,11 +110,11 @@ export function RouterProvider({
   );
   // 可见页面列表状态
   const [visiblePages, setVisiblePages] = useState<PageType[]>(() =>
-    getSyncSnapshot('app/visiblePages', getDefaultVisibleFeatureKeys(), isValidPageList),
+    getSyncSnapshot(visiblePagesKey as string, getDefaultVisibleFeatureKeys(), isValidPageList),
   );
   // 页面排序状态
   const [pageOrder, setPageOrder] = useState<PageType[]>(() =>
-    getSyncSnapshot('app/pageOrder', getDefaultPageOrder(), isValidPageList),
+    getSyncSnapshot(pageOrderKey as string, getDefaultPageOrder(), isValidPageList),
   );
   // 加载完成标识
   const [isLoaded, setIsLoaded] = useState(false);
@@ -119,10 +125,10 @@ export function RouterProvider({
     try {
       const savedRoute = await storageUtil.get(syncKey, defaultRoute);
       const savedVisiblePages = await storageUtil.get(
-        'app/visiblePages',
+        visiblePagesKey,
         getDefaultVisibleFeatureKeys(),
       );
-      const savedPageOrder = await storageUtil.get('app/pageOrder', getDefaultPageOrder());
+      const savedPageOrder = await storageUtil.get(pageOrderKey, getDefaultPageOrder());
 
       // 增加数据合法性校验并进行类型收窄
       if (isValidPage(savedRoute) && syncRoute) {
@@ -139,7 +145,7 @@ export function RouterProvider({
     } finally {
       setIsLoaded(true);
     }
-  }, [defaultRoute, syncKey, syncRoute]);
+  }, [defaultRoute, syncKey, syncRoute, visiblePagesKey, pageOrderKey]);
 
   // 组件挂载时加载初始数据
   useEffect(() => {
@@ -157,18 +163,18 @@ export function RouterProvider({
   // 持久化可见页面列表
   useEffect(() => {
     if (isLoaded) {
-      storageUtil.set('app/visiblePages', visiblePages).catch(console.error);
-      localStorage.setItem('snapshot/app/visiblePages', JSON.stringify(visiblePages));
+      storageUtil.set(visiblePagesKey, visiblePages).catch(console.error);
+      localStorage.setItem(`snapshot/${visiblePagesKey}`, JSON.stringify(visiblePages));
     }
-  }, [visiblePages, isLoaded]);
+  }, [visiblePages, isLoaded, visiblePagesKey]);
 
   // 持久化页面排序
   useEffect(() => {
     if (isLoaded) {
-      storageUtil.set('app/pageOrder', pageOrder).catch(console.error);
-      localStorage.setItem('snapshot/app/pageOrder', JSON.stringify(pageOrder));
+      storageUtil.set(pageOrderKey, pageOrder).catch(console.error);
+      localStorage.setItem(`snapshot/${pageOrderKey}`, JSON.stringify(pageOrder));
     }
-  }, [pageOrder, isLoaded]);
+  }, [pageOrder, isLoaded, pageOrderKey]);
 
   /**
    * 监听存储变化，以便在多个入口（如 Popup 和 Options）之间同步路由和设置
@@ -185,15 +191,15 @@ export function RouterProvider({
         }
       }
       // 同步可见页面列表
-      if (changes['app/visiblePages']) {
-        const newPages = changes['app/visiblePages'].newValue;
+      if (changes[visiblePagesKey as string]) {
+        const newPages = changes[visiblePagesKey as string].newValue;
         if (isValidPageList(newPages)) {
           setVisiblePages(newPages);
         }
       }
       // 同步页面排序
-      if (changes['app/pageOrder']) {
-        const newOrder = changes['app/pageOrder'].newValue;
+      if (changes[pageOrderKey as string]) {
+        const newOrder = changes[pageOrderKey as string].newValue;
         if (isValidPageList(newOrder)) {
           setPageOrder(newOrder);
         }
@@ -202,7 +208,7 @@ export function RouterProvider({
 
     chrome.storage.onChanged.addListener(handleStorageChange);
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
-  }, [syncRoute, currentPage, syncKey]);
+  }, [syncRoute, currentPage, syncKey, visiblePagesKey, pageOrderKey]);
 
   /**
    * 跳转到指定页面

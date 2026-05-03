@@ -13,7 +13,7 @@ export default function ErrorDisplay({ error }: ErrorDisplayProps) {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '400px',
+        minHeight: { xs: 'auto', sm: '400px' },
         textAlign: 'center',
       }}
     >

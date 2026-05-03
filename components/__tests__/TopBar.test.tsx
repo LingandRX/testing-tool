@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TopBar from '../TopBar';
 import { RouterProvider } from '@/providers/RouterProvider';
 import type { PageType } from '@/types/storage';
+import React from 'react';
 
 const mockRouterValue = {
   currentPage: 'dashboard' as PageType,
