@@ -1,16 +1,16 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import {
   FEATURES,
-  getFeatureByKey,
-  getDefaultVisibleFeatureKeys,
   getAllFeatureKeys,
   getDefaultPageOrder,
+  getDefaultVisibleFeatureKeys,
+  getFeatureByKey,
 } from '../features';
 
 describe('features', () => {
   describe('FEATURES', () => {
-    it('should have 9 features defined', () => {
-      expect(FEATURES).toHaveLength(9);
+    it('should have 6 features defined', () => {
+      expect(FEATURES).toHaveLength(6);
     });
 
     it('should have all required properties for each feature', () => {
@@ -27,10 +27,10 @@ describe('features', () => {
         expect(typeof feature.components).toBe('object');
         expect(feature.components).toHaveProperty('popup');
         expect(feature.components).toHaveProperty('sidepanel');
-        expect(feature.components).toHaveProperty('detached');
+        expect(feature.components).toHaveProperty('tab');
 
         // Optional UI properties for non-hidden features
-        if (feature.key !== 'dashboard' && feature.key !== 'openUrlViewer') {
+        if (feature.key !== 'dashboard') {
           expect(feature).toHaveProperty('icon');
           expect(feature).toHaveProperty('themeColor');
           expect(typeof feature.themeColor).toBe('string');
@@ -83,31 +83,25 @@ describe('features', () => {
       });
     });
 
-    it('should include dashboard, timestamp, storageCleaner, openUrl', () => {
+    it('should include dashboard, timestamp, storageCleaner, qrCode', () => {
       const visibleKeys = getDefaultVisibleFeatureKeys();
       expect(visibleKeys).toContain('dashboard');
       expect(visibleKeys).toContain('timestamp');
       expect(visibleKeys).toContain('storageCleaner');
-      expect(visibleKeys).toContain('openUrl');
-    });
-
-    it('should not include openUrlViewer (not visible by default)', () => {
-      const visibleKeys = getDefaultVisibleFeatureKeys();
-      expect(visibleKeys).not.toContain('openUrlViewer');
+      expect(visibleKeys).toContain('qrCode');
     });
   });
 
   describe('getAllFeatureKeys', () => {
     it('should return all feature keys', () => {
       const allKeys = getAllFeatureKeys();
-      expect(allKeys).toHaveLength(9);
+      expect(allKeys).toHaveLength(6);
       expect(allKeys).toContain('dashboard');
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
-      expect(allKeys).toContain('openUrl');
       expect(allKeys).toContain('qrCode');
-      expect(allKeys).toContain('formRecognizer');
-      expect(allKeys).toContain('openUrlViewer');
+      expect(allKeys).toContain('textStatistics');
+      expect(allKeys).toContain('jwt');
     });
   });
 
@@ -117,23 +111,16 @@ describe('features', () => {
       expect(pageOrder).not.toContain('dashboard');
     });
 
-    it('should exclude openUrlViewer from page order', () => {
-      const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).not.toContain('openUrlViewer');
-    });
-
-    it('should include timestamp, storageCleaner, openUrl, qrCode, formRecognizer in page order', () => {
+    it('should include timestamp, storageCleaner, qrCode in page order', () => {
       const pageOrder = getDefaultPageOrder();
       expect(pageOrder).toContain('timestamp');
       expect(pageOrder).toContain('storageCleaner');
-      expect(pageOrder).toContain('openUrl');
       expect(pageOrder).toContain('qrCode');
-      expect(pageOrder).toContain('formRecognizer');
     });
 
-    it('should have 7 items in page order', () => {
+    it('should have 5 items in page order', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(7);
+      expect(pageOrder).toHaveLength(5);
     });
   });
 });

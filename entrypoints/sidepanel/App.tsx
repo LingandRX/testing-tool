@@ -3,6 +3,7 @@ import RouterProvider from '@/providers/RouterProvider';
 import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { SnackbarProvider } from '@/components/GlobalSnackbar';
 import { MessageAction, sendMessage } from '@/utils/messages';
 import { Box } from '@mui/material';
 
@@ -22,21 +23,23 @@ export default function App() {
 
   return (
     <RouterProvider defaultRoute="dashboard" syncKey="app/sidepanelRoute">
-      <Box
-        className="app"
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100vh',
-          width: '100%',
-          overflow: 'hidden',
-        }}
-      >
-        <TopBar onOpenOptions={handleOpenOptions} />
-        <ErrorBoundary>
-          <RouterContainer />
-        </ErrorBoundary>
-      </Box>
+      <SnackbarProvider initialOptions={{ autoHideDuration: 1500 }}>
+        <Box
+          className="app"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100vh',
+            width: '100%',
+            overflow: 'hidden',
+          }}
+        >
+          <TopBar onOpenOptions={handleOpenOptions} />
+          <ErrorBoundary>
+            <RouterContainer />
+          </ErrorBoundary>
+        </Box>
+      </SnackbarProvider>
     </RouterProvider>
   );
 }

@@ -1,6 +1,6 @@
 import { Box, Stack, Container, CircularProgress } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import { useSnackbar as useGlobalSnackbar } from '@/components/SnackbarProvider';
+import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 import UrlToQrCodeSection from '@/components/UrlToQrCodeSection';
 import QrCodeToUrlSection from '@/components/QrCodeToUrlSection';
 import { useStorageState } from '@/utils/useStorageState';

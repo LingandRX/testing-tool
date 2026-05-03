@@ -8,6 +8,7 @@ export default [
   {
     ignores: [
       'dist',
+      '.output',
       '.wxt',
       'node_modules',
       'eslint.config.ts',

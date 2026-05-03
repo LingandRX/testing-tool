@@ -1,7 +1,7 @@
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
-import { useMemo } from 'react';
+import { useMemo, Suspense } from 'react';
 
 export default function RouterContainer() {
   const { currentPage, isLoaded } = useRouter();
@@ -15,7 +15,18 @@ export default function RouterContainer() {
   }, []);
 
   if (!isLoaded) {
-    return <div className="app">Loading...</div>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+        }}
+      >
+        <CircularProgress size={32} />
+      </Box>
+    );
   }
 
   const currentFeature = FEATURES.find((f) => f.key === currentPage);
@@ -34,7 +45,23 @@ export default function RouterContainer() {
         flexDirection: 'column',
       }}
     >
-      {Component && <Component />}
+      <Suspense
+        fallback={
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flex: 1,
+              minHeight: 200,
+            }}
+          >
+            <CircularProgress size={32} />
+          </Box>
+        }
+      >
+        {Component && <Component />}
+      </Suspense>
     </Box>
   );
 }
