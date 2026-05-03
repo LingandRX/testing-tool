@@ -3,6 +3,7 @@ import type { PageType } from '@/types/storage';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
 import QrCodeIcon from '@mui/icons-material/QrCode';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 import { THEME_COLORS } from './pageTheme';
 
@@ -11,6 +12,7 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const TimestampPage = lazy(() => import('@/pages/TimestampPage'));
 const StorageCleanerPage = lazy(() => import('@/pages/StorageCleanerPage'));
 const QrCodePage = lazy(() => import('@/pages/QrCodePage'));
+const TextStatisticsPage = lazy(() => import('@/pages/TextStatisticsPage'));
 
 /**
  * 功能配置接口
@@ -90,6 +92,19 @@ export const FEATURES: FeatureConfig[] = [
       popup: QrCodePage,
       sidepanel: QrCodePage,
       tab: QrCodePage,
+    },
+  },
+  {
+    key: 'textStatistics',
+    label: '文本统计',
+    description: '实时分析文本字符、单词及字节',
+    themeColor: THEME_COLORS.purple,
+    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: TextStatisticsPage,
+      sidepanel: TextStatisticsPage,
+      tab: TextStatisticsPage,
     },
   },
 ];

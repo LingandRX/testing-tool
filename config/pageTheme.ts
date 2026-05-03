@@ -168,3 +168,12 @@ export const formRecognizerPageStyles = {
 export const formMappingPageStyles = {
   secondaryColor: THEME_COLORS.purple,
 } as const;
+
+/**
+ * 文本统计页面样式
+ */
+export const textStatisticsPageStyles = {
+  primaryColor: THEME_COLORS.purple,
+  cardBg: alpha(THEME_COLORS.purple, 0.04),
+  cardBorder: alpha(THEME_COLORS.purple, 0.1),
+} as const;

@@ -6,9 +6,7 @@ export type PageType =
   | 'timestamp' // 时间戳转换工具
   | 'storageCleaner' // 存储清理工具
   | 'qrCode' // 二维码工具
-  | 'formRecognizer' // 表单识别工具
-  | 'formMapping' // 表单映射配置
-  | 'formFill'; // 表单填充工具
+  | 'textStatistics'; // 文本统计工具
 
 /**
  * 表单映射条目定义
@@ -76,20 +74,12 @@ export interface StorageSchema {
   'app/lastRoute': string;
   /** 应用主题配置 */
   'app/theme': string;
-  /** 表单映射工具是否正处于“元素拾取”模式 */
-  'app/formMapping/isPicking': boolean;
-  /** 高亮显示的持续时间（毫秒） */
-  'app/formMapping/highlightDuration': number;
-  /** 当前激活的表单映射条目列表 */
-  active_form_map: FormMapEntry[];
   /** 存储清理工具的偏好设置 */
   'storageCleaner/preferences': StorageCleanerPreferences;
   /** 二维码工具中二维码部分是否展开 */
   'qrCode/qrExpanded': boolean;
   /** 二维码工具中 URL 部分是否展开 */
   'qrCode/urlExpanded': boolean;
-  /** 表单识别工具的字段类型偏好（按域名存储） */
-  'formRecognizer/fieldTypePreferences': FieldTypePreferences;
 }
 
 /**
