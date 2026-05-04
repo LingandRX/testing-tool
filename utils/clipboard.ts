@@ -10,8 +10,8 @@ export const copyTextToClipboard = async (text: string): Promise<boolean> => {
       .then(() => {
         resolve(true);
       })
-      .catch(() => {
-        reject(false);
+      .catch((error) => {
+        reject(new Error(`复制文本到剪贴板失败，错误: ${error?.message || 'Unknown error'}`));
       });
   });
 };
@@ -32,8 +32,8 @@ export const copyImageToClipboard = async (blob: Blob): Promise<boolean> => {
       .then(() => {
         resolve(true);
       })
-      .catch(() => {
-        reject(false);
+      .catch((error) => {
+        reject(new Error(`复制图片到剪贴板失败，错误: ${error?.message || 'Unknown error'}`));
       });
   });
 };
