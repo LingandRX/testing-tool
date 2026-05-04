@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, Stack, Tooltip } from '@mui/material';
+import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';

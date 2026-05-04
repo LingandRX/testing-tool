@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { parseJwt, decodeBase64Url } from '../jwt';
+import { describe, expect, it } from 'vitest';
+import { decodeBase64Url, parseJwt } from '../jwt';
 
 describe('jwt utils', () => {
   describe('decodeBase64Url', () => {

@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
-import { TextField, Stack, Box, Container, Typography, Paper } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { Box, Container, Paper, Stack, TextField, Typography } from '@mui/material';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PageHeader from '@/components/PageHeader';
 import { jwtPageStyles } from '@/config/pageTheme';
-import { parseJwt, formatJson } from '@/utils/jwt';
+import { formatJson, parseJwt } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
 
 interface SectionProps {

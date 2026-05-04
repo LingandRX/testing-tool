@@ -1,4 +1,4 @@
-import { Box, Container, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Container } from '@mui/material';
 import Button from '@/components/Button';
 import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';

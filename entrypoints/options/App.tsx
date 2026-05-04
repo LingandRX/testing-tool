@@ -1,17 +1,17 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
+  alpha,
   Box,
-  Typography,
-  Paper,
-  Switch,
   Button,
   CircularProgress,
-  Stack,
-  IconButton,
-  Tabs,
-  Tab,
-  alpha,
   Divider,
+  IconButton,
+  Paper,
+  Stack,
+  Switch,
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -21,9 +21,9 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
-  getFeatureByKey,
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
+  getFeatureByKey,
 } from '@/config/features';
 import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import ErrorBoundary from '@/components/ErrorBoundary';

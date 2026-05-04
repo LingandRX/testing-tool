@@ -1,4 +1,4 @@
-import { Box, Stack, Container, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Container, Stack } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 import UrlToQrCodeSection from '@/components/UrlToQrCodeSection';

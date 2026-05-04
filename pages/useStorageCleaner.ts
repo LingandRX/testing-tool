@@ -1,21 +1,21 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 import type {
-  StorageCleanerOptions,
   CleaningResult,
+  StorageCleanerOptions,
   StorageCleanerPreferences,
 } from '@/types/storage';
 import {
-  getCurrentTab,
-  isRestrictedUrl,
   clearStorage,
-  getCookieSize,
-  getLocalStorageSize,
-  getSessionStorageSize,
-  getIndexedDBSize,
   getCacheStorageSize,
+  getCookieSize,
+  getCurrentTab,
+  getIndexedDBSize,
+  getLocalStorageSize,
   getServiceWorkerCount,
+  getSessionStorageSize,
+  isRestrictedUrl,
 } from '@/utils/storageCleaner';
 import { MessageAction, sendMessage } from '@/utils/messages';
 

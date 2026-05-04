@@ -4,7 +4,7 @@
  * 用于在仪表盘中展示各个工具功能的卡片组件，支持图标、标题、描述、
  * AI 标识和快照内容展示，具备悬停动画效果。
  */
-import { Box, Typography, Stack } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'; // Sparkles for AI
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import React from 'react';

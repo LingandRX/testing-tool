@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { RouterProvider, useRouter } from '../RouterProvider';
 import { storageUtil } from '@/utils/chromeStorage';
 import React from 'react';

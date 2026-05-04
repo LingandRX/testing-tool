@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { Typography, Box, Fade, Stack, alpha } from '@mui/material';
+import { alpha, Box, Fade, Stack, Typography } from '@mui/material';
 import dayjs from '@/utils/dayjs';
 import CopyButton from '@/components/CopyButton';
-import { DATE_FORMAT, timestampPageStyles } from '@/config/pageTheme';
 import type { UnitType } from '@/config/pageTheme';
+import { DATE_FORMAT, timestampPageStyles } from '@/config/pageTheme';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
 interface ResultViewProps {

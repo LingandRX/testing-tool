@@ -1,4 +1,4 @@
-import React, { ReactNode, lazy } from 'react';
+import React, { lazy, ReactNode } from 'react';
 import type { PageType } from '@/types/storage';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';

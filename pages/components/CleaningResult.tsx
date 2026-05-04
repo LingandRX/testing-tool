@@ -1,4 +1,4 @@
-import { Box, Alert } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import type { CleaningResult } from '@/types/storage';
 import { formatCleaningResult } from '@/utils/storageCleaner';
 

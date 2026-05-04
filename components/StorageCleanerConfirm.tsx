@@ -1,12 +1,12 @@
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
+  alpha,
   Box,
   Chip,
-  alpha,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
 } from '@mui/material';
 import type { StorageCleanerOptions } from '@/types/storage';
 import Button from '@/components/Button';

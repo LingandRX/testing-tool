@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
-import { Box, Container, TextField, Grid, Paper, Typography, alpha } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { alpha, Box, Container, Grid, Paper, TextField, Typography } from '@mui/material';
 import PageHeader from '@/components/PageHeader';
 import DescriptionIcon from '@mui/icons-material/Description';
-import { getTextStats, formatByteSize } from '@/utils/textStatistics';
+import { formatByteSize, getTextStats } from '@/utils/textStatistics';
 import { textStatisticsPageStyles } from '@/config/pageTheme';
 
 /**
