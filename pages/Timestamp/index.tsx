@@ -4,11 +4,11 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';
 import { timestampPageStyles, ZONES } from '@/config/pageTheme';
-import LiveClock from './components/LiveClock';
-import ResultView from './components/ResultView';
-import { useTimestampConverter } from './hooks/useTimestampConverter';
+import LiveClock from './LiveClock';
+import ResultView from './ResultView';
+import { useTimestampConverter } from './useTimestampConverter';
 
-export default function TimestampPage() {
+export default function Index() {
   const { showMessage } = useSnackbar();
   const {
     mode,

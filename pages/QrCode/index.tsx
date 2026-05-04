@@ -7,7 +7,7 @@ import { useStorageState } from '@/utils/useStorageState';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
 
-export default function QrCodePage() {
+export default function Index() {
   const { showMessage } = useGlobalSnackbar();
 
   // 使用自定义钩子管理展开状态

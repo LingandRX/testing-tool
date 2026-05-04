@@ -54,7 +54,7 @@ const Section = ({ title, content, color }: SectionProps) => (
   </Paper>
 );
 
-export default function JwtPage() {
+export default function Index() {
   useSnackbar();
   const [jwtInput, setJwtInput] = useState('');
 

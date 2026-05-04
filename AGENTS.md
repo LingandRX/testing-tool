@@ -69,11 +69,11 @@ npx vitest run path/to/your.test.ts
 │   └── sidepanel/        # 侧边栏界面主入口
 ├── pages/                # 功能模块页面组件
 │   ├── DashboardPage.tsx # 仪表盘/首页
-│   ├── JwtPage.tsx       # JWT 解析工具
-│   ├── QrCodePage.tsx    # 二维码工具
-│   ├── StorageCleanerPage.tsx # 存储清理工具
-│   ├── TextStatisticsPage.tsx # 文本统计工具
-│   └── TimestampPage.tsx # 时间戳转换工具
+│   ├── Jwt/index.tsx       # JWT 解析工具
+│   ├── QrCode/index.tsx    # 二维码工具
+│   ├── StorageCleaner/index.tsx # 存储清理工具
+│   ├── TextStatics/index.tsx # 文本统计工具
+│   └── Timestamp/index.tsx # 时间戳转换工具
 ├── providers/            # React Context Providers (Router, Theme 等)
 ├── utils/                # 业务逻辑与工具函数
 │   ├── chromeStorage.ts  # 类型安全的 Chrome Storage 封装

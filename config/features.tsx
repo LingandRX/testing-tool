@@ -1,4 +1,4 @@
-import React, { lazy, ReactNode } from 'react';
+import { type ComponentType, lazy, ReactNode } from 'react';
 import type { PageType } from '@/types/storage';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -10,11 +10,11 @@ import { THEME_COLORS } from './pageTheme';
 
 // 懒加载页面组件
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
-const TimestampPage = lazy(() => import('@/pages/TimestampPage'));
-const StorageCleanerPage = lazy(() => import('@/pages/StorageCleanerPage'));
-const QrCodePage = lazy(() => import('@/pages/QrCodePage'));
-const TextStatisticsPage = lazy(() => import('@/pages/TextStatisticsPage'));
-const JwtPage = lazy(() => import('@/pages/JwtPage'));
+const TimestampPage = lazy(() => import('../pages/Timestamp'));
+const StorageCleanerPage = lazy(() => import('../pages/StorageCleaner'));
+const QrCodePage = lazy(() => import('../pages/QrCode'));
+const TextStatisticsPage = lazy(() => import('../pages/TextStatics'));
+const JwtPage = lazy(() => import('../pages/Jwt'));
 
 /**
  * 功能配置接口
@@ -37,11 +37,11 @@ export interface FeatureConfig {
   /** 不同显示模式对应的组件 */
   components: {
     /** 弹窗模式组件 */
-    popup: React.ComponentType;
+    popup: ComponentType;
     /** 侧边栏模式组件 */
-    sidepanel: React.ComponentType;
+    sidepanel: ComponentType;
     /** 标签页模式组件 */
-    tab: React.ComponentType;
+    tab: ComponentType;
   };
 }
 

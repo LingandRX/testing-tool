@@ -29,7 +29,6 @@
   },
   // 确保包含你的源代码目录
   "include": [
-    "vite-env.d.ts",
     "entrypoints/**/*",
     "pages/**/*",
     "components/**/*",

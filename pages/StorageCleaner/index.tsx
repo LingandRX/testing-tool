@@ -4,13 +4,13 @@ import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useStorageCleaner } from './useStorageCleaner';
-import DomainHeader from './components/DomainHeader';
-import StorageOptionsGrid from './components/StorageOptionsGrid';
-import AutoRefreshToggle from './components/AutoRefreshToggle';
-import ErrorDisplay from './components/ErrorDisplay';
-import CleaningResult from './components/CleaningResult';
+import DomainHeader from './DomainHeader';
+import StorageOptionsGrid from './StorageOptionsGrid';
+import AutoRefreshToggle from './AutoRefreshToggle';
+import ErrorDisplay from './ErrorDisplay';
+import CleaningResult from './CleaningResult';
 
-export default function StorageCleanerPage() {
+export default function Index() {
   const { showMessage } = useGlobalSnackbar();
   const {
     domain,

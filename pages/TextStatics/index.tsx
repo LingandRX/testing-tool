@@ -10,7 +10,7 @@ import { textStatisticsPageStyles } from '@/config/pageTheme';
  *
  * 提供实时的文本分析功能，包括字符数、单词数、行数和字节大小。
  */
-export default function TextStatisticsPage() {
+export default function Index() {
   const [text, setText] = useState('');
 
   // 实时计算统计信息，使用 useMemo 优化性能
