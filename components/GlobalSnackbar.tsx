@@ -35,7 +35,14 @@
  * ```
  */
 
-import React, { JSX, useState, createContext, useContext, type ReactNode } from 'react';
+import {
+  JSX,
+  useState,
+  createContext,
+  useContext,
+  type ReactNode,
+  type SyntheticEvent,
+} from 'react';
 import { Snackbar, Alert, type SxProps, type Theme, alpha, Portal } from '@mui/material';
 
 /**
@@ -181,7 +188,9 @@ export function GlobalSnackbar({
           >
             {message}
           </Alert>
-        ) : undefined}
+        ) : (
+          <div>{message}</div>
+        )}
       </Snackbar>
     </Portal>
   );
@@ -210,7 +219,7 @@ export function useSnackbarState(initialOptions?: SnackbarOptions): UseSnackbarS
     setOpen(false);
   };
 
-  const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') return;
     closeMessage();
   };
