@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Text Statistics",
+  "pageSubtitle": "Real-time analysis of characters, words, lines, and byte size",
+  "placeholder": "Type or paste text here...",
+  "characters": "Characters",
+  "words": "Words",
+  "lines": "Lines",
+  "bytes": "Byte Size"
+}

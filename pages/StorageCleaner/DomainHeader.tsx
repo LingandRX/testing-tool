@@ -3,6 +3,7 @@ import StorageIcon from '@mui/icons-material/Storage';
 import PageHeader from '@/components/PageHeader';
 import { formatSize } from '@/utils/storageCleaner';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * DomainHeader 组件属性接口
@@ -28,12 +29,13 @@ interface DomainHeaderProps {
  * ```
  */
 export default function DomainHeader({ domain, totalSize }: DomainHeaderProps) {
+  const { t } = useTranslation(['storageCleaner']);
   return (
     <PageHeader
       icon={<StorageIcon sx={{ fontSize: 22 }} />}
       iconColor={storageCleanerPageStyles.warningColor}
-      title="存储清理"
-      subtitle={domain || '加载中...'}
+      title={t('storageCleaner:pageTitle')}
+      subtitle={domain || t('storageCleaner:loading')}
       badge={
         totalSize > 0 ? (
           <Box
@@ -52,7 +54,7 @@ export default function DomainHeader({ domain, totalSize }: DomainHeaderProps) {
               },
             }}
           >
-            已占用 {formatSize(totalSize)}
+            {t('storageCleaner:occupied', { size: formatSize(totalSize) })}
           </Box>
         ) : null
       }

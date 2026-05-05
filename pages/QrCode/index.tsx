@@ -6,9 +6,11 @@ import QrCodeToUrlSection from '@/components/QrCodeToUrlSection';
 import { useStorageState } from '@/utils/useStorageState';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
+import { useTranslation } from 'react-i18next';
 
 export default function Index() {
   const { showMessage } = useGlobalSnackbar();
+  const { t } = useTranslation(['qrCode']);
 
   // 使用自定义钩子管理展开状态
   const [urlExpanded, setUrlExpanded, urlInitialized] = useStorageState('qrCode/urlExpanded', true);
@@ -36,8 +38,8 @@ export default function Index() {
     <Box>
       <Container sx={{ py: 2, maxWidth: 400 }}>
         <PageHeader
-          title="二维码工具"
-          subtitle="生成和解析二维码"
+          title={t('qrCode:pageTitle')}
+          subtitle={t('qrCode:pageSubtitle')}
           icon={<QrCodeIcon />}
           iconColor={qrCodePageStyles.primaryColor}
           sx={{ mb: 2.5 }}

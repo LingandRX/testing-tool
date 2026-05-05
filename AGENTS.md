@@ -72,7 +72,7 @@ npx vitest run path/to/your.test.ts
 │   ├── Jwt/index.tsx       # JWT 解析工具
 │   ├── QrCode/index.tsx    # 二维码工具
 │   ├── StorageCleaner/index.tsx # 存储清理工具
-│   ├── TextStatics/index.tsx # 文本统计工具
+│   ├── TextStatistics/index.tsx # 文本统计工具
 │   └── Timestamp/index.tsx # 时间戳转换工具
 ├── providers/            # React Context Providers (Router, Theme 等)
 ├── utils/                # 业务逻辑与工具函数

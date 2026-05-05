@@ -9,9 +9,11 @@ import StorageOptionsGrid from './StorageOptionsGrid';
 import AutoRefreshToggle from './AutoRefreshToggle';
 import ErrorDisplay from './ErrorDisplay';
 import CleaningResult from './CleaningResult';
+import { useTranslation } from 'react-i18next';
 
 export default function Index() {
   const { showMessage } = useGlobalSnackbar();
+  const { t } = useTranslation(['storageCleaner']);
   const {
     domain,
     error,
@@ -74,7 +76,7 @@ export default function Index() {
           disabled={isDisabled}
           fullWidth
         >
-          {loading ? '正在清理...' : '立即清理'}
+          {loading ? t('storageCleaner:cleaning') : t('storageCleaner:cleanNow')}
         </Button>
 
         <CleaningResult result={result} />

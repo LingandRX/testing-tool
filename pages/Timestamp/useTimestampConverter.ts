@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import dayjs from '@/utils/dayjs';
 import type { UnitType, ZoneType } from '@/config/pageTheme';
 import { DATE_FORMAT } from '@/config/pageTheme';
+import { useTranslation } from 'react-i18next';
 
 export interface UseTimestampConverterReturn {
   // State
@@ -24,6 +25,7 @@ export interface UseTimestampConverterReturn {
 }
 
 export function useTimestampConverter(): UseTimestampConverterReturn {
+  const { t } = useTranslation(['timestamp']);
   const [mode, setMode] = useState<'ts2dt' | 'dt2ts'>('ts2dt');
   const [tsInput, setTsInput] = useState(() => String(Date.now()));
   const [dtInput, setDtInput] = useState(() => dayjs().format(DATE_FORMAT));
@@ -38,12 +40,12 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
       if (!rawInput) return;
       const num = Number(rawInput);
       if (isNaN(num)) {
-        setError('无效数字');
+        setError(t('timestamp:errors.invalidNumber'));
         return;
       }
       const d = unit === 'ms' ? dayjs(num) : dayjs.unix(num);
       if (!d.isValid()) {
-        setError('无效时间戳');
+        setError(t('timestamp:errors.invalidTimestamp'));
         return;
       }
       setError('');
@@ -53,14 +55,14 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
       if (!rawInput) return;
       const d = dayjs.tz(rawInput, DATE_FORMAT, zone);
       if (!d.isValid()) {
-        setError('格式错误');
+        setError(t('timestamp:errors.invalidFormat'));
         return;
       }
       setError('');
       const ms = d.valueOf();
       setResult(unit === 'ms' ? String(ms) : String(Math.floor(ms / 1000)));
     }
-  }, [mode, tsInput, dtInput, unit, zone]);
+  }, [mode, tsInput, dtInput, unit, zone, t]);
 
   useEffect(() => {
     const timer = setTimeout(convert, 400);

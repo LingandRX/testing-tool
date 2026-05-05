@@ -1,0 +1,26 @@
+{
+  "pageTitle": "Timestamp Conversion",
+  "pageSubtitle": "Unix millisecond conversion and formatting",
+  "tsToDate": "Timestamp → Date",
+  "dateToTs": "Date → Timestamp",
+  "placeholderTs": "Enter timestamp...",
+  "placeholderDate": "YYYY-MM-DD HH:mm:ss",
+  "unitMs": "Millisecond (ms)",
+  "unitS": "Second (s)",
+  "convertButton": "Convert Now",
+  "currentTs": "Current Timestamp",
+  "useNowTooltip": "Use this value",
+  "copyTsTooltip": "Copy timestamp",
+  "usedSuccess": "Using current timestamp",
+  "resultLabel": "Conversion Result",
+  "copyResultTooltip": "Copy result",
+  "relativeTime": "Relative Time",
+  "iso8601": "ISO 8601",
+  "utcTime": "UTC Time",
+  "copyTooltip": "Copy",
+  "errors": {
+    "invalidNumber": "Invalid number",
+    "invalidTimestamp": "Invalid timestamp",
+    "invalidFormat": "Format error"
+  }
+}

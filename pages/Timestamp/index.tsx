@@ -7,9 +7,11 @@ import { timestampPageStyles, ZONES } from '@/config/pageTheme';
 import LiveClock from './LiveClock';
 import ResultView from './ResultView';
 import { useTimestampConverter } from './useTimestampConverter';
+import { useTranslation } from 'react-i18next';
 
 export default function Index() {
   const { showMessage } = useSnackbar();
+  const { t } = useTranslation(['timestamp']);
   const {
     mode,
     tsInput,
@@ -32,8 +34,8 @@ export default function Index() {
       <Container sx={{ p: 2 }}>
         {/* Header */}
         <PageHeader
-          title="时间戳转换"
-          subtitle="Unix 毫秒数转换与格式化"
+          title={t('timestamp:pageTitle')}
+          subtitle={t('timestamp:pageSubtitle')}
           icon={<AccessTimeIcon />}
         />
 
@@ -89,7 +91,7 @@ export default function Index() {
                 transition: 'color 0.3s',
               }}
             >
-              {m === 'ts2dt' ? '时间戳 → 日期' : '日期 → 时间戳'}
+              {m === 'ts2dt' ? t('timestamp:tsToDate') : t('timestamp:dateToTs')}
             </Box>
           ))}
         </Box>
@@ -97,7 +99,9 @@ export default function Index() {
         {/* Input Area */}
         <Stack spacing={2} sx={{ mb: 3 }}>
           <TextField
-            placeholder={mode === 'ts2dt' ? '输入时间戳...' : 'YYYY-MM-DD HH:mm:ss'}
+            placeholder={
+              mode === 'ts2dt' ? t('timestamp:placeholderTs') : t('timestamp:placeholderDate')
+            }
             value={mode === 'ts2dt' ? tsInput : dtInput}
             onChange={(e) => {
               const val = e.target.value;
@@ -144,7 +148,7 @@ export default function Index() {
                     boxShadow: unit === u ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
                   }}
                 >
-                  {u === 'ms' ? '毫秒 (ms)' : '秒 (s)'}
+                  {u === 'ms' ? t('timestamp:unitMs') : t('timestamp:unitS')}
                 </Box>
               ))}
             </Box>
@@ -171,7 +175,7 @@ export default function Index() {
 
         {/* Main Action */}
         <Button fullWidth variant="contained" onClick={convert}>
-          立即转换
+          {t('timestamp:convertButton')}
         </Button>
 
         {/* Result View */}

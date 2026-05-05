@@ -83,6 +83,8 @@ export interface StorageSchema {
   'qrCode/urlExpanded': boolean;
   /** 搜索历史记录 */
   'app/searchHistory': string[];
+  /** 语言偏好设置 */
+  'app/language': string;
 }
 
 /**

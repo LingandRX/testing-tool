@@ -4,11 +4,13 @@ import DashboardCard from '@/components/DashboardCard';
 import { getFeatureByKey } from '@/config/features';
 import type { PageType } from '@/types/storage';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { dashboardPageStyles } from '@/config/pageTheme';
 
 export default function DashboardPage() {
   const { navigateTo, visiblePages, pageOrder } = useRouter();
+  const { t } = useTranslation(['features']);
 
   const isVisible = (key: string) => visiblePages.includes(key as PageType);
 
@@ -39,8 +41,8 @@ export default function DashboardPage() {
 
         // 适配 DashboardCard 组件，将 themeColor 映射到 colorCode
         const cardConfig = {
-          title: feature.label,
-          description: feature.description,
+          title: t(feature.labelKey),
+          description: t(feature.descriptionKey),
           colorCode: feature.themeColor,
           icon: feature.icon,
         };

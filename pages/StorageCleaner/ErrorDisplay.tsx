@@ -1,11 +1,13 @@
 import { Box, Container, Typography } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
+import { useTranslation } from 'react-i18next';
 
 interface ErrorDisplayProps {
   error: string;
 }
 
 export default function ErrorDisplay({ error }: ErrorDisplayProps) {
+  const { t } = useTranslation(['storageCleaner']);
   return (
     <Container
       sx={{
@@ -53,7 +55,7 @@ export default function ErrorDisplay({ error }: ErrorDisplayProps) {
               lineHeight: 1.4,
             }}
           >
-            存储清理功能仅适用于标准网页
+            {t('storageCleaner:errorStandardOnly')}
           </Typography>
         </Box>
       </Box>

@@ -1,6 +1,7 @@
 import { Box, Checkbox, Typography } from '@mui/material';
 import { formatSize } from '@/utils/storageCleaner';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
+import { useTranslation } from 'react-i18next';
 
 interface OptionItemProps {
   label: string;
@@ -17,6 +18,7 @@ export default function OptionItem({
   isCount = false,
   onChange,
 }: OptionItemProps) {
+  const { t } = useTranslation(['storageCleaner']);
   return (
     <Box
       sx={{
@@ -67,7 +69,7 @@ export default function OptionItem({
               opacity: 0.8,
             }}
           >
-            {isCount ? `${size} 个` : formatSize(size)}
+            {isCount ? `${size} ${t('storageCleaner:countUnit')}` : formatSize(size)}
           </Typography>
         ) : (
           <Typography
@@ -82,7 +84,7 @@ export default function OptionItem({
               fontStyle: 'italic',
             }}
           >
-            无数据
+            {t('storageCleaner:noData')}
           </Typography>
         )}
       </Box>

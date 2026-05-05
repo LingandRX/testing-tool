@@ -19,12 +19,15 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import SearchIcon from '@mui/icons-material/Search';
 import HistoryIcon from '@mui/icons-material/History';
 import CloseIcon from '@mui/icons-material/Close';
+import LanguageIcon from '@mui/icons-material/Language';
 import { useRouter } from '@/providers/RouterProvider';
 import { FEATURES, FeatureConfig } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
+import { useTranslation } from 'react-i18next';
 
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
+  const { t, i18n } = useTranslation(['common', 'features']);
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -42,12 +45,13 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase();
-    return FEATURES.filter(
-      (f) =>
-        f.key !== 'dashboard' &&
-        (f.label.toLowerCase().includes(query) || f.description.toLowerCase().includes(query)),
-    );
-  }, [searchQuery]);
+    return FEATURES.filter((f) => {
+      if (f.key === 'dashboard') return false;
+      const label = t(f.labelKey).toLowerCase();
+      const desc = t(f.descriptionKey).toLowerCase();
+      return label.includes(query) || desc.includes(query);
+    });
+  }, [searchQuery, t]);
 
   const displayedHistory = useMemo(() => {
     if (searchQuery.trim()) return [];
@@ -74,9 +78,14 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
 
   const handleSelectFeature = (feature: FeatureConfig) => {
     navigateTo(feature.key);
-    saveToHistory(feature.label);
+    saveToHistory(t(feature.labelKey));
     setSearchQuery('');
     setShowResults(false);
+  };
+
+  const toggleLanguage = () => {
+    const newLng = i18n.language.startsWith('zh') ? 'en' : 'zh';
+    i18n.changeLanguage(newLng);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -127,7 +136,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           <IconButton
             size="small"
             onClick={goBack}
-            aria-label="返回"
+            aria-label={t('common:back')}
             sx={{
               bgcolor: 'grey.50',
               '&:hover': { bgcolor: 'grey.200' },
@@ -138,17 +147,32 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         )}
       </Box>
 
+      <Typography
+        variant="subtitle2"
+        sx={{
+          fontWeight: 800,
+          letterSpacing: '0.5px',
+          textTransform: 'uppercase',
+          fontSize: '0.75rem',
+          color: 'text.secondary',
+          ml: 1,
+          display: { xs: 'none', md: 'block' },
+        }}
+      >
+        Testing Tools
+      </Typography>
+
       <Box sx={{ flex: 1, mx: { xs: 1, sm: 2 }, position: 'relative', maxWidth: 400 }}>
         <ClickAwayListener onClickAway={() => setShowResults(false)}>
           <Box>
             <InputBase
               ref={inputRef}
-              placeholder="搜索工具..."
+              placeholder={t('common:search')}
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={() => setShowResults(true)}
               onKeyDown={handleKeyDown}
-              inputProps={{ 'aria-label': '搜索工具' }}
+              inputProps={{ 'aria-label': t('common:search') }}
               startAdornment={<SearchIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />}
               endAdornment={
                 searchQuery && (
@@ -158,7 +182,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                       setSearchQuery('');
                       setSelectedIndex(-1);
                     }}
-                    aria-label="清除搜索"
+                    aria-label={t('common:clearSearch')}
                   >
                     <CloseIcon sx={{ fontSize: 16 }} />
                   </IconButton>
@@ -211,8 +235,8 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                         >
                           <ListItemIcon sx={{ minWidth: 40 }}>{feature.icon}</ListItemIcon>
                           <ListItemText
-                            primary={feature.label}
-                            secondary={feature.description}
+                            primary={t(feature.labelKey)}
+                            secondary={t(feature.descriptionKey)}
                             primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
                             secondaryTypographyProps={{ variant: 'caption', noWrap: true }}
                           />
@@ -221,7 +245,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                     ) : (
                       <Box sx={{ py: 3, textAlign: 'center' }}>
                         <Typography variant="body2" color="text.secondary">
-                          未找到相关工具
+                          {t('common:noResults')}
                         </Typography>
                       </Box>
                     )
@@ -229,7 +253,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                     <>
                       <Box sx={{ px: 2, py: 1 }}>
                         <Typography variant="caption" fontWeight={700} color="text.disabled">
-                          最近搜索
+                          {t('common:recentSearch')}
                         </Typography>
                       </Box>
                       {displayedHistory.map((item, index) => (
@@ -264,15 +288,20 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
       <Stack
         direction="row"
         spacing={0.5}
-        sx={{ width: { xs: 72, sm: 120 }, justifyContent: 'flex-end' }}
+        sx={{ width: { xs: 100, sm: 150 }, justifyContent: 'flex-end' }}
       >
-        <Tooltip title="在标签页打开">
-          <IconButton size="small" onClick={handleOpenInTab} aria-label="在标签页打开">
+        <Tooltip title={t('common:toggleLanguage')}>
+          <IconButton size="small" onClick={toggleLanguage} aria-label={t('common:toggleLanguage')}>
+            <LanguageIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t('common:openInTab')}>
+          <IconButton size="small" onClick={handleOpenInTab} aria-label={t('common:openInTab')}>
             <OpenInNewIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
-        <Tooltip title="设置">
-          <IconButton size="small" onClick={onOpenOptions} aria-label="设置">
+        <Tooltip title={t('common:settings')}>
+          <IconButton size="small" onClick={onOpenOptions} aria-label={t('common:settings')}>
             <SettingsIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>

@@ -4,6 +4,7 @@ import PageHeader from '@/components/PageHeader';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
 import { textStatisticsPageStyles } from '@/config/pageTheme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * 文本统计页面组件
@@ -11,6 +12,7 @@ import { textStatisticsPageStyles } from '@/config/pageTheme';
  * 提供实时的文本分析功能，包括字符数、单词数、行数和字节大小。
  */
 export default function Index() {
+  const { t } = useTranslation(['textStatistics']);
   const [text, setText] = useState('');
 
   // 实时计算统计信息，使用 useMemo 优化性能
@@ -18,10 +20,10 @@ export default function Index() {
   const stats = useMemo(() => getTextStats(text), [text]);
 
   const statItems = [
-    { label: '字符数', value: stats.characters },
-    { label: '单词数', value: stats.words },
-    { label: '行数', value: stats.lines },
-    { label: '字节大小', value: formatByteSize(stats.bytes) },
+    { label: t('textStatistics:characters'), value: stats.characters },
+    { label: t('textStatistics:words'), value: stats.words },
+    { label: t('textStatistics:lines'), value: stats.lines },
+    { label: t('textStatistics:bytes'), value: formatByteSize(stats.bytes) },
   ];
 
   return (
@@ -29,8 +31,8 @@ export default function Index() {
       <Container sx={{ p: 2 }}>
         {/* 头部区域 */}
         <PageHeader
-          title="文本统计"
-          subtitle="实时分析文本的字符、单词、行数及字节大小"
+          title={t('textStatistics:pageTitle')}
+          subtitle={t('textStatistics:pageSubtitle')}
           icon={<DescriptionIcon />}
           iconColor={textStatisticsPageStyles.primaryColor}
         />
@@ -41,7 +43,7 @@ export default function Index() {
           fullWidth
           minRows={8}
           maxRows={15}
-          placeholder="在此输入或粘贴文本..."
+          placeholder={t('textStatistics:placeholder')}
           value={text}
           onChange={(e) => setText(e.target.value)}
           sx={{
@@ -68,9 +70,9 @@ export default function Index() {
         />
 
         {/* 统计结果展示区域 */}
-        <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center' }}>
+        <Grid container spacing={2}>
           {statItems.map((item) => (
-            <Grid sx={{ xs: 12, md: 3 }} key={item.label}>
+            <Grid size={{ xs: 12, md: 3 }} key={item.label}>
               <Paper
                 elevation={0}
                 sx={{

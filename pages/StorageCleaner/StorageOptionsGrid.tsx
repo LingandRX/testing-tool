@@ -1,6 +1,7 @@
 import { Box, Checkbox, Divider, Grid, Typography } from '@mui/material';
 import type { StorageCleanerOptions } from '@/types/storage';
 import OptionItem from './OptionItem';
+import { useTranslation } from 'react-i18next';
 
 interface StorageOptionsGridProps {
   options: StorageCleanerOptions;
@@ -19,6 +20,7 @@ export default function StorageOptionsGrid({
   onOptionChange,
   onSelectAll,
 }: StorageOptionsGridProps) {
+  const { t } = useTranslation(['storageCleaner']);
   return (
     <Box
       sx={{
@@ -110,7 +112,7 @@ export default function StorageOptionsGrid({
           fontWeight={700}
           sx={{ color: 'text.secondary', fontSize: '0.7rem', px: 0 }}
         >
-          全选所有项
+          {t('storageCleaner:selectAll')}
         </Typography>
         <Checkbox
           size="small"

@@ -21,6 +21,7 @@ import CopyButton from '@/components/CopyButton';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
+import { useTranslation } from 'react-i18next';
 
 interface QrCodeToUrlSectionProps {
   expanded: boolean;
@@ -33,6 +34,7 @@ const QrCodeToUrlSection = ({
   onExpandedChange,
   showMessage,
 }: QrCodeToUrlSectionProps) => {
+  const { t } = useTranslation(['qrCode']);
   const [qrCodeFile, setQrCodeFile] = useState<File | null>(null);
   const [parsedUrl, setParsedUrl] = useState('');
   const [parseError, setParseError] = useState('');
@@ -73,7 +75,7 @@ const QrCodeToUrlSection = ({
 
   const parseQrCode = async () => {
     if (!qrCodeFile) {
-      showMessage('请选择二维码图片', { severity: 'error', autoHideDuration: 300 });
+      showMessage(t('qrCode:selectImage'), { severity: 'error', autoHideDuration: 300 });
       return;
     }
 
@@ -86,16 +88,16 @@ const QrCodeToUrlSection = ({
 
       if (result.success && result.data) {
         setParsedUrl(result.data);
-        showMessage('二维码解析成功', { severity: 'success', autoHideDuration: 1000 });
+        showMessage(t('qrCode:parseSuccess'), { severity: 'success', autoHideDuration: 1000 });
       } else {
-        showMessage(result.error || '未检测到二维码', {
+        showMessage(result.error || t('qrCode:noQrDetected'), {
           severity: 'error',
           autoHideDuration: 1000,
         });
       }
     } catch (error) {
       console.error('解析二维码失败:', error);
-      showMessage('解析二维码失败，请重试', { severity: 'error', autoHideDuration: 300 });
+      showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
     } finally {
       setParsing(false);
     }
@@ -117,10 +119,13 @@ const QrCodeToUrlSection = ({
           if (file) {
             try {
               handleFileChange(file);
-              showMessage('图片粘贴成功', { severity: 'success', autoHideDuration: 1000 });
+              showMessage(t('qrCode:imagePasted'), { severity: 'success', autoHideDuration: 1000 });
             } catch (error) {
               console.error('处理粘贴图片失败:', error);
-              showMessage('粘贴图片失败，请重试', { severity: 'error', autoHideDuration: 3000 });
+              showMessage(t('qrCode:imagePasteError'), {
+                severity: 'error',
+                autoHideDuration: 3000,
+              });
             }
           }
           break;
@@ -133,7 +138,7 @@ const QrCodeToUrlSection = ({
     return () => {
       document.removeEventListener('paste', handlePaste);
     };
-  }, [expanded, showMessage, handleFileChange]);
+  }, [expanded, showMessage, handleFileChange, t]);
 
   return (
     <Accordion
@@ -149,7 +154,7 @@ const QrCodeToUrlSection = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <LinkIcon color="success" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            二维码转 URL
+            {t('qrCode:qrToUrl')}
           </Typography>
         </Box>
       </AccordionSummary>
@@ -220,7 +225,7 @@ const QrCodeToUrlSection = ({
                         setQrCodeFile(null);
                         setParsedUrl('');
                         setParseError('');
-                        showMessage('图片已清除', {
+                        showMessage(t('qrCode:imageCleared'), {
                           severity: 'success',
                           autoHideDuration: 1000,
                         });
@@ -243,17 +248,17 @@ const QrCodeToUrlSection = ({
                     {qrCodeFile.name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    点击更换图片
+                    {t('qrCode:clickToChange')}
                   </Typography>
                 </Box>
               ) : (
                 <>
                   <ImageIcon sx={{ fontSize: 48, color: 'grey.300', mb: 2 }} />
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    点击、拖拽或粘贴上传二维码图片
+                    {t('qrCode:clickToUpload')}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    支持 PNG、JPG、WEBP 格式
+                    {t('qrCode:supportFormats')}
                   </Typography>
                 </>
               )}
@@ -275,7 +280,7 @@ const QrCodeToUrlSection = ({
               },
             }}
           >
-            {parsing ? '解析中...' : '解析二维码'}
+            {parsing ? t('qrCode:parsing') : t('qrCode:parseButton')}
           </Button>
 
           <Box
@@ -285,7 +290,7 @@ const QrCodeToUrlSection = ({
             }}
           >
             <TextField
-              label="解析结果"
+              label={t('qrCode:resultLabel')}
               value={parsedUrl}
               fullWidth
               variant="outlined"
@@ -296,7 +301,7 @@ const QrCodeToUrlSection = ({
                     <InputAdornment position="end">
                       <CopyButton
                         text={parsedUrl}
-                        tooltip="复制"
+                        tooltip={t('qrCode:copyTooltip')}
                         size="small"
                         color={qrCodePageStyles.primaryColor}
                         showMessage={showMessage}

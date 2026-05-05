@@ -375,39 +375,38 @@ export async function clearStorage(
 
   if (failures.length > 0) {
     result.success = false;
-    result.error = '部分清理失败';
   }
 
   return result;
 }
 
-export function formatCleaningResult(result: CleaningResult): string {
+export function formatCleaningResult(
+  result: CleaningResult,
+  t: (key: string, options?: unknown) => string,
+): string {
   const parts: string[] = [];
 
-  if (result.localStorage?.success) {
-    parts.push(`${result.localStorage.count} 个 localStorage`);
-  }
-  if (result.sessionStorage?.success) {
-    parts.push(`${result.sessionStorage.count} 个 sessionStorage`);
-  }
-  if (result.indexedDB?.success) {
-    parts.push(`${result.indexedDB.count} 个 IndexedDB`);
-  }
-  if (result.cookies?.success) {
-    parts.push(`${result.cookies.count} 个 Cookies`);
-  }
-  if (result.cacheStorage?.success) {
-    parts.push(`${result.cacheStorage.count} 个 Cache`);
-  }
-  if (result.serviceWorkers?.success) {
-    parts.push(`${result.serviceWorkers.count} 个 Service Workers`);
+  const optionKeys: (keyof StorageCleanerOptions)[] = [
+    'localStorage',
+    'sessionStorage',
+    'indexedDB',
+    'cookies',
+    'cacheStorage',
+    'serviceWorkers',
+  ];
+
+  for (const key of optionKeys) {
+    const r = result[key];
+    if (r?.success && r.count > 0) {
+      parts.push(`${r.count} ${t(`storageCleaner:options.${key}`)}`);
+    }
   }
 
   if (parts.length === 0) {
-    return '该页面没有可清理的存储数据';
+    return t('storageCleaner:noDataToClean');
   }
 
-  return `清理了 ${parts.join(', ')}`;
+  return t('storageCleaner:cleanedSummary', { items: parts.join(', ') });
 }
 
 export function isEmptyResult(result: CleaningResult): boolean {

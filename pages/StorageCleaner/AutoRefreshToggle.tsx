@@ -1,4 +1,5 @@
 import { Box, Switch, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface AutoRefreshToggleProps {
   autoRefresh: boolean;
@@ -6,6 +7,7 @@ interface AutoRefreshToggleProps {
 }
 
 export default function AutoRefreshToggle({ autoRefresh, onChange }: AutoRefreshToggleProps) {
+  const { t } = useTranslation(['storageCleaner']);
   return (
     <Box
       sx={{
@@ -26,7 +28,7 @@ export default function AutoRefreshToggle({ autoRefresh, onChange }: AutoRefresh
       }}
     >
       <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.8rem', px: 1.2 }}>
-        清理后自动刷新页面
+        {t('storageCleaner:autoRefresh')}
       </Typography>
       <Switch
         size="small"

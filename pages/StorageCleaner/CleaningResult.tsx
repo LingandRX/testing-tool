@@ -1,12 +1,14 @@
 import { Alert, Box } from '@mui/material';
 import type { CleaningResult } from '@/types/storage';
 import { formatCleaningResult } from '@/utils/storageCleaner';
+import { useTranslation } from 'react-i18next';
 
 interface CleaningResultProps {
   result: CleaningResult | null;
 }
 
 export default function CleaningResult({ result }: CleaningResultProps) {
+  const { t } = useTranslation(['storageCleaner']);
   if (!result) return null;
 
   return (
@@ -29,7 +31,9 @@ export default function CleaningResult({ result }: CleaningResultProps) {
           },
         }}
       >
-        {result.success ? formatCleaningResult(result) : result.error || '清理失败'}
+        {result.success
+          ? formatCleaningResult(result, t as unknown as (key: string, options?: unknown) => string)
+          : result.error || t('storageCleaner:partialFailure')}
       </Alert>
     </Box>
   );

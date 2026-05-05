@@ -18,6 +18,7 @@ import {
   isRestrictedUrl,
 } from '@/utils/storageCleaner';
 import { MessageAction, sendMessage } from '@/utils/messages';
+import { useTranslation } from 'react-i18next';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
   localStorage: true,
@@ -65,6 +66,7 @@ export interface UseStorageCleanerOptions {
 export function useStorageCleaner({
   showMessage,
 }: UseStorageCleanerOptions): UseStorageCleanerReturn {
+  const { t } = useTranslation(['storageCleaner', 'common']);
   const [domain, setDomain] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
@@ -93,11 +95,11 @@ export function useStorageCleaner({
       if (currentRequestId !== requestIdRef.current) return;
 
       if (!tab || !tab.url) {
-        setError('无法获取当前标签页');
+        setError(t('storageCleaner:errorNoTab'));
         return;
       }
       if (isRestrictedUrl(tab.url)) {
-        setError('存储清理功能不支持此页面');
+        setError(t('storageCleaner:errorRestricted'));
         return;
       }
 
@@ -136,7 +138,7 @@ export function useStorageCleaner({
         setIsInitializing(false);
       }
     }
-  }, []);
+  }, [t]);
 
   const loadInfoRef = useRef(loadInfo);
   loadInfoRef.current = loadInfo;
@@ -225,7 +227,7 @@ export function useStorageCleaner({
     }
     const tab = await getCurrentTab();
     if (!tab || !tab.id || !tab.url) {
-      showMessage('无法获取当前标签页', { severity: 'warning' });
+      showMessage(t('storageCleaner:errorNoTab'), { severity: 'warning' });
       return;
     }
     setLoading(true);
@@ -234,18 +236,18 @@ export function useStorageCleaner({
       setResult(cleaningResult);
 
       if (autoRefresh && cleaningResult.success) {
-        showMessage('清理成功，即将刷新页面', { severity: 'success' });
+        showMessage(t('storageCleaner:cleanSuccessReload'), { severity: 'success' });
         await sendMessage(MessageAction.RELOAD_TAB, { tabId: tab.id, delay: 1000 });
       } else {
         await loadInfo();
       }
     } catch (err) {
-      showMessage(`清理失败: ${String(err)}`, { severity: 'error' });
+      showMessage(`${t('common:messages.copyError')}: ${String(err)}`, { severity: 'error' });
     } finally {
       setLoading(false);
       setShowConfirm(false);
     }
-  }, [loading, options, autoRefresh, showMessage, loadInfo]);
+  }, [loading, options, autoRefresh, showMessage, loadInfo, t]);
 
   const totalSize = (sizes.cookies || 0) + (sizes.indexedDB || 0);
 

@@ -1,0 +1,22 @@
+{
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "copy": "Copy",
+    "clear": "Clear",
+    "refresh": "Refresh",
+    "toggleLanguage": "Switch Language",
+    "search": "Search tools...",
+    "back": "Back",
+    "clearSearch": "Clear search",
+    "recentSearch": "Recent search",
+    "noResults": "No tools found",
+    "openInTab": "Open in tab",
+    "settings": "Settings"
+  },
+  "messages": {
+    "copySuccess": "Copied to clipboard",
+    "copyError": "Copy failed"
+  }
+}

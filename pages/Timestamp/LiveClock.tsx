@@ -5,6 +5,7 @@ import CopyButton from '@/components/CopyButton';
 import type { UnitType } from '@/config/pageTheme';
 import { timestampPageStyles } from '@/config/pageTheme';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
+import { useTranslation } from 'react-i18next';
 
 interface LiveClockProps {
   unit: UnitType;
@@ -15,6 +16,7 @@ interface LiveClockProps {
 
 const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: LiveClockProps) => {
   const [now, setNow] = useState(() => Date.now());
+  const { t } = useTranslation(['timestamp']);
   const onUseNowRef = useRef(onUseNow);
   const showMessageRef = useRef(showMessage);
 
@@ -35,8 +37,8 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
 
   const handleUseNow = useCallback(() => {
     onUseNowRef.current(now);
-    showMessageRef.current?.('已使用当前时间戳', { severity: 'success' });
-  }, [now, showMessageRef]);
+    showMessageRef.current?.(t('timestamp:usedSuccess'), { severity: 'success' });
+  }, [now, showMessageRef, t]);
 
   return (
     <Box
@@ -65,7 +67,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
             letterSpacing: 1,
           }}
         >
-          当前时间戳
+          {t('timestamp:currentTs')}
         </Typography>
         <Typography
           variant="subtitle2"
@@ -123,7 +125,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
         />
 
         <Stack direction="row" spacing={0.5}>
-          <Tooltip title="填充到下方">
+          <Tooltip title={t('timestamp:useNowTooltip')}>
             <IconButton
               size="small"
               onClick={handleUseNow}
@@ -139,7 +141,7 @@ const LiveClock = React.memo(({ unit, onUseNow, onUnitChange, showMessage }: Liv
           </Tooltip>
           <CopyButton
             text={displayVal}
-            tooltip="复制时间戳"
+            tooltip={t('timestamp:copyTsTooltip')}
             size="small"
             color={timestampPageStyles.primaryColor}
             showMessage={showMessage}

@@ -16,13 +16,13 @@ describe('features', () => {
     it('should have all required properties for each feature', () => {
       FEATURES.forEach((feature) => {
         expect(feature).toHaveProperty('key');
-        expect(feature).toHaveProperty('label');
-        expect(feature).toHaveProperty('description');
+        expect(feature).toHaveProperty('labelKey');
+        expect(feature).toHaveProperty('descriptionKey');
         expect(feature).toHaveProperty('defaultVisible');
         expect(feature).toHaveProperty('components');
         expect(typeof feature.key).toBe('string');
-        expect(typeof feature.label).toBe('string');
-        expect(typeof feature.description).toBe('string');
+        expect(typeof feature.labelKey).toBe('string');
+        expect(typeof feature.descriptionKey).toBe('string');
         expect(typeof feature.defaultVisible).toBe('boolean');
         expect(typeof feature.components).toBe('object');
         expect(feature.components).toHaveProperty('popup');
@@ -50,14 +50,14 @@ describe('features', () => {
       const feature = getFeatureByKey('dashboard');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('dashboard');
-      expect(feature?.label).toBe('Dashboard');
+      expect(feature?.labelKey).toBe('features:dashboard.title');
     });
 
     it('should return timestamp feature', () => {
       const feature = getFeatureByKey('timestamp');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('timestamp');
-      expect(feature?.label).toBe('时间戳');
+      expect(feature?.labelKey).toBe('features:timestamp.title');
       expect(feature?.themeColor).toBeDefined();
     });
 
@@ -65,7 +65,7 @@ describe('features', () => {
       const feature = getFeatureByKey('storageCleaner');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('storageCleaner');
-      expect(feature?.label).toBe('存储清理');
+      expect(feature?.labelKey).toBe('features:storageCleaner.title');
     });
 
     it('should return undefined for invalid key', () => {

@@ -7,6 +7,7 @@ import PageHeader from '@/components/PageHeader';
 import { jwtPageStyles } from '@/config/pageTheme';
 import { formatJson, parseJwt } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
+import { useTranslation } from 'react-i18next';
 
 interface SectionProps {
   title: string;
@@ -15,47 +16,51 @@ interface SectionProps {
   color: string;
 }
 
-const Section = ({ title, content, color }: SectionProps) => (
-  <Paper
-    variant="outlined"
-    sx={{
-      p: 2,
-      borderRadius: 3,
-      borderColor: `${color}40`,
-      bgcolor: `${color}05`,
-      position: 'relative',
-    }}
-  >
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: color, letterSpacing: 0.5 }}>
-        {title}
-      </Typography>
-      <Box sx={{ display: 'flex', gap: 0.5 }}>
-        <CopyButton text={JSON.stringify(content)} size="small" />
-      </Box>
-    </Box>
-    <Box
-      component="pre"
+const Section = ({ title, content, color }: SectionProps) => {
+  const { t } = useTranslation(['jwt']);
+  return (
+    <Paper
+      variant="outlined"
       sx={{
-        m: 0,
-        p: 1.5,
-        bgcolor: 'rgba(255,255,255,0.6)',
-        borderRadius: 2,
-        fontSize: '0.8rem',
-        fontFamily: 'monospace',
-        overflowX: 'auto',
-        whiteSpace: 'pre-wrap',
-        wordBreak: 'break-all',
-        border: '1px solid rgba(0,0,0,0.05)',
+        p: 2,
+        borderRadius: 3,
+        borderColor: `${color}40`,
+        bgcolor: `${color}05`,
+        position: 'relative',
       }}
     >
-      {content ? formatJson(content) : '无法解析'}
-    </Box>
-  </Paper>
-);
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: color, letterSpacing: 0.5 }}>
+          {title}
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <CopyButton text={JSON.stringify(content)} size="small" />
+        </Box>
+      </Box>
+      <Box
+        component="pre"
+        sx={{
+          m: 0,
+          p: 1.5,
+          bgcolor: 'rgba(255,255,255,0.6)',
+          borderRadius: 2,
+          fontSize: '0.8rem',
+          fontFamily: 'monospace',
+          overflowX: 'auto',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-all',
+          border: '1px solid rgba(0,0,0,0.05)',
+        }}
+      >
+        {content ? formatJson(content) : t('jwt:invalidFormat')}
+      </Box>
+    </Paper>
+  );
+};
 
 export default function Index() {
   useSnackbar();
+  const { t } = useTranslation(['jwt']);
   const [jwtInput, setJwtInput] = useState('');
 
   const result = useMemo(() => {
@@ -68,14 +73,18 @@ export default function Index() {
   return (
     <Box>
       <Container sx={{ p: 2 }}>
-        <PageHeader title="JWT 解析" subtitle="JSON Web Token 解码与查看" icon={<VpnKeyIcon />} />
+        <PageHeader
+          title={t('jwt:pageTitle')}
+          subtitle={t('jwt:pageSubtitle')}
+          icon={<VpnKeyIcon />}
+        />
 
         <Stack spacing={2.5}>
           {/* Input Area */}
           <TextField
             multiline
             rows={4}
-            placeholder="在此粘贴 JWT 令牌 (Encoded JWT)..."
+            placeholder={t('jwt:placeholder')}
             value={jwtInput}
             onChange={(e) => {
               // 自动去除 Bearer 前缀及首尾空白字符/换行
@@ -110,13 +119,13 @@ export default function Index() {
           {result && !result.error && (
             <Stack spacing={2}>
               <Section
-                title="HEADER: 算法 & 令牌类型"
+                title={t('jwt:headerTitle')}
                 content={result.header}
                 raw={result.raw.header}
                 color="#fb015b" // JWT.io Header Color
               />
               <Section
-                title="PAYLOAD: 数据"
+                title={t('jwt:payloadTitle')}
                 content={result.payload}
                 raw={result.raw.payload}
                 color="#d63aff" // JWT.io Payload Color
@@ -142,7 +151,7 @@ export default function Index() {
                     variant="subtitle2"
                     sx={{ fontWeight: 800, color: '#00b9f1', letterSpacing: 0.5 }}
                   >
-                    签名
+                    {t('jwt:signatureTitle')}
                   </Typography>
                   <CopyButton text={JSON.stringify(result.raw.signature)} size="small" />
                 </Box>
@@ -159,7 +168,7 @@ export default function Index() {
                     border: '1px solid rgba(0,0,0,0.05)',
                   }}
                 >
-                  {result.signature || 'No Signature'}
+                  {result.signature || t('jwt:noSignature')}
                 </Typography>
               </Paper>
             </Stack>

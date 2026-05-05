@@ -5,6 +5,7 @@ import CopyButton from '@/components/CopyButton';
 import type { UnitType } from '@/config/pageTheme';
 import { DATE_FORMAT, timestampPageStyles } from '@/config/pageTheme';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
+import { useTranslation } from 'react-i18next';
 
 interface ResultViewProps {
   result: string;
@@ -15,6 +16,7 @@ interface ResultViewProps {
 }
 
 const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: ResultViewProps) => {
+  const { t } = useTranslation(['timestamp']);
   const extraInfo = useMemo(() => {
     if (!result) return null;
     const d =
@@ -46,7 +48,7 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
             fontSize: '0.7rem',
           }}
         >
-          转换结果
+          {t('timestamp:resultLabel')}
         </Typography>
 
         <Box
@@ -78,7 +80,7 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
           </Typography>
           <CopyButton
             text={result}
-            tooltip="复制结果"
+            tooltip={t('timestamp:copyResultTooltip')}
             size="small"
             color={timestampPageStyles.primaryColor}
             showMessage={showMessage}
@@ -96,9 +98,9 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
           }}
         >
           {[
-            { label: '相对时间', value: extraInfo?.relative },
-            { label: 'ISO 8601', value: extraInfo?.iso },
-            { label: 'UTC 时间', value: extraInfo?.utc },
+            { label: t('timestamp:relativeTime'), value: extraInfo?.relative },
+            { label: t('timestamp:iso8601'), value: extraInfo?.iso },
+            { label: t('timestamp:utcTime'), value: extraInfo?.utc },
           ].map((item) => (
             <Box
               key={item.label}
@@ -125,7 +127,7 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
                 {item.value && (
                   <CopyButton
                     text={item.value}
-                    tooltip="复制"
+                    tooltip={t('timestamp:copyTooltip')}
                     size="small"
                     color={timestampPageStyles.primaryColor}
                     showMessage={showMessage}

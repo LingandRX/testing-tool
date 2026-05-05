@@ -13,7 +13,7 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const TimestampPage = lazy(() => import('../pages/Timestamp'));
 const StorageCleanerPage = lazy(() => import('../pages/StorageCleaner'));
 const QrCodePage = lazy(() => import('../pages/QrCode'));
-const TextStatisticsPage = lazy(() => import('../pages/TextStatics'));
+const TextStatisticsPage = lazy(() => import('../pages/TextStatistics'));
 const JwtPage = lazy(() => import('../pages/Jwt'));
 
 /**
@@ -24,10 +24,10 @@ const JwtPage = lazy(() => import('../pages/Jwt'));
 export interface FeatureConfig {
   /** 页面类型标识 */
   key: PageType;
-  /** 功能名称（用于路由标签和卡片标题） */
-  label: string;
-  /** 功能描述（用于仪表盘卡片） */
-  description: string;
+  /** 功能名称翻译键 */
+  labelKey: string;
+  /** 功能描述翻译键 */
+  descriptionKey: string;
   /** 主题颜色（用于仪表盘卡片） */
   themeColor?: string;
   /** 图标组件（用于仪表盘卡片） */
@@ -48,8 +48,8 @@ export interface FeatureConfig {
 export const FEATURES: FeatureConfig[] = [
   {
     key: 'dashboard',
-    label: 'Dashboard',
-    description: '',
+    labelKey: 'features:dashboard.title',
+    descriptionKey: '',
     defaultVisible: true,
     components: {
       popup: DashboardPage,
@@ -59,8 +59,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'timestamp',
-    label: '时间戳',
-    description: 'Unix 毫秒数转换与格式化',
+    labelKey: 'features:timestamp.title',
+    descriptionKey: 'features:timestamp.description',
     themeColor: THEME_COLORS.primary,
     icon: <AccessTimeIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
@@ -72,8 +72,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'storageCleaner',
-    label: '存储清理',
-    description: '清理缓存、Cookies 及本地存储',
+    labelKey: 'features:storageCleaner.title',
+    descriptionKey: 'features:storageCleaner.description',
     themeColor: THEME_COLORS.warning,
     icon: <StorageIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
@@ -85,8 +85,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'qrCode',
-    label: '二维码工具',
-    description: '生成当前选中的 URL 的二维码',
+    labelKey: 'features:qrCode.title',
+    descriptionKey: 'features:qrCode.description',
     themeColor: THEME_COLORS.success,
     icon: <QrCodeIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
@@ -98,8 +98,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'textStatistics',
-    label: '文本统计',
-    description: '实时分析文本字符、单词及字节',
+    labelKey: 'features:textStatistics.title',
+    descriptionKey: 'features:textStatistics.description',
     themeColor: THEME_COLORS.purple,
     icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
@@ -111,8 +111,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'jwt',
-    label: 'JWT 解析',
-    description: 'JSON Web Token 解码与查看',
+    labelKey: 'features:jwt.title',
+    descriptionKey: 'features:jwt.description',
     themeColor: THEME_COLORS.indigo,
     icon: <VpnKeyIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,

@@ -1,18 +1,33 @@
 import '@testing-library/jest-dom';
 import { vi, beforeEach, afterEach } from 'vitest';
 
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      changeLanguage: vi.fn(),
+      language: 'zh-CN',
+    },
+  }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn(),
+  },
+}));
+
 const storageMock = {
   local: {
-    get: vi.fn(),
-    set: vi.fn().mockResolvedValue(undefined),
-    remove: vi.fn().mockResolvedValue(undefined),
-    clear: vi.fn().mockResolvedValue(undefined),
+    get: vi.fn().mockImplementation(() => Promise.resolve({})),
+    set: vi.fn().mockImplementation(() => Promise.resolve()),
+    remove: vi.fn().mockImplementation(() => Promise.resolve()),
+    clear: vi.fn().mockImplementation(() => Promise.resolve()),
   },
   session: {
-    get: vi.fn(),
-    set: vi.fn().mockResolvedValue(undefined),
-    remove: vi.fn().mockResolvedValue(undefined),
-    clear: vi.fn().mockResolvedValue(undefined),
+    get: vi.fn().mockImplementation(() => Promise.resolve({})),
+    set: vi.fn().mockImplementation(() => Promise.resolve()),
+    remove: vi.fn().mockImplementation(() => Promise.resolve()),
+    clear: vi.fn().mockImplementation(() => Promise.resolve()),
   },
   onChanged: {
     addListener: vi.fn(),
@@ -28,6 +43,7 @@ Object.defineProperty(global, 'chrome', {
       query: vi.fn().mockResolvedValue([]),
       get: vi.fn(),
       sendMessage: vi.fn().mockResolvedValue(undefined),
+      create: vi.fn().mockResolvedValue({}),
     },
     runtime: {
       id: 'test-extension-id',
@@ -60,6 +76,9 @@ Object.defineProperty(global, 'chrome', {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Ensure storage mocks return objects even after clearAllMocks
+  storageMock.local.get.mockResolvedValue({});
+  storageMock.session.get.mockResolvedValue({});
 });
 
 afterEach(() => {

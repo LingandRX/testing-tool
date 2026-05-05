@@ -1,0 +1,9 @@
+{
+  "pageTitle": "文本统计",
+  "pageSubtitle": "实时分析文本的字符、单词、行数及字节大小",
+  "placeholder": "在此输入或粘贴文本...",
+  "characters": "字符数",
+  "words": "单词数",
+  "lines": "行数",
+  "bytes": "字节大小"
+}

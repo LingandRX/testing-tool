@@ -17,6 +17,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import QRious from 'qrious';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
+import { useTranslation } from 'react-i18next';
 
 interface UrlToQrCodeSectionProps {
   expanded: boolean;
@@ -29,6 +30,7 @@ const UrlToQrCodeSection = ({
   onExpandedChange,
   showMessage,
 }: UrlToQrCodeSectionProps) => {
+  const { t } = useTranslation(['qrCode']);
   const [urlInput, setUrlInput] = useState('');
   const [urlError, setUrlError] = useState('');
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
@@ -41,7 +43,7 @@ const UrlToQrCodeSection = ({
 
   const generateQrCode = async () => {
     if (!urlInput) {
-      setUrlError('请输入 URL');
+      setUrlError(t('qrCode:enterUrlError'));
       return;
     }
 
@@ -64,10 +66,10 @@ const UrlToQrCodeSection = ({
       });
 
       setQrCodeDataUrl(qr.toDataURL());
-      showMessage('二维码生成成功', { severity: 'success', autoHideDuration: 1000 });
+      showMessage(t('qrCode:qrCodeSuccess'), { severity: 'success', autoHideDuration: 1000 });
     } catch (error) {
       console.error('生成二维码失败:', error);
-      showMessage('生成二维码失败，请重试', { severity: 'error', autoHideDuration: 300 });
+      showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
     } finally {
       setGenerating(false);
     }
@@ -80,7 +82,7 @@ const UrlToQrCodeSection = ({
     link.href = qrCodeDataUrl;
     link.download = 'qrcode.png';
     link.click();
-    showMessage('二维码下载成功', { severity: 'success', autoHideDuration: 300 });
+    showMessage(t('qrCode:qrCodeDownloadSuccess'), { severity: 'success', autoHideDuration: 300 });
   };
 
   const copyQrCode = async () => {
@@ -96,10 +98,10 @@ const UrlToQrCodeSection = ({
         }),
       ]);
 
-      showMessage('二维码已复制到剪贴板', { severity: 'success', autoHideDuration: 1000 });
+      showMessage(t('qrCode:qrCodeCopySuccess'), { severity: 'success', autoHideDuration: 1000 });
     } catch (error) {
       console.error('复制二维码失败:', error);
-      showMessage('复制二维码失败，请重试', { severity: 'error', autoHideDuration: 300 });
+      showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
     }
   };
 
@@ -117,15 +119,15 @@ const UrlToQrCodeSection = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <QrCodeIcon color="primary" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            URL 转二维码
+            {t('qrCode:urlToQr')}
           </Typography>
         </Box>
       </AccordionSummary>
       <AccordionDetails>
         <Stack spacing={3}>
           <TextField
-            label="输入 URL"
-            placeholder="https://example.com"
+            label={t('qrCode:urlInputLabel')}
+            placeholder={t('qrCode:urlInputPlaceholder')}
             value={urlInput}
             onChange={handleUrlInputChange}
             fullWidth
@@ -150,7 +152,7 @@ const UrlToQrCodeSection = ({
               },
             }}
           >
-            {generating ? '生成中...' : '生成二维码'}
+            {generating ? t('qrCode:generating') : t('qrCode:generateButton')}
           </Button>
 
           <Box
@@ -196,7 +198,7 @@ const UrlToQrCodeSection = ({
                       },
                     }}
                   >
-                    下载二维码
+                    {t('qrCode:downloadButton')}
                   </Button>
                   <Button
                     variant="contained"
@@ -210,13 +212,13 @@ const UrlToQrCodeSection = ({
                       },
                     }}
                   >
-                    复制二维码
+                    {t('qrCode:copyQrButton')}
                   </Button>
                 </Box>
               </Box>
             ) : (
               <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-                二维码将显示在这里
+                {t('qrCode:qrCodeWillShow')}
               </Typography>
             )}
           </Box>
