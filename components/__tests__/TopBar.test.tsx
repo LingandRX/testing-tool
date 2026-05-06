@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import TopBar from '../TopBar';
+import TopBar from '@/components/TopBar';
 import { RouterProvider } from '@/providers/RouterProvider';
 import type { PageType } from '@/types/storage';
 import React from 'react';

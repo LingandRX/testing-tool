@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import RouterContainer from '../RouterContainer';
+import RouterContainer from '@/components/RouterContainer';
 import { RouterProvider } from '@/providers/RouterProvider';
 import { SnackbarProvider } from '@/components/GlobalSnackbar';
 import type { PageType } from '@/types/storage';

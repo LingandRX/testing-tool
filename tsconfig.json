@@ -33,13 +33,14 @@
     "entrypoints/**/*",
     "pages/**/*",
     "components/**/*",
+    "providers/**/*",
     "utils/**/*",
+    "config/**/*",
     "types/**/*",
     "assets/**/*",
     "hooks/**/*",
     ".wxt/types/**/*.ts",
     ".wxt/types/*.d.ts",
-    "components",
     "eslint.config.ts"
   ],
   "exclude": ["node_modules", ".wxt", "dist"]

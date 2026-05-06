@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
-import { copyToClipboard } from '@/utils/clipboard';
+import { copyTextToClipboard } from '@/utils/clipboard';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
 /**
@@ -45,11 +45,15 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
 
   const handleCopy = async () => {
     if (text) {
-      const success = await copyToClipboard(text, showMessage);
-      if (success) {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      }
+      await copyTextToClipboard(text)
+        .then(() => {
+          showMessage?.('复制成功', { severity: 'success' });
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        })
+        .catch(() => {
+          showMessage?.('复制失败', { severity: 'error' });
+        });
     } else {
       showMessage?.('无内容可复制', { severity: 'error' });
     }

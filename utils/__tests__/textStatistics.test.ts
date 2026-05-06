@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatByteSize, getTextStats } from '../textStatistics';
+import { formatByteSize, getTextStats } from '@/utils/textStatistics';
 
 describe('textStatistics utils', () => {
   describe('getTextStats', () => {

@@ -1,8 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
-import { RouterProvider, useRouter } from '../RouterProvider';
+import { RouterProvider, useRouter } from '@/providers/RouterProvider';
 import { storageUtil } from '@/utils/chromeStorage';
-import React from 'react';
 
 // Mock storageUtil
 vi.mock('@/utils/chromeStorage', () => ({
@@ -43,7 +42,7 @@ describe('RouterProvider', () => {
   });
 
   it('应该使用默认值初始化路由', async () => {
-    (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) =>
+    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: any) =>
       Promise.resolve(defaultValue),
     );
 
@@ -76,7 +75,7 @@ describe('RouterProvider', () => {
   });
 
   it('导航时应该更新指定的 syncKey', async () => {
-    (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) =>
+    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: any) =>
       Promise.resolve(defaultValue),
     );
 

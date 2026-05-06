@@ -7,7 +7,7 @@ import {
   SnackbarProvider,
   useSnackbar,
   useSnackbarState,
-} from '../GlobalSnackbar';
+} from '@/components/GlobalSnackbar';
 
 describe('GlobalSnackbar 组件系统', () => {
   const mockOnClose = vi.fn();

@@ -10,11 +10,11 @@ import { THEME_COLORS } from './pageTheme';
 
 // 懒加载页面组件
 const DashboardPage = lazy(() => import('@/pages/Dashboard'));
-const TimestampPage = lazy(() => import('../pages/Timestamp'));
-const StorageCleanerPage = lazy(() => import('../pages/StorageCleaner'));
-const QrCodePage = lazy(() => import('../pages/QrCode'));
-const TextStatisticsPage = lazy(() => import('../pages/TextStatistics'));
-const JwtPage = lazy(() => import('../pages/Jwt'));
+const TimestampPage = lazy(() => import('@/pages/Timestamp'));
+const StorageCleanerPage = lazy(() => import('@/pages/StorageCleaner'));
+const QrCodePage = lazy(() => import('@/pages/QrCode'));
+const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
+const JwtPage = lazy(() => import('@/pages/Jwt'));
 
 /**
  * 功能配置接口

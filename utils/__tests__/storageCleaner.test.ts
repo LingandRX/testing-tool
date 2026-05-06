@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatSize, isRestrictedUrl } from '../storageCleaner';
+import { formatSize, isRestrictedUrl } from '@/utils/storageCleaner';
 
 describe('storageCleaner utils', () => {
   describe('isRestrictedUrl', () => {

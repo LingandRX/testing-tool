@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import {
   alpha,
   Box,
@@ -179,7 +179,7 @@ export default function App() {
     }
   };
 
-  const handleWindowTypeChange = (_event: React.SyntheticEvent, newType: WindowType) => {
+  const handleWindowTypeChange = (_event: SyntheticEvent, newType: WindowType) => {
     if (newType !== null) {
       setWindowType(newType);
     }
@@ -188,6 +188,16 @@ export default function App() {
   const showToast = (message: string, severity: 'success' | 'info' | 'warning') => {
     showMessage(message, { severity });
   };
+
+  if (!isLoaded) {
+    return (
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}
+      >
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
 
   return (
     <Box

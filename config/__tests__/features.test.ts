@@ -5,7 +5,7 @@ import {
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
   getFeatureByKey,
-} from '../features';
+} from '@/config/features';
 
 describe('features', () => {
   describe('FEATURES', () => {
