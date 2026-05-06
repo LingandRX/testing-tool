@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CloseIcon from '@mui/icons-material/Close';
 import { render, screen } from '@testing-library/react';
-import PageHeader, { type PageHeaderProps } from '../PageHeader';
+import PageHeader, { type PageHeaderProps } from '@/components/PageHeader';
 
 describe('PageHeader 组件系统', () => {
   beforeEach(() => {

@@ -81,6 +81,10 @@ export interface StorageSchema {
   'qrCode/qrExpanded': boolean;
   /** 二维码工具中 URL 部分是否展开 */
   'qrCode/urlExpanded': boolean;
+  /** 搜索历史记录 */
+  'app/searchHistory': string[];
+  /** 语言偏好设置 */
+  'app/language': string;
 }
 
 /**

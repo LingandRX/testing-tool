@@ -1,0 +1,33 @@
+{
+  "pageTitle": "存储清理",
+  "pageSubtitle": "清理缓存、Cookies 及本地存储",
+  "loading": "加载中...",
+  "occupied": "已占用 {{size}}",
+  "cleaning": "正在清理...",
+  "cleanNow": "立即清理",
+  "autoRefresh": "清理后自动刷新页面",
+  "selectAll": "全选所有项",
+  "cleanSuccess": "清理完成",
+  "cleanError": "清理失败",
+  "noData": "无数据",
+  "countUnit": "个",
+  "errorNoTab": "无法获取当前标签页",
+  "errorRestricted": "存储清理功能不支持此页面",
+  "cleanSuccessReload": "清理成功，即将刷新页面",
+  "errorStandardOnly": "存储清理功能仅适用于标准网页",
+  "confirmTitle": "确认清理数据？",
+  "confirmDesc": "您将永久删除当前页面的以下选定存储项。",
+  "irreversible": "此操作不可撤销",
+  "confirmAction": "确认清理",
+  "cleanedSummary": "清理了 {{items}}",
+  "noDataToClean": "该页面没有可清理的存储数据",
+  "partialFailure": "部分清理失败",
+  "options": {
+    "localStorage": "Local Storage",
+    "sessionStorage": "Session Storage",
+    "indexedDB": "IndexedDB",
+    "cookies": "Cookies",
+    "cacheStorage": "Cache Storage",
+    "serviceWorkers": "Service Workers"
+  }
+}

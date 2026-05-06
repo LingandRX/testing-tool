@@ -1,0 +1,10 @@
+{
+  "pageTitle": "JWT Parser",
+  "pageSubtitle": "JSON Web Token decoding and viewing",
+  "placeholder": "Paste Encoded JWT here...",
+  "headerTitle": "HEADER: Algorithm & Token Type",
+  "payloadTitle": "PAYLOAD: Data",
+  "signatureTitle": "Signature",
+  "noSignature": "No Signature",
+  "invalidFormat": "Unable to parse"
+}

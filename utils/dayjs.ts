@@ -8,6 +8,4 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(relativeTime);
 
-dayjs.locale('zh-cn');
-
 export default dayjs;

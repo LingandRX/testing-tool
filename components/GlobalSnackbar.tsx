@@ -197,24 +197,71 @@ export function GlobalSnackbar({
 }
 
 /**
- * useSnackbarState - 消息提示的状态管理 Hook
+ * useSnackbarState - 消息提示的 Hook 方式
  *
  * 提供状态管理的 Snackbar 功能，自动处理 open、message 等状态。
+ * 适合在组件内部使用，无需额外的状态管理代码。
  *
  * @param {SnackbarOptions} [initialOptions] - 初始配置选项
  * @returns {UseSnackbarStateResult} 包含 snackbarProps 和操作方法的对象
+ *
+ * @description
+ * - 自动管理 Snackbar 的显示/隐藏状态
+ * - 支持链式调用 showMessage
+ * - 合并初始选项和调用时选项
+ *
+ * @example
+ * ```tsx
+ * function MyComponent() {
+ *   const { snackbarProps, showMessage, closeMessage } = useSnackbarState({
+ *     severity: 'info',
+ *     autoHideDuration: 3000,
+ *   });
+ *
+ *   const handleSave = () => {
+ *     // 业务逻辑...
+ *     showMessage('保存成功！', { severity: 'success' });
+ *   };
+ *
+ *   return (
+ *     <>
+ *       <button onClick={handleSave}>保存</button>
+ *       <GlobalSnackbar {...snackbarProps} />
+ *     </>
+ *   );
+ * }
+ * ```
  */
 export function useSnackbarState(initialOptions?: SnackbarOptions): UseSnackbarStateResult {
+  // Snackbar 显示状态
   const [open, setOpen] = useState(false);
+  // 当前显示的消息内容
   const [message, setMessage] = useState('');
+  // 消息配置选项
   const [options, setOptions] = useState<SnackbarOptions>(initialOptions || {});
 
+  /**
+   * 显示消息
+   *
+   * @param {string} newMessage - 要显示的消息文本
+   * @param {SnackbarOptions} [newOptions={}] - 新的配置选项
+   *
+   * @description
+   * - 合并初始选项和新的调用选项
+   * - 新选项会覆盖初始选项
+   */
   const showMessage = (newMessage: string, newOptions: SnackbarOptions = {}) => {
     setMessage(newMessage);
     setOptions({ ...initialOptions, ...newOptions });
     setOpen(true);
   };
 
+  /**
+   * 关闭消息
+   *
+   * @description
+   * - 直接将 open 状态设置为 false
+   */
   const closeMessage = () => {
     setOpen(false);
   };
@@ -224,6 +271,13 @@ export function useSnackbarState(initialOptions?: SnackbarOptions): UseSnackbarS
     closeMessage();
   };
 
+  /**
+   * 传递给 GlobalSnackbar 组件的属性
+   *
+   * @description
+   * - 组合当前状态和选项为完整的组件 props
+   * - onClose 使用 handleClose 包装后的版本
+   */
   const snackbarProps: GlobalSnackbarProps = {
     message,
     open,
