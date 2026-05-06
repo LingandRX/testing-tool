@@ -550,6 +550,149 @@ export const qrCodePageStyles = {
   successDark: THEME_COLORS.successDark,
   white: THEME_COLORS.white,
   black: THEME_COLORS.black,
+  /** 加载状态容器 */
+  LOADING_CONTAINER: {
+    py: 4,
+    maxWidth: 400,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  } as const,
+  /** Accordion 容器 */
+  ACCORDION: {
+    borderRadius: 4,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+    '&:before': { display: 'none' },
+  } as const,
+  ACCORDION_SUMMARY: {
+    borderBottom: 'none',
+  } as const,
+  ACCORDION_TITLE_ICON: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 2,
+  } as const,
+  ACCORDION_TITLE_TEXT: {
+    fontWeight: 700,
+  } as const,
+  /** 主操作按钮（生成/解析） */
+  PRIMARY_BUTTON: {
+    py: 1.2,
+    borderRadius: 3,
+    bgcolor: THEME_COLORS.success,
+    fontWeight: 700,
+    '&:hover': {
+      bgcolor: THEME_COLORS.successDark,
+    },
+  } as const,
+  /** 二维码展示区域 */
+  QR_PREVIEW_CONTAINER: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+    border: '2px dashed',
+    borderColor: 'grey.200',
+    borderRadius: 3,
+    p: 2,
+    bgcolor: 'grey.50',
+  } as const,
+  QR_PREVIEW_INNER: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
+  } as const,
+  QR_PREVIEW_IMAGE: {
+    maxWidth: '100%',
+    height: 'auto',
+    display: 'block',
+  } as const,
+  QR_PREVIEW_ACTIONS: {
+    display: 'flex',
+    gap: 1,
+    mt: 2,
+  } as const,
+  /** 下载按钮 */
+  DOWNLOAD_BUTTON: {
+    borderRadius: 2,
+    borderColor: THEME_COLORS.success,
+    color: THEME_COLORS.success,
+    '&:hover': {
+      borderColor: THEME_COLORS.successDark,
+      bgcolor: alpha(THEME_COLORS.success, 0.05),
+    },
+  } as const,
+  /** 复制按钮 */
+  COPY_BUTTON: {
+    borderRadius: 2,
+    bgcolor: THEME_COLORS.success,
+    '&:hover': {
+      bgcolor: THEME_COLORS.successDark,
+    },
+  } as const,
+  /** 拖拽上传区域 */
+  DROPZONE: (dragging: boolean, hasFile: boolean) =>
+    ({
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 200,
+      border: '2px dashed',
+      borderColor: dragging || hasFile ? THEME_COLORS.success : 'grey.200',
+      borderRadius: 3,
+      p: 4,
+      bgcolor: dragging
+        ? alpha(THEME_COLORS.success, 0.1)
+        : hasFile
+          ? alpha(THEME_COLORS.success, 0.05)
+          : 'grey.50',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+      '&:hover': {
+        borderColor: THEME_COLORS.success,
+        bgcolor: alpha(THEME_COLORS.success, 0.05),
+      },
+    }) as const,
+  /** 图片预览容器 */
+  IMAGE_PREVIEW_WRAPPER: {
+    textAlign: 'center',
+    width: '100%',
+    position: 'relative',
+  } as const,
+  IMAGE_PREVIEW_BOX: {
+    position: 'relative',
+    display: 'inline-block',
+  } as const,
+  IMAGE_PREVIEW_IMG: {
+    maxWidth: '100%',
+    maxHeight: 160,
+    borderRadius: 8,
+    objectFit: 'contain',
+  } as const,
+  /** 清除按钮 */
+  CLEAR_BUTTON: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    bgcolor: alpha(THEME_COLORS.error, 0.9),
+    color: 'white',
+    '&:hover': {
+      bgcolor: alpha(THEME_COLORS.errorDark, 0.95),
+    },
+  } as const,
+  /** 结果输入框 */
+  RESULT_INPUT: {
+    position: 'relative',
+    mt: 2,
+  } as const,
+  /** 提示文本 */
+  PLACEHOLDER_TEXT: {
+    textAlign: 'center',
+  } as const,
   INPUT_STYLE: {},
 } as const;
 

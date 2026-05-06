@@ -19,23 +19,20 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ClearIcon from '@mui/icons-material/Clear';
 import CopyButton from '@/components/CopyButton';
 import { qrCodePageStyles } from '@/config/pageTheme';
-import type { SnackbarOptions } from '@/components/GlobalSnackbar';
+import { useSnackbar } from '@/components/GlobalSnackbar';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 import { useTranslation } from 'react-i18next';
 
 interface QrCodeToUrlSectionProps {
   expanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
-  showMessage: (message: string, options?: SnackbarOptions) => void;
 }
 
-const QrCodeToUrlSection = ({
-  expanded,
-  onExpandedChange,
-  showMessage,
-}: QrCodeToUrlSectionProps) => {
+const QrCodeToUrlSection = ({ expanded, onExpandedChange }: QrCodeToUrlSectionProps) => {
   const { t } = useTranslation(['qrCode']);
+  const { showMessage } = useSnackbar();
   const [qrCodeFile, setQrCodeFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
   const [parsedUrl, setParsedUrl] = useState('');
   const [parseError, setParseError] = useState('');
   const [parsing, setParsing] = useState(false);
@@ -43,11 +40,35 @@ const QrCodeToUrlSection = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 清理预览 URL，防止内存泄漏
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   const handleFileChange = useCallback((file: File) => {
     setQrCodeFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
     setParseError('');
     setParsedUrl('');
   }, []);
+
+  const handleClearFile = () => {
+    setQrCodeFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl('');
+    setParsedUrl('');
+    setParseError('');
+    showMessage(t('qrCode:imageCleared'), {
+      severity: 'success',
+      autoHideDuration: 1000,
+    });
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -144,16 +165,12 @@ const QrCodeToUrlSection = ({
     <Accordion
       expanded={expanded}
       onChange={(_, isExpanded) => onExpandedChange(isExpanded)}
-      sx={{
-        borderRadius: 4,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-        '&:before': { display: 'none' },
-      }}
+      sx={qrCodePageStyles.ACCORDION}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ borderBottom: 'none' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={qrCodePageStyles.ACCORDION_SUMMARY}>
+        <Box sx={qrCodePageStyles.ACCORDION_TITLE_ICON}>
           <LinkIcon color="success" />
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+          <Typography variant="subtitle1" sx={qrCodePageStyles.ACCORDION_TITLE_TEXT}>
             {t('qrCode:qrToUrl')}
           </Typography>
         </Box>
@@ -161,32 +178,7 @@ const QrCodeToUrlSection = ({
       <AccordionDetails>
         <Stack spacing={3}>
           <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 200,
-              border: '2px dashed',
-              borderColor: dragging
-                ? qrCodePageStyles.successColor
-                : qrCodeFile
-                  ? qrCodePageStyles.successColor
-                  : 'grey.200',
-              borderRadius: 3,
-              p: 4,
-              bgcolor: dragging
-                ? 'rgba(76, 175, 80, 0.1)'
-                : qrCodeFile
-                  ? 'rgba(76, 175, 80, 0.05)'
-                  : 'grey.50',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: qrCodePageStyles.successColor,
-                bgcolor: 'rgba(76, 175, 80, 0.05)',
-              },
-            }}
+            sx={qrCodePageStyles.DROPZONE(dragging, !!qrCodeFile)}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -196,9 +188,7 @@ const QrCodeToUrlSection = ({
               type="file"
               accept="image/*"
               onChange={handleInputChange}
-              style={{
-                display: 'none',
-              }}
+              style={{ display: 'none' }}
               id="qr-code-upload"
             />
             <label
@@ -206,40 +196,20 @@ const QrCodeToUrlSection = ({
               style={{ cursor: 'pointer', textAlign: 'center', width: '100%' }}
             >
               {qrCodeFile ? (
-                <Box sx={{ textAlign: 'center', width: '100%', position: 'relative' }}>
-                  <Box sx={{ position: 'relative', display: 'inline-block' }}>
+                <Box sx={qrCodePageStyles.IMAGE_PREVIEW_WRAPPER}>
+                  <Box sx={qrCodePageStyles.IMAGE_PREVIEW_BOX}>
                     <img
-                      src={URL.createObjectURL(qrCodeFile)}
+                      src={previewUrl}
                       alt="QR Code Preview"
-                      style={{
-                        maxWidth: '100%',
-                        maxHeight: 160,
-                        borderRadius: 8,
-                        objectFit: 'contain',
-                      }}
+                      style={qrCodePageStyles.IMAGE_PREVIEW_IMG}
                     />
                     <IconButton
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setQrCodeFile(null);
-                        setParsedUrl('');
-                        setParseError('');
-                        showMessage(t('qrCode:imageCleared'), {
-                          severity: 'success',
-                          autoHideDuration: 1000,
-                        });
+                        handleClearFile();
                       }}
-                      sx={{
-                        position: 'absolute',
-                        top: -8,
-                        right: -8,
-                        bgcolor: 'rgba(244, 67, 54, 0.9)',
-                        color: 'white',
-                        '&:hover': {
-                          bgcolor: 'rgba(211, 47, 47, 0.95)',
-                        },
-                      }}
+                      sx={qrCodePageStyles.CLEAR_BUTTON}
                     >
                       <ClearIcon fontSize="small" />
                     </IconButton>
@@ -270,25 +240,12 @@ const QrCodeToUrlSection = ({
             startIcon={parsing ? <CircularProgress size={16} color="inherit" /> : <LinkIcon />}
             onClick={parseQrCode}
             disabled={parsing}
-            sx={{
-              py: 1.2,
-              borderRadius: 3,
-              bgcolor: qrCodePageStyles.successColor,
-              fontWeight: 700,
-              '&:hover': {
-                bgcolor: qrCodePageStyles.successDark,
-              },
-            }}
+            sx={qrCodePageStyles.PRIMARY_BUTTON}
           >
             {parsing ? t('qrCode:parsing') : t('qrCode:parseButton')}
           </Button>
 
-          <Box
-            sx={{
-              position: 'relative',
-              mt: 2,
-            }}
-          >
+          <Box sx={qrCodePageStyles.RESULT_INPUT}>
             <TextField
               label={t('qrCode:resultLabel')}
               value={parsedUrl}

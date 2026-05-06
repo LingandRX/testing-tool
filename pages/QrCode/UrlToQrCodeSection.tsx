@@ -16,21 +16,17 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import QRious from 'qrious';
 import { qrCodePageStyles } from '@/config/pageTheme';
-import type { SnackbarOptions } from '@/components/GlobalSnackbar';
+import { useSnackbar } from '@/components/GlobalSnackbar';
 import { useTranslation } from 'react-i18next';
 
 interface UrlToQrCodeSectionProps {
   expanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
-  showMessage: (message: string, options?: SnackbarOptions) => void;
 }
 
-const UrlToQrCodeSection = ({
-  expanded,
-  onExpandedChange,
-  showMessage,
-}: UrlToQrCodeSectionProps) => {
+const UrlToQrCodeSection = ({ expanded, onExpandedChange }: UrlToQrCodeSectionProps) => {
   const { t } = useTranslation(['qrCode']);
+  const { showMessage } = useSnackbar();
   const [urlInput, setUrlInput] = useState('');
   const [urlError, setUrlError] = useState('');
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
@@ -109,16 +105,12 @@ const UrlToQrCodeSection = ({
     <Accordion
       expanded={expanded}
       onChange={(_, isExpanded) => onExpandedChange(isExpanded)}
-      sx={{
-        borderRadius: 4,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-        '&:before': { display: 'none' },
-      }}
+      sx={qrCodePageStyles.ACCORDION}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ borderBottom: 'none' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={qrCodePageStyles.ACCORDION_SUMMARY}>
+        <Box sx={qrCodePageStyles.ACCORDION_TITLE_ICON}>
           <QrCodeIcon color="primary" />
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+          <Typography variant="subtitle1" sx={qrCodePageStyles.ACCORDION_TITLE_TEXT}>
             {t('qrCode:urlToQr')}
           </Typography>
         </Box>
@@ -142,61 +134,21 @@ const UrlToQrCodeSection = ({
             startIcon={generating ? <CircularProgress size={16} color="inherit" /> : <QrCodeIcon />}
             onClick={generateQrCode}
             disabled={generating}
-            sx={{
-              py: 1.2,
-              borderRadius: 3,
-              bgcolor: qrCodePageStyles.successColor,
-              fontWeight: 700,
-              '&:hover': {
-                bgcolor: qrCodePageStyles.successDark,
-              },
-            }}
+            sx={qrCodePageStyles.PRIMARY_BUTTON}
           >
             {generating ? t('qrCode:generating') : t('qrCode:generateButton')}
           </Button>
 
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: 200,
-              border: '2px dashed',
-              borderColor: 'grey.200',
-              borderRadius: 3,
-              p: 2,
-              bgcolor: 'grey.50',
-            }}
-          >
+          <Box sx={qrCodePageStyles.QR_PREVIEW_CONTAINER}>
             {qrCodeDataUrl ? (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  width: '100%',
-                }}
-              >
-                <img
-                  src={qrCodeDataUrl}
-                  alt="QR Code"
-                  style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
-                />
-                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+              <Box sx={qrCodePageStyles.QR_PREVIEW_INNER}>
+                <img src={qrCodeDataUrl} alt="QR Code" style={qrCodePageStyles.QR_PREVIEW_IMAGE} />
+                <Box sx={qrCodePageStyles.QR_PREVIEW_ACTIONS}>
                   <Button
                     variant="outlined"
                     startIcon={<DownloadIcon />}
                     onClick={downloadQrCode}
-                    sx={{
-                      borderRadius: 2,
-                      borderColor: qrCodePageStyles.successColor,
-                      color: qrCodePageStyles.successColor,
-                      '&:hover': {
-                        borderColor: qrCodePageStyles.successDark,
-                        bgcolor: 'rgba(76, 175, 80, 0.05)',
-                      },
-                    }}
+                    sx={qrCodePageStyles.DOWNLOAD_BUTTON}
                   >
                     {t('qrCode:downloadButton')}
                   </Button>
@@ -204,20 +156,18 @@ const UrlToQrCodeSection = ({
                     variant="contained"
                     startIcon={<ContentCopyIcon />}
                     onClick={copyQrCode}
-                    sx={{
-                      borderRadius: 2,
-                      bgcolor: qrCodePageStyles.successColor,
-                      '&:hover': {
-                        bgcolor: qrCodePageStyles.successDark,
-                      },
-                    }}
+                    sx={qrCodePageStyles.COPY_BUTTON}
                   >
                     {t('qrCode:copyQrButton')}
                   </Button>
                 </Box>
               </Box>
             ) : (
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={qrCodePageStyles.PLACEHOLDER_TEXT}
+              >
                 {t('qrCode:qrCodeWillShow')}
               </Typography>
             )}

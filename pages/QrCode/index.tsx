@@ -1,6 +1,5 @@
 import { Box, CircularProgress, Container, Stack } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
 import UrlToQrCodeSection from '@/pages/QrCode/UrlToQrCodeSection';
 import QrCodeToUrlSection from '@/pages/QrCode/QrCodeToUrlSection';
 import { useStorageState } from '@/utils/useStorageState';
@@ -9,7 +8,6 @@ import PageHeader from '@/components/PageHeader';
 import { useTranslation } from 'react-i18next';
 
 export default function Index() {
-  const { showMessage } = useGlobalSnackbar();
   const { t } = useTranslation(['qrCode']);
 
   // 使用自定义钩子管理展开状态
@@ -19,16 +17,7 @@ export default function Index() {
   // 初始化未完成时显示加载状态
   if (!urlInitialized || !qrInitialized) {
     return (
-      <Container
-        sx={{
-          py: 4,
-          maxWidth: 400,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: 200,
-        }}
-      >
+      <Container sx={qrCodePageStyles.LOADING_CONTAINER}>
         <CircularProgress />
       </Container>
     );
@@ -46,17 +35,9 @@ export default function Index() {
         />
 
         <Stack spacing={3}>
-          <UrlToQrCodeSection
-            expanded={urlExpanded}
-            onExpandedChange={setUrlExpanded}
-            showMessage={showMessage}
-          />
+          <UrlToQrCodeSection expanded={urlExpanded} onExpandedChange={setUrlExpanded} />
 
-          <QrCodeToUrlSection
-            expanded={qrExpanded}
-            onExpandedChange={setQrExpanded}
-            showMessage={showMessage}
-          />
+          <QrCodeToUrlSection expanded={qrExpanded} onExpandedChange={setQrExpanded} />
         </Stack>
       </Container>
     </Box>
