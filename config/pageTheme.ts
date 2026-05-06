@@ -283,6 +283,260 @@ export const storageCleanerPageStyles = {
   warningBorder: `1px solid ${alpha(THEME_COLORS.warning, 0.2)}`,
   errorBorder: `1px solid ${alpha(THEME_COLORS.error, 0.2)}`,
   errorBg: alpha(THEME_COLORS.error, 0.05),
+  /** 选项网格容器 */
+  OPTIONS_GRID_CONTAINER: {
+    mb: 3,
+    border: '1px solid',
+    borderColor: 'grey.100',
+    borderRadius: 4,
+    bgcolor: 'background.paper',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+    transition: 'all 0.2s',
+    overflow: 'hidden',
+    '&:hover': {
+      boxShadow: '0 6px 16px rgba(0, 0, 0, 0.08)',
+    },
+  },
+  OPTIONS_GRID_FOOTER: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    px: 2.7,
+    py: 0.8,
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+    transition: 'all 0.2s',
+    '&:hover': {
+      bgcolor: 'rgba(0, 0, 0, 0.04)',
+    },
+  },
+  OPTIONS_GRID_CHECKBOX: {
+    p: 0.6,
+    mr: 0,
+    '& .MuiSvgIcon-root': {
+      fontSize: 18,
+      transition: 'transform 0.2s',
+    },
+    '&:hover .MuiSvgIcon-root': {
+      transform: 'scale(1.1)',
+    },
+  },
+  /** 选项项 */
+  OPTION_ITEM: (checked: boolean) => ({
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    py: 1,
+    px: { xs: 1, sm: 1.5 },
+    borderRadius: 3,
+    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    bgcolor: checked ? alpha(THEME_COLORS.warning, 0.05) : 'transparent',
+    border: `1px solid ${checked ? alpha(THEME_COLORS.warning, 0.2) : 'transparent'}`,
+    '&:hover': {
+      bgcolor: checked ? alpha(THEME_COLORS.warning, 0.1) : 'rgba(0, 0, 0, 0.02)',
+      transform: 'translateY(-1px)',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+    },
+  }),
+  OPTION_ITEM_LABEL: (checked: boolean) => ({
+    fontSize: '0.75rem',
+    display: 'block',
+    lineHeight: 1.2,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    transition: 'color 0.2s',
+    color: checked ? THEME_COLORS.warning : 'text.primary',
+  }),
+  OPTION_ITEM_SIZE: {
+    color: 'text.secondary',
+    fontSize: '0.65rem',
+    fontWeight: 600,
+    display: 'block',
+    mt: 0.3,
+    lineHeight: 1,
+    whiteSpace: 'nowrap',
+    opacity: 0.8,
+  },
+  OPTION_ITEM_NO_DATA: {
+    color: 'grey.400',
+    fontSize: '0.65rem',
+    fontWeight: 500,
+    display: 'block',
+    mt: 0.3,
+    lineHeight: 1,
+    fontStyle: 'italic',
+  },
+  OPTION_ITEM_CHECKBOX: {
+    p: 0.6,
+    '& .MuiSvgIcon-root': {
+      fontSize: 18,
+      transition: 'transform 0.2s',
+    },
+    '&:hover .MuiSvgIcon-root': {
+      transform: 'scale(1.1)',
+    },
+  },
+  /** 自动刷新切换 */
+  AUTO_REFRESH_CONTAINER: {
+    mb: 3,
+    p: 1.5,
+    borderRadius: 4,
+    bgcolor: 'background.paper',
+    border: '1px solid',
+    borderColor: 'grey.100',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+    transition: 'all 0.2s',
+    '&:hover': {
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+    },
+  },
+  AUTO_REFRESH_SWITCH: {
+    '& .MuiSwitch-track': {
+      borderRadius: 20,
+    },
+    '& .MuiSwitch-thumb': {
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+      transition: 'all 0.2s',
+    },
+    '&:hover .MuiSwitch-thumb': {
+      transform: 'scale(1.1)',
+    },
+  },
+  /** DomainHeader */
+  DOMAIN_HEADER_BADGE: {
+    bgcolor: alpha(THEME_COLORS.warning, 0.15),
+    color: THEME_COLORS.warning,
+    px: 1.5,
+    py: 0.3,
+    borderRadius: 2,
+    fontWeight: 800,
+    fontSize: '0.7rem',
+    boxShadow: `0 2px 4px ${alpha(THEME_COLORS.warning, 0.2)}`,
+    transition: 'all 0.2s',
+    '&:hover': {
+      bgcolor: alpha(THEME_COLORS.warning, 0.25),
+    },
+  },
+  DOMAIN_HEADER_ICON: {
+    p: 1.2,
+    borderRadius: 3,
+    boxShadow: `0 2px 8px ${alpha(THEME_COLORS.warning, 0.15)}`,
+    transition: 'all 0.2s',
+    '&:hover': {
+      bgcolor: alpha(THEME_COLORS.warning, 0.15),
+      transform: 'scale(1.05)',
+    },
+  },
+  /** ErrorDisplay */
+  ERROR_DISPLAY_CONTAINER: {
+    py: 8,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: { xs: 'auto', sm: '400px' },
+    textAlign: 'center',
+  },
+  ERROR_DISPLAY_BOX: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    p: 4,
+    boxShadow: `0 8px 24px ${alpha(THEME_COLORS.error, 0.15)}`,
+    border: `1px solid ${alpha(THEME_COLORS.error, 0.2)}`,
+    bgcolor: alpha(THEME_COLORS.error, 0.05),
+  },
+  /** CleaningResult */
+  CLEANING_RESULT_ALERT: {
+    borderRadius: 3,
+    py: 1,
+    px: 2,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+    '& .MuiAlert-message': {
+      fontSize: '0.8rem',
+      fontWeight: 600,
+      lineHeight: 1.4,
+    },
+    '& .MuiAlert-icon': {
+      fontSize: '1.2rem',
+      mr: 1,
+    },
+  },
+  /** StorageCleanerConfirm Dialog */
+  CONFIRM_DIALOG_PAPER: {
+    borderRadius: 6,
+    backgroundImage: 'none',
+    boxShadow: `0 24px 64px -12px ${alpha(THEME_COLORS.black, 0.18)}`,
+    p: 1.5,
+    bgcolor: 'background.paper',
+  },
+  CONFIRM_DIALOG_TITLE: {
+    textAlign: 'center',
+    pt: 4,
+    pb: 1,
+    fontWeight: 900,
+    letterSpacing: '-0.5px',
+    fontSize: '1.35rem',
+    color: 'text.primary',
+  },
+  CONFIRM_DIALOG_CONTENT: {
+    textAlign: 'center',
+    pb: 2,
+  },
+  CONFIRM_DIALOG_DESC: {
+    mb: 3.5,
+    fontWeight: 500,
+    fontSize: '0.9rem',
+  },
+  CONFIRM_DIALOG_CHIP: {
+    bgcolor: alpha(THEME_COLORS.warning, 0.04),
+    fontWeight: 700,
+    color: THEME_COLORS.warning,
+    fontSize: '0.75rem',
+    border: '1px solid',
+    borderColor: alpha(THEME_COLORS.warning, 0.15),
+    borderRadius: 2.5,
+    height: 'auto',
+    '& .MuiChip-label': { px: 1.2, py: 0.6 },
+  },
+  CONFIRM_DIALOG_WARNING_BOX: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 1,
+    bgcolor: alpha(THEME_COLORS.error, 0.05),
+    color: THEME_COLORS.error,
+    px: 2,
+    py: 0.8,
+    borderRadius: 3,
+    border: '1px dashed',
+    borderColor: alpha(THEME_COLORS.error, 0.2),
+  },
+  CONFIRM_DIALOG_WARNING_TEXT: {
+    fontWeight: 800,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 0.5,
+    fontSize: '0.75rem',
+  },
+  CONFIRM_DIALOG_CANCEL: {
+    boxShadow: '0 0 1px 1px rgba(0, 0, 0, 0.1)',
+    color: 'text.secondary',
+    '&:hover': {
+      bgcolor: 'grey.100',
+      color: 'text.primary',
+    },
+  },
+  CONFIRM_DIALOG_CONFIRM: {
+    bgcolor: THEME_COLORS.warning,
+    '&:hover': {
+      bgcolor: THEME_COLORS.warningDark,
+    },
+  },
 } as const;
 
 /**

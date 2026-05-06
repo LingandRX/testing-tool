@@ -1,6 +1,6 @@
 import { Box, CircularProgress, Container } from '@mui/material';
 import Button from '@/components/Button';
-import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
+import { useSnackbar } from '@/components/GlobalSnackbar';
 import StorageCleanerConfirm from '@/pages/StorageCleaner/StorageCleanerConfirm';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useStorageCleaner } from './useStorageCleaner';
@@ -12,7 +12,7 @@ import CleaningResult from './CleaningResult';
 import { useTranslation } from 'react-i18next';
 
 export default function Index() {
-  const { showMessage } = useGlobalSnackbar();
+  const { showMessage } = useSnackbar();
   const { t } = useTranslation(['storageCleaner']);
   const {
     domain,
@@ -67,12 +67,7 @@ export default function Index() {
         <Button
           variant="contained"
           onClick={() => setShowConfirm(true)}
-          sx={{
-            bgcolor: storageCleanerPageStyles.warningColor,
-            '&:hover': {
-              bgcolor: storageCleanerPageStyles.warningDark,
-            },
-          }}
+          sx={storageCleanerPageStyles.CONFIRM_DIALOG_CONFIRM}
           disabled={isDisabled}
           fullWidth
         >

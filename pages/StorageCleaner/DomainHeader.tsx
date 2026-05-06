@@ -38,36 +38,12 @@ export default function DomainHeader({ domain, totalSize }: DomainHeaderProps) {
       subtitle={domain || t('storageCleaner:loading')}
       badge={
         totalSize > 0 ? (
-          <Box
-            sx={{
-              bgcolor: 'rgba(255, 152, 0, 0.15)',
-              color: storageCleanerPageStyles.warningColor,
-              px: 1.5,
-              py: 0.3,
-              borderRadius: 2,
-              fontWeight: 800,
-              fontSize: '0.7rem',
-              boxShadow: '0 2px 4px rgba(255, 152, 0, 0.2)',
-              transition: 'all 0.2s',
-              '&:hover': {
-                bgcolor: 'rgba(255, 152, 0, 0.25)',
-              },
-            }}
-          >
+          <Box sx={storageCleanerPageStyles.DOMAIN_HEADER_BADGE}>
             {t('storageCleaner:occupied', { size: formatSize(totalSize) })}
           </Box>
         ) : null
       }
-      iconSx={{
-        p: 1.2,
-        borderRadius: 3,
-        boxShadow: '0 2px 8px rgba(255, 152, 0, 0.15)',
-        transition: 'all 0.2s',
-        '&:hover': {
-          bgcolor: 'rgba(255, 152, 0, 0.15)',
-          transform: 'scale(1.05)',
-        },
-      }}
+      iconSx={storageCleanerPageStyles.DOMAIN_HEADER_ICON}
       titleSx={{
         fontSize: '1rem',
       }}

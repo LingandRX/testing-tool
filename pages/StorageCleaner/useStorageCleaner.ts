@@ -79,6 +79,11 @@ export function useStorageCleaner({
   const resultTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const requestIdRef = useRef<number>(0);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const loadingRef = useRef(loading);
+
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
   useEffect(() => {
     const resultTimeout = resultTimeoutRef.current;
@@ -190,16 +195,14 @@ export function useStorageCleaner({
 
   const handleOptionChange = useCallback(
     async (key: keyof StorageCleanerOptions) => {
-      setOptions((prev) => {
-        const newOptions = { ...prev, [key]: !prev[key] };
-        storageUtil.set('storageCleaner/preferences', {
-          autoRefresh,
-          selectedTypes: newOptions,
-        });
-        return newOptions;
+      const newOptions = { ...options, [key]: !options[key] };
+      setOptions(newOptions);
+      await storageUtil.set('storageCleaner/preferences', {
+        autoRefresh,
+        selectedTypes: newOptions,
       });
     },
-    [autoRefresh],
+    [options, autoRefresh],
   );
 
   const handleSelectAll = useCallback(
@@ -222,7 +225,7 @@ export function useStorageCleaner({
   );
 
   const handleClean = useCallback(async () => {
-    if (loading) {
+    if (loadingRef.current) {
       return;
     }
     const tab = await getCurrentTab();
@@ -247,9 +250,13 @@ export function useStorageCleaner({
       setLoading(false);
       setShowConfirm(false);
     }
-  }, [loading, options, autoRefresh, showMessage, loadInfo, t]);
+  }, [options, autoRefresh, showMessage, loadInfo, t]);
 
-  const totalSize = (sizes.cookies || 0) + (sizes.indexedDB || 0);
+  const totalSize =
+    (sizes.cookies || 0) +
+    (sizes.localStorage || 0) +
+    (sizes.sessionStorage || 0) +
+    (sizes.indexedDB || 0);
 
   const allSelected = Object.values(options).every(Boolean);
   const someSelected = Object.values(options).some(Boolean) && !allSelected;

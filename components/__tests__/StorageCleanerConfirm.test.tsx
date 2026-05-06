@@ -36,25 +36,27 @@ describe('StorageCleanerConfirm 组件', () => {
   describe('渲染测试', () => {
     it('open 为 true 时应渲染对话框', () => {
       renderComponent();
-      expect(screen.getByText('确认清理数据？')).toBeInTheDocument();
+      expect(screen.getByText('storageCleaner:confirmTitle')).toBeInTheDocument();
     });
 
     it('应显示警告信息', () => {
       renderComponent();
-      expect(screen.getByText(/此操作不可撤销/i)).toBeInTheDocument();
+      expect(screen.getByText(/storageCleaner:irreversible/i)).toBeInTheDocument();
     });
 
     it('应将选中的选项显示为标签', () => {
       renderComponent();
-      expect(screen.getByText('LocalStorage')).toBeInTheDocument();
-      expect(screen.getByText('Session Storage')).toBeInTheDocument();
-      expect(screen.getByText('Cookies')).toBeInTheDocument();
+      expect(screen.getByText('storageCleaner:options.localStorage')).toBeInTheDocument();
+      expect(screen.getByText('storageCleaner:options.sessionStorage')).toBeInTheDocument();
+      expect(screen.getByText('storageCleaner:options.cookies')).toBeInTheDocument();
     });
 
     it('应显示取消和确认按钮', () => {
       renderComponent();
-      expect(screen.getByRole('button', { name: /取消/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /确认清理/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /common:buttons.cancel/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /storageCleaner:confirmAction/i }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -62,7 +64,7 @@ describe('StorageCleanerConfirm 组件', () => {
     it('点击取消时应调用 onClose', () => {
       renderComponent();
 
-      fireEvent.click(screen.getByRole('button', { name: /取消/i }));
+      fireEvent.click(screen.getByRole('button', { name: /common:buttons.cancel/i }));
       expect(mockOnClose).toHaveBeenCalledTimes(1);
       expect(mockOnConfirm).not.toHaveBeenCalled();
     });
@@ -70,7 +72,7 @@ describe('StorageCleanerConfirm 组件', () => {
     it('点击确认时应调用 onConfirm', () => {
       renderComponent();
 
-      fireEvent.click(screen.getByRole('button', { name: /确认清理/i }));
+      fireEvent.click(screen.getByRole('button', { name: /storageCleaner:confirmAction/i }));
       expect(mockOnConfirm).toHaveBeenCalledTimes(1);
       expect(mockOnClose).not.toHaveBeenCalled();
     });
@@ -89,10 +91,10 @@ describe('StorageCleanerConfirm 组件', () => {
 
       renderComponent({ options: partialOptions });
 
-      expect(screen.getByText('LocalStorage')).toBeInTheDocument();
-      expect(screen.getByText('IndexedDB')).toBeInTheDocument();
-      expect(screen.queryByText('Session Storage')).not.toBeInTheDocument();
-      expect(screen.queryByText('Cookies')).not.toBeInTheDocument();
+      expect(screen.getByText('storageCleaner:options.localStorage')).toBeInTheDocument();
+      expect(screen.getByText('storageCleaner:options.indexedDB')).toBeInTheDocument();
+      expect(screen.queryByText('storageCleaner:options.sessionStorage')).not.toBeInTheDocument();
+      expect(screen.queryByText('storageCleaner:options.cookies')).not.toBeInTheDocument();
     });
 
     it('应处理空选项', () => {
@@ -115,7 +117,7 @@ describe('StorageCleanerConfirm 组件', () => {
   describe('对话框行为测试', () => {
     it('open 为 false 时不应渲染', () => {
       renderComponent({ open: false });
-      expect(screen.queryByText('确认清理数据？')).not.toBeInTheDocument();
+      expect(screen.queryByText('storageCleaner:confirmTitle')).not.toBeInTheDocument();
     });
 
     it('应使用不同选项渲染', () => {
@@ -130,8 +132,8 @@ describe('StorageCleanerConfirm 组件', () => {
 
       renderComponent({ options: customOptions });
 
-      expect(screen.getByText('Session Storage')).toBeInTheDocument();
-      expect(screen.getByText('Cookies')).toBeInTheDocument();
+      expect(screen.getByText('storageCleaner:options.sessionStorage')).toBeInTheDocument();
+      expect(screen.getByText('storageCleaner:options.cookies')).toBeInTheDocument();
     });
   });
 });

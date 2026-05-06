@@ -1,5 +1,4 @@
 import {
-  alpha,
   Box,
   Chip,
   Dialog,
@@ -10,7 +9,8 @@ import {
 } from '@mui/material';
 import type { StorageCleanerOptions } from '@/types/storage';
 import Button from '@/components/Button';
-import { storageCleanerPageStyles, THEME_COLORS } from '@/config/pageTheme';
+import { storageCleanerPageStyles } from '@/config/pageTheme';
+import { useTranslation } from 'react-i18next';
 
 export interface StorageCleanerConfirmProps {
   open: boolean;
@@ -19,24 +19,17 @@ export interface StorageCleanerConfirmProps {
   options: StorageCleanerOptions;
 }
 
-const STORAGE_LABELS: Record<keyof StorageCleanerOptions, string> = {
-  localStorage: 'LocalStorage',
-  sessionStorage: 'Session Storage',
-  indexedDB: 'IndexedDB',
-  cookies: 'Cookies',
-  cacheStorage: 'Cache Storage',
-  serviceWorkers: 'Service Workers',
-};
-
 export function StorageCleanerConfirm({
   open,
   onClose,
   onConfirm,
   options,
 }: StorageCleanerConfirmProps) {
+  const { t } = useTranslation(['storageCleaner']);
+
   const selectedOptions = Object.entries(options)
     .filter(([_, value]) => value)
-    .map(([key, _]) => STORAGE_LABELS[key as keyof StorageCleanerOptions] || key);
+    .map(([key, _]) => t(`storageCleaner:options.${key as keyof StorageCleanerOptions}`));
 
   return (
     <Dialog
@@ -46,37 +39,21 @@ export function StorageCleanerConfirm({
       maxWidth="xs"
       slotProps={{
         paper: {
-          sx: {
-            borderRadius: 6,
-            backgroundImage: 'none',
-            boxShadow: `0 24px 64px -12px ${alpha(THEME_COLORS.black, 0.18)}`,
-            p: 1.5,
-            bgcolor: 'background.paper',
-          },
+          sx: storageCleanerPageStyles.CONFIRM_DIALOG_PAPER,
         },
       }}
     >
-      <DialogTitle
-        sx={{
-          textAlign: 'center',
-          pt: 4,
-          pb: 1,
-          fontWeight: 900,
-          letterSpacing: '-0.5px',
-          fontSize: '1.35rem',
-          color: 'text.primary',
-        }}
-      >
-        确认清理数据？
+      <DialogTitle sx={storageCleanerPageStyles.CONFIRM_DIALOG_TITLE}>
+        {t('storageCleaner:confirmTitle')}
       </DialogTitle>
 
-      <DialogContent sx={{ textAlign: 'center', pb: 2 }}>
+      <DialogContent sx={storageCleanerPageStyles.CONFIRM_DIALOG_CONTENT}>
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ mb: 3.5, fontWeight: 500, fontSize: '0.9rem' }}
+          sx={storageCleanerPageStyles.CONFIRM_DIALOG_DESC}
         >
-          您将永久删除当前页面的以下选定存储项。
+          {t('storageCleaner:confirmDesc')}
         </Typography>
 
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2, justifyContent: 'center', mb: 4 }}>
@@ -85,49 +62,17 @@ export function StorageCleanerConfirm({
               key={label}
               label={label}
               size="small"
-              sx={{
-                bgcolor: alpha(THEME_COLORS.warning, 0.04),
-                fontWeight: 700,
-                color: THEME_COLORS.warning,
-                fontSize: '0.75rem',
-                border: '1px solid',
-                borderColor: alpha(THEME_COLORS.warning, 0.15),
-                borderRadius: 2.5,
-                height: 'auto',
-                '& .MuiChip-label': { px: 1.2, py: 0.6 },
-              }}
+              sx={storageCleanerPageStyles.CONFIRM_DIALOG_CHIP}
             />
           ))}
         </Box>
 
-        <Box
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 1,
-            bgcolor: alpha(THEME_COLORS.error, 0.05),
-            color: THEME_COLORS.error,
-            px: 2,
-            py: 0.8,
-            borderRadius: 3,
-            border: '1px dashed',
-            borderColor: alpha(THEME_COLORS.error, 0.2),
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 800,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              fontSize: '0.75rem',
-            }}
-          >
+        <Box sx={storageCleanerPageStyles.CONFIRM_DIALOG_WARNING_BOX}>
+          <Typography variant="caption" sx={storageCleanerPageStyles.CONFIRM_DIALOG_WARNING_TEXT}>
             <span role="img" aria-label="warning">
               ⚠️
             </span>{' '}
-            此操作不可撤销
+            {t('storageCleaner:irreversible')}
           </Typography>
         </Box>
       </DialogContent>
@@ -137,29 +82,17 @@ export function StorageCleanerConfirm({
           variant="text"
           onClick={onClose}
           fullWidth
-          sx={{
-            boxShadow: '0 0 1px 1px rgba(0, 0, 0, 0.1)',
-            color: 'text.secondary',
-            '&:hover': {
-              bgcolor: 'grey.100',
-              color: 'text.primary',
-            },
-          }}
+          sx={storageCleanerPageStyles.CONFIRM_DIALOG_CANCEL}
         >
-          取消
+          {t('common:buttons.cancel')}
         </Button>
         <Button
           variant="contained"
           onClick={onConfirm}
           fullWidth
-          sx={{
-            bgcolor: storageCleanerPageStyles.warningColor,
-            '&:hover': {
-              bgcolor: storageCleanerPageStyles.warningDark,
-            },
-          }}
+          sx={storageCleanerPageStyles.CONFIRM_DIALOG_CONFIRM}
         >
-          确认清理
+          {t('storageCleaner:confirmAction')}
         </Button>
       </DialogActions>
     </Dialog>

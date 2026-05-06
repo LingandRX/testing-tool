@@ -382,7 +382,7 @@ export async function clearStorage(
 
 export function formatCleaningResult(
   result: CleaningResult,
-  t: (key: string, options?: unknown) => string,
+  t: (key: string, options?: Record<string, unknown>) => string,
 ): string {
   const parts: string[] = [];
 
