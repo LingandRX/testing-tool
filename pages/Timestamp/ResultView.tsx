@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
-import { alpha, Box, Fade, Stack, Typography } from '@mui/material';
+import { Box, Fade, Stack, Typography } from '@mui/material';
 import dayjs from '@/utils/dayjs';
 import CopyButton from '@/components/CopyButton';
 import type { UnitType } from '@/config/pageTheme';
 import { DATE_FORMAT, timestampPageStyles } from '@/config/pageTheme';
-import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 import { useTranslation } from 'react-i18next';
 
 interface ResultViewProps {
@@ -12,10 +11,9 @@ interface ResultViewProps {
   mode: 'ts2dt' | 'dt2ts';
   unit: UnitType;
   zone: string;
-  showMessage?: (message: string, options?: SnackbarOptions) => void;
 }
 
-const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: ResultViewProps) => {
+const ResultView = React.memo(({ result, mode, unit, zone }: ResultViewProps) => {
   const { t } = useTranslation(['timestamp']);
   const extraInfo = useMemo(() => {
     if (!result) return null;
@@ -38,44 +36,12 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
   return (
     <Fade in={!!result}>
       <Box sx={{ mt: 3, pt: 2.5, borderTop: '1px solid', borderColor: 'grey.50' }}>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.secondary',
-            mb: 1.2,
-            display: 'block',
-            fontWeight: 800,
-            fontSize: '0.7rem',
-          }}
-        >
+        <Typography variant="caption" sx={timestampPageStyles.RESULT_LABEL}>
           {t('timestamp:resultLabel')}
         </Typography>
 
-        <Box
-          sx={{
-            bgcolor: alpha(timestampPageStyles.primaryColor, 0.05),
-            p: 2,
-            borderRadius: 4,
-            position: 'relative',
-            mb: 2.5,
-            border: '1px solid',
-            borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              color: timestampPageStyles.primaryColor,
-              wordBreak: 'break-all',
-              pr: 4,
-              fontSize: '1rem',
-            }}
-          >
+        <Box sx={timestampPageStyles.RESULT_MAIN_BOX}>
+          <Typography variant="body1" sx={timestampPageStyles.RESULT_MAIN_TEXT}>
             {result}
           </Typography>
           <CopyButton
@@ -83,20 +49,10 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
             tooltip={t('timestamp:copyResultTooltip')}
             size="small"
             color={timestampPageStyles.primaryColor}
-            showMessage={showMessage}
           />
         </Box>
 
-        <Stack
-          spacing={1.2}
-          sx={{
-            bgcolor: alpha(timestampPageStyles.primaryColor, 0.05),
-            p: 2,
-            borderRadius: 4,
-            border: '1px solid',
-            borderColor: alpha(timestampPageStyles.primaryColor, 0.1),
-          }}
-        >
+        <Stack spacing={1.2} sx={timestampPageStyles.RESULT_EXTRA_STACK}>
           {[
             { label: t('timestamp:relativeTime'), value: extraInfo?.relative },
             { label: t('timestamp:iso8601'), value: extraInfo?.iso },
@@ -106,22 +62,11 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
               key={item.label}
               sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <Typography
-                variant="caption"
-                sx={{ color: 'text.disabled', fontWeight: 700, fontSize: '0.65rem', pr: 4 }}
-              >
+              <Typography variant="caption" sx={timestampPageStyles.RESULT_EXTRA_LABEL}>
                 {item.label}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontFamily: 'monospace',
-                    color: timestampPageStyles.primaryColor,
-                    fontWeight: 600,
-                    fontSize: '0.65rem',
-                  }}
-                >
+                <Typography variant="caption" sx={timestampPageStyles.RESULT_EXTRA_VALUE}>
                   {item.value}
                 </Typography>
                 {item.value && (
@@ -130,7 +75,6 @@ const ResultView = React.memo(({ result, mode, unit, zone, showMessage }: Result
                     tooltip={t('timestamp:copyTooltip')}
                     size="small"
                     color={timestampPageStyles.primaryColor}
-                    showMessage={showMessage}
                   />
                 )}
               </Box>

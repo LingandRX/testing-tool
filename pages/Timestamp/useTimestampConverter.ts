@@ -16,8 +16,7 @@ export interface UseTimestampConverterReturn {
 
   // Actions
   setMode: (mode: 'ts2dt' | 'dt2ts') => void;
-  setTsInput: (value: string) => void;
-  setDtInput: (value: string) => void;
+  setInput: (value: string) => void;
   setUnit: (unit: UnitType) => void;
   setZone: (zone: ZoneType) => void;
   handleUseNow: (now: number) => void;
@@ -86,15 +85,17 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
     setResult('');
   }, []);
 
-  const handleSetTsInput = useCallback((value: string) => {
-    setTsInput(value);
-    setError('');
-  }, []);
-
-  const handleSetDtInput = useCallback((value: string) => {
-    setDtInput(value);
-    setError('');
-  }, []);
+  const setInput = useCallback(
+    (value: string) => {
+      if (mode === 'ts2dt') {
+        setTsInput(value);
+      } else {
+        setDtInput(value);
+      }
+      setError('');
+    },
+    [mode],
+  );
 
   return {
     mode,
@@ -105,8 +106,7 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
     result,
     error,
     setMode: handleSetMode,
-    setTsInput: handleSetTsInput,
-    setDtInput: handleSetDtInput,
+    setInput,
     setUnit,
     setZone,
     handleUseNow,
