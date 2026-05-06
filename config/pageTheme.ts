@@ -753,6 +753,21 @@ export const textStatisticsPageStyles = {
 /**
  * JWT 解析工具页面样式
  */
+/**
+ * TopBar 组件样式
+ */
+export const topBarStyles = {
+  SEARCH_MAX_WIDTH: 400,
+  DROPDOWN_MAX_HEIGHT: 300,
+  Z_INDEX: 1100,
+  DROPDOWN_Z_INDEX: 1200,
+  SEARCH_HISTORY_LIMIT: 10,
+  SEARCH_HISTORY_DISPLAY: 5,
+} as const;
+
+/**
+ * JWT 解析工具页面样式
+ */
 export const jwtPageStyles = {
   primaryColor: THEME_COLORS.indigo,
   cardBg: alpha(THEME_COLORS.indigo, 0.04),

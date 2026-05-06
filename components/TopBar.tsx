@@ -23,8 +23,10 @@ import LanguageIcon from '@mui/icons-material/Language';
 import { useRouter } from '@/providers/RouterProvider';
 import { FEATURES, FeatureConfig } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
+import { openExtensionPage } from '@/utils/chromeTabs';
 import { useTranslation } from 'react-i18next';
 import { SUPPORTED_LANGUAGES, normalizeLanguage } from '@/i18n';
+import { topBarStyles } from '@/config/pageTheme';
 
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
@@ -37,9 +39,14 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
 
   // 加载搜索历史
   useEffect(() => {
-    storageUtil.get('app/searchHistory', []).then((history) => {
-      setSearchHistory(history || []);
-    });
+    storageUtil
+      .get('app/searchHistory', [])
+      .then((history) => {
+        setSearchHistory(history || []);
+      })
+      .catch((error) => {
+        console.error('加载搜索历史失败:', error);
+      });
   }, []);
 
   // 模糊搜索逻辑
@@ -56,11 +63,11 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
 
   const displayedHistory = useMemo(() => {
     if (searchQuery.trim()) return [];
-    return searchHistory.slice(0, 5);
+    return searchHistory.slice(0, topBarStyles.SEARCH_HISTORY_DISPLAY);
   }, [searchHistory, searchQuery]);
 
-  const handleOpenInTab = () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html?mode=tab') }).catch(console.error);
+  const handleOpenInTab = async () => {
+    await openExtensionPage('popup.html', { mode: 'tab' });
     window.close();
   };
 
@@ -72,9 +79,16 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
 
   const saveToHistory = async (query: string) => {
     if (!query.trim()) return;
-    const newHistory = [query, ...searchHistory.filter((h) => h !== query)].slice(0, 10);
-    setSearchHistory(newHistory);
-    await storageUtil.set('app/searchHistory', newHistory);
+    setSearchHistory((prev) => {
+      const newHistory = [query, ...prev.filter((h) => h !== query)].slice(
+        0,
+        topBarStyles.SEARCH_HISTORY_LIMIT,
+      );
+      storageUtil.set('app/searchHistory', newHistory).catch((error) => {
+        console.error('保存搜索历史失败:', error);
+      });
+      return newHistory;
+    });
   };
 
   const handleSelectFeature = (feature: FeatureConfig) => {
@@ -107,8 +121,16 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         if (searchQuery.trim()) {
           handleSelectFeature(searchResults[selectedIndex]);
         } else {
-          setSearchQuery(displayedHistory[selectedIndex]);
+          const selectedQuery = displayedHistory[selectedIndex];
+          setSearchQuery(selectedQuery);
           setSelectedIndex(-1);
+          // 触发搜索：如果匹配到功能则跳转，否则保持搜索词展示结果
+          const matchedFeature = FEATURES.find(
+            (f) => f.key !== 'dashboard' && t(f.labelKey) === selectedQuery,
+          );
+          if (matchedFeature) {
+            handleSelectFeature(matchedFeature);
+          }
         }
       } else if (searchQuery.trim() && searchResults.length > 0) {
         handleSelectFeature(searchResults[0]);
@@ -132,7 +154,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         borderBottom: '1px solid',
         borderColor: 'grey.100',
         bgcolor: 'background.paper',
-        zIndex: 1100,
+        zIndex: topBarStyles.Z_INDEX,
         position: 'relative',
       }}
     >
@@ -220,10 +242,10 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                   left: 0,
                   right: 0,
                   mt: 1,
-                  maxHeight: 300,
+                  maxHeight: topBarStyles.DROPDOWN_MAX_HEIGHT,
                   overflow: 'auto',
                   borderRadius: 2,
-                  zIndex: 1200,
+                  zIndex: topBarStyles.DROPDOWN_Z_INDEX,
                 }}
               >
                 <List disablePadding role="listbox">
