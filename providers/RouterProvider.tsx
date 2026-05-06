@@ -1,10 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
-  getDefaultVisibleFeatureKeys,
-  getDefaultPageOrder,
   getAllFeatureKeys,
+  getDefaultPageOrder,
+  getDefaultVisibleFeatureKeys,
 } from '@/config/features';
 
 /**

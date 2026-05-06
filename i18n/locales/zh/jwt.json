@@ -1,0 +1,10 @@
+{
+  "pageTitle": "JWT 解析",
+  "pageSubtitle": "JSON Web Token 解码与查看",
+  "placeholder": "在此粘贴 JWT 令牌 (Encoded JWT)...",
+  "headerTitle": "HEADER: 算法 & 令牌类型",
+  "payloadTitle": "PAYLOAD: 数据",
+  "signatureTitle": "签名",
+  "noSignature": "无签名",
+  "invalidFormat": "无法解析"
+}

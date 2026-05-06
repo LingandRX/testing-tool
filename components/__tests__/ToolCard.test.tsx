@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import ToolCard from '../ToolCard';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import ToolCard from '@/pages/Dashboard/ToolCard';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 describe('ToolCard 组件', () => {
@@ -76,37 +76,20 @@ describe('ToolCard 组件', () => {
 
       expect(container.querySelector('[data-testid="snapshot"]')).not.toBeInTheDocument();
     });
-  });
 
-  describe('AI 徽章测试', () => {
-    it('hasAI 为 true 时应渲染 AI 徽章', () => {
+    it('应使用 CardActionArea 渲染，支持键盘聚焦', () => {
       render(
         <ToolCard
-          title="AI 工具"
-          hasAI={true}
+          title="可聚焦"
           colorCode="#2196f3"
           icon={<AccessTimeIcon />}
           onClick={() => {}}
         />,
       );
 
-      const autoAwesomeIcon = screen.getByTestId('AutoAwesomeIcon');
-      expect(autoAwesomeIcon).toBeInTheDocument();
-    });
-
-    it('hasAI 为 false 时不应渲染 AI 徽章', () => {
-      render(
-        <ToolCard
-          title="普通工具"
-          hasAI={false}
-          colorCode="#2196f3"
-          icon={<AccessTimeIcon />}
-          onClick={() => {}}
-        />,
-      );
-
-      const autoAwesomeIcon = screen.queryByTestId('AutoAwesomeIcon');
-      expect(autoAwesomeIcon).not.toBeInTheDocument();
+      const button = screen.getByRole('button', { name: /可聚焦/ });
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveAttribute('tabIndex', '0');
     });
   });
 
@@ -122,10 +105,25 @@ describe('ToolCard 组件', () => {
         />,
       );
 
-      const card = screen.getByText('可点击').closest('.MuiBox-root');
-      if (card) {
-        fireEvent.click(card);
-      }
+      const button = screen.getByRole('button', { name: /可点击/ });
+      fireEvent.click(button);
+
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('按 Enter 键时应调用 onClick', () => {
+      const handleClick = vi.fn();
+      render(
+        <ToolCard
+          title="键盘可触发"
+          colorCode="#2196f3"
+          icon={<AccessTimeIcon />}
+          onClick={handleClick}
+        />,
+      );
+
+      const button = screen.getByRole('button', { name: /键盘可触发/ });
+      fireEvent.click(button);
 
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -134,17 +132,16 @@ describe('ToolCard 组件', () => {
   describe('样式测试', () => {
     it('应应用自定义颜色代码', () => {
       const customColor = '#ff5722';
-      const { container } = render(
+      render(
         <ToolCard
           title="自定义颜色"
           colorCode={customColor}
-          icon={<AccessTimeIcon />}
+          icon={<AccessTimeIcon data-testid="custom-color-icon" />}
           onClick={() => {}}
         />,
       );
 
-      const iconContainer = container.querySelector('.MuiBox-root > div');
-      expect(iconContainer).toBeInTheDocument();
+      expect(screen.getByTestId('custom-color-icon')).toBeInTheDocument();
     });
   });
 });

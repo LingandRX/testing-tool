@@ -1,4 +1,4 @@
-import { Stack, Typography, Box, alpha, SxProps, Theme } from '@mui/material';
+import { alpha, Box, Stack, SxProps, Theme, Typography } from '@mui/material';
 import { ReactNode } from 'react';
 
 /**

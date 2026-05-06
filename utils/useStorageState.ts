@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
 import type { StorageSchema } from '@/types/storage';
 

@@ -1,0 +1,26 @@
+{
+  "pageTitle": "时间戳转换",
+  "pageSubtitle": "Unix 毫秒数转换与格式化",
+  "tsToDate": "时间戳 → 日期",
+  "dateToTs": "日期 → 时间戳",
+  "placeholderTs": "输入时间戳...",
+  "placeholderDate": "YYYY-MM-DD HH:mm:ss",
+  "unitMs": "毫秒 (ms)",
+  "unitS": "秒 (s)",
+  "convertButton": "立即转换",
+  "currentTs": "当前时间戳",
+  "useNowTooltip": "填充到下方",
+  "copyTsTooltip": "复制时间戳",
+  "usedSuccess": "已使用当前时间戳",
+  "resultLabel": "转换结果",
+  "copyResultTooltip": "复制结果",
+  "relativeTime": "相对时间",
+  "iso8601": "ISO 8601",
+  "utcTime": "UTC 时间",
+  "copyTooltip": "复制",
+  "errors": {
+    "invalidNumber": "无效数字",
+    "invalidTimestamp": "无效时间戳",
+    "invalidFormat": "格式错误"
+  }
+}

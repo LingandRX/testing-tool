@@ -1,0 +1,25 @@
+{
+  "dashboard": {
+    "title": "Dashboard"
+  },
+  "timestamp": {
+    "title": "Timestamp",
+    "description": "Unix millisecond conversion and formatting"
+  },
+  "storageCleaner": {
+    "title": "Storage Cleaner",
+    "description": "Clean cache, cookies, and local storage"
+  },
+  "qrCode": {
+    "title": "QR Code Tools",
+    "description": "Generate QR code for the selected URL"
+  },
+  "textStatistics": {
+    "title": "Text Statistics",
+    "description": "Real-time analysis of text characters, words, and bytes"
+  },
+  "jwt": {
+    "title": "JWT Parser",
+    "description": "JSON Web Token decoding and viewing"
+  }
+}

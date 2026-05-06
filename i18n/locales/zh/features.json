@@ -1,0 +1,25 @@
+{
+  "dashboard": {
+    "title": "仪表盘"
+  },
+  "timestamp": {
+    "title": "时间戳",
+    "description": "Unix 毫秒数转换与格式化"
+  },
+  "storageCleaner": {
+    "title": "存储清理",
+    "description": "清理缓存、Cookies 及本地存储"
+  },
+  "qrCode": {
+    "title": "二维码工具",
+    "description": "生成当前选中的 URL 的二维码"
+  },
+  "textStatistics": {
+    "title": "文本统计",
+    "description": "实时分析文本字符、单词及字节"
+  },
+  "jwt": {
+    "title": "JWT 解析",
+    "description": "JSON Web Token 解码与查看"
+  }
+}
