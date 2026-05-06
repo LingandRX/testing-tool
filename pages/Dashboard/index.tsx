@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { useRouter } from '@/providers/RouterProvider';
-import DashboardCard from '@/components/DashboardCard';
+import DashboardCard from '@/pages/Dashboard/DashboardCard';
 import { getFeatureByKey } from '@/config/features';
 import type { PageType } from '@/types/storage';
 import { useCallback } from 'react';

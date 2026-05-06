@@ -1,8 +1,8 @@
 import { Box, CircularProgress, Container, Stack } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
-import UrlToQrCodeSection from '@/components/UrlToQrCodeSection';
-import QrCodeToUrlSection from '@/components/QrCodeToUrlSection';
+import UrlToQrCodeSection from '@/pages/QrCode/UrlToQrCodeSection';
+import QrCodeToUrlSection from '@/pages/QrCode/QrCodeToUrlSection';
 import { useStorageState } from '@/utils/useStorageState';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';

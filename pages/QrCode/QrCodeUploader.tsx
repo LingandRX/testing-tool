@@ -13,8 +13,8 @@ import ImageIcon from '@mui/icons-material/Image';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import GlobalSnackbar, { useSnackbarState } from './GlobalSnackbar';
-import CopyButton from './CopyButton';
+import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
+import CopyButton from '@/components/CopyButton';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 
 interface QrCodeUploaderProps {

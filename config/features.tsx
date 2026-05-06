@@ -9,7 +9,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { THEME_COLORS } from './pageTheme';
 
 // 懒加载页面组件
-const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const DashboardPage = lazy(() => import('@/pages/Dashboard'));
 const TimestampPage = lazy(() => import('../pages/Timestamp'));
 const StorageCleanerPage = lazy(() => import('../pages/StorageCleaner'));
 const QrCodePage = lazy(() => import('../pages/QrCode'));

@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Container } from '@mui/material';
 import Button from '@/components/Button';
 import { useSnackbar as useGlobalSnackbar } from '@/components/GlobalSnackbar';
-import StorageCleanerConfirm from '@/components/StorageCleanerConfirm';
+import StorageCleanerConfirm from '@/pages/StorageCleaner/StorageCleanerConfirm';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useStorageCleaner } from './useStorageCleaner';
 import DomainHeader from './DomainHeader';

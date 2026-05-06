@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { StorageCleanerConfirm } from '../StorageCleanerConfirm';
+import { StorageCleanerConfirm } from '../../pages/StorageCleaner/StorageCleanerConfirm';
 import type { StorageCleanerOptions } from '@/types/storage';
 import React from 'react';
 
