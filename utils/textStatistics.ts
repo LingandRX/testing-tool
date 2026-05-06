@@ -60,8 +60,18 @@ export function getTextStats(text: string): TextStats {
  * 格式化字节大小显示
  *
  * @param bytes 字节数
- * @returns 格式化后的字符串，例如 "100 Bytes"
+ * @returns 格式化后的字符串，例如 "1.2 KB" 或 "100 B"
  */
 export function formatByteSize(bytes: number): string {
-  return `${bytes} Bytes`;
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  let size = bytes / 1024;
+  let unitIndex = 0;
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex++;
+  }
+  return `${size.toFixed(unitIndex > 0 ? 2 : 1)} ${units[unitIndex]}`;
 }

@@ -1,17 +1,17 @@
-import { useState, useEffect, useMemo } from 'react';
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import {
+  alpha,
   Box,
-  Typography,
-  Paper,
-  Switch,
   Button,
   CircularProgress,
-  Stack,
-  IconButton,
-  Tabs,
-  Tab,
-  alpha,
   Divider,
+  IconButton,
+  Paper,
+  Stack,
+  Switch,
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -21,14 +21,15 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
-  getFeatureByKey,
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
+  getFeatureByKey,
 } from '@/config/features';
 import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import PageHeader from '@/components/PageHeader';
 import { THEME_COLORS } from '@/config/pageTheme';
+import { useTranslation } from 'react-i18next';
 
 type WindowType = 'popup' | 'sidepanel' | 'tab';
 
@@ -37,6 +38,7 @@ type WindowType = 'popup' | 'sidepanel' | 'tab';
  * 支持对不同窗口入口的功能显示和排序进行独立配置
  */
 export default function App() {
+  const { t } = useTranslation(['features', 'common']);
   // 从 URL 参数中初始化当前的 Tab 类型
   const initialWindowType = useMemo(() => {
     if (typeof window === 'undefined') return 'popup';
@@ -127,7 +129,8 @@ export default function App() {
       await storageUtil.set(configKeys.visible, newPages);
       setVisiblePages(newPages);
       const feature = getFeatureByKey(page);
-      showToast(`已${isCurrentlyVisible ? '隐藏' : '显示'} ${feature?.label || page}`, 'success');
+      const label = feature ? t(feature.labelKey) : page;
+      showToast(`已${isCurrentlyVisible ? '隐藏' : '显示'} ${label}`, 'success');
     } catch (error) {
       console.error('Failed to save config:', error);
       showToast('保存失败', 'warning');
@@ -176,7 +179,7 @@ export default function App() {
     }
   };
 
-  const handleWindowTypeChange = (_event: React.SyntheticEvent, newType: WindowType) => {
+  const handleWindowTypeChange = (_event: SyntheticEvent, newType: WindowType) => {
     if (newType !== null) {
       setWindowType(newType);
     }
@@ -185,6 +188,16 @@ export default function App() {
   const showToast = (message: string, severity: 'success' | 'info' | 'warning') => {
     showMessage(message, { severity });
   };
+
+  if (!isLoaded) {
+    return (
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}
+      >
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -347,7 +360,7 @@ export default function App() {
                                 mb: 0.5,
                               }}
                             >
-                              {feature.label}
+                              {t(feature.labelKey)}
                             </Typography>
                             <Typography
                               variant="caption"
@@ -360,7 +373,7 @@ export default function App() {
                                 whiteSpace: 'nowrap',
                               }}
                             >
-                              {feature.description || '暂无描述'}
+                              {feature.descriptionKey ? t(feature.descriptionKey) : '暂无描述'}
                             </Typography>
                           </Box>
                         </Stack>

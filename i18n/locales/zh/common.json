@@ -1,0 +1,23 @@
+{
+  "appName": "测试工具",
+  "buttons": {
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "copy": "复制",
+    "clear": "清理",
+    "refresh": "刷新",
+    "toggleLanguage": "切换语言",
+    "search": "搜索工具...",
+    "back": "返回",
+    "clearSearch": "清除搜索",
+    "recentSearch": "最近搜索",
+    "noResults": "未找到相关工具",
+    "openInTab": "在标签页打开",
+    "settings": "设置"
+  },
+  "messages": {
+    "copySuccess": "已复制到剪贴板",
+    "copyError": "复制失败"
+  }
+}

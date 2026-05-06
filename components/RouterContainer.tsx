@@ -1,7 +1,7 @@
 import { Box, CircularProgress } from '@mui/material';
 import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
-import { useMemo, Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 
 export default function RouterContainer() {
   const { currentPage, isLoaded } = useRouter();

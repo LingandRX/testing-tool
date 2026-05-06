@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import { Box, Typography, Button, Paper, Container } from '@mui/material';
+import { Box, Button, Container, Paper, Typography } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
@@ -16,25 +16,24 @@ interface State {
  * 错误边界组件：捕获子组件树中的 JavaScript 错误
  */
 export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
+  state: State = {
     hasError: false,
     error: null,
   };
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
   }
 
   private handleReset = () => {
-    this.setState({ hasError: false, error: null });
     window.location.reload();
   };
 
-  public render() {
+  render() {
     if (this.state.hasError) {
       return (
         <Container sx={{ mt: 8 }}>
@@ -46,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
               borderRadius: 4,
               border: '1px solid',
               borderColor: 'error.light',
-              bgcolor: 'error.shortest',
+              bgcolor: 'rgba(211, 47, 47, 0.04)',
             }}
           >
             <ErrorOutlineIcon color="error" sx={{ fontSize: 64, mb: 2 }} />

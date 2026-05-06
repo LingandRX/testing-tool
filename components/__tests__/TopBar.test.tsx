@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import TopBar from '../TopBar';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import TopBar from '@/components/TopBar';
 import { RouterProvider } from '@/providers/RouterProvider';
 import type { PageType } from '@/types/storage';
 import React from 'react';
@@ -35,7 +35,7 @@ describe('TopBar 组件', () => {
   describe('渲染测试', () => {
     it('应使用默认标题渲染', () => {
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.getByText('Testing Tools')).toBeInTheDocument();
+      expect(screen.getByText('common:appName')).toBeInTheDocument();
     });
 
     it('不在 dashboard 时应渲染返回按钮', () => {

@@ -1,0 +1,33 @@
+{
+  "pageTitle": "Storage Cleaner",
+  "pageSubtitle": "Clear cache, cookies, and local storage",
+  "loading": "Loading...",
+  "occupied": "Occupied {{size}}",
+  "cleaning": "Cleaning...",
+  "cleanNow": "Clean Now",
+  "autoRefresh": "Auto refresh page after cleaning",
+  "selectAll": "Select all items",
+  "cleanSuccess": "Cleaning complete",
+  "cleanError": "Cleaning failed",
+  "noData": "No data",
+  "countUnit": "items",
+  "errorNoTab": "Unable to get current tab",
+  "errorRestricted": "Storage cleaning is not supported on this page",
+  "cleanSuccessReload": "Cleaning successful, reloading page...",
+  "errorStandardOnly": "Storage cleaning only works on standard web pages",
+  "confirmTitle": "Confirm Clear Data?",
+  "confirmDesc": "You are about to permanently delete the following selected storage items from the current page.",
+  "irreversible": "This action is irreversible",
+  "confirmAction": "Confirm Clear",
+  "cleanedSummary": "Cleaned {{items}}",
+  "noDataToClean": "No storage data found to clean",
+  "partialFailure": "Some items failed to clean",
+  "options": {
+    "localStorage": "Local Storage",
+    "sessionStorage": "Session Storage",
+    "indexedDB": "IndexedDB",
+    "cookies": "Cookies",
+    "cacheStorage": "Cache Storage",
+    "serviceWorkers": "Service Workers"
+  }
+}

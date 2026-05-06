@@ -7,6 +7,7 @@
     "module": "ESNext", // 支持 import.meta
     "moduleResolution": "Bundler", // 或者用 "Node"
     "strict": true,
+    "resolveJsonModule": true,
 
     /* --- 代码质量检查 --- */
     // 声明了但没使用的变量报错（防止代码冗余）
@@ -29,17 +30,17 @@
   },
   // 确保包含你的源代码目录
   "include": [
-    "vite-env.d.ts",
     "entrypoints/**/*",
     "pages/**/*",
     "components/**/*",
+    "providers/**/*",
     "utils/**/*",
+    "config/**/*",
     "types/**/*",
     "assets/**/*",
     "hooks/**/*",
     ".wxt/types/**/*.ts",
     ".wxt/types/*.d.ts",
-    "components",
     "eslint.config.ts"
   ],
   "exclude": ["node_modules", ".wxt", "dist"]
