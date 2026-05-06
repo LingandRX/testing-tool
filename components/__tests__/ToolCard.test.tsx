@@ -83,7 +83,6 @@ describe('ToolCard 组件', () => {
       render(
         <ToolCard
           title="AI 工具"
-          hasAI={true}
           colorCode="#2196f3"
           icon={<AccessTimeIcon />}
           onClick={() => {}}
@@ -98,7 +97,6 @@ describe('ToolCard 组件', () => {
       render(
         <ToolCard
           title="普通工具"
-          hasAI={false}
           colorCode="#2196f3"
           icon={<AccessTimeIcon />}
           onClick={() => {}}

@@ -3,16 +3,15 @@ import { useRouter } from '@/providers/RouterProvider';
 import DashboardCard from '@/pages/Dashboard/DashboardCard';
 import { getFeatureByKey } from '@/config/features';
 import type { PageType } from '@/types/storage';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { dashboardPageStyles } from '@/config/pageTheme';
 
 export default function DashboardPage() {
   const { navigateTo, visiblePages, pageOrder } = useRouter();
   const { t } = useTranslation(['features']);
 
-  const isVisible = (key: string) => visiblePages.includes(key as PageType);
+  const visibleSet = useMemo(() => new Set(visiblePages), [visiblePages]);
 
   const handleCardClick = useCallback(
     (page: PageType) => {
@@ -26,32 +25,28 @@ export default function DashboardPage() {
       sx={{
         display: 'grid',
         gridTemplateColumns: {
-          xs: '1fr', // 弹出窗口或小屏幕保持单列
-          sm: 'repeat(auto-fill, minmax(300px, 1fr))', // 标签页大屏幕自适应多列
+          xs: '1fr',
+          sm: 'repeat(auto-fill, minmax(300px, 1fr))',
         },
         gap: 2,
         p: 2,
       }}
     >
       {pageOrder.map((key) => {
-        if (!isVisible(key)) return null;
+        if (!visibleSet.has(key as PageType)) return null;
 
         const feature = getFeatureByKey(key);
-        if (!feature || !feature.icon || !feature.themeColor) return null;
-
-        // 适配 DashboardCard 组件，将 themeColor 映射到 colorCode
-        const cardConfig = {
-          title: t(feature.labelKey),
-          description: t(feature.descriptionKey),
-          colorCode: feature.themeColor,
-          icon: feature.icon,
-        };
+        if (!feature?.themeColor || feature.icon == null) return null;
 
         return (
           <DashboardCard
             key={key}
-            config={cardConfig}
-            onClick={() => handleCardClick(key)}
+            title={t(feature.labelKey)}
+            description={t(feature.descriptionKey)}
+            colorCode={feature.themeColor}
+            icon={feature.icon}
+            onClick={handleCardClick}
+            pageKey={key as PageType}
             cardBackgroundColor={dashboardPageStyles.cardBackgroundColor}
           />
         );
