@@ -24,6 +24,7 @@ import { useRouter } from '@/providers/RouterProvider';
 import { FEATURES, FeatureConfig } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
 import { useTranslation } from 'react-i18next';
+import { SUPPORTED_LANGUAGES, normalizeLanguage } from '@/i18n';
 
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
@@ -83,9 +84,13 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
     setShowResults(false);
   };
 
-  const toggleLanguage = () => {
-    const newLng = i18n.language.startsWith('zh') ? 'en' : 'zh';
-    i18n.changeLanguage(newLng);
+  const toggleLanguage = async () => {
+    const currentLng = normalizeLanguage(i18n.language);
+    const currentIndex = SUPPORTED_LANGUAGES.indexOf(currentLng);
+    const nextIndex = (currentIndex + 1) % SUPPORTED_LANGUAGES.length;
+    const newLng = SUPPORTED_LANGUAGES[nextIndex];
+    await i18n.changeLanguage(newLng);
+    await storageUtil.set('app/language', newLng);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -136,7 +141,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           <IconButton
             size="small"
             onClick={goBack}
-            aria-label={t('common:back')}
+            aria-label={t('common:buttons.back')}
             sx={{
               bgcolor: 'grey.50',
               '&:hover': { bgcolor: 'grey.200' },
@@ -159,7 +164,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           display: { xs: 'none', md: 'block' },
         }}
       >
-        Testing Tools
+        {t('common:appName')}
       </Typography>
 
       <Box sx={{ flex: 1, mx: { xs: 1, sm: 2 }, position: 'relative', maxWidth: 400 }}>
@@ -167,12 +172,12 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           <Box>
             <InputBase
               ref={inputRef}
-              placeholder={t('common:search')}
+              placeholder={t('common:buttons.search')}
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={() => setShowResults(true)}
               onKeyDown={handleKeyDown}
-              inputProps={{ 'aria-label': t('common:search') }}
+              inputProps={{ 'aria-label': t('common:buttons.search') }}
               startAdornment={<SearchIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />}
               endAdornment={
                 searchQuery && (
@@ -182,7 +187,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                       setSearchQuery('');
                       setSelectedIndex(-1);
                     }}
-                    aria-label={t('common:clearSearch')}
+                    aria-label={t('common:buttons.clearSearch')}
                   >
                     <CloseIcon sx={{ fontSize: 16 }} />
                   </IconButton>
@@ -245,7 +250,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                     ) : (
                       <Box sx={{ py: 3, textAlign: 'center' }}>
                         <Typography variant="body2" color="text.secondary">
-                          {t('common:noResults')}
+                          {t('common:buttons.noResults')}
                         </Typography>
                       </Box>
                     )
@@ -253,7 +258,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                     <>
                       <Box sx={{ px: 2, py: 1 }}>
                         <Typography variant="caption" fontWeight={700} color="text.disabled">
-                          {t('common:recentSearch')}
+                          {t('common:buttons.recentSearch')}
                         </Typography>
                       </Box>
                       {displayedHistory.map((item, index) => (
@@ -290,18 +295,30 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         spacing={0.5}
         sx={{ width: { xs: 100, sm: 150 }, justifyContent: 'flex-end' }}
       >
-        <Tooltip title={t('common:toggleLanguage')}>
-          <IconButton size="small" onClick={toggleLanguage} aria-label={t('common:toggleLanguage')}>
+        <Tooltip title={t('common:buttons.toggleLanguage')}>
+          <IconButton
+            size="small"
+            onClick={toggleLanguage}
+            aria-label={t('common:buttons.toggleLanguage')}
+          >
             <LanguageIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t('common:openInTab')}>
-          <IconButton size="small" onClick={handleOpenInTab} aria-label={t('common:openInTab')}>
+        <Tooltip title={t('common:buttons.openInTab')}>
+          <IconButton
+            size="small"
+            onClick={handleOpenInTab}
+            aria-label={t('common:buttons.openInTab')}
+          >
             <OpenInNewIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t('common:settings')}>
-          <IconButton size="small" onClick={onOpenOptions} aria-label={t('common:settings')}>
+        <Tooltip title={t('common:buttons.settings')}>
+          <IconButton
+            size="small"
+            onClick={onOpenOptions}
+            aria-label={t('common:buttons.settings')}
+          >
             <SettingsIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>

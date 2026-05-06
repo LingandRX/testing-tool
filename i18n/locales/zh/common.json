@@ -1,4 +1,5 @@
 {
+  "appName": "测试工具",
   "buttons": {
     "save": "保存",
     "cancel": "取消",

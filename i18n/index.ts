@@ -41,21 +41,57 @@ const resources = {
   },
 };
 
+export const SUPPORTED_LANGUAGES = ['zh', 'en'] as const;
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
+const LANGUAGE_STORAGE_KEY = 'app/language';
+const LANGUAGE_SNAPSHOT_KEY = 'snapshot/app/language';
+
+/**
+ * 将任意语言标识归一化为受支持的语言代码
+ */
+export const normalizeLanguage = (lng: string): SupportedLanguage => {
+  return lng.startsWith('zh') ? 'zh' : 'en';
+};
+
+/**
+ * 校验语言是否受支持
+ */
+const isValidLanguage = (lng: unknown): lng is SupportedLanguage => {
+  return typeof lng === 'string' && (SUPPORTED_LANGUAGES as readonly string[]).includes(lng);
+};
+
+/**
+ * 同步从 localStorage 获取语言快照（用于消除异步加载产生的首屏闪烁）
+ */
+const getSyncLanguageSnapshot = (): SupportedLanguage | null => {
+  try {
+    const val = localStorage.getItem(LANGUAGE_SNAPSHOT_KEY);
+    if (!val) return null;
+    const parsed = JSON.parse(val) as unknown;
+    return isValidLanguage(parsed) ? parsed : null;
+  } catch (error) {
+    console.error('解析语言同步快照失败:', error);
+    return null;
+  }
+};
+
 // 自定义 Chrome Storage 探测器
 const chromeStorageDetector = {
   name: 'chromeStorage',
   lookup() {
-    // 这在初始化时可能是异步的，但 i18next 探测器通常期望同步
-    // 我们会在初始化后根据存储值再次调用 changeLanguage
+    // 同步初始化已通过 getSyncLanguageSnapshot + init 的 lng 参数处理
     return undefined;
   },
   cacheUserLanguage(lng: string) {
-    storageUtil.set('app/language', lng);
+    storageUtil.set(LANGUAGE_STORAGE_KEY, lng);
   },
 };
 
 const detector = new LanguageDetector();
 detector.addDetector(chromeStorageDetector);
+
+const syncLng = getSyncLanguageSnapshot();
 
 i18n
   .use(detector)
@@ -63,6 +99,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
+    lng: syncLng || undefined,
     ns: ['common', 'features', 'timestamp', 'storageCleaner', 'qrCode', 'textStatistics', 'jwt'],
     defaultNS: 'common',
     debug: false,
@@ -75,20 +112,23 @@ i18n
     },
   });
 
-// 监听语言变化并同步 Day.js
+// 监听语言变化：同步 Day.js 和 localStorage 快照
 i18n.on('languageChanged', (lng) => {
-  const dayjsLocale = lng.startsWith('zh') ? 'zh-cn' : 'en';
-  dayjs.locale(dayjsLocale);
+  const normalizedLng = normalizeLanguage(lng);
+  dayjs.locale(normalizedLng === 'zh' ? 'zh-cn' : 'en');
+  localStorage.setItem(LANGUAGE_SNAPSHOT_KEY, JSON.stringify(normalizedLng));
 });
 
 // 初始化时从存储中恢复语言
-storageUtil.get('app/language').then((lng) => {
-  if (lng && lng !== i18n.language) {
-    i18n.changeLanguage(lng);
-  } else if (!lng) {
-    // 第一次运行，设置初始语言
-    const initialLng = i18n.language.startsWith('zh') ? 'zh' : 'en';
-    storageUtil.set('app/language', initialLng);
+storageUtil.get(LANGUAGE_STORAGE_KEY).then((lng) => {
+  const targetLng = lng || syncLng;
+
+  if (targetLng && isValidLanguage(targetLng) && targetLng !== i18n.language) {
+    i18n.changeLanguage(targetLng);
+  } else if (!targetLng) {
+    // 第一次运行，归一化并持久化初始语言
+    const initialLng = normalizeLanguage(i18n.language);
+    storageUtil.set(LANGUAGE_STORAGE_KEY, initialLng);
     if (initialLng !== i18n.language) {
       i18n.changeLanguage(initialLng);
     }

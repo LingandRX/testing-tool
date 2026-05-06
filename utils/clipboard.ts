@@ -1,5 +1,6 @@
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 import { useSnackbarState } from '@/components/GlobalSnackbar';
+import { t } from 'i18next';
 
 /**
  * 复制文本到剪贴板
@@ -13,11 +14,11 @@ export const copyToClipboard = async (
 ): Promise<boolean> => {
   try {
     await navigator.clipboard.writeText(text);
-    showMessage?.('已复制', { severity: 'success' });
+    showMessage?.(t('common:messages.copySuccess'), { severity: 'success' });
     return true;
   } catch (error) {
     console.error('复制失败:', error);
-    showMessage?.('复制失败', { severity: 'error' });
+    showMessage?.(t('common:messages.copyError'), { severity: 'error' });
     return false;
   }
 };

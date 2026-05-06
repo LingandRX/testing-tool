@@ -35,7 +35,7 @@ describe('TopBar 组件', () => {
   describe('渲染测试', () => {
     it('应使用默认标题渲染', () => {
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.getByText('Testing Tools')).toBeInTheDocument();
+      expect(screen.getByText('common:appName')).toBeInTheDocument();
     });
 
     it('不在 dashboard 时应渲染返回按钮', () => {
