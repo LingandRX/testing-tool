@@ -34,7 +34,7 @@ export default function Index() {
     handleClean,
   } = useStorageCleaner({ showMessage });
 
-  const isDisabled = (!someSelected && !allSelected) || loading;
+  const isDisabled = !(someSelected || allSelected) || loading;
 
   if (isInitializing) {
     return (

@@ -76,7 +76,7 @@ export function useStorageCleaner({
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
-  const resultTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const requestIdRef = useRef<number>(0);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const loadingRef = useRef(loading);
@@ -86,9 +86,7 @@ export function useStorageCleaner({
   }, [loading]);
 
   useEffect(() => {
-    const resultTimeout = resultTimeoutRef.current;
     return () => {
-      if (resultTimeout) clearTimeout(resultTimeout);
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
   }, []);
