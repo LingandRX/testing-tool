@@ -306,6 +306,15 @@ export const dashboardPageStyles = {
   primaryColor: THEME_COLORS.primary,
   backgroundColor: '#f5f5f5',
   cardBackgroundColor: '#ffffff',
+  GRID_CONTAINER: {
+    display: 'grid',
+    gridTemplateColumns: {
+      xs: '1fr',
+      sm: 'repeat(auto-fill, minmax(300px, 1fr))',
+    },
+    gap: 2,
+    p: 2,
+  },
 } as const;
 
 /**
