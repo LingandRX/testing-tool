@@ -57,8 +57,8 @@ const UrlToQrCodeSection = ({ expanded, onExpandedChange }: UrlToQrCodeSectionPr
         value: url,
         size: 250,
         level: 'H',
-        foreground: qrCodePageStyles.black,
-        background: qrCodePageStyles.white,
+        foreground: '#000000',
+        background: '#FFFFFF',
       });
 
       setQrCodeDataUrl(qr.toDataURL());

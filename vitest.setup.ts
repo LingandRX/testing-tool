@@ -84,3 +84,21 @@ beforeEach(() => {
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+// 全局 matchMedia mock（ThemeModeProvider 依赖）
+// 必须在 beforeEach 中设置，因为 afterEach 的 restoreAllMocks 会清除它
+beforeEach(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+});

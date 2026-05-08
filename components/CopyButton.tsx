@@ -67,15 +67,16 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
         style={style}
         sx={{
           color: copied ? 'success.main' : color,
-          bgcolor: '#fff',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          bgcolor: 'background.paper',
+          boxShadow: (theme) =>
+            `0 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)'}`,
           '&:hover': {
             bgcolor: copied
               ? 'success.main'
               : !['primary', 'secondary', 'success', 'error', 'info', 'warning'].includes(color)
                 ? color
                 : `${color}.main`,
-            color: '#fff',
+            color: 'background.paper',
           },
         }}
       >

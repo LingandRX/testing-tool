@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { Box, Button, Container, Paper, Typography } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
@@ -60,7 +61,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 sx={{
                   mb: 3,
                   p: 2,
-                  bgcolor: 'grey.100',
+                  bgcolor: (theme: Theme) =>
+                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.100',
                   borderRadius: 2,
                   textAlign: 'left',
                   maxHeight: '200px',

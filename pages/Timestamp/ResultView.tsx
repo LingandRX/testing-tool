@@ -35,7 +35,7 @@ const ResultView = React.memo(({ result, mode, unit, zone }: ResultViewProps) =>
 
   return (
     <Fade in={!!result}>
-      <Box sx={{ mt: 3, pt: 2.5, borderTop: '1px solid', borderColor: 'grey.50' }}>
+      <Box sx={{ mt: 3, pt: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
         <Typography variant="caption" sx={timestampPageStyles.RESULT_LABEL}>
           {t('timestamp:resultLabel')}
         </Typography>

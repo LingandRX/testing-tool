@@ -19,6 +19,8 @@ import textStatisticsZh from './locales/zh/textStatistics.json';
 import textStatisticsEn from './locales/en/textStatistics.json';
 import jwtZh from './locales/zh/jwt.json';
 import jwtEn from './locales/en/jwt.json';
+import jsonDiffZh from './locales/zh/jsonDiff.json';
+import jsonDiffEn from './locales/en/jsonDiff.json';
 
 const resources = {
   zh: {
@@ -29,6 +31,7 @@ const resources = {
     qrCode: qrCodeZh,
     textStatistics: textStatisticsZh,
     jwt: jwtZh,
+    jsonDiff: jsonDiffZh,
   },
   en: {
     common: commonEn,
@@ -38,6 +41,7 @@ const resources = {
     qrCode: qrCodeEn,
     textStatistics: textStatisticsEn,
     jwt: jwtEn,
+    jsonDiff: jsonDiffEn,
   },
 };
 
@@ -100,7 +104,16 @@ i18n
     resources,
     fallbackLng: 'en',
     lng: syncLng || undefined,
-    ns: ['common', 'features', 'timestamp', 'storageCleaner', 'qrCode', 'textStatistics', 'jwt'],
+    ns: [
+      'common',
+      'features',
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonDiff',
+    ],
     defaultNS: 'common',
     debug: false,
     interpolation: {

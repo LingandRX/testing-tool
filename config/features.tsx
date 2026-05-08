@@ -5,8 +5,9 @@ import StorageIcon from '@mui/icons-material/Storage';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import DescriptionIcon from '@mui/icons-material/Description';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 
-import { THEME_COLORS } from './pageTheme';
+export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
 
 // 懒加载页面组件
 const DashboardPage = lazy(() => import('@/pages/Dashboard'));
@@ -15,6 +16,7 @@ const StorageCleanerPage = lazy(() => import('@/pages/StorageCleaner'));
 const QrCodePage = lazy(() => import('@/pages/QrCode'));
 const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
 const JwtPage = lazy(() => import('@/pages/Jwt'));
+const JsonDiffPage = lazy(() => import('@/pages/JsonDiff'));
 
 /**
  * 功能配置接口
@@ -28,8 +30,8 @@ export interface FeatureConfig {
   labelKey: string;
   /** 功能描述翻译键 */
   descriptionKey: string;
-  /** 主题颜色（用于仪表盘卡片） */
-  themeColor?: string;
+  /** 主题颜色键（用于仪表盘卡片，映射到 theme.palette[key].main） */
+  themeColorKey?: PaletteColorKey;
   /** 图标组件（用于仪表盘卡片） */
   icon?: ReactNode;
   /** 默认是否在仪表盘显示 */
@@ -61,7 +63,7 @@ export const FEATURES: FeatureConfig[] = [
     key: 'timestamp',
     labelKey: 'features:timestamp.title',
     descriptionKey: 'features:timestamp.description',
-    themeColor: THEME_COLORS.primary,
+    themeColorKey: 'primary',
     icon: <AccessTimeIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
@@ -74,7 +76,7 @@ export const FEATURES: FeatureConfig[] = [
     key: 'storageCleaner',
     labelKey: 'features:storageCleaner.title',
     descriptionKey: 'features:storageCleaner.description',
-    themeColor: THEME_COLORS.warning,
+    themeColorKey: 'warning',
     icon: <StorageIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
@@ -87,7 +89,7 @@ export const FEATURES: FeatureConfig[] = [
     key: 'qrCode',
     labelKey: 'features:qrCode.title',
     descriptionKey: 'features:qrCode.description',
-    themeColor: THEME_COLORS.success,
+    themeColorKey: 'success',
     icon: <QrCodeIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
@@ -100,7 +102,7 @@ export const FEATURES: FeatureConfig[] = [
     key: 'textStatistics',
     labelKey: 'features:textStatistics.title',
     descriptionKey: 'features:textStatistics.description',
-    themeColor: THEME_COLORS.purple,
+    themeColorKey: 'secondary',
     icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
@@ -113,13 +115,26 @@ export const FEATURES: FeatureConfig[] = [
     key: 'jwt',
     labelKey: 'features:jwt.title',
     descriptionKey: 'features:jwt.description',
-    themeColor: THEME_COLORS.indigo,
+    themeColorKey: 'info',
     icon: <VpnKeyIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
       popup: JwtPage,
       sidepanel: JwtPage,
       tab: JwtPage,
+    },
+  },
+  {
+    key: 'jsonDiff',
+    labelKey: 'features:jsonDiff.title',
+    descriptionKey: 'features:jsonDiff.description',
+    themeColorKey: 'primary',
+    icon: <CompareArrowsIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: JsonDiffPage,
+      sidepanel: JsonDiffPage,
+      tab: JsonDiffPage,
     },
   },
 ];

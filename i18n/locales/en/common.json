@@ -8,6 +8,12 @@
     "clear": "Clear",
     "refresh": "Refresh",
     "toggleLanguage": "Switch Language",
+    "toggleTheme": "Toggle theme",
+    "themeMode": {
+      "light": "Switch to dark mode",
+      "dark": "Switch to system mode",
+      "system": "Switch to light mode"
+    },
     "search": "Search tools...",
     "back": "Back",
     "clearSearch": "Clear search",
