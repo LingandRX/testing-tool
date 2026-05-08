@@ -1,6 +1,7 @@
-import { Box, Collapse } from '@mui/material';
+import { Box, Collapse, useTheme } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { jsonDiffPageStyles } from '@/config/pageTheme';
+import { surfaceTint } from '@/config/pageTheme';
 import type { DiffNode, DiffType } from './types';
 
 export type TreeSide = 'left' | 'right';
@@ -42,19 +43,19 @@ const getValueForSide = (node: DiffNode, side: TreeSide): unknown => {
   return side === 'left' ? node.oldValue : node.newValue;
 };
 
-const getRowBg = (type: DiffType, side: TreeSide): string | undefined => {
+const getRowBg = (type: DiffType, side: TreeSide, theme: Theme): string | undefined => {
   if (!shouldRenderOnSide(type, side)) return undefined;
-  if (type === 'added') return jsonDiffPageStyles.addedBg;
-  if (type === 'removed') return jsonDiffPageStyles.removedBg;
-  if (type === 'modified') return jsonDiffPageStyles.modifiedBg;
+  if (type === 'added') return surfaceTint(theme, theme.palette.success.main, 0.15);
+  if (type === 'removed') return surfaceTint(theme, theme.palette.error.main, 0.15);
+  if (type === 'modified') return surfaceTint(theme, theme.palette.warning.main, 0.15);
   return undefined;
 };
 
 const getValueColor = (type: DiffType, side: TreeSide): string | undefined => {
   if (!shouldRenderOnSide(type, side)) return undefined;
-  if (type === 'added') return jsonDiffPageStyles.addedText;
-  if (type === 'removed') return jsonDiffPageStyles.removedText;
-  if (type === 'modified') return jsonDiffPageStyles.modifiedText;
+  if (type === 'added') return 'success.main';
+  if (type === 'removed') return 'error.main';
+  if (type === 'modified') return 'warning.main';
   return undefined;
 };
 
@@ -73,6 +74,7 @@ const NodeRow = ({
   // 'auto' = follow defaults + activePath; otherwise user explicitly toggled
   const [override, setOverride] = useState<'auto' | 'open' | 'closed'>('auto');
   const rowRef = useRef<HTMLDivElement | null>(null);
+  const theme = useTheme();
 
   const onActivePath = Boolean(
     activePath &&
@@ -103,7 +105,7 @@ const NodeRow = ({
   const value = getValueForSide(node, side);
   const isContainer = isContainerValue(value) && Array.isArray(node.children);
   const isArray = Array.isArray(value);
-  const bg = getRowBg(node.type, side);
+  const bg = getRowBg(node.type, side, theme);
   const valueColor = getValueColor(node.type, side);
   const isActive = activePath === node.path;
 
@@ -240,7 +242,21 @@ export default function JsonTree({
 }: JsonTreeProps) {
   const sideKey = useMemo(() => side, [side]);
   return (
-    <Box sx={jsonDiffPageStyles.TREE_CONTAINER}>
+    <Box
+      sx={{
+        p: 1.5,
+        borderRadius: 3,
+        bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+        fontFamily: 'monospace',
+        fontSize: '0.8rem',
+        overflowX: 'auto',
+        minHeight: 200,
+        maxHeight: 480,
+        overflowY: 'auto',
+      }}
+    >
       <NodeRow
         node={node}
         side={sideKey}

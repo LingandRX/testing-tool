@@ -11,6 +11,9 @@ export type ZoneType = (typeof ZONES)[number];
 /**
  * 符合 WCAG AA 标准（4.5:1 对比度）的主题颜色体系
  * 所有颜色都经过对比度计算，确保可访问性
+ *
+ * 注意：这些颜色是品牌色源，实际组件应优先使用 theme.palette.* 令牌，
+ * 以便在亮色/暗色模式下自动切换。
  */
 export const THEME_COLORS = {
   // 主要颜色 - 蓝色系
@@ -66,11 +69,10 @@ export const STATUS_COLORS = {
 } as const;
 
 /**
- * 全局样式配置
+ * 暗色模式下自动加深 alpha 值的辅助函数
  */
-export const globalStyles = {
-  backgroundColor: '#f5f5f5',
-} as const;
+export const surfaceTint = (theme: Theme, color: string, baseAlpha: number) =>
+  alpha(color, theme.palette.mode === 'dark' ? Math.min(baseAlpha + 0.1, 0.9) : baseAlpha);
 
 /**
  * 时间戳转换页面样式
@@ -82,18 +84,18 @@ export const timestampPageStyles = {
       bgcolor: 'background.paper',
       borderRadius: 3,
       border: '1px solid',
-      borderColor: 'grey.100',
+      borderColor: 'divider',
       transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       '& fieldset': { border: 'none' },
-      '&:hover': { borderColor: 'grey.300', bgcolor: 'grey.50' },
+      '&:hover': { borderColor: 'action.active', bgcolor: 'action.hover' },
       '&.Mui-focused': {
-        bgcolor: '#fff',
+        bgcolor: 'background.paper',
         borderColor: 'primary.main',
-        boxShadow: (theme: Theme) => `0 0 0 4px ${theme.palette.primary.main}1a`,
+        boxShadow: (theme: Theme) => `0 0 0 4px ${alpha(theme.palette.primary.main, 0.1)}`,
       },
       '&.Mui-error': {
         borderColor: 'error.main',
-        boxShadow: (theme: Theme) => `0 0 0 4px ${theme.palette.error.main}1a`,
+        boxShadow: (theme: Theme) => `0 0 0 4px ${alpha(theme.palette.error.main, 0.1)}`,
       },
     },
     '& .MuiInputBase-input': {
@@ -109,21 +111,21 @@ export const timestampPageStyles = {
       sx: { borderRadius: 3, mt: 1, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' },
     },
   },
-  cardBg: alpha(THEME_COLORS.primary, 0.04),
-  cardBorder: alpha(THEME_COLORS.primary, 0.1),
-  switcherBg: alpha(THEME_COLORS.primary, 0.08),
-  switcherBorder: alpha(THEME_COLORS.primary, 0.1),
-  mutedText: alpha(THEME_COLORS.primary, 0.4),
-  resultBg: alpha(THEME_COLORS.primary, 0.05),
-  buttonHover: `0 8px 24px ${alpha(THEME_COLORS.primary, 0.2)}`,
+  cardBg: (theme: Theme) => alpha(theme.palette.primary.main, 0.04),
+  cardBorder: (theme: Theme) => alpha(theme.palette.primary.main, 0.1),
+  switcherBg: (theme: Theme) => alpha(theme.palette.primary.main, 0.08),
+  switcherBorder: (theme: Theme) => alpha(theme.palette.primary.main, 0.1),
+  mutedText: (theme: Theme) => alpha(theme.palette.primary.main, 0.4),
+  resultBg: (theme: Theme) => alpha(theme.palette.primary.main, 0.05),
+  buttonHover: (theme: Theme) => `0 8px 24px ${alpha(theme.palette.primary.main, 0.2)}`,
   /** 模式切换器 (ToggleButtonGroup) 样式 */
   MODE_SWITCHER: {
     width: '100%',
     mb: 2.5,
     borderRadius: 4,
-    bgcolor: 'grey.100',
+    bgcolor: (theme: Theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.900'),
     border: '1px solid',
-    borderColor: 'grey.200',
+    borderColor: 'divider',
     p: 0.6,
     '& .MuiToggleButtonGroup-grouped': {
       flex: 1,
@@ -135,7 +137,7 @@ export const timestampPageStyles = {
       color: 'text.secondary',
       transition: 'color 0.3s',
       '&.Mui-selected': {
-        bgcolor: '#fff',
+        bgcolor: 'background.paper',
         color: 'primary.main',
         boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
       },
@@ -145,11 +147,11 @@ export const timestampPageStyles = {
   UNIT_SWITCHER_CONTAINER: {
     flex: 1,
     display: 'flex',
-    bgcolor: 'grey.50',
+    bgcolor: 'action.hover',
     p: 0.5,
     borderRadius: 3.5,
     border: '1px solid',
-    borderColor: 'grey.100',
+    borderColor: 'divider',
   },
   UNIT_SWITCHER_ITEM: (active: boolean) => ({
     flex: 1,
@@ -160,12 +162,12 @@ export const timestampPageStyles = {
     fontSize: '0.75rem',
     fontWeight: 800,
     transition: 'all 0.2s',
-    bgcolor: active ? '#fff' : 'transparent',
+    bgcolor: active ? 'background.paper' : 'transparent',
     color: active ? 'primary.main' : 'text.disabled',
     boxShadow: active ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
   }),
   /** LiveClock 卡片样式 */
-  LIVE_CLOCK_CARD: {
+  LIVE_CLOCK_CARD: (theme: Theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -173,13 +175,13 @@ export const timestampPageStyles = {
     gap: 1.5,
     p: 1.8,
     mb: 2.5,
-    bgcolor: alpha(THEME_COLORS.primary, 0.04),
+    bgcolor: alpha(theme.palette.primary.main, 0.04),
     borderRadius: 4,
     border: '1px solid',
-    borderColor: alpha(THEME_COLORS.primary, 0.1),
-  },
+    borderColor: alpha(theme.palette.primary.main, 0.1),
+  }),
   LIVE_CLOCK_LABEL: {
-    color: THEME_COLORS.primary,
+    color: 'primary.main',
     fontWeight: 800,
     fontSize: '0.6rem',
     textTransform: 'uppercase',
@@ -187,21 +189,21 @@ export const timestampPageStyles = {
   },
   LIVE_CLOCK_VALUE: {
     fontWeight: 800,
-    color: THEME_COLORS.primary,
+    color: 'primary.main',
     fontFamily: 'monospace',
     fontSize: { xs: '1.1rem', sm: '1.2rem' },
     letterSpacing: '-0.5px',
     lineHeight: 1.2,
   },
-  LIVE_CLOCK_UNIT_SWITCHER: {
+  LIVE_CLOCK_UNIT_SWITCHER: (theme: Theme) => ({
     display: 'flex',
     p: 0.4,
-    bgcolor: alpha(THEME_COLORS.primary, 0.08),
+    bgcolor: alpha(theme.palette.primary.main, 0.08),
     borderRadius: 2.5,
     border: '1px solid',
-    borderColor: alpha(THEME_COLORS.primary, 0.1),
-  },
-  LIVE_CLOCK_UNIT_ITEM: (active: boolean) => ({
+    borderColor: alpha(theme.palette.primary.main, 0.1),
+  }),
+  LIVE_CLOCK_UNIT_ITEM: (active: boolean) => (theme: Theme) => ({
     px: { xs: 1, sm: 1.2 },
     py: 0.35,
     borderRadius: 2,
@@ -209,20 +211,20 @@ export const timestampPageStyles = {
     fontSize: '0.65rem',
     fontWeight: 900,
     transition: 'all 0.2s',
-    bgcolor: active ? '#fff' : 'transparent',
-    color: active ? 'primary.main' : alpha(THEME_COLORS.primary, 0.4),
+    bgcolor: active ? 'background.paper' : 'transparent',
+    color: active ? 'primary.main' : alpha(theme.palette.primary.main, 0.4),
     boxShadow: active ? '0 2px 6px rgba(33, 150, 243, 0.2)' : 'none',
   }),
   LIVE_CLOCK_ICON_BUTTON: {
-    color: THEME_COLORS.primary,
-    bgcolor: '#fff',
+    color: 'primary.main',
+    bgcolor: 'background.paper',
     boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    '&:hover': { bgcolor: THEME_COLORS.primary, color: '#fff' },
+    '&:hover': { bgcolor: 'primary.main', color: 'primary.contrastText' },
   },
   LIVE_CLOCK_DIVIDER: {
     mx: 0.5,
     my: 1,
-    borderColor: alpha(THEME_COLORS.primary, 0.1),
+    borderColor: (theme: Theme) => alpha(theme.palette.primary.main, 0.1),
   },
   /** ResultView 样式 */
   RESULT_LABEL: {
@@ -232,33 +234,33 @@ export const timestampPageStyles = {
     fontWeight: 800,
     fontSize: '0.7rem',
   },
-  RESULT_MAIN_BOX: {
-    bgcolor: alpha(THEME_COLORS.primary, 0.05),
+  RESULT_MAIN_BOX: (theme: Theme) => ({
+    bgcolor: alpha(theme.palette.primary.main, 0.05),
     p: 2,
     borderRadius: 4,
     position: 'relative',
     mb: 2.5,
     border: '1px solid',
-    borderColor: alpha(THEME_COLORS.primary, 0.1),
+    borderColor: alpha(theme.palette.primary.main, 0.1),
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
+  }),
   RESULT_MAIN_TEXT: {
     fontFamily: 'monospace',
     fontWeight: 700,
-    color: THEME_COLORS.primary,
+    color: 'primary.main',
     wordBreak: 'break-all',
     pr: 4,
     fontSize: '1rem',
   },
-  RESULT_EXTRA_STACK: {
-    bgcolor: alpha(THEME_COLORS.primary, 0.05),
+  RESULT_EXTRA_STACK: (theme: Theme) => ({
+    bgcolor: alpha(theme.palette.primary.main, 0.05),
     p: 2,
     borderRadius: 4,
     border: '1px solid',
-    borderColor: alpha(THEME_COLORS.primary, 0.1),
-  },
+    borderColor: alpha(theme.palette.primary.main, 0.1),
+  }),
   RESULT_EXTRA_LABEL: {
     color: 'text.disabled',
     fontWeight: 700,
@@ -267,7 +269,7 @@ export const timestampPageStyles = {
   },
   RESULT_EXTRA_VALUE: {
     fontFamily: 'monospace',
-    color: THEME_COLORS.primary,
+    color: 'primary.main',
     fontWeight: 600,
     fontSize: '0.65rem',
   },
@@ -279,15 +281,14 @@ export const timestampPageStyles = {
 export const storageCleanerPageStyles = {
   warningColor: THEME_COLORS.warning,
   warningDark: THEME_COLORS.warningDark,
-  warningBg: alpha(THEME_COLORS.warning, 0.05),
-  warningBorder: `1px solid ${alpha(THEME_COLORS.warning, 0.2)}`,
-  errorBorder: `1px solid ${alpha(THEME_COLORS.error, 0.2)}`,
-  errorBg: alpha(THEME_COLORS.error, 0.05),
+  warningBg: (theme: Theme) => surfaceTint(theme, theme.palette.warning.main, 0.05),
+  errorBorder: (theme: Theme) => `1px solid ${surfaceTint(theme, theme.palette.error.main, 0.2)}`,
+  errorBg: (theme: Theme) => surfaceTint(theme, theme.palette.error.main, 0.05),
   /** 选项网格容器 */
   OPTIONS_GRID_CONTAINER: {
     mb: 3,
     border: '1px solid',
-    borderColor: 'grey.100',
+    borderColor: 'divider',
     borderRadius: 4,
     bgcolor: 'background.paper',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
@@ -307,7 +308,7 @@ export const storageCleanerPageStyles = {
     borderBottomRightRadius: 4,
     transition: 'all 0.2s',
     '&:hover': {
-      bgcolor: 'rgba(0, 0, 0, 0.04)',
+      bgcolor: 'action.hover',
     },
   },
   OPTIONS_GRID_CHECKBOX: {
@@ -322,7 +323,7 @@ export const storageCleanerPageStyles = {
     },
   },
   /** 选项项 */
-  OPTION_ITEM: (checked: boolean) => ({
+  OPTION_ITEM: (checked: boolean) => (theme: Theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -330,10 +331,10 @@ export const storageCleanerPageStyles = {
     px: { xs: 1, sm: 1.5 },
     borderRadius: 3,
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-    bgcolor: checked ? alpha(THEME_COLORS.warning, 0.05) : 'transparent',
-    border: `1px solid ${checked ? alpha(THEME_COLORS.warning, 0.2) : 'transparent'}`,
+    bgcolor: checked ? surfaceTint(theme, theme.palette.warning.main, 0.05) : 'transparent',
+    border: `1px solid ${checked ? surfaceTint(theme, theme.palette.warning.main, 0.2) : 'transparent'}`,
     '&:hover': {
-      bgcolor: checked ? alpha(THEME_COLORS.warning, 0.1) : 'rgba(0, 0, 0, 0.02)',
+      bgcolor: checked ? surfaceTint(theme, theme.palette.warning.main, 0.1) : 'action.hover',
       transform: 'translateY(-1px)',
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
     },
@@ -346,7 +347,7 @@ export const storageCleanerPageStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     transition: 'color 0.2s',
-    color: checked ? THEME_COLORS.warning : 'text.primary',
+    color: checked ? 'warning.main' : 'text.primary',
   }),
   OPTION_ITEM_SIZE: {
     color: 'text.secondary',
@@ -359,7 +360,7 @@ export const storageCleanerPageStyles = {
     opacity: 0.8,
   },
   OPTION_ITEM_NO_DATA: {
-    color: 'grey.400',
+    color: 'text.disabled',
     fontSize: '0.65rem',
     fontWeight: 500,
     display: 'block',
@@ -384,7 +385,7 @@ export const storageCleanerPageStyles = {
     borderRadius: 4,
     bgcolor: 'background.paper',
     border: '1px solid',
-    borderColor: 'grey.100',
+    borderColor: 'divider',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -407,30 +408,30 @@ export const storageCleanerPageStyles = {
     },
   },
   /** DomainHeader */
-  DOMAIN_HEADER_BADGE: {
-    bgcolor: alpha(THEME_COLORS.warning, 0.15),
-    color: THEME_COLORS.warning,
+  DOMAIN_HEADER_BADGE: (theme: Theme) => ({
+    bgcolor: surfaceTint(theme, theme.palette.warning.main, 0.15),
+    color: 'warning.main',
     px: 1.5,
     py: 0.3,
     borderRadius: 2,
     fontWeight: 800,
     fontSize: '0.7rem',
-    boxShadow: `0 2px 4px ${alpha(THEME_COLORS.warning, 0.2)}`,
+    boxShadow: `0 2px 4px ${surfaceTint(theme, theme.palette.warning.main, 0.2)}`,
     transition: 'all 0.2s',
     '&:hover': {
-      bgcolor: alpha(THEME_COLORS.warning, 0.25),
+      bgcolor: surfaceTint(theme, theme.palette.warning.main, 0.25),
     },
-  },
-  DOMAIN_HEADER_ICON: {
+  }),
+  DOMAIN_HEADER_ICON: (theme: Theme) => ({
     p: 1.2,
     borderRadius: 3,
-    boxShadow: `0 2px 8px ${alpha(THEME_COLORS.warning, 0.15)}`,
+    boxShadow: `0 2px 8px ${surfaceTint(theme, theme.palette.warning.main, 0.15)}`,
     transition: 'all 0.2s',
     '&:hover': {
-      bgcolor: alpha(THEME_COLORS.warning, 0.15),
+      bgcolor: surfaceTint(theme, theme.palette.warning.main, 0.15),
       transform: 'scale(1.05)',
     },
-  },
+  }),
   /** ErrorDisplay */
   ERROR_DISPLAY_CONTAINER: {
     py: 8,
@@ -440,17 +441,18 @@ export const storageCleanerPageStyles = {
     minHeight: { xs: 'auto', sm: '400px' },
     textAlign: 'center',
   },
-  ERROR_DISPLAY_BOX: {
+  ERROR_DISPLAY_BOX: (theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
     p: 4,
-    boxShadow: `0 8px 24px ${alpha(THEME_COLORS.error, 0.15)}`,
-    border: `1px solid ${alpha(THEME_COLORS.error, 0.2)}`,
-    bgcolor: alpha(THEME_COLORS.error, 0.05),
-  },
+    boxShadow: `0 8px 24px ${surfaceTint(theme, theme.palette.error.main, 0.15)}`,
+    border: '1px solid',
+    borderColor: surfaceTint(theme, theme.palette.error.main, 0.2),
+    bgcolor: surfaceTint(theme, theme.palette.error.main, 0.05),
+  }),
   /** CleaningResult */
   CLEANING_RESULT_ALERT: {
     borderRadius: 3,
@@ -471,7 +473,7 @@ export const storageCleanerPageStyles = {
   CONFIRM_DIALOG_PAPER: {
     borderRadius: 6,
     backgroundImage: 'none',
-    boxShadow: `0 24px 64px -12px ${alpha(THEME_COLORS.black, 0.18)}`,
+    boxShadow: '0 24px 64px -12px rgba(0, 0, 0, 0.18)',
     p: 1.5,
     bgcolor: 'background.paper',
   },
@@ -493,29 +495,29 @@ export const storageCleanerPageStyles = {
     fontWeight: 500,
     fontSize: '0.9rem',
   },
-  CONFIRM_DIALOG_CHIP: {
-    bgcolor: alpha(THEME_COLORS.warning, 0.04),
+  CONFIRM_DIALOG_CHIP: (theme: Theme) => ({
+    bgcolor: surfaceTint(theme, theme.palette.warning.main, 0.04),
     fontWeight: 700,
-    color: THEME_COLORS.warning,
+    color: 'warning.main',
     fontSize: '0.75rem',
     border: '1px solid',
-    borderColor: alpha(THEME_COLORS.warning, 0.15),
+    borderColor: surfaceTint(theme, theme.palette.warning.main, 0.15),
     borderRadius: 2.5,
     height: 'auto',
     '& .MuiChip-label': { px: 1.2, py: 0.6 },
-  },
-  CONFIRM_DIALOG_WARNING_BOX: {
+  }),
+  CONFIRM_DIALOG_WARNING_BOX: (theme: Theme) => ({
     display: 'inline-flex',
     alignItems: 'center',
     gap: 1,
-    bgcolor: alpha(THEME_COLORS.error, 0.05),
-    color: THEME_COLORS.error,
+    bgcolor: surfaceTint(theme, theme.palette.error.main, 0.05),
+    color: 'error.main',
     px: 2,
     py: 0.8,
     borderRadius: 3,
     border: '1px dashed',
-    borderColor: alpha(THEME_COLORS.error, 0.2),
-  },
+    borderColor: surfaceTint(theme, theme.palette.error.main, 0.2),
+  }),
   CONFIRM_DIALOG_WARNING_TEXT: {
     fontWeight: 800,
     display: 'flex',
@@ -527,29 +529,23 @@ export const storageCleanerPageStyles = {
     boxShadow: '0 0 1px 1px rgba(0, 0, 0, 0.1)',
     color: 'text.secondary',
     '&:hover': {
-      bgcolor: 'grey.100',
+      bgcolor: 'action.hover',
       color: 'text.primary',
     },
   },
   CONFIRM_DIALOG_CONFIRM: {
-    bgcolor: THEME_COLORS.warning,
+    bgcolor: 'warning.main',
     '&:hover': {
-      bgcolor: THEME_COLORS.warningDark,
+      bgcolor: 'warning.dark',
     },
   },
 } as const;
 
 /**
  * 二维码工具页面样式
- * 注意：保留 successColor 和 successDark 以保持向后兼容性
  */
 export const qrCodePageStyles = {
   primaryColor: THEME_COLORS.success,
-  primaryDark: THEME_COLORS.successDark,
-  successColor: THEME_COLORS.success,
-  successDark: THEME_COLORS.successDark,
-  white: THEME_COLORS.white,
-  black: THEME_COLORS.black,
   /** 加载状态容器 */
   LOADING_CONTAINER: {
     py: 4,
@@ -580,10 +576,10 @@ export const qrCodePageStyles = {
   PRIMARY_BUTTON: {
     py: 1.2,
     borderRadius: 3,
-    bgcolor: THEME_COLORS.success,
+    bgcolor: 'success.main',
     fontWeight: 700,
     '&:hover': {
-      bgcolor: THEME_COLORS.successDark,
+      bgcolor: 'success.dark',
     },
   } as const,
   /** 二维码展示区域 */
@@ -594,10 +590,10 @@ export const qrCodePageStyles = {
     alignItems: 'center',
     minHeight: 200,
     border: '2px dashed',
-    borderColor: 'grey.200',
+    borderColor: 'divider',
     borderRadius: 3,
     p: 2,
-    bgcolor: 'grey.50',
+    bgcolor: 'action.hover',
   } as const,
   QR_PREVIEW_INNER: {
     display: 'flex',
@@ -618,23 +614,23 @@ export const qrCodePageStyles = {
   /** 下载按钮 */
   DOWNLOAD_BUTTON: {
     borderRadius: 2,
-    borderColor: THEME_COLORS.success,
-    color: THEME_COLORS.success,
+    borderColor: 'success.main',
+    color: 'success.main',
     '&:hover': {
-      borderColor: THEME_COLORS.successDark,
-      bgcolor: alpha(THEME_COLORS.success, 0.05),
+      borderColor: 'success.dark',
+      bgcolor: (theme: Theme) => alpha(theme.palette.success.main, 0.05),
     },
   } as const,
   /** 复制按钮 */
   COPY_BUTTON: {
     borderRadius: 2,
-    bgcolor: THEME_COLORS.success,
+    bgcolor: 'success.main',
     '&:hover': {
-      bgcolor: THEME_COLORS.successDark,
+      bgcolor: 'success.dark',
     },
   } as const,
   /** 拖拽上传区域 */
-  DROPZONE: (dragging: boolean, hasFile: boolean) =>
+  DROPZONE: (dragging: boolean, hasFile: boolean) => (theme: Theme) =>
     ({
       display: 'flex',
       flexDirection: 'column',
@@ -642,19 +638,19 @@ export const qrCodePageStyles = {
       justifyContent: 'center',
       minHeight: 200,
       border: '2px dashed',
-      borderColor: dragging || hasFile ? THEME_COLORS.success : 'grey.200',
+      borderColor: dragging || hasFile ? 'success.main' : 'divider',
       borderRadius: 3,
       p: 4,
       bgcolor: dragging
-        ? alpha(THEME_COLORS.success, 0.1)
+        ? alpha(theme.palette.success.main, 0.1)
         : hasFile
-          ? alpha(THEME_COLORS.success, 0.05)
-          : 'grey.50',
+          ? alpha(theme.palette.success.main, 0.05)
+          : 'action.hover',
       cursor: 'pointer',
       transition: 'all 0.2s',
       '&:hover': {
-        borderColor: THEME_COLORS.success,
-        bgcolor: alpha(THEME_COLORS.success, 0.05),
+        borderColor: 'success.main',
+        bgcolor: alpha(theme.palette.success.main, 0.05),
       },
     }) as const,
   /** 图片预览容器 */
@@ -674,16 +670,16 @@ export const qrCodePageStyles = {
     objectFit: 'contain',
   } as const,
   /** 清除按钮 */
-  CLEAR_BUTTON: {
+  CLEAR_BUTTON: (theme: Theme) => ({
     position: 'absolute',
     top: -8,
     right: -8,
-    bgcolor: alpha(THEME_COLORS.error, 0.9),
+    bgcolor: alpha(theme.palette.error.main, 0.9),
     color: 'white',
     '&:hover': {
-      bgcolor: alpha(THEME_COLORS.errorDark, 0.95),
+      bgcolor: 'error.dark',
     },
-  } as const,
+  }),
   /** 结果输入框 */
   RESULT_INPUT: {
     position: 'relative',
@@ -700,9 +696,6 @@ export const qrCodePageStyles = {
  * 仪表盘页面样式
  */
 export const dashboardPageStyles = {
-  primaryColor: THEME_COLORS.primary,
-  backgroundColor: '#f5f5f5',
-  cardBackgroundColor: '#ffffff',
   GRID_CONTAINER: {
     display: 'grid',
     gridTemplateColumns: {
@@ -719,14 +712,14 @@ export const dashboardPageStyles = {
  * 使用语义化的颜色命名：valid（有效）、invalid（无效）、clear（清除）
  */
 export const formRecognizerPageStyles = {
-  primaryColor: '#ff5722',
-  validColor: THEME_COLORS.success,
-  validDark: THEME_COLORS.successDark,
-  invalidColor: THEME_COLORS.warning,
-  invalidDark: THEME_COLORS.warningDark,
-  clearColor: THEME_COLORS.error,
-  clearDark: THEME_COLORS.errorDark,
-  clearBg: alpha(THEME_COLORS.error, 0.05),
+  primaryColor: 'warning.main',
+  validColor: 'success.main',
+  validDark: 'success.dark',
+  invalidColor: 'warning.main',
+  invalidDark: 'warning.dark',
+  clearColor: 'error.main',
+  clearDark: 'error.dark',
+  clearBg: (theme: Theme) => surfaceTint(theme, theme.palette.error.main, 0.05),
   buttonStyle: {
     py: 1.2,
     borderRadius: 3,
@@ -738,7 +731,7 @@ export const formRecognizerPageStyles = {
  * 表单映射页面样式
  */
 export const formMappingPageStyles = {
-  secondaryColor: THEME_COLORS.purple,
+  secondaryColor: 'secondary.main',
 } as const;
 
 /**
@@ -746,13 +739,10 @@ export const formMappingPageStyles = {
  */
 export const textStatisticsPageStyles = {
   primaryColor: THEME_COLORS.purple,
-  cardBg: alpha(THEME_COLORS.purple, 0.04),
-  cardBorder: alpha(THEME_COLORS.purple, 0.1),
+  cardBg: (theme: Theme) => alpha(theme.palette.secondary.main, 0.04),
+  cardBorder: (theme: Theme) => alpha(theme.palette.secondary.main, 0.1),
 } as const;
 
-/**
- * JWT 解析工具页面样式
- */
 /**
  * TopBar 组件样式
  */
@@ -770,8 +760,8 @@ export const topBarStyles = {
  */
 export const jwtPageStyles = {
   primaryColor: THEME_COLORS.indigo,
-  cardBg: alpha(THEME_COLORS.indigo, 0.04),
-  cardBorder: alpha(THEME_COLORS.indigo, 0.1),
+  cardBg: (theme: Theme) => alpha(theme.palette.info.main, 0.04),
+  cardBorder: (theme: Theme) => alpha(theme.palette.info.main, 0.1),
   INPUT_STYLE: {
     '& .MuiOutlinedInput-root': {
       bgcolor: 'background.paper',
@@ -779,8 +769,8 @@ export const jwtPageStyles = {
       fontSize: '0.85rem',
       fontFamily: 'monospace',
       transition: 'all 0.2s',
-      '&:hover': { bgcolor: 'grey.50' },
-      '&.Mui-focused': { bgcolor: '#fff' },
+      '&:hover': { bgcolor: 'action.hover' },
+      '&.Mui-focused': { bgcolor: 'background.paper' },
     },
   },
 } as const;
@@ -790,15 +780,15 @@ export const jwtPageStyles = {
  */
 export const jsonDiffPageStyles = {
   primaryColor: THEME_COLORS.primary,
-  addedBg: alpha(THEME_COLORS.success, 0.15),
-  addedBorder: alpha(THEME_COLORS.success, 0.4),
-  addedText: THEME_COLORS.success,
-  removedBg: alpha(THEME_COLORS.error, 0.15),
-  removedBorder: alpha(THEME_COLORS.error, 0.4),
-  removedText: THEME_COLORS.error,
-  modifiedBg: alpha(THEME_COLORS.warning, 0.15),
-  modifiedBorder: alpha(THEME_COLORS.warning, 0.4),
-  modifiedText: THEME_COLORS.warning,
+  addedBg: (theme: Theme) => surfaceTint(theme, theme.palette.success.main, 0.15),
+  addedBorder: (theme: Theme) => surfaceTint(theme, theme.palette.success.main, 0.4),
+  addedText: 'success.main',
+  removedBg: (theme: Theme) => surfaceTint(theme, theme.palette.error.main, 0.15),
+  removedBorder: (theme: Theme) => surfaceTint(theme, theme.palette.error.main, 0.4),
+  removedText: 'error.main',
+  modifiedBg: (theme: Theme) => surfaceTint(theme, theme.palette.warning.main, 0.15),
+  modifiedBorder: (theme: Theme) => surfaceTint(theme, theme.palette.warning.main, 0.4),
+  modifiedText: 'warning.main',
   INPUT_STYLE: {
     '& .MuiOutlinedInput-root': {
       bgcolor: 'background.paper',
@@ -807,13 +797,13 @@ export const jsonDiffPageStyles = {
       fontFamily: 'monospace',
       alignItems: 'flex-start',
       transition: 'all 0.2s',
-      '&:hover': { bgcolor: 'grey.50' },
+      '&:hover': { bgcolor: 'action.hover' },
       '&.Mui-focused': {
-        bgcolor: '#fff',
-        boxShadow: (theme: Theme) => `0 0 0 4px ${theme.palette.primary.main}1a`,
+        bgcolor: 'background.paper',
+        boxShadow: (theme: Theme) => `0 0 0 4px ${alpha(theme.palette.primary.main, 0.1)}`,
       },
       '&.Mui-error': {
-        boxShadow: (theme: Theme) => `0 0 0 4px ${theme.palette.error.main}1a`,
+        boxShadow: (theme: Theme) => `0 0 0 4px ${alpha(theme.palette.error.main, 0.1)}`,
       },
     },
   },
@@ -822,7 +812,7 @@ export const jsonDiffPageStyles = {
     borderRadius: 3,
     bgcolor: 'background.paper',
     border: '1px solid',
-    borderColor: 'grey.200',
+    borderColor: 'divider',
     fontFamily: 'monospace',
     fontSize: '0.8rem',
     overflowX: 'auto',
@@ -830,15 +820,15 @@ export const jsonDiffPageStyles = {
     maxHeight: 480,
     overflowY: 'auto',
   },
-  NAVIGATOR: {
+  NAVIGATOR: (theme: Theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 1.5,
     p: 1,
     borderRadius: 3,
-    bgcolor: alpha(THEME_COLORS.primary, 0.05),
+    bgcolor: alpha(theme.palette.primary.main, 0.05),
     border: '1px solid',
-    borderColor: alpha(THEME_COLORS.primary, 0.15),
-  },
+    borderColor: alpha(theme.palette.primary.main, 0.15),
+  }),
 } as const;

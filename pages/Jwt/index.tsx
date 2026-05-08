@@ -149,7 +149,7 @@ export default function Index() {
                 >
                   <Typography
                     variant="subtitle2"
-                    sx={{ fontWeight: 800, color: '#00b9f1', letterSpacing: 0.5 }}
+                    sx={{ fontWeight: 800, color: 'info.main', letterSpacing: 0.5 }}
                   >
                     {t('jwt:signatureTitle')}
                   </Typography>

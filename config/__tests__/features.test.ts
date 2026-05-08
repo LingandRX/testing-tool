@@ -32,8 +32,8 @@ describe('features', () => {
         // Optional UI properties for non-hidden features
         if (feature.key !== 'dashboard') {
           expect(feature).toHaveProperty('icon');
-          expect(feature).toHaveProperty('themeColor');
-          expect(typeof feature.themeColor).toBe('string');
+          expect(feature).toHaveProperty('themeColorKey');
+          expect(typeof feature.themeColorKey).toBe('string');
         }
       });
     });
@@ -58,7 +58,7 @@ describe('features', () => {
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('timestamp');
       expect(feature?.labelKey).toBe('features:timestamp.title');
-      expect(feature?.themeColor).toBeDefined();
+      expect(feature?.themeColorKey).toBeDefined();
     });
 
     it('should return storageCleaner feature', () => {

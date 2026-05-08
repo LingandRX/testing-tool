@@ -19,14 +19,14 @@ export default function DashboardPage() {
         if (!visibleSet.has(key as PageType)) return null;
 
         const feature = getFeatureByKey(key);
-        if (!feature?.themeColor || feature.icon == null) return null;
+        if (!feature?.themeColorKey || feature.icon == null) return null;
 
         return (
           <ToolCard
             key={key}
             title={t(feature.labelKey)}
             description={t(feature.descriptionKey)}
-            colorCode={feature.themeColor}
+            colorKey={feature.themeColorKey}
             icon={feature.icon}
             onClick={() => navigateTo(key)}
           />

@@ -1,6 +1,7 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
-import { jsonDiffPageStyles } from '@/config/pageTheme';
+import { jsonDiffPageStyles, surfaceTint } from '@/config/pageTheme';
 import JsonTree from './JsonTree';
 import type { DiffNode, DiffResult as DiffResultType, DiffType, ViewMode } from './types';
 
@@ -77,10 +78,10 @@ const colorForType = (type: DiffType): string | undefined => {
   return undefined;
 };
 
-const bgForType = (type: DiffType): string | undefined => {
-  if (type === 'added') return jsonDiffPageStyles.addedBg;
-  if (type === 'removed') return jsonDiffPageStyles.removedBg;
-  if (type === 'modified') return jsonDiffPageStyles.modifiedBg;
+const bgForType = (type: DiffType, theme: Theme): string | undefined => {
+  if (type === 'added') return surfaceTint(theme, theme.palette.success.main, 0.15);
+  if (type === 'removed') return surfaceTint(theme, theme.palette.error.main, 0.15);
+  if (type === 'modified') return surfaceTint(theme, theme.palette.warning.main, 0.15);
   return undefined;
 };
 
@@ -176,8 +177,9 @@ interface UnifiedRowProps {
 }
 
 const UnifiedRow = ({ depth, type, text, active, multiline }: UnifiedRowProps) => {
+  const theme = useTheme();
   const color = colorForType(type);
-  const bg = bgForType(type);
+  const bg = bgForType(type, theme);
   return (
     <Box
       sx={{

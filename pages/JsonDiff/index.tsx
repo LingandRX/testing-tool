@@ -176,9 +176,11 @@ export default function Index() {
               sx={{
                 p: 3,
                 borderRadius: 3,
-                bgcolor: 'grey.50',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
                 border: '1px dashed',
-                borderColor: 'grey.300',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'grey.300',
                 textAlign: 'center',
               }}
             >
