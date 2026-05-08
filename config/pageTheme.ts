@@ -784,3 +784,61 @@ export const jwtPageStyles = {
     },
   },
 } as const;
+
+/**
+ * JSON 差异比较工具页面样式
+ */
+export const jsonDiffPageStyles = {
+  primaryColor: THEME_COLORS.primary,
+  addedBg: alpha(THEME_COLORS.success, 0.15),
+  addedBorder: alpha(THEME_COLORS.success, 0.4),
+  addedText: THEME_COLORS.success,
+  removedBg: alpha(THEME_COLORS.error, 0.15),
+  removedBorder: alpha(THEME_COLORS.error, 0.4),
+  removedText: THEME_COLORS.error,
+  modifiedBg: alpha(THEME_COLORS.warning, 0.15),
+  modifiedBorder: alpha(THEME_COLORS.warning, 0.4),
+  modifiedText: THEME_COLORS.warning,
+  INPUT_STYLE: {
+    '& .MuiOutlinedInput-root': {
+      bgcolor: 'background.paper',
+      borderRadius: 3,
+      fontSize: '0.8rem',
+      fontFamily: 'monospace',
+      alignItems: 'flex-start',
+      transition: 'all 0.2s',
+      '&:hover': { bgcolor: 'grey.50' },
+      '&.Mui-focused': {
+        bgcolor: '#fff',
+        boxShadow: (theme: Theme) => `0 0 0 4px ${theme.palette.primary.main}1a`,
+      },
+      '&.Mui-error': {
+        boxShadow: (theme: Theme) => `0 0 0 4px ${theme.palette.error.main}1a`,
+      },
+    },
+  },
+  TREE_CONTAINER: {
+    p: 1.5,
+    borderRadius: 3,
+    bgcolor: 'background.paper',
+    border: '1px solid',
+    borderColor: 'grey.200',
+    fontFamily: 'monospace',
+    fontSize: '0.8rem',
+    overflowX: 'auto',
+    minHeight: 200,
+    maxHeight: 480,
+    overflowY: 'auto',
+  },
+  NAVIGATOR: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 1.5,
+    p: 1,
+    borderRadius: 3,
+    bgcolor: alpha(THEME_COLORS.primary, 0.05),
+    border: '1px solid',
+    borderColor: alpha(THEME_COLORS.primary, 0.15),
+  },
+} as const;

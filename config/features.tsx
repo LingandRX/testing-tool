@@ -5,6 +5,7 @@ import StorageIcon from '@mui/icons-material/Storage';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import DescriptionIcon from '@mui/icons-material/Description';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 
 import { THEME_COLORS } from './pageTheme';
 
@@ -15,6 +16,7 @@ const StorageCleanerPage = lazy(() => import('@/pages/StorageCleaner'));
 const QrCodePage = lazy(() => import('@/pages/QrCode'));
 const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
 const JwtPage = lazy(() => import('@/pages/Jwt'));
+const JsonDiffPage = lazy(() => import('@/pages/JsonDiff'));
 
 /**
  * 功能配置接口
@@ -120,6 +122,19 @@ export const FEATURES: FeatureConfig[] = [
       popup: JwtPage,
       sidepanel: JwtPage,
       tab: JwtPage,
+    },
+  },
+  {
+    key: 'jsonDiff',
+    labelKey: 'features:jsonDiff.title',
+    descriptionKey: 'features:jsonDiff.description',
+    themeColor: THEME_COLORS.primary,
+    icon: <CompareArrowsIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: JsonDiffPage,
+      sidepanel: JsonDiffPage,
+      tab: JsonDiffPage,
     },
   },
 ];

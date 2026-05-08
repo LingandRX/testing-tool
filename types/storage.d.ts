@@ -7,7 +7,8 @@ export type PageType =
   | 'storageCleaner' // 存储清理工具
   | 'qrCode' // 二维码工具
   | 'textStatistics' // 文本统计工具
-  | 'jwt'; // JWT 解析工具
+  | 'jwt' // JWT 解析工具
+  | 'jsonDiff'; // JSON 差异比较工具
 
 /**
  * 表单映射条目定义

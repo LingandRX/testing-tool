@@ -21,5 +21,9 @@
   "jwt": {
     "title": "JWT 解析",
     "description": "JSON Web Token 解码与查看"
+  },
+  "jsonDiff": {
+    "title": "JSON 差异比较",
+    "description": "对比两个 JSON 数据的差异"
   }
 }
