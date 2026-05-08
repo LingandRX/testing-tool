@@ -9,8 +9,8 @@ import {
 
 describe('features', () => {
   describe('FEATURES', () => {
-    it('should have 6 features defined', () => {
-      expect(FEATURES).toHaveLength(6);
+    it('should have 7 features defined', () => {
+      expect(FEATURES).toHaveLength(7);
     });
 
     it('should have all required properties for each feature', () => {
@@ -32,8 +32,8 @@ describe('features', () => {
         // Optional UI properties for non-hidden features
         if (feature.key !== 'dashboard') {
           expect(feature).toHaveProperty('icon');
-          expect(feature).toHaveProperty('themeColor');
-          expect(typeof feature.themeColor).toBe('string');
+          expect(feature).toHaveProperty('themeColorKey');
+          expect(typeof feature.themeColorKey).toBe('string');
         }
       });
     });
@@ -58,7 +58,7 @@ describe('features', () => {
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('timestamp');
       expect(feature?.labelKey).toBe('features:timestamp.title');
-      expect(feature?.themeColor).toBeDefined();
+      expect(feature?.themeColorKey).toBeDefined();
     });
 
     it('should return storageCleaner feature', () => {
@@ -95,13 +95,14 @@ describe('features', () => {
   describe('getAllFeatureKeys', () => {
     it('should return all feature keys', () => {
       const allKeys = getAllFeatureKeys();
-      expect(allKeys).toHaveLength(6);
+      expect(allKeys).toHaveLength(7);
       expect(allKeys).toContain('dashboard');
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
       expect(allKeys).toContain('qrCode');
       expect(allKeys).toContain('textStatistics');
       expect(allKeys).toContain('jwt');
+      expect(allKeys).toContain('jsonDiff');
     });
   });
 
@@ -118,9 +119,9 @@ describe('features', () => {
       expect(pageOrder).toContain('qrCode');
     });
 
-    it('should have 5 items in page order', () => {
+    it('should have 6 items in page order', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(5);
+      expect(pageOrder).toHaveLength(6);
     });
   });
 });

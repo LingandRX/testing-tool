@@ -49,7 +49,7 @@ export default function StorageOptionsGrid({
           ))}
         </Grid>
       </Box>
-      <Divider sx={{ mx: 0, borderColor: 'grey.100' }} />
+      <Divider sx={{ mx: 0, borderColor: 'divider' }} />
       <Box sx={storageCleanerPageStyles.OPTIONS_GRID_FOOTER}>
         <Typography
           variant="body2"

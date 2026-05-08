@@ -4,9 +4,10 @@
  * 用于在仪表盘中展示各个工具功能的卡片组件，支持图标、标题、描述、
  * 快照内容展示，具备悬停动画效果。
  */
-import { alpha, Box, Card, CardActionArea, Stack, Typography } from '@mui/material';
+import { alpha, Box, Card, CardActionArea, Stack, Typography, useTheme } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import React from 'react';
+import type { PaletteColorKey } from '@/config/features';
 
 /**
  * ToolCard 组件属性接口
@@ -18,8 +19,8 @@ interface ToolCardProps {
   description?: string;
   /** 快照内容，用于在卡片底部展示额外信息（可选） */
   snapshot?: React.ReactNode;
-  /** 主题色代码，用于图标背景和悬停效果 */
-  colorCode: string;
+  /** 主题色键，映射到 theme.palette[key].main */
+  colorKey: PaletteColorKey;
   /** 工具图标元素 */
   icon: React.ReactNode;
   /** 卡片点击事件处理函数 */
@@ -36,10 +37,13 @@ export default function ToolCard({
   title,
   description,
   snapshot,
-  colorCode,
+  colorKey,
   icon,
   onClick,
 }: ToolCardProps) {
+  const theme = useTheme();
+  const colorCode = theme.palette[colorKey].main;
+
   return (
     <Card
       elevation={0}
@@ -47,7 +51,7 @@ export default function ToolCard({
         position: 'relative',
         borderRadius: 4,
         border: '1px solid',
-        borderColor: 'grey.100',
+        borderColor: 'divider',
         height: '100%',
         boxSizing: 'border-box',
         transition:
@@ -124,7 +128,7 @@ export default function ToolCard({
             className="arrow-icon"
             sx={{
               fontSize: 12,
-              color: 'grey.300',
+              color: 'text.disabled',
               mt: 0.5,
               transition: 'all 0.3s ease',
             }}
@@ -137,7 +141,7 @@ export default function ToolCard({
               mt: 'auto',
               pt: 1.5,
               borderTop: '1px dashed',
-              borderColor: 'grey.100',
+              borderColor: 'divider',
               width: '100%',
             }}
           >

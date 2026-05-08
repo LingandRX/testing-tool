@@ -223,7 +223,7 @@ const QrCodeToUrlSection = ({ expanded, onExpandedChange }: QrCodeToUrlSectionPr
                 </Box>
               ) : (
                 <>
-                  <ImageIcon sx={{ fontSize: 48, color: 'grey.300', mb: 2 }} />
+                  <ImageIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {t('qrCode:clickToUpload')}
                   </Typography>

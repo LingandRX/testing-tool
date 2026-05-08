@@ -2,7 +2,6 @@ import RouterProvider from '@/providers/RouterProvider';
 import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import { globalStyles } from '@/config/pageTheme';
 import { SnackbarProvider } from '@/components/GlobalSnackbar';
 import { Box } from '@mui/material';
 import { getEntryPointType } from '@/config/features';
@@ -49,7 +48,7 @@ export default function App() {
             height: '600px',
             minHeight: '600px',
             overflow: 'hidden',
-            backgroundColor: globalStyles.backgroundColor,
+            backgroundColor: 'background.default',
             // 仅在明确的大屏幕（如独立页面或侧边栏拉伸）下才允许扩展
             '@media screen and (min-width: 600px)': {
               width: '100vw',

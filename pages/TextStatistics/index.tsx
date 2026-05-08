@@ -50,13 +50,16 @@ export default function Index() {
             mb: 3,
             '& .MuiOutlinedInput-root': {
               borderRadius: 4,
-              bgcolor: 'grey.50',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
               transition: 'all 0.2s',
               '& fieldset': {
-                borderColor: 'grey.200',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'grey.200',
               },
               '&:hover fieldset': {
-                borderColor: 'grey.300',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'grey.300',
               },
               '&.Mui-focused fieldset': {
                 borderColor: textStatisticsPageStyles.primaryColor,

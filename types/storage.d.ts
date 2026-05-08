@@ -7,7 +7,8 @@ export type PageType =
   | 'storageCleaner' // 存储清理工具
   | 'qrCode' // 二维码工具
   | 'textStatistics' // 文本统计工具
-  | 'jwt'; // JWT 解析工具
+  | 'jwt' // JWT 解析工具
+  | 'jsonDiff'; // JSON 差异比较工具
 
 /**
  * 表单映射条目定义
@@ -75,6 +76,8 @@ export interface StorageSchema {
   'app/lastRoute': string;
   /** 应用主题配置 */
   'app/theme': string;
+  /** 主题模式偏好（light/dark/system） */
+  'app/themeMode': 'light' | 'dark' | 'system';
   /** 存储清理工具的偏好设置 */
   'storageCleaner/preferences': StorageCleanerPreferences;
   /** 二维码工具中二维码部分是否展开 */

@@ -1,9 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import TopBar from '@/components/TopBar';
-import { RouterProvider } from '@/providers/RouterProvider';
 import type { PageType } from '@/types/storage';
 import React from 'react';
+
+// matchMedia must be mocked before ThemeModeProvider is imported
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
+import TopBar from '@/components/TopBar';
+import { RouterProvider } from '@/providers/RouterProvider';
+import { ThemeModeProvider } from '@/providers/ThemeModeProvider';
 
 const mockRouterValue = {
   currentPage: 'dashboard' as PageType,
@@ -29,7 +46,11 @@ describe('TopBar 组件', () => {
   });
 
   const renderWithProvider = (ui: React.ReactElement) => {
-    return render(<RouterProvider>{ui}</RouterProvider>);
+    return render(
+      <ThemeModeProvider>
+        <RouterProvider>{ui}</RouterProvider>
+      </ThemeModeProvider>,
+    );
   };
 
   describe('渲染测试', () => {

@@ -28,8 +28,13 @@ import {
 import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import PageHeader from '@/components/PageHeader';
-import { THEME_COLORS } from '@/config/pageTheme';
+import { useTheme, type PaletteColor, type Theme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
+import type { PaletteColorKey } from '@/config/features';
+
+/** 安全地从 theme.palette 中取 PaletteColor */
+const getPaletteColor = (theme: Theme, key: PaletteColorKey): PaletteColor =>
+  (theme.palette as unknown as Record<string, PaletteColor>)[key];
 
 type WindowType = 'popup' | 'sidepanel' | 'tab';
 
@@ -38,6 +43,7 @@ type WindowType = 'popup' | 'sidepanel' | 'tab';
  * 支持对不同窗口入口的功能显示和排序进行独立配置
  */
 export default function App() {
+  const theme = useTheme();
   const { t } = useTranslation(['features', 'common']);
   // 从 URL 参数中初始化当前的 Tab 类型
   const initialWindowType = useMemo(() => {
@@ -204,7 +210,7 @@ export default function App() {
       className="app"
       sx={{
         minHeight: '100vh',
-        bgcolor: 'grey.50',
+        bgcolor: 'background.default',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -216,7 +222,7 @@ export default function App() {
             width: '100%',
             bgcolor: 'background.paper',
             borderBottom: '1px solid',
-            borderColor: 'grey.200',
+            borderColor: 'divider',
             pt: { xs: 3, sm: 5 },
             pb: 0,
             px: { xs: 2, sm: 4 },
@@ -225,7 +231,7 @@ export default function App() {
           <Box sx={{ maxWidth: 800, mx: 'auto' }}>
             <PageHeader
               icon={<SettingsIcon />}
-              iconColor={THEME_COLORS.primary}
+              iconColor={theme.palette.primary.main}
               title="应用设置"
               subtitle="针对不同窗口类型独立配置 Dashboard 中显示的功能及其排序"
               sx={{ mb: 4 }}
@@ -270,12 +276,12 @@ export default function App() {
                   borderRadius: 2.5,
                   fontWeight: 700,
                   textTransform: 'none',
-                  borderColor: 'grey.200',
+                  borderColor: 'divider',
                   color: 'text.secondary',
                   '&:hover': {
                     borderColor: 'primary.main',
                     color: 'primary.main',
-                    bgcolor: alpha(THEME_COLORS.primary, 0.04),
+                    bgcolor: alpha(theme.palette.primary.main, 0.04),
                   },
                 }}
               >
@@ -293,7 +299,7 @@ export default function App() {
                 sx={{
                   borderRadius: 4,
                   border: '1px solid',
-                  borderColor: 'grey.200',
+                  borderColor: 'divider',
                   overflow: 'hidden',
                   bgcolor: 'background.paper',
                   boxShadow: '0 4px 24px rgba(0,0,0,0.03)',
@@ -316,10 +322,13 @@ export default function App() {
                           justifyContent: 'space-between',
                           p: { xs: 2, sm: 2.5 },
                           borderBottom: index === array.length - 1 ? 'none' : '1px solid',
-                          borderColor: 'grey.100',
+                          borderColor: 'divider',
                           transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                           '&:hover': {
-                            bgcolor: alpha(feature.themeColor || THEME_COLORS.primary, 0.02),
+                            bgcolor: alpha(
+                              getPaletteColor(theme, feature.themeColorKey ?? 'primary').main,
+                              0.02,
+                            ),
                           },
                         }}
                       >
@@ -330,7 +339,7 @@ export default function App() {
                           sx={{ flex: 1, minWidth: 0 }}
                         >
                           {/* 拖拽/排序暗示图标 */}
-                          <Box sx={{ color: 'grey.300', display: 'flex' }}>
+                          <Box sx={{ color: 'text.disabled', display: 'flex' }}>
                             <DragIndicatorIcon fontSize="small" />
                           </Box>
 
@@ -339,8 +348,12 @@ export default function App() {
                             sx={{
                               p: 1.2,
                               borderRadius: 2.5,
-                              bgcolor: alpha(feature.themeColor || THEME_COLORS.primary, 0.1),
-                              color: feature.themeColor || THEME_COLORS.primary,
+                              bgcolor: alpha(
+                                getPaletteColor(theme, feature.themeColorKey ?? 'primary').main,
+                                0.1,
+                              ),
+                              color: getPaletteColor(theme, feature.themeColorKey ?? 'primary')
+                                .main,
                               display: 'flex',
                               flexShrink: 0,
                             }}
@@ -386,11 +399,11 @@ export default function App() {
                               onClick={() => handleMove(index, 'up')}
                               disabled={index === 0}
                               sx={{
-                                color: 'grey.400',
+                                color: 'text.disabled',
                                 p: { xs: 0.5, sm: 1 },
                                 '&:hover': {
                                   color: 'primary.main',
-                                  bgcolor: alpha(THEME_COLORS.primary, 0.08),
+                                  bgcolor: alpha(theme.palette.primary.main, 0.08),
                                 },
                               }}
                             >
@@ -401,11 +414,11 @@ export default function App() {
                               onClick={() => handleMove(index, 'down')}
                               disabled={index === array.length - 1}
                               sx={{
-                                color: 'grey.400',
+                                color: 'text.disabled',
                                 p: { xs: 0.5, sm: 1 },
                                 '&:hover': {
                                   color: 'primary.main',
-                                  bgcolor: alpha(THEME_COLORS.primary, 0.08),
+                                  bgcolor: alpha(theme.palette.primary.main, 0.08),
                                 },
                               }}
                             >
@@ -432,10 +445,14 @@ export default function App() {
                             disabled={isDisabled}
                             sx={{
                               '& .MuiSwitch-switchBase.Mui-checked': {
-                                color: feature.themeColor || THEME_COLORS.primary,
+                                color: getPaletteColor(theme, feature.themeColorKey ?? 'primary')
+                                  .main,
                               },
                               '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                backgroundColor: feature.themeColor || THEME_COLORS.primary,
+                                backgroundColor: getPaletteColor(
+                                  theme,
+                                  feature.themeColorKey ?? 'primary',
+                                ).main,
                               },
                             }}
                           />

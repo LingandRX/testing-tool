@@ -182,8 +182,8 @@ export function GlobalSnackbar({
               backgroundImage: 'none',
               boxShadow: (theme: Theme) =>
                 `0 12px 32px ${alpha(theme.palette[severity].main, 0.35)}`,
-              '& .MuiAlert-icon': { mr: 0.5, fontSize: '1.1rem', color: '#fff' },
-              '& .MuiAlert-message': { color: '#fff', padding: '6px 0' },
+              '& .MuiAlert-icon': { mr: 0.5, fontSize: '1.1rem' },
+              '& .MuiAlert-message': { padding: '6px 0' },
             }}
           >
             {message}
