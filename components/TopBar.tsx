@@ -20,16 +20,22 @@ import SearchIcon from '@mui/icons-material/Search';
 import HistoryIcon from '@mui/icons-material/History';
 import CloseIcon from '@mui/icons-material/Close';
 import LanguageIcon from '@mui/icons-material/Language';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
 import { useRouter } from '@/providers/RouterProvider';
+import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FEATURES, FeatureConfig } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
 import { openExtensionPage } from '@/utils/chromeTabs';
 import { useTranslation } from 'react-i18next';
+import { alpha } from '@mui/material/styles';
 import { SUPPORTED_LANGUAGES, normalizeLanguage } from '@/i18n';
 import { topBarStyles } from '@/config/pageTheme';
 
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
+  const { mode, setMode } = useThemeMode();
   const { t, i18n } = useTranslation(['common', 'features']);
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -107,6 +113,14 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
     await storageUtil.set('app/language', newLng);
   };
 
+  const cycleThemeMode = () => {
+    const next = { light: 'dark', dark: 'system', system: 'light' } as const;
+    setMode(next[mode]);
+  };
+
+  const ThemeIcon =
+    mode === 'light' ? LightModeIcon : mode === 'dark' ? DarkModeIcon : SettingsBrightnessIcon;
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const totalItems = searchQuery.trim() ? searchResults.length : displayedHistory.length;
 
@@ -152,7 +166,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         px: { xs: 1, sm: 2 },
         py: 1.5,
         borderBottom: '1px solid',
-        borderColor: 'grey.100',
+        borderColor: 'divider',
         bgcolor: 'background.paper',
         zIndex: topBarStyles.Z_INDEX,
         position: 'relative',
@@ -165,8 +179,12 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
             onClick={goBack}
             aria-label={t('common:buttons.back')}
             sx={{
-              bgcolor: 'grey.50',
-              '&:hover': { bgcolor: 'grey.200' },
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.50',
+              '&:hover': {
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'grey.200',
+              },
             }}
           >
             <ArrowBackIosNewIcon sx={{ fontSize: 14 }} />
@@ -217,18 +235,24 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
               }
               sx={{
                 width: '100%',
-                bgcolor: 'grey.50',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.50',
                 px: 1.5,
                 py: 0.5,
                 borderRadius: 2,
                 fontSize: '0.875rem',
-                border: '1px solid transparent',
+                border: '1px solid',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'transparent',
                 transition: 'all 0.2s',
-                '&:hover': { bgcolor: 'grey.100' },
+                '&:hover': {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'grey.100',
+                },
                 '&.Mui-focused': {
                   bgcolor: 'background.paper',
                   borderColor: 'primary.main',
-                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                  boxShadow: (theme) => `0 0 0 2px ${alpha(theme.palette.primary.main, 0.15)}`,
                 },
               }}
             />
@@ -312,11 +336,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         </ClickAwayListener>
       </Box>
 
-      <Stack
-        direction="row"
-        spacing={0.5}
-        sx={{ width: { xs: 100, sm: 150 }, justifyContent: 'flex-end' }}
-      >
+      <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end', flexShrink: 0 }}>
         <Tooltip title={t('common:buttons.toggleLanguage')}>
           <IconButton
             size="small"
@@ -324,6 +344,15 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
             aria-label={t('common:buttons.toggleLanguage')}
           >
             <LanguageIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t(`common:buttons.themeMode.${mode}`)}>
+          <IconButton
+            size="small"
+            onClick={cycleThemeMode}
+            aria-label={t('common:buttons.toggleTheme')}
+          >
+            <ThemeIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
         <Tooltip title={t('common:buttons.openInTab')}>

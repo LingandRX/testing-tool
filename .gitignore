@@ -29,3 +29,5 @@ stats-*.json
 .trae/*
 .workbuddy/*
 dev/*
+
+docs/*
