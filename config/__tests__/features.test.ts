@@ -9,8 +9,8 @@ import {
 
 describe('features', () => {
   describe('FEATURES', () => {
-    it('should have 7 features defined', () => {
-      expect(FEATURES).toHaveLength(7);
+    it('should have 10 features defined', () => {
+      expect(FEATURES).toHaveLength(10);
     });
 
     it('should have all required properties for each feature', () => {
@@ -95,7 +95,7 @@ describe('features', () => {
   describe('getAllFeatureKeys', () => {
     it('should return all feature keys', () => {
       const allKeys = getAllFeatureKeys();
-      expect(allKeys).toHaveLength(7);
+      expect(allKeys).toHaveLength(10);
       expect(allKeys).toContain('dashboard');
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
@@ -103,6 +103,9 @@ describe('features', () => {
       expect(allKeys).toContain('textStatistics');
       expect(allKeys).toContain('jwt');
       expect(allKeys).toContain('jsonDiff');
+      expect(allKeys).toContain('base64Converter');
+      expect(allKeys).toContain('markdownToHtml');
+      expect(allKeys).toContain('htmlToMarkdown');
     });
   });
 
@@ -119,9 +122,9 @@ describe('features', () => {
       expect(pageOrder).toContain('qrCode');
     });
 
-    it('should have 6 items in page order', () => {
+    it('should have 9 items in page order', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(6);
+      expect(pageOrder).toHaveLength(9);
     });
   });
 });

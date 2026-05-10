@@ -21,6 +21,14 @@ import jwtZh from './locales/zh/jwt.json';
 import jwtEn from './locales/en/jwt.json';
 import jsonDiffZh from './locales/zh/jsonDiff.json';
 import jsonDiffEn from './locales/en/jsonDiff.json';
+import jsonFormatZh from './locales/zh/jsonFormat.json';
+import jsonFormatEn from './locales/en/jsonFormat.json';
+import base64ConverterZh from './locales/zh/base64Converter.json';
+import base64ConverterEn from './locales/en/base64Converter.json';
+import markdownToHtmlZh from './locales/zh/markdownToHtml.json';
+import markdownToHtmlEn from './locales/en/markdownToHtml.json';
+import htmlToMarkdownZh from './locales/zh/htmlToMarkdown.json';
+import htmlToMarkdownEn from './locales/en/htmlToMarkdown.json';
 
 const resources = {
   zh: {
@@ -32,6 +40,10 @@ const resources = {
     textStatistics: textStatisticsZh,
     jwt: jwtZh,
     jsonDiff: jsonDiffZh,
+    jsonFormat: jsonFormatZh,
+    base64Converter: base64ConverterZh,
+    markdownToHtml: markdownToHtmlZh,
+    htmlToMarkdown: htmlToMarkdownZh,
   },
   en: {
     common: commonEn,
@@ -42,6 +54,10 @@ const resources = {
     textStatistics: textStatisticsEn,
     jwt: jwtEn,
     jsonDiff: jsonDiffEn,
+    jsonFormat: jsonFormatEn,
+    base64Converter: base64ConverterEn,
+    markdownToHtml: markdownToHtmlEn,
+    htmlToMarkdown: htmlToMarkdownEn,
   },
 };
 
@@ -113,6 +129,10 @@ i18n
       'textStatistics',
       'jwt',
       'jsonDiff',
+      'jsonFormat',
+      'base64Converter',
+      'markdownToHtml',
+      'htmlToMarkdown',
     ],
     defaultNS: 'common',
     debug: false,
