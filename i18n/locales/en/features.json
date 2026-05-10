@@ -33,5 +33,9 @@
   "markdownToHtml": {
     "title": "Markdown to HTML",
     "description": "Real-time Markdown conversion and HTML preview"
+  },
+  "htmlToMarkdown": {
+    "title": "HTML to Markdown",
+    "description": "Real-time HTML conversion and Markdown preview"
   }
 }

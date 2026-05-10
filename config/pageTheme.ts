@@ -816,6 +816,37 @@ export const markdownToHtmlPageStyles = {
 } as const;
 
 /**
+ * HTML 转 Markdown 页面样式
+ */
+export const htmlToMarkdownPageStyles = {
+  primaryColor: THEME_COLORS.purple,
+  cardBg: (theme: Theme) => alpha(theme.palette.secondary.main, 0.04),
+  cardBorder: (theme: Theme) => alpha(theme.palette.secondary.main, 0.1),
+  MODE_SWITCHER: {
+    borderRadius: 4,
+    bgcolor: (theme: Theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.900'),
+    border: '1px solid',
+    borderColor: 'divider',
+    p: 0.6,
+    '& .MuiToggleButtonGroup-grouped': {
+      border: 'none',
+      borderRadius: 3.5,
+      py: 0.8,
+      px: 1.5,
+      fontWeight: 700,
+      fontSize: '0.75rem',
+      color: 'text.secondary',
+      transition: 'color 0.3s',
+      '&.Mui-selected': {
+        bgcolor: 'background.paper',
+        color: 'primary.main',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+      },
+    },
+  },
+} as const;
+
+/**
  * JSON 差异比较工具页面样式
  */
 export const jsonDiffPageStyles = {

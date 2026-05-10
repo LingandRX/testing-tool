@@ -10,7 +10,8 @@ export type PageType =
   | 'jwt' // JWT 解析工具
   | 'jsonDiff' // JSON 差异比较工具
   | 'base64Converter' // Base64 转换器工具
-  | 'markdownToHtml'; // Markdown 转 HTML 工具
+  | 'markdownToHtml' // Markdown 转 HTML 工具
+  | 'htmlToMarkdown'; // HTML 转 Markdown 工具
 
 /**
  * JSON 工具页面子模式类型定义
@@ -26,6 +27,11 @@ export type Base64ConverterPageMode = 'text' | 'file' | 'image';
  * Markdown 转 HTML 页面预览模式类型定义
  */
 export type MarkdownToHtmlPreviewMode = 'split' | 'preview' | 'html';
+
+/**
+ * HTML 转 Markdown 页面预览模式类型定义
+ */
+export type HtmlToMarkdownPreviewMode = 'split' | 'preview' | 'markdown';
 
 /**
  * 表单映射条目定义
@@ -109,6 +115,8 @@ export interface StorageSchema {
   'base64Converter/pageMode': Base64ConverterPageMode;
   /** Markdown 转 HTML 页面当前预览模式 */
   'markdownToHtml/previewMode': MarkdownToHtmlPreviewMode;
+  /** HTML 转 Markdown 页面当前预览模式 */
+  'htmlToMarkdown/previewMode': HtmlToMarkdownPreviewMode;
   /** 语言偏好设置 */
   'app/language': string;
 }

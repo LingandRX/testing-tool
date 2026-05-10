@@ -27,6 +27,8 @@ import base64ConverterZh from './locales/zh/base64Converter.json';
 import base64ConverterEn from './locales/en/base64Converter.json';
 import markdownToHtmlZh from './locales/zh/markdownToHtml.json';
 import markdownToHtmlEn from './locales/en/markdownToHtml.json';
+import htmlToMarkdownZh from './locales/zh/htmlToMarkdown.json';
+import htmlToMarkdownEn from './locales/en/htmlToMarkdown.json';
 
 const resources = {
   zh: {
@@ -41,6 +43,7 @@ const resources = {
     jsonFormat: jsonFormatZh,
     base64Converter: base64ConverterZh,
     markdownToHtml: markdownToHtmlZh,
+    htmlToMarkdown: htmlToMarkdownZh,
   },
   en: {
     common: commonEn,
@@ -54,6 +57,7 @@ const resources = {
     jsonFormat: jsonFormatEn,
     base64Converter: base64ConverterEn,
     markdownToHtml: markdownToHtmlEn,
+    htmlToMarkdown: htmlToMarkdownEn,
   },
 };
 
@@ -128,6 +132,7 @@ i18n
       'jsonFormat',
       'base64Converter',
       'markdownToHtml',
+      'htmlToMarkdown',
     ],
     defaultNS: 'common',
     debug: false,
