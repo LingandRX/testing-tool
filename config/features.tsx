@@ -16,7 +16,7 @@ const StorageCleanerPage = lazy(() => import('@/pages/StorageCleaner'));
 const QrCodePage = lazy(() => import('@/pages/QrCode'));
 const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
 const JwtPage = lazy(() => import('@/pages/Jwt'));
-const JsonDiffPage = lazy(() => import('@/pages/JsonDiff'));
+const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
 
 /**
  * 功能配置接口
@@ -132,9 +132,9 @@ export const FEATURES: FeatureConfig[] = [
     icon: <CompareArrowsIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
-      popup: JsonDiffPage,
-      sidepanel: JsonDiffPage,
-      tab: JsonDiffPage,
+      popup: JsonToolsPage,
+      sidepanel: JsonToolsPage,
+      tab: JsonToolsPage,
     },
   },
 ];

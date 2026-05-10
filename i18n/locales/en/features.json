@@ -23,7 +23,7 @@
     "description": "JSON Web Token decoding and viewing"
   },
   "jsonDiff": {
-    "title": "JSON Diff",
-    "description": "Compare differences between two JSON values"
+    "title": "JSON Tools",
+    "description": "Diff, format, YAML/TOML conversion, and minify"
   }
 }

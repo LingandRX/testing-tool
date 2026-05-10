@@ -23,7 +23,7 @@
     "description": "JSON Web Token 解码与查看"
   },
   "jsonDiff": {
-    "title": "JSON 差异比较",
-    "description": "对比两个 JSON 数据的差异"
+    "title": "JSON 工具",
+    "description": "差异比较、格式化、YAML/TOML 转换及压缩"
   }
 }
