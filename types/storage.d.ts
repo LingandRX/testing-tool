@@ -11,6 +11,11 @@ export type PageType =
   | 'jsonDiff'; // JSON 差异比较工具
 
 /**
+ * JSON 工具页面子模式类型定义
+ */
+export type JsonToolsPageMode = 'diff' | 'format' | 'yaml' | 'toml' | 'minify';
+
+/**
  * 表单映射条目定义
  */
 export interface FormMapEntry {
@@ -86,6 +91,8 @@ export interface StorageSchema {
   'qrCode/urlExpanded': boolean;
   /** 搜索历史记录 */
   'app/searchHistory': string[];
+  /** JSON 工具页面当前子模式 */
+  'jsonTools/pageMode': JsonToolsPageMode;
   /** 语言偏好设置 */
   'app/language': string;
 }

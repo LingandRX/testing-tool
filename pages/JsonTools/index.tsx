@@ -26,6 +26,8 @@ import type { DiffResult as DiffResultType, ViewMode } from './types';
 import { jsonToYaml } from '@/utils/jsonToYaml';
 import { jsonToToml } from '@/utils/jsonToToml';
 import { minifyJson } from '@/utils/jsonFormatter';
+import { useStorageState } from '@/utils/useStorageState';
+import type { JsonToolsPageMode } from '@/types/storage';
 
 interface ParseState {
   value: unknown;
@@ -43,11 +45,16 @@ const tryParse = (raw: string, invalidMsg: string): ParseState => {
 };
 
 /** 页面模式 */
-type PageMode = 'diff' | 'format' | 'yaml' | 'toml' | 'minify';
+const VALID_PAGE_MODES: readonly JsonToolsPageMode[] = ['diff', 'format', 'yaml', 'toml', 'minify'];
+
+const isValidPageMode = (val: unknown): val is JsonToolsPageMode =>
+  typeof val === 'string' && (VALID_PAGE_MODES as readonly string[]).includes(val);
+
+type PageMode = JsonToolsPageMode;
 
 export default function Index() {
   const { t } = useTranslation(['jsonDiff', 'jsonFormat']);
-  const [pageMode, setPageMode] = useState<PageMode>('diff');
+  const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
   const [leftInput, setLeftInput] = useState('');
   const [rightInput, setRightInput] = useState('');
   const [leftError, setLeftError] = useState<string | null>(null);
