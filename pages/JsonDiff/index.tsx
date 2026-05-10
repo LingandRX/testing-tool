@@ -9,12 +9,14 @@ import {
   Typography,
 } from '@mui/material';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import DataObjectIcon from '@mui/icons-material/DataObject';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/PageHeader';
 import { jsonDiffPageStyles } from '@/config/pageTheme';
 import JsonDiffInput from './JsonDiffInput';
 import DiffResult from './DiffResult';
 import DiffNavigator from './DiffNavigator';
+import JsonFormatSection from './JsonFormatSection';
 import { diffJson } from './diffEngine';
 import type { DiffResult as DiffResultType, ViewMode } from './types';
 
@@ -33,8 +35,12 @@ const tryParse = (raw: string, invalidMsg: string): ParseState => {
   }
 };
 
+/** 页面模式：差异比较 / 格式化 */
+type PageMode = 'diff' | 'format';
+
 export default function Index() {
-  const { t } = useTranslation(['jsonDiff']);
+  const { t } = useTranslation(['jsonDiff', 'jsonFormat']);
+  const [pageMode, setPageMode] = useState<PageMode>('diff');
   const [leftInput, setLeftInput] = useState('');
   const [rightInput, setRightInput] = useState('');
   const [leftError, setLeftError] = useState<string | null>(null);
@@ -99,95 +105,119 @@ export default function Index() {
     <Box>
       <Container sx={{ p: 2 }}>
         <PageHeader
-          title={t('jsonDiff:pageTitle')}
-          subtitle={t('jsonDiff:pageSubtitle')}
-          icon={<CompareArrowsIcon />}
+          title={pageMode === 'diff' ? t('jsonDiff:pageTitle') : t('jsonFormat:formatTitle')}
+          subtitle={
+            pageMode === 'diff' ? t('jsonDiff:pageSubtitle') : t('jsonFormat:formatSubtitle')
+          }
+          icon={pageMode === 'diff' ? <CompareArrowsIcon /> : <DataObjectIcon />}
           iconColor={jsonDiffPageStyles.primaryColor}
         />
 
         <Stack spacing={2.5}>
-          {/* 工具栏 */}
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={1.5}
-            justifyContent="space-between"
-            alignItems={{ xs: 'stretch', sm: 'center' }}
+          {/* 页面模式切换器 */}
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={pageMode}
+            onChange={(_, v: PageMode | null) => v && setPageMode(v)}
+            sx={{ borderRadius: 3 }}
           >
-            <ToggleButtonGroup
-              size="small"
-              exclusive
-              value={viewMode}
-              onChange={(_, v: ViewMode | null) => v && setViewMode(v)}
-              sx={{ borderRadius: 3 }}
-            >
-              <ToggleButton value="sideBySide" sx={{ px: 2, fontWeight: 700 }}>
-                {t('jsonDiff:sideBySideMode')}
-              </ToggleButton>
-              <ToggleButton value="unified" sx={{ px: 2, fontWeight: 700 }}>
-                {t('jsonDiff:unifiedMode')}
-              </ToggleButton>
-            </ToggleButtonGroup>
-            <Stack direction="row" spacing={1}>
-              <Button variant="text" onClick={handleClear} sx={{ borderRadius: 3 }}>
-                {t('jsonDiff:clearButton')}
-              </Button>
-              <Button
-                variant="contained"
-                disabled={!canCompare}
-                onClick={handleCompare}
-                sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
-              >
-                {t('jsonDiff:compareButton')}
-              </Button>
-            </Stack>
-          </Stack>
+            <ToggleButton value="diff" sx={{ px: 2.5, fontWeight: 700 }}>
+              {t('jsonFormat:diffMode')}
+            </ToggleButton>
+            <ToggleButton value="format" sx={{ px: 2.5, fontWeight: 700 }}>
+              {t('jsonFormat:formatMode')}
+            </ToggleButton>
+          </ToggleButtonGroup>
 
-          {/* 输入区 */}
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-            <JsonDiffInput
-              label={t('jsonDiff:leftLabel')}
-              placeholder={t('jsonDiff:leftPlaceholder')}
-              value={leftInput}
-              onChange={setLeftInput}
-              error={leftError}
-            />
-            <JsonDiffInput
-              label={t('jsonDiff:rightLabel')}
-              placeholder={t('jsonDiff:rightPlaceholder')}
-              value={rightInput}
-              onChange={setRightInput}
-              error={rightError}
-            />
-          </Stack>
-
-          {/* 差异展示 */}
-          {diffResult ? (
+          {pageMode === 'diff' ? (
             <>
-              <DiffNavigator
-                total={total}
-                currentIndex={currentDiffIndex}
-                onPrev={handlePrev}
-                onNext={handleNext}
-              />
-              <DiffResult result={diffResult} viewMode={viewMode} activePath={activePath} />
+              {/* 工具栏 */}
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={1.5}
+                justifyContent="space-between"
+                alignItems={{ xs: 'stretch', sm: 'center' }}
+              >
+                <ToggleButtonGroup
+                  size="small"
+                  exclusive
+                  value={viewMode}
+                  onChange={(_, v: ViewMode | null) => v && setViewMode(v)}
+                  sx={{ borderRadius: 3 }}
+                >
+                  <ToggleButton value="sideBySide" sx={{ px: 2, fontWeight: 700 }}>
+                    {t('jsonDiff:sideBySideMode')}
+                  </ToggleButton>
+                  <ToggleButton value="unified" sx={{ px: 2, fontWeight: 700 }}>
+                    {t('jsonDiff:unifiedMode')}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                <Stack direction="row" spacing={1}>
+                  <Button variant="text" onClick={handleClear} sx={{ borderRadius: 3 }}>
+                    {t('jsonDiff:clearButton')}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    disabled={!canCompare}
+                    onClick={handleCompare}
+                    sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
+                  >
+                    {t('jsonDiff:compareButton')}
+                  </Button>
+                </Stack>
+              </Stack>
+
+              {/* 输入区 */}
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                <JsonDiffInput
+                  label={t('jsonDiff:leftLabel')}
+                  placeholder={t('jsonDiff:leftPlaceholder')}
+                  value={leftInput}
+                  onChange={setLeftInput}
+                  error={leftError}
+                />
+                <JsonDiffInput
+                  label={t('jsonDiff:rightLabel')}
+                  placeholder={t('jsonDiff:rightPlaceholder')}
+                  value={rightInput}
+                  onChange={setRightInput}
+                  error={rightError}
+                />
+              </Stack>
+
+              {/* 差异展示 */}
+              {diffResult ? (
+                <>
+                  <DiffNavigator
+                    total={total}
+                    currentIndex={currentDiffIndex}
+                    onPrev={handlePrev}
+                    onNext={handleNext}
+                  />
+                  <DiffResult result={diffResult} viewMode={viewMode} activePath={activePath} />
+                </>
+              ) : (
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
+                    border: '1px dashed',
+                    borderColor: (theme) =>
+                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'grey.300',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                    {t('jsonDiff:emptyHint')}
+                  </Typography>
+                </Box>
+              )}
             </>
           ) : (
-            <Box
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-                border: '1px dashed',
-                borderColor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'grey.300',
-                textAlign: 'center',
-              }}
-            >
-              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                {t('jsonDiff:emptyHint')}
-              </Typography>
-            </Box>
+            <JsonFormatSection />
           )}
         </Stack>
       </Container>

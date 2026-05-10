@@ -1,0 +1,21 @@
+{
+  "formatTitle": "JSON 格式化",
+  "formatSubtitle": "美化和格式化 JSON 数据",
+  "inputPlaceholder": "输入需要格式化的 JSON...",
+  "formatButton": "格式化",
+  "clearButton": "清空",
+  "sortKeys": "键名排序",
+  "sortKeysTooltip": "按字母顺序对 JSON 对象键进行排序",
+  "indentSize": "缩进",
+  "indentSpaces": "{{count}} 个空格",
+  "outputLabel": "格式化结果",
+  "copySuccess": "复制成功",
+  "copyFail": "复制失败",
+  "noContent": "无内容可复制",
+  "invalidJson": "无效的 JSON 格式",
+  "emptyHint": "输入 JSON 后点击格式化",
+  "originalSize": "原始大小",
+  "formattedSize": "格式化后大小",
+  "diffMode": "差异比较",
+  "formatMode": "格式化"
+}

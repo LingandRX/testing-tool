@@ -1,0 +1,21 @@
+{
+  "formatTitle": "JSON Formatter",
+  "formatSubtitle": "Beautify and format JSON data",
+  "inputPlaceholder": "Enter JSON to format...",
+  "formatButton": "Format",
+  "clearButton": "Clear",
+  "sortKeys": "Sort Keys",
+  "sortKeysTooltip": "Sort JSON object keys in alphabetical order",
+  "indentSize": "Indent",
+  "indentSpaces": "{{count}} spaces",
+  "outputLabel": "Formatted Result",
+  "copySuccess": "Copied",
+  "copyFail": "Copy failed",
+  "noContent": "Nothing to copy",
+  "invalidJson": "Invalid JSON format",
+  "emptyHint": "Enter JSON and click Format",
+  "originalSize": "Original size",
+  "formattedSize": "Formatted size",
+  "diffMode": "Diff",
+  "formatMode": "Format"
+}

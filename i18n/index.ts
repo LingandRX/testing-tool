@@ -21,6 +21,8 @@ import jwtZh from './locales/zh/jwt.json';
 import jwtEn from './locales/en/jwt.json';
 import jsonDiffZh from './locales/zh/jsonDiff.json';
 import jsonDiffEn from './locales/en/jsonDiff.json';
+import jsonFormatZh from './locales/zh/jsonFormat.json';
+import jsonFormatEn from './locales/en/jsonFormat.json';
 
 const resources = {
   zh: {
@@ -32,6 +34,7 @@ const resources = {
     textStatistics: textStatisticsZh,
     jwt: jwtZh,
     jsonDiff: jsonDiffZh,
+    jsonFormat: jsonFormatZh,
   },
   en: {
     common: commonEn,
@@ -42,6 +45,7 @@ const resources = {
     textStatistics: textStatisticsEn,
     jwt: jwtEn,
     jsonDiff: jsonDiffEn,
+    jsonFormat: jsonFormatEn,
   },
 };
 
@@ -113,6 +117,7 @@ i18n
       'textStatistics',
       'jwt',
       'jsonDiff',
+      'jsonFormat',
     ],
     defaultNS: 'common',
     debug: false,
