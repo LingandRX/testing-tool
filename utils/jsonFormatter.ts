@@ -69,6 +69,41 @@ export function formatJson(text: string, options: JsonFormatOptions): JsonFormat
 }
 
 /**
+ * JSON 压缩结果
+ */
+export interface JsonMinifyResult {
+  /** 压缩后的 JSON 字符串 */
+  minified: string;
+  /** 原始输入的字节大小 */
+  originalBytes: number;
+  /** 压缩后的字节大小 */
+  minifiedBytes: number;
+}
+
+/**
+ * 压缩 JSON 字符串
+ *
+ * 将格式化的 JSON 字符串压缩为单行，移除所有不必要的空白字符、换行符和缩进。
+ *
+ * @param text - 输入的 JSON 字符串
+ * @returns 压缩结果
+ * @throws {SyntaxError} 当输入不是有效的 JSON 时抛出语法错误
+ */
+export function minifyJson(text: string): JsonMinifyResult {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return { minified: '', originalBytes: 0, minifiedBytes: 0 };
+  }
+
+  const parsed: unknown = JSON.parse(trimmed);
+  const minified = JSON.stringify(parsed);
+  const originalBytes = new TextEncoder().encode(trimmed).length;
+  const minifiedBytes = new TextEncoder().encode(minified).length;
+
+  return { minified, originalBytes, minifiedBytes };
+}
+
+/**
  * 校验 JSON 字符串是否有效
  *
  * @param text - 输入的 JSON 字符串

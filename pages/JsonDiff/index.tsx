@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import DataObjectIcon from '@mui/icons-material/DataObject';
+import TransformIcon from '@mui/icons-material/Transform';
+import CompressIcon from '@mui/icons-material/Compress';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/PageHeader';
 import { jsonDiffPageStyles } from '@/config/pageTheme';
@@ -17,8 +19,13 @@ import JsonDiffInput from './JsonDiffInput';
 import DiffResult from './DiffResult';
 import DiffNavigator from './DiffNavigator';
 import JsonFormatSection from './JsonFormatSection';
+import JsonConvertSection from './JsonConvertSection';
+import type { ConvertFunction } from './JsonConvertSection';
 import { diffJson } from './diffEngine';
 import type { DiffResult as DiffResultType, ViewMode } from './types';
+import { jsonToYaml } from '@/utils/jsonToYaml';
+import { jsonToToml } from '@/utils/jsonToToml';
+import { minifyJson } from '@/utils/jsonFormatter';
 
 interface ParseState {
   value: unknown;
@@ -35,8 +42,8 @@ const tryParse = (raw: string, invalidMsg: string): ParseState => {
   }
 };
 
-/** 页面模式：差异比较 / 格式化 */
-type PageMode = 'diff' | 'format';
+/** 页面模式 */
+type PageMode = 'diff' | 'format' | 'yaml' | 'toml' | 'minify';
 
 export default function Index() {
   const { t } = useTranslation(['jsonDiff', 'jsonFormat']);
@@ -101,15 +108,45 @@ export default function Index() {
 
   const activePath = diffResult && total > 0 ? diffResult.diffPaths[currentDiffIndex] : undefined;
 
+  /** 页面模式对应的标题和副标题翻译键 */
+  const modeTitles: Record<PageMode, { title: string; subtitle: string }> = {
+    diff: { title: 'jsonDiff:pageTitle', subtitle: 'jsonDiff:pageSubtitle' },
+    format: { title: 'jsonFormat:formatTitle', subtitle: 'jsonFormat:formatSubtitle' },
+    yaml: { title: 'jsonFormat:yamlTitle', subtitle: 'jsonFormat:yamlSubtitle' },
+    toml: { title: 'jsonFormat:tomlTitle', subtitle: 'jsonFormat:tomlSubtitle' },
+    minify: { title: 'jsonFormat:minifyTitle', subtitle: 'jsonFormat:minifySubtitle' },
+  };
+
+  const modeIcon: Record<PageMode, React.ReactNode> = {
+    diff: <CompareArrowsIcon />,
+    format: <DataObjectIcon />,
+    yaml: <TransformIcon />,
+    toml: <TransformIcon />,
+    minify: <CompressIcon />,
+  };
+
+  const yamlConvert: ConvertFunction = useCallback((text: string) => {
+    const r = jsonToYaml(text);
+    return { output: r.output, originalBytes: r.originalBytes, outputBytes: r.outputBytes };
+  }, []);
+
+  const tomlConvert: ConvertFunction = useCallback((text: string) => {
+    const r = jsonToToml(text);
+    return { output: r.output, originalBytes: r.originalBytes, outputBytes: r.outputBytes };
+  }, []);
+
+  const minifyConvert: ConvertFunction = useCallback((text: string) => {
+    const r = minifyJson(text);
+    return { output: r.minified, originalBytes: r.originalBytes, outputBytes: r.minifiedBytes };
+  }, []);
+
   return (
     <Box>
       <Container sx={{ p: 2 }}>
         <PageHeader
-          title={pageMode === 'diff' ? t('jsonDiff:pageTitle') : t('jsonFormat:formatTitle')}
-          subtitle={
-            pageMode === 'diff' ? t('jsonDiff:pageSubtitle') : t('jsonFormat:formatSubtitle')
-          }
-          icon={pageMode === 'diff' ? <CompareArrowsIcon /> : <DataObjectIcon />}
+          title={t(modeTitles[pageMode].title)}
+          subtitle={t(modeTitles[pageMode].subtitle)}
+          icon={modeIcon[pageMode]}
           iconColor={jsonDiffPageStyles.primaryColor}
         />
 
@@ -120,13 +157,22 @@ export default function Index() {
             exclusive
             value={pageMode}
             onChange={(_, v: PageMode | null) => v && setPageMode(v)}
-            sx={{ borderRadius: 3 }}
+            sx={{ borderRadius: 3, flexWrap: 'wrap', gap: 0.5 }}
           >
-            <ToggleButton value="diff" sx={{ px: 2.5, fontWeight: 700 }}>
+            <ToggleButton value="diff" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
               {t('jsonFormat:diffMode')}
             </ToggleButton>
-            <ToggleButton value="format" sx={{ px: 2.5, fontWeight: 700 }}>
+            <ToggleButton value="format" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
               {t('jsonFormat:formatMode')}
+            </ToggleButton>
+            <ToggleButton value="yaml" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
+              {t('jsonFormat:yamlMode')}
+            </ToggleButton>
+            <ToggleButton value="toml" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
+              {t('jsonFormat:tomlMode')}
+            </ToggleButton>
+            <ToggleButton value="minify" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
+              {t('jsonFormat:minifyMode')}
             </ToggleButton>
           </ToggleButtonGroup>
 
@@ -216,8 +262,18 @@ export default function Index() {
                 </Box>
               )}
             </>
-          ) : (
+          ) : pageMode === 'format' ? (
             <JsonFormatSection />
+          ) : pageMode === 'yaml' ? (
+            <JsonConvertSection translationPrefix="yamlMode" convertFunction={yamlConvert} />
+          ) : pageMode === 'toml' ? (
+            <JsonConvertSection translationPrefix="tomlMode" convertFunction={tomlConvert} />
+          ) : (
+            <JsonConvertSection
+              translationPrefix="minifyMode"
+              convertFunction={minifyConvert}
+              convertButtonKey="minifyButton"
+            />
           )}
         </Stack>
       </Container>
