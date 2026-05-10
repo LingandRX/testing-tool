@@ -9,8 +9,8 @@ import {
 
 describe('features', () => {
   describe('FEATURES', () => {
-    it('should have 8 features defined', () => {
-      expect(FEATURES).toHaveLength(8);
+    it('should have 9 features defined', () => {
+      expect(FEATURES).toHaveLength(9);
     });
 
     it('should have all required properties for each feature', () => {
@@ -95,7 +95,7 @@ describe('features', () => {
   describe('getAllFeatureKeys', () => {
     it('should return all feature keys', () => {
       const allKeys = getAllFeatureKeys();
-      expect(allKeys).toHaveLength(8);
+      expect(allKeys).toHaveLength(9);
       expect(allKeys).toContain('dashboard');
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
@@ -104,6 +104,7 @@ describe('features', () => {
       expect(allKeys).toContain('jwt');
       expect(allKeys).toContain('jsonDiff');
       expect(allKeys).toContain('base64Converter');
+      expect(allKeys).toContain('markdownToHtml');
     });
   });
 
@@ -120,9 +121,9 @@ describe('features', () => {
       expect(pageOrder).toContain('qrCode');
     });
 
-    it('should have 7 items in page order', () => {
+    it('should have 8 items in page order', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(7);
+      expect(pageOrder).toHaveLength(8);
     });
   });
 });

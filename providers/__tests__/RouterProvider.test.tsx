@@ -191,9 +191,9 @@ describe('RouterProvider', () => {
       expect(visiblePages.startsWith('dashboard,timestamp')).toBe(true);
       expect(pageOrder.startsWith('timestamp,storageCleaner')).toBe(true);
 
-      // base64Converter 应追加在末尾
-      expect(visiblePages.endsWith('base64Converter')).toBe(true);
-      expect(pageOrder.endsWith('base64Converter')).toBe(true);
+      // base64Converter 和 markdownToHtml 应追加在末尾
+      expect(visiblePages.endsWith('markdownToHtml')).toBe(true);
+      expect(pageOrder.endsWith('markdownToHtml')).toBe(true);
     });
   });
 

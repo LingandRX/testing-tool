@@ -7,6 +7,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import TransformIcon from '@mui/icons-material/Transform';
+import CodeIcon from '@mui/icons-material/Code';
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
 
@@ -19,6 +20,7 @@ const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
 const JwtPage = lazy(() => import('@/pages/Jwt'));
 const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
 const Base64ConverterPage = lazy(() => import('@/pages/Base64Converter'));
+const MarkdownToHtmlPage = lazy(() => import('@/pages/MarkdownToHtml'));
 
 /**
  * 功能配置接口
@@ -150,6 +152,19 @@ export const FEATURES: FeatureConfig[] = [
       popup: Base64ConverterPage,
       sidepanel: Base64ConverterPage,
       tab: Base64ConverterPage,
+    },
+  },
+  {
+    key: 'markdownToHtml',
+    labelKey: 'features:markdownToHtml.title',
+    descriptionKey: 'features:markdownToHtml.description',
+    themeColorKey: 'secondary',
+    icon: <CodeIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: MarkdownToHtmlPage,
+      sidepanel: MarkdownToHtmlPage,
+      tab: MarkdownToHtmlPage,
     },
   },
 ];

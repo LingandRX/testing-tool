@@ -29,5 +29,9 @@
   "base64Converter": {
     "title": "Base64 转换器",
     "description": "文本、文件与图像的 Base64 编码转换"
+  },
+  "markdownToHtml": {
+    "title": "Markdown 转 HTML",
+    "description": "实时 Markdown 转换与 HTML 预览"
   }
 }
