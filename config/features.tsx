@@ -6,6 +6,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import DescriptionIcon from '@mui/icons-material/Description';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import TransformIcon from '@mui/icons-material/Transform';
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
 
@@ -17,6 +18,7 @@ const QrCodePage = lazy(() => import('@/pages/QrCode'));
 const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
 const JwtPage = lazy(() => import('@/pages/Jwt'));
 const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
+const Base64ConverterPage = lazy(() => import('@/pages/Base64Converter'));
 
 /**
  * 功能配置接口
@@ -135,6 +137,19 @@ export const FEATURES: FeatureConfig[] = [
       popup: JsonToolsPage,
       sidepanel: JsonToolsPage,
       tab: JsonToolsPage,
+    },
+  },
+  {
+    key: 'base64Converter',
+    labelKey: 'features:base64Converter.title',
+    descriptionKey: 'features:base64Converter.description',
+    themeColorKey: 'info',
+    icon: <TransformIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: Base64ConverterPage,
+      sidepanel: Base64ConverterPage,
+      tab: Base64ConverterPage,
     },
   },
 ];

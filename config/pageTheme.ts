@@ -776,6 +776,15 @@ export const jwtPageStyles = {
 } as const;
 
 /**
+ * Base64 转换器页面样式
+ */
+export const base64ConverterPageStyles = {
+  primaryColor: THEME_COLORS.indigo,
+  cardBg: (theme: Theme) => alpha(theme.palette.info.main, 0.04),
+  cardBorder: (theme: Theme) => alpha(theme.palette.info.main, 0.1),
+} as const;
+
+/**
  * JSON 差异比较工具页面样式
  */
 export const jsonDiffPageStyles = {

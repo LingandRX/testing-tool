@@ -25,5 +25,9 @@
   "jsonDiff": {
     "title": "JSON Tools",
     "description": "Diff, format, YAML/TOML conversion, and minify"
+  },
+  "base64Converter": {
+    "title": "Base64 Converter",
+    "description": "Encode text, files, and images to Base64"
   }
 }

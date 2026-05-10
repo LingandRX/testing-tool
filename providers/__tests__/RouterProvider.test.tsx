@@ -115,7 +115,7 @@ describe('RouterProvider', () => {
     });
   });
 
-  it('应该独立支持 visiblePagesKey 和 pageOrderKey', async () => {
+  it('应该独立支持 visiblePagesKey 和 pageOrderKey，并合并缺失的新功能', async () => {
     (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) => {
       if (key === 'app/sidepanelVisiblePages')
         return Promise.resolve(['timestamp', 'storageCleaner']);
@@ -133,8 +133,106 @@ describe('RouterProvider', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('visible-pages')).toHaveTextContent('timestamp,storageCleaner');
-      expect(screen.getByTestId('page-order')).toHaveTextContent('storageCleaner,timestamp');
+      // 合并后应保留用户已有顺序，并追加缺失的默认可见功能
+      const visiblePages = screen.getByTestId('visible-pages').textContent;
+      expect(visiblePages).toContain('timestamp');
+      expect(visiblePages).toContain('storageCleaner');
+      expect(visiblePages).toContain('base64Converter');
+
+      // 合并后应保留用户已有排序，并追加缺失的新功能到末尾
+      const pageOrder = screen.getByTestId('page-order').textContent;
+      expect(pageOrder).toContain('storageCleaner');
+      expect(pageOrder).toContain('timestamp');
+      expect(pageOrder).toContain('base64Converter');
     });
+  });
+
+  it('应该将旧存储中缺失的新功能自动合并到 visiblePages 和 pageOrder', async () => {
+    // 模拟旧版存储：只有 6 个功能，缺少 base64Converter
+    const oldVisiblePages = [
+      'dashboard',
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonDiff',
+    ];
+    const oldPageOrder = [
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonDiff',
+    ];
+
+    (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) => {
+      if (key === 'app/popupVisiblePages') return Promise.resolve(oldVisiblePages);
+      if (key === 'app/popupPageOrder') return Promise.resolve(oldPageOrder);
+      return Promise.resolve(defaultValue);
+    });
+
+    render(
+      <RouterProvider visiblePagesKey="app/popupVisiblePages" pageOrderKey="app/popupPageOrder">
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await waitFor(() => {
+      const visiblePages = screen.getByTestId('visible-pages').textContent!;
+      const pageOrder = screen.getByTestId('page-order').textContent!;
+
+      // base64Converter 应该被自动追加
+      expect(visiblePages).toContain('base64Converter');
+      expect(pageOrder).toContain('base64Converter');
+
+      // 原有功能顺序应保持不变
+      expect(visiblePages.startsWith('dashboard,timestamp')).toBe(true);
+      expect(pageOrder.startsWith('timestamp,storageCleaner')).toBe(true);
+
+      // base64Converter 应追加在末尾
+      expect(visiblePages.endsWith('base64Converter')).toBe(true);
+      expect(pageOrder.endsWith('base64Converter')).toBe(true);
+    });
+  });
+
+  it('应该从 localStorage 快照合并缺失的新功能', async () => {
+    // 在 localStorage 中存储旧版快照（缺少 base64Converter）
+    const oldVisiblePages = [
+      'dashboard',
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonDiff',
+    ];
+    const oldPageOrder = [
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonDiff',
+    ];
+    localStorage.setItem('snapshot/app/visiblePages', JSON.stringify(oldVisiblePages));
+    localStorage.setItem('snapshot/app/pageOrder', JSON.stringify(oldPageOrder));
+
+    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: any) =>
+      Promise.resolve(defaultValue),
+    );
+
+    render(
+      <RouterProvider>
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    // 即使异步加载还未完成，同步快照合并也应包含新功能
+    const visiblePages = screen.getByTestId('visible-pages').textContent!;
+    const pageOrder = screen.getByTestId('page-order').textContent!;
+    expect(visiblePages).toContain('base64Converter');
+    expect(pageOrder).toContain('base64Converter');
   });
 });

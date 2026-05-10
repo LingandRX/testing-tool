@@ -23,6 +23,8 @@ import jsonDiffZh from './locales/zh/jsonDiff.json';
 import jsonDiffEn from './locales/en/jsonDiff.json';
 import jsonFormatZh from './locales/zh/jsonFormat.json';
 import jsonFormatEn from './locales/en/jsonFormat.json';
+import base64ConverterZh from './locales/zh/base64Converter.json';
+import base64ConverterEn from './locales/en/base64Converter.json';
 
 const resources = {
   zh: {
@@ -35,6 +37,7 @@ const resources = {
     jwt: jwtZh,
     jsonDiff: jsonDiffZh,
     jsonFormat: jsonFormatZh,
+    base64Converter: base64ConverterZh,
   },
   en: {
     common: commonEn,
@@ -46,6 +49,7 @@ const resources = {
     jwt: jwtEn,
     jsonDiff: jsonDiffEn,
     jsonFormat: jsonFormatEn,
+    base64Converter: base64ConverterEn,
   },
 };
 
@@ -118,6 +122,7 @@ i18n
       'jwt',
       'jsonDiff',
       'jsonFormat',
+      'base64Converter',
     ],
     defaultNS: 'common',
     debug: false,

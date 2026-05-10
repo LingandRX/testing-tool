@@ -25,5 +25,9 @@
   "jsonDiff": {
     "title": "JSON 工具",
     "description": "差异比较、格式化、YAML/TOML 转换及压缩"
+  },
+  "base64Converter": {
+    "title": "Base64 转换器",
+    "description": "文本、文件与图像的 Base64 编码转换"
   }
 }
