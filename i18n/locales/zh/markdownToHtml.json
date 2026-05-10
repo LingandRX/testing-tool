@@ -1,0 +1,18 @@
+{
+  "pageTitle": "Markdown 转 HTML",
+  "pageSubtitle": "实时将 Markdown 转换为 HTML 并预览",
+  "splitMode": "分屏",
+  "previewMode": "预览",
+  "htmlMode": "HTML",
+  "clear": "清空",
+  "print": "打印",
+  "download": "下载",
+  "inputLabel": "Markdown 输入",
+  "previewLabel": "实时预览",
+  "htmlOutputLabel": "HTML 输出",
+  "inputPlaceholder": "在此输入 Markdown 内容...",
+  "charCount": "{{count}} 字符",
+  "copyHtml": "复制 HTML",
+  "downloadSuccess": "文件下载成功",
+  "printSuccess": "打印窗口已打开"
+}

@@ -22,6 +22,27 @@ const isValidPageList = (pages: unknown): pages is PageType[] => {
 };
 
 /**
+ * 将已保存的列表与默认列表合并，确保新增的功能特性被自动包含
+ *
+ * 合并策略：
+ * - 保留用户已有的自定义顺序
+ * - 过滤掉已不再存在的旧项
+ * - 将默认列表中存在但保存列表中缺失的新项追加到末尾
+ */
+const mergeWithDefaults = (saved: PageType[], defaults: PageType[]): PageType[] => {
+  const savedSet = new Set(saved);
+  const defaultSet = new Set(defaults);
+
+  // 保留 saved 中仍然合法的项（按用户自定义顺序）
+  const preserved = saved.filter((page) => defaultSet.has(page));
+
+  // 追加 defaults 中有但 saved 中没有的新功能
+  const newItems = defaults.filter((page) => !savedSet.has(page));
+
+  return [...preserved, ...newItems];
+};
+
+/**
  * 路由上下文类型定义
  */
 interface RouterContextType {
@@ -108,14 +129,24 @@ export function RouterProvider({
   const [currentPage, setCurrentPage] = useState<PageType>(() =>
     getSyncSnapshot(syncKey as string, defaultRoute, isValidPage),
   );
-  // 可见页面列表状态
-  const [visiblePages, setVisiblePages] = useState<PageType[]>(() =>
-    getSyncSnapshot(visiblePagesKey as string, getDefaultVisibleFeatureKeys(), isValidPageList),
-  );
-  // 页面排序状态
-  const [pageOrder, setPageOrder] = useState<PageType[]>(() =>
-    getSyncSnapshot(pageOrderKey as string, getDefaultPageOrder(), isValidPageList),
-  );
+  // 可见页面列表状态：从快照加载后与默认值合并，确保新功能可见
+  const [visiblePages, setVisiblePages] = useState<PageType[]>(() => {
+    const snapshot = getSyncSnapshot(
+      visiblePagesKey as string,
+      getDefaultVisibleFeatureKeys(),
+      isValidPageList,
+    );
+    return mergeWithDefaults(snapshot, getDefaultVisibleFeatureKeys());
+  });
+  // 页面排序状态：从快照加载后与默认值合并，确保新功能出现在排序中
+  const [pageOrder, setPageOrder] = useState<PageType[]>(() => {
+    const snapshot = getSyncSnapshot(
+      pageOrderKey as string,
+      getDefaultPageOrder(),
+      isValidPageList,
+    );
+    return mergeWithDefaults(snapshot, getDefaultPageOrder());
+  });
   // 加载完成标识
   const [isLoaded, setIsLoaded] = useState(false);
   /**
@@ -135,10 +166,10 @@ export function RouterProvider({
         setCurrentPage(savedRoute);
       }
       if (isValidPageList(savedVisiblePages)) {
-        setVisiblePages(savedVisiblePages);
+        setVisiblePages(mergeWithDefaults(savedVisiblePages, getDefaultVisibleFeatureKeys()));
       }
       if (isValidPageList(savedPageOrder) && savedPageOrder.length > 0) {
-        setPageOrder(savedPageOrder);
+        setPageOrder(mergeWithDefaults(savedPageOrder, getDefaultPageOrder()));
       }
     } catch (error) {
       console.error('加载初始路由数据失败:', error);

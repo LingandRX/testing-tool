@@ -8,7 +8,30 @@ export type PageType =
   | 'qrCode' // 二维码工具
   | 'textStatistics' // 文本统计工具
   | 'jwt' // JWT 解析工具
-  | 'jsonDiff'; // JSON 差异比较工具
+  | 'jsonDiff' // JSON 差异比较工具
+  | 'base64Converter' // Base64 转换器工具
+  | 'markdownToHtml' // Markdown 转 HTML 工具
+  | 'htmlToMarkdown'; // HTML 转 Markdown 工具
+
+/**
+ * JSON 工具页面子模式类型定义
+ */
+export type JsonToolsPageMode = 'diff' | 'format' | 'yaml' | 'toml' | 'minify';
+
+/**
+ * Base64 转换器页面子模式类型定义
+ */
+export type Base64ConverterPageMode = 'text' | 'file' | 'image';
+
+/**
+ * Markdown 转 HTML 页面预览模式类型定义
+ */
+export type MarkdownToHtmlPreviewMode = 'split' | 'preview' | 'html';
+
+/**
+ * HTML 转 Markdown 页面预览模式类型定义
+ */
+export type HtmlToMarkdownPreviewMode = 'split' | 'preview' | 'markdown';
 
 /**
  * 表单映射条目定义
@@ -86,6 +109,14 @@ export interface StorageSchema {
   'qrCode/urlExpanded': boolean;
   /** 搜索历史记录 */
   'app/searchHistory': string[];
+  /** JSON 工具页面当前子模式 */
+  'jsonTools/pageMode': JsonToolsPageMode;
+  /** Base64 转换器页面当前子模式 */
+  'base64Converter/pageMode': Base64ConverterPageMode;
+  /** Markdown 转 HTML 页面当前预览模式 */
+  'markdownToHtml/previewMode': MarkdownToHtmlPreviewMode;
+  /** HTML 转 Markdown 页面当前预览模式 */
+  'htmlToMarkdown/previewMode': HtmlToMarkdownPreviewMode;
   /** 语言偏好设置 */
   'app/language': string;
 }

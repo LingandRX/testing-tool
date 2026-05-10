@@ -1,0 +1,16 @@
+{
+  "pageTitle": "HTML 转 Markdown",
+  "pageSubtitle": "实时将 HTML 转换为 Markdown 格式",
+  "splitMode": "分屏",
+  "previewMode": "预览",
+  "markdownMode": "Markdown",
+  "clear": "清空",
+  "inputLabel": "HTML 输入",
+  "previewLabel": "Markdown 预览",
+  "markdownOutputLabel": "Markdown 输出",
+  "inputPlaceholder": "在此输入 HTML 内容...",
+  "charCount": "{{count}} 字符",
+  "copyMarkdown": "复制 Markdown",
+  "download": "下载",
+  "emptyHint": "输入 HTML 内容以查看转换结果"
+}

@@ -23,7 +23,19 @@
     "description": "JSON Web Token decoding and viewing"
   },
   "jsonDiff": {
-    "title": "JSON Diff",
-    "description": "Compare differences between two JSON values"
+    "title": "JSON Tools",
+    "description": "Diff, format, YAML/TOML conversion, and minify"
+  },
+  "base64Converter": {
+    "title": "Base64 Converter",
+    "description": "Encode text, files, and images to Base64"
+  },
+  "markdownToHtml": {
+    "title": "Markdown to HTML",
+    "description": "Real-time Markdown conversion and HTML preview"
+  },
+  "htmlToMarkdown": {
+    "title": "HTML to Markdown",
+    "description": "Real-time HTML conversion and Markdown preview"
   }
 }
