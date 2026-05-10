@@ -6,6 +6,9 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import DescriptionIcon from '@mui/icons-material/Description';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import TransformIcon from '@mui/icons-material/Transform';
+import CodeIcon from '@mui/icons-material/Code';
+import ArticleIcon from '@mui/icons-material/Article';
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
 
@@ -16,7 +19,10 @@ const StorageCleanerPage = lazy(() => import('@/pages/StorageCleaner'));
 const QrCodePage = lazy(() => import('@/pages/QrCode'));
 const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
 const JwtPage = lazy(() => import('@/pages/Jwt'));
-const JsonDiffPage = lazy(() => import('@/pages/JsonDiff'));
+const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
+const Base64ConverterPage = lazy(() => import('@/pages/Base64Converter'));
+const MarkdownToHtmlPage = lazy(() => import('@/pages/MarkdownToHtml'));
+const HtmlToMarkdownPage = lazy(() => import('@/pages/HtmlToMarkdown'));
 
 /**
  * 功能配置接口
@@ -132,9 +138,48 @@ export const FEATURES: FeatureConfig[] = [
     icon: <CompareArrowsIcon sx={{ fontSize: 20 }} />,
     defaultVisible: true,
     components: {
-      popup: JsonDiffPage,
-      sidepanel: JsonDiffPage,
-      tab: JsonDiffPage,
+      popup: JsonToolsPage,
+      sidepanel: JsonToolsPage,
+      tab: JsonToolsPage,
+    },
+  },
+  {
+    key: 'base64Converter',
+    labelKey: 'features:base64Converter.title',
+    descriptionKey: 'features:base64Converter.description',
+    themeColorKey: 'info',
+    icon: <TransformIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: Base64ConverterPage,
+      sidepanel: Base64ConverterPage,
+      tab: Base64ConverterPage,
+    },
+  },
+  {
+    key: 'markdownToHtml',
+    labelKey: 'features:markdownToHtml.title',
+    descriptionKey: 'features:markdownToHtml.description',
+    themeColorKey: 'secondary',
+    icon: <CodeIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: MarkdownToHtmlPage,
+      sidepanel: MarkdownToHtmlPage,
+      tab: MarkdownToHtmlPage,
+    },
+  },
+  {
+    key: 'htmlToMarkdown',
+    labelKey: 'features:htmlToMarkdown.title',
+    descriptionKey: 'features:htmlToMarkdown.description',
+    themeColorKey: 'secondary',
+    icon: <ArticleIcon sx={{ fontSize: 20 }} />,
+    defaultVisible: true,
+    components: {
+      popup: HtmlToMarkdownPage,
+      sidepanel: HtmlToMarkdownPage,
+      tab: HtmlToMarkdownPage,
     },
   },
 ];
