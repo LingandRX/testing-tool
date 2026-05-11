@@ -112,10 +112,10 @@ export function parseJwt(token: string): JwtResult {
 }
 
 /**
- * 格式化 JSON
+ * 将对象格式化为 JSON 字符串
  * @param obj 对象
  */
-export function formatJson(obj: unknown): string {
+export function stringifyJson(obj: unknown): string {
   try {
     return JSON.stringify(obj, null, 2);
   } catch (e) {

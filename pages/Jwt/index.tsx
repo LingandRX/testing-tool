@@ -5,7 +5,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PageHeader from '@/components/PageHeader';
 import { jwtPageStyles } from '@/config/pageTheme';
-import { formatJson, parseJwt } from '@/utils/jwt';
+import { stringifyJson, parseJwt } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
 import { useTranslation } from 'react-i18next';
 
@@ -52,7 +52,7 @@ const Section = ({ title, content, color }: SectionProps) => {
           border: '1px solid rgba(0,0,0,0.05)',
         }}
       >
-        {content ? formatJson(content) : t('jwt:invalidFormat')}
+        {content ? stringifyJson(content) : t('jwt:invalidFormat')}
       </Box>
     </Paper>
   );
