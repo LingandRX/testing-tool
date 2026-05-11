@@ -815,6 +815,7 @@ export const dashboardPageStyles = {
       xs: '1fr',
       sm: 'repeat(auto-fill, minmax(300px, 1fr))',
     },
+    gridAutoRows: '1fr',
     gap: 2,
     p: 2,
   },
