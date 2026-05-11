@@ -14,6 +14,11 @@
   "usedSuccess": "Using current timestamp",
   "resultLabel": "Conversion Result",
   "copyResultTooltip": "Copy result",
+  "relativeTime": "Relative Time",
+  "iso8601": "ISO 8601",
+  "utcTime": "UTC Time",
+  "copyTooltip": "Copy",
+  "resultEmpty": "Enter a value and click convert",
   "errors": {
     "invalidNumber": "Invalid number",
     "invalidTimestamp": "Invalid timestamp",

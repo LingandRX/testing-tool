@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Container, Stack } from '@mui/material';
+import { Box, CircularProgress, Container, Stack, useMediaQuery, useTheme } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import UrlToQrCodeSection from '@/pages/QrCode/UrlToQrCodeSection';
 import QrCodeToUrlSection from '@/pages/QrCode/QrCodeToUrlSection';
@@ -9,8 +9,10 @@ import { useTranslation } from 'react-i18next';
 
 export default function Index() {
   const { t } = useTranslation(['qrCode']);
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 
-  // 使用自定义钩子管理展开状态
+  // 使用自定义钩子管理展开状态（移动端使用）
   const [urlExpanded, setUrlExpanded, urlInitialized] = useStorageState('qrCode/urlExpanded', true);
   const [qrExpanded, setQrExpanded, qrInitialized] = useStorageState('qrCode/qrExpanded', false);
 
@@ -23,9 +25,36 @@ export default function Index() {
     );
   }
 
+  const sections = isDesktop ? (
+    <>
+      <Box sx={qrCodePageStyles.GRID_CELL}>
+        <UrlToQrCodeSection
+          expanded={urlExpanded}
+          onExpandedChange={setUrlExpanded}
+          forceExpanded={isDesktop}
+        />
+      </Box>
+      <Box sx={qrCodePageStyles.GRID_CELL}>
+        <QrCodeToUrlSection
+          expanded={qrExpanded}
+          onExpandedChange={setQrExpanded}
+          forceExpanded={isDesktop}
+        />
+      </Box>
+    </>
+  ) : (
+    <>
+      <UrlToQrCodeSection expanded={urlExpanded} onExpandedChange={setUrlExpanded} />
+      <QrCodeToUrlSection expanded={qrExpanded} onExpandedChange={setQrExpanded} />
+    </>
+  );
+
   return (
     <Box>
-      <Container sx={{ py: 2, maxWidth: 400 }}>
+      <Container
+        maxWidth={isDesktop ? 'lg' : false}
+        sx={{ py: 2, maxWidth: isDesktop ? undefined : 400 }}
+      >
         <PageHeader
           title={t('qrCode:pageTitle')}
           subtitle={t('qrCode:pageSubtitle')}
@@ -34,11 +63,11 @@ export default function Index() {
           sx={{ mb: 2.5 }}
         />
 
-        <Stack spacing={3}>
-          <UrlToQrCodeSection expanded={urlExpanded} onExpandedChange={setUrlExpanded} />
-
-          <QrCodeToUrlSection expanded={qrExpanded} onExpandedChange={setQrExpanded} />
-        </Stack>
+        {isDesktop ? (
+          <Box sx={qrCodePageStyles.LAYOUT_GRID}>{sections}</Box>
+        ) : (
+          <Stack spacing={3}>{sections}</Stack>
+        )}
       </Container>
     </Box>
   );

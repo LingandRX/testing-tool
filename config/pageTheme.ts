@@ -157,6 +157,37 @@ export const timestampPageStyles = {
     borderColor: 'divider',
     boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
   },
+  /** 桌面端左右分栏布局 (md 断点开始等宽分栏，两栏卡片等高) */
+  LAYOUT_GRID: {
+    display: 'grid',
+    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+    gap: 2,
+    alignItems: 'stretch',
+  },
+  /** 右栏结果卡片（独立卡片样式，与左栏等高） */
+  RESULT_COLUMN_CARD: {
+    p: 2.5,
+    borderRadius: 4,
+    bgcolor: 'background.paper',
+    border: '1px solid',
+    borderColor: 'divider',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  /** 结果区空状态占位（桌面端右栏未转换时） */
+  RESULT_EMPTY_PLACEHOLDER: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'text.disabled',
+    fontSize: '0.85rem',
+    fontWeight: 600,
+    py: 6,
+    textAlign: 'center',
+  },
   /** 立即转换按钮（缩小+居中，融入卡片） */
   CONVERT_BUTTON: {
     display: 'block',
@@ -263,6 +294,28 @@ export const timestampPageStyles = {
     fontSize: '1.35rem',
     letterSpacing: '-0.5px',
     lineHeight: 1.2,
+  },
+  RESULT_EXTRA_STACK: (theme: Theme) => ({
+    bgcolor: alpha(theme.palette.primary.main, 0.05),
+    p: 2,
+    borderRadius: 4,
+    border: '1px solid',
+    borderColor: alpha(theme.palette.primary.main, 0.1),
+  }),
+  RESULT_EXTRA_LABEL: {
+    color: 'text.disabled',
+    fontWeight: 700,
+    fontSize: '0.7rem',
+    pr: 2,
+    whiteSpace: 'nowrap',
+  },
+  RESULT_EXTRA_VALUE: {
+    fontFamily: 'monospace',
+    color: 'primary.main',
+    fontWeight: 600,
+    fontSize: '0.75rem',
+    wordBreak: 'break-all',
+    textAlign: 'right',
   },
 } as const;
 
@@ -537,6 +590,74 @@ export const storageCleanerPageStyles = {
  */
 export const qrCodePageStyles = {
   primaryColor: THEME_COLORS.success,
+  /** 桌面端左右分栏布局 (md 断点开始等宽分栏，两栏卡片等高) */
+  LAYOUT_GRID: {
+    display: 'grid',
+    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+    gap: 2,
+    alignItems: 'stretch',
+  },
+  /** 桌面端 grid item 包装：撑满 grid row 并把高度传给 Accordion */
+  GRID_CELL: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    '& > .MuiAccordion-root': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+  } as const,
+  /** 桌面端 Accordion 强展开样式：隐藏箭头，禁用 hover/cursor，等高填充 */
+  ACCORDION_DESKTOP: {
+    borderRadius: 4,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    '&:before': { display: 'none' },
+    '& .MuiAccordionSummary-root': {
+      cursor: 'default',
+    },
+    '& .MuiAccordionSummary-expandIconWrapper': {
+      display: 'none',
+    },
+    // 让 Collapse 整条链都 flex 撑满，否则 Details 拿不到剩余高度
+    '& .MuiCollapse-root': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiCollapse-wrapper': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiCollapse-wrapperInner': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiAccordion-region': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiAccordionDetails-root': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiAccordionDetails-root > .MuiStack-root': {
+      flex: 1,
+    },
+    '& .qr-flex-grow': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+  } as const,
   /** 加载状态容器 */
   LOADING_CONTAINER: {
     py: 4,
@@ -550,6 +671,7 @@ export const qrCodePageStyles = {
   ACCORDION: {
     borderRadius: 4,
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+    overflow: 'hidden',
     '&:before': { display: 'none' },
   } as const,
   ACCORDION_SUMMARY: {
