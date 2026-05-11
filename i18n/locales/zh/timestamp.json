@@ -14,10 +14,6 @@
   "usedSuccess": "已使用当前时间戳",
   "resultLabel": "转换结果",
   "copyResultTooltip": "复制结果",
-  "relativeTime": "相对时间",
-  "iso8601": "ISO 8601",
-  "utcTime": "UTC 时间",
-  "copyTooltip": "复制",
   "errors": {
     "invalidNumber": "无效数字",
     "invalidTimestamp": "无效时间戳",
