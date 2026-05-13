@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import ToolCard from '@/pages/Dashboard/ToolCard';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
@@ -96,7 +97,7 @@ describe('ToolCard 组件', () => {
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
-    it('按 Enter 键时应调用 onClick', () => {
+    it('按 Enter 键时应调用 onClick', async () => {
       const handleClick = vi.fn();
       render(
         <ToolCard
@@ -108,8 +109,10 @@ describe('ToolCard 组件', () => {
       );
 
       const button = screen.getByRole('button', { name: /键盘可触发/ });
-      fireEvent.keyDown(button, { key: 'Enter' });
-      fireEvent.keyUp(button, { key: 'Enter' });
+      await act(async () => {
+        button.focus();
+        await userEvent.keyboard('{Enter}');
+      });
 
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
