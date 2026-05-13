@@ -2,6 +2,8 @@
  * Base64 转换器工具函数
  */
 
+import { formatBytes } from './format';
+
 /** 最大文件大小限制（10 MB） */
 export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -197,19 +199,11 @@ export function extractMimeTypeFromDataUri(dataUri: string): string {
 }
 
 /**
- * 格式化文件大小显示
+ * 格式化文件大小显示（兼容旧接口，内部委托给 formatBytes）
  *
  * @param bytes 字节数
  * @returns 格式化后的字符串
  */
 export function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  const units = ['KB', 'MB', 'GB'];
-  let size = bytes / 1024;
-  let unitIndex = 0;
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
-  }
-  return `${size.toFixed(unitIndex > 0 ? 2 : 1)} ${units[unitIndex]}`;
+  return formatBytes(bytes);
 }

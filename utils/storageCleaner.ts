@@ -1,4 +1,5 @@
 import type { CleaningResult, StorageCleanerOptions, StorageCleanResult } from '@/types/storage';
+import { formatBytes } from './format';
 
 const RESTRICTED_PROTOCOLS = [
   'chrome:',
@@ -166,13 +167,14 @@ export async function getServiceWorkerCount(tabId: number): Promise<number> {
   }
 }
 
+/**
+ * 格式化字节大小显示（兼容旧接口，内部委托给 formatBytes）
+ *
+ * @param bytes 字节数
+ * @returns 格式化后的字符串
+ */
 export function formatSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  if (bytes < 1024) return `${bytes} B`; // 处理小于 1KB 的情况
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  return formatBytes(bytes);
 }
 
 export async function clearCookies(url: string): Promise<StorageCleanResult> {
