@@ -73,6 +73,7 @@ export default function Index() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const fileSelectCancelRef = useRef(false);
 
   /** 清空文本模式 */
   const handleClearText = useCallback(() => {
@@ -100,6 +101,7 @@ export default function Index() {
   /** 处理文件选择 */
   const handleFileSelect = useCallback(
     async (file: File, isImageMode: boolean) => {
+      fileSelectCancelRef.current = false;
       setFileError(null);
       setFileResult(null);
       setFileInfo(null);
@@ -129,11 +131,17 @@ export default function Index() {
 
       try {
         const result = await fileToBase64(file);
-        setFileResult(result);
+        if (!fileSelectCancelRef.current) {
+          setFileResult(result);
+        }
       } catch (e) {
-        setFileError(e instanceof Error ? e.message : t('base64Converter:conversionFailed'));
+        if (!fileSelectCancelRef.current) {
+          setFileError(e instanceof Error ? e.message : t('base64Converter:conversionFailed'));
+        }
       } finally {
-        setIsLoading(false);
+        if (!fileSelectCancelRef.current) {
+          setIsLoading(false);
+        }
       }
     },
     [t],
@@ -141,9 +149,11 @@ export default function Index() {
 
   /** 清空文件/图像模式 */
   const handleClearFile = useCallback(() => {
+    fileSelectCancelRef.current = true;
     setFileResult(null);
     setFileInfo(null);
     setFileError(null);
+    setIsLoading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (imageInputRef.current) imageInputRef.current.value = '';
   }, []);
@@ -203,7 +213,11 @@ export default function Index() {
             size="small"
             exclusive
             value={pageMode}
-            onChange={(_, v: PageMode | null) => v && setPageMode(v)}
+            onChange={(_, v: PageMode | null) => {
+              if (!v || v === pageMode) return;
+              handleClearFile();
+              setPageMode(v);
+            }}
             sx={{ borderRadius: 3, flexWrap: 'wrap', gap: 0.5 }}
           >
             <ToggleButton value="text" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
@@ -226,7 +240,12 @@ export default function Index() {
                   size="small"
                   exclusive
                   value={textDirection}
-                  onChange={(_, v: 'encode' | 'decode' | null) => v && setTextDirection(v)}
+                  onChange={(_, v: 'encode' | 'decode' | null) => {
+                    if (!v || v === textDirection) return;
+                    setTextDirection(v);
+                    setTextOutput('');
+                    setTextError(null);
+                  }}
                   sx={{ borderRadius: 3 }}
                 >
                   <ToggleButton value="encode" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
