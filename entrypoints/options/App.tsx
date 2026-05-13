@@ -35,6 +35,7 @@ import { CSS } from '@dnd-kit/utilities';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
+  getAllFeatureKeys,
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
   getFeatureByKey,
@@ -48,6 +49,14 @@ import type { PaletteColorKey } from '@/config/features';
 
 const getPaletteColor = (theme: Theme, key: PaletteColorKey): PaletteColor =>
   (theme.palette as unknown as Record<string, PaletteColor>)[key];
+
+const isValidPage = (page: unknown): page is PageType => {
+  return typeof page === 'string' && (getAllFeatureKeys() as string[]).includes(page);
+};
+
+const isValidPageList = (pages: unknown): pages is PageType[] => {
+  return Array.isArray(pages) && pages.every(isValidPage);
+};
 
 type WindowType = 'popup' | 'sidepanel' | 'tab';
 
@@ -259,8 +268,10 @@ export default function App() {
           storageUtil.get(configKeys.visible, getDefaultVisibleFeatureKeys()),
           storageUtil.get(configKeys.order, getDefaultPageOrder()),
         ]);
-        setVisiblePages((savedVisible as PageType[]) ?? getDefaultVisibleFeatureKeys());
-        setPageOrder((savedOrder as PageType[]) ?? getDefaultPageOrder());
+        setVisiblePages(
+          isValidPageList(savedVisible) ? savedVisible : getDefaultVisibleFeatureKeys(),
+        );
+        setPageOrder(isValidPageList(savedOrder) ? savedOrder : getDefaultPageOrder());
       } catch (error) {
         console.error('Failed to load config:', error);
         setVisiblePages(getDefaultVisibleFeatureKeys());
