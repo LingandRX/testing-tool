@@ -56,10 +56,6 @@ interface RouterContextType {
   isLoaded: boolean;
   /** 导航到指定页面 */
   navigateTo: (page: PageType) => void;
-  /** 仅在本地（当前组件状态）跳转，不影响其他同步端 */
-  navigateLocal: (page: PageType) => void;
-  /** 强制同步当前路由到存储 */
-  syncNavigation: (page: PageType) => void;
   /** 返回仪表盘 */
   goBack: () => void;
   /** 设置可见页面列表 */
@@ -257,20 +253,6 @@ export function RouterProvider({
   };
 
   /**
-   * 仅在本地跳转，不触发自动同步（通常由 handleStorageChange 内部调用）
-   */
-  const navigateLocal = (page: PageType) => {
-    setCurrentPage(page);
-  };
-
-  /**
-   * 手动同步导航状态到存储
-   */
-  const syncNavigation = (page: PageType) => {
-    storageUtil.set(syncKey, page as StorageSchema[typeof syncKey]).catch(console.error);
-  };
-
-  /**
    * 返回主仪表盘
    */
   const goBack = () => {
@@ -285,8 +267,6 @@ export function RouterProvider({
         pageOrder,
         isLoaded,
         navigateTo,
-        navigateLocal,
-        syncNavigation,
         goBack,
         setVisiblePages,
         setPageOrder,
