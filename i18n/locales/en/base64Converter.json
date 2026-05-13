@@ -22,5 +22,9 @@
   "unsupportedImageType": "Unsupported image format",
   "conversionFailed": "Conversion failed",
   "originalSize": "Original Size",
-  "encodedSize": "Encoded Size"
+  "encodedSize": "Encoded Size",
+  "invalidBase64": "Invalid Base64 string",
+  "binaryDataDetected": "Input appears to be binary data (e.g. an image). Please switch to the Image tab.",
+  "imageDataUriHint": "Detected an image data URI — please use the Image tab to decode it.",
+  "switchToImageMode": "Switch to Image mode"
 }

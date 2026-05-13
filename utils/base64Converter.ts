@@ -78,19 +78,33 @@ export function textToBase64(text: string): TextToBase64Result {
   };
 }
 
+/** 匹配 data URI 的 base64 前缀，如 "data:image/png;base64," */
+const DATA_URI_BASE64_PREFIX = /^data:[^;,]+;base64,/i;
+
 /**
  * 将 Base64 字符串解码为文本
  *
+ * 支持 data:<mime>;base64,<payload> 形式：会自动剥离前缀后再解码。
+ * 若解码出的字节不是合法 UTF-8（典型如图片等二进制数据），抛出更易懂的错误。
+ *
  * @param base64 Base64 编码字符串
  * @returns 解码后的文本
- * @throws {Error} 如果输入不是有效的 Base64 字符串
+ * @throws {Error} 输入不是合法的 Base64 字符串
+ * @throws {Error} 输入解码后是二进制数据，无法作为文本展示
  */
 export function base64ToText(base64: string): string {
-  const cleaned = base64.trim();
+  const trimmed = base64.trim();
+  const cleaned = trimmed.replace(DATA_URI_BASE64_PREFIX, '');
   if (!isValidBase64(cleaned)) {
     throw new Error('Invalid Base64 string');
   }
-  return decodeURIComponent(escape(atob(cleaned)));
+  try {
+    return decodeURIComponent(escape(atob(cleaned)));
+  } catch {
+    throw new Error(
+      'Input appears to be binary data (e.g. an image). Please use the Image tab instead.',
+    );
+  }
 }
 
 /**

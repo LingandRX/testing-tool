@@ -11,6 +11,12 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ['**/__tests__/**', '**/*.test.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
     files: [
       'hooks/**/*.{ts,tsx}',
       'entrypoints/**/*.{ts,tsx}',
@@ -19,6 +25,7 @@ export default [
       'components/**/*.{ts,tsx}',
       'services/**/*.{ts,tsx}',
     ],
+    ignores: ['**/__tests__/**', '**/*.test.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {

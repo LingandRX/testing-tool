@@ -22,5 +22,9 @@
   "unsupportedImageType": "不支持的图像格式",
   "conversionFailed": "转换失败",
   "originalSize": "原始大小",
-  "encodedSize": "编码大小"
+  "encodedSize": "编码大小",
+  "invalidBase64": "Base64 字符串无效",
+  "binaryDataDetected": "输入似乎是二进制数据（如图片）。请切换到「图像」选项卡。",
+  "imageDataUriHint": "检测到图片的 data URI，请使用「图像」选项卡进行解码。",
+  "switchToImageMode": "切换到图像模式"
 }

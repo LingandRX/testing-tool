@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
   alpha,
@@ -17,12 +17,29 @@ import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
 import { textToBase64, base64ToText } from '@/utils/base64Converter';
 
-export default function TextMode() {
+const IMAGE_DATA_URI_PATTERN = /^\s*data:image\//i;
+
+const ERROR_MESSAGE_TO_I18N: Record<string, string> = {
+  'Invalid Base64 string': 'invalidBase64',
+  'Input appears to be binary data (e.g. an image). Please use the Image tab instead.':
+    'binaryDataDetected',
+};
+
+interface TextModeProps {
+  onSwitchToImageMode?: () => void;
+}
+
+export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   const { t } = useTranslation('base64Converter');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [direction, setDirection] = useState<'encode' | 'decode'>('encode');
+
+  const showImageHint = useMemo(
+    () => direction === 'decode' && IMAGE_DATA_URI_PATTERN.test(input),
+    [direction, input],
+  );
 
   const handleClear = useCallback(() => {
     setInput('');
@@ -41,7 +58,9 @@ export default function TextMode() {
         setOutput(decoded);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('conversionFailed'));
+      const message = e instanceof Error ? e.message : '';
+      const i18nKey = ERROR_MESSAGE_TO_I18N[message];
+      setError(i18nKey ? t(i18nKey) : message || t('conversionFailed'));
     }
   }, [input, direction, t]);
 
@@ -117,6 +136,19 @@ export default function TextMode() {
           },
         }}
       />
+
+      {showImageHint && (
+        <Alert
+          severity="info"
+          action={
+            <Button color="info" size="small" onClick={onSwitchToImageMode}>
+              {t('switchToImageMode')}
+            </Button>
+          }
+        >
+          {t('imageDataUriHint')}
+        </Alert>
+      )}
 
       {error && <Alert severity="error">{error}</Alert>}
 

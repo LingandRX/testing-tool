@@ -61,7 +61,7 @@ export default function Index() {
             </ToggleButton>
           </ToggleButtonGroup>
 
-          {pageMode === 'text' && <TextMode />}
+          {pageMode === 'text' && <TextMode onSwitchToImageMode={() => setPageMode('image')} />}
           {pageMode === 'file' && <FileMode />}
           {pageMode === 'image' && <ImageMode />}
         </Stack>

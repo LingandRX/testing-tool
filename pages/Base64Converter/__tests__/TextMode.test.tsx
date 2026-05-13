@@ -66,7 +66,7 @@ describe('TextMode', () => {
     fireEvent.click(convertBtn);
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('Invalid Base64 string');
+      expect(screen.getByRole('alert')).toHaveTextContent('invalidBase64');
     });
   });
 
@@ -124,5 +124,60 @@ describe('TextMode', () => {
     fireEvent.change(input, { target: { value: 'Hello' } });
     const convertBtn = screen.getAllByText('encode')[1];
     expect(convertBtn).not.toBeDisabled();
+  });
+
+  it('解码模式下粘贴图片 data URI 时应该显示切换图像模式的提示', () => {
+    render(<TextMode />);
+
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    fireEvent.change(input, {
+      target: { value: 'data:image/png;base64,iVBORw0KGgo=' },
+    });
+
+    expect(screen.getByText('imageDataUriHint')).toBeInTheDocument();
+    expect(screen.getByText('switchToImageMode')).toBeInTheDocument();
+  });
+
+  it('粘贴非图片 data URI 时不应该显示图像模式提示', () => {
+    render(<TextMode />);
+
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    fireEvent.change(input, { target: { value: 'SGVsbG8=' } });
+
+    expect(screen.queryByText('imageDataUriHint')).not.toBeInTheDocument();
+  });
+
+  it('点击切换图像模式按钮应该调用 onSwitchToImageMode 回调', () => {
+    const onSwitch = vi.fn();
+    render(<TextMode onSwitchToImageMode={onSwitch} />);
+
+    fireEvent.click(screen.getByText('decode'));
+    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    fireEvent.change(input, {
+      target: { value: 'data:image/png;base64,iVBORw0KGgo=' },
+    });
+
+    fireEvent.click(screen.getByText('switchToImageMode'));
+    expect(onSwitch).toHaveBeenCalledTimes(1);
+  });
+
+  it('解码模式下对二进制数据应该显示更清晰的错误', async () => {
+    render(<TextMode />);
+
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
+
+    const convertBtn = screen.getAllByText('decode')[1];
+    fireEvent.click(convertBtn);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('binaryDataDetected');
+    });
   });
 });

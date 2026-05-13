@@ -67,6 +67,28 @@ describe('base64ToText', () => {
     const result = base64ToText('  SGVsbG8=  ');
     expect(result).toBe('Hello');
   });
+
+  it('应该自动剥离 data:<mime>;base64, 前缀后再解码', () => {
+    // "hello" -> base64 "aGVsbG8="
+    const result = base64ToText('data:text/plain;base64,aGVsbG8=');
+    expect(result).toBe('hello');
+  });
+
+  it('应该剥离带空白的 data URI 前缀', () => {
+    const result = base64ToText('  data:text/plain;base64,aGVsbG8=  ');
+    expect(result).toBe('hello');
+  });
+
+  it('应该对二进制（如 PNG）数据抛出更清晰的错误', () => {
+    // PNG 文件签名 89 50 4E 47 0D 0A 1A 0A 的 Base64 编码
+    const pngSignatureBase64 = 'iVBORw0KGgo=';
+    expect(() => base64ToText(pngSignatureBase64)).toThrow(/binary|二进制|image|图像/i);
+  });
+
+  it('应该对带 data:image/png 前缀的 PNG 数据抛出二进制错误', () => {
+    const pngDataUri = 'data:image/png;base64,iVBORw0KGgo=';
+    expect(() => base64ToText(pngDataUri)).toThrow(/binary|二进制|image|图像/i);
+  });
 });
 
 describe('isValidBase64', () => {
