@@ -94,7 +94,7 @@ export async function getSessionStorageSize(tabId: number): Promise<number> {
   }
 }
 
-export async function getIndexedDBSize(tabId: number): Promise<number> {
+export async function getOriginStorageEstimate(tabId: number): Promise<number> {
   try {
     const [result] = await chrome.scripting.executeScript({
       target: { tabId },
@@ -114,7 +114,7 @@ export async function getIndexedDBSize(tabId: number): Promise<number> {
     });
     return (result?.result as number) || 0;
   } catch (error) {
-    console.error('Failed to get IndexedDB size:', error);
+    console.error('Failed to get origin storage estimate:', error);
     return 0;
   }
 }
