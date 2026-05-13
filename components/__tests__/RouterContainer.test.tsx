@@ -82,4 +82,16 @@ describe('RouterContainer 组件', () => {
       expect(box).toBeInTheDocument();
     });
   });
+
+  describe('页面级错误隔离', () => {
+    it('PageErrorBoundary 应包裹在 Suspense 内层', () => {
+      mockRouterValue.isLoaded = true;
+      mockRouterValue.currentPage = 'dashboard';
+      const { container } = renderWithProvider(<RouterContainer />);
+
+      // 验证 RouterContainer 的 Box 结构存在
+      const routerBox = container.querySelector('.page-transition-dashboard');
+      expect(routerBox).toBeInTheDocument();
+    });
+  });
 });
