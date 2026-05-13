@@ -9,7 +9,9 @@ import { Box } from '@mui/material';
 
 export default function App() {
   const handleOpenOptions = () => {
-    chrome.runtime.openOptionsPage();
+    chrome.runtime.openOptionsPage().catch((err) => {
+      console.error('Failed to open options page:', err);
+    });
   };
 
   // 通知侧边栏已打开
