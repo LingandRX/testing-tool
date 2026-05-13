@@ -41,7 +41,7 @@ import {
   getFeatureByKey,
 } from '@/config/features';
 import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import PageErrorBoundary from '@/components/PageErrorBoundary';
 import PageHeader from '@/components/PageHeader';
 import { useTheme, type PaletteColor, type Theme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
@@ -378,7 +378,7 @@ export default function App() {
         flexDirection: 'column',
       }}
     >
-      <ErrorBoundary>
+      <PageErrorBoundary>
         {/* 顶部标题与导航栏 */}
         <Box
           sx={{
@@ -494,7 +494,7 @@ export default function App() {
             </Paper>
           </Box>
         </Box>
-      </ErrorBoundary>
+      </PageErrorBoundary>
 
       <GlobalSnackbar {...snackbarProps} />
     </Box>
