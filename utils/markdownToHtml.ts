@@ -206,12 +206,19 @@ export function printHtml(html: string, title: string = 'Markdown Preview'): voi
   printWindow.document.close();
 
   // 等待样式加载完成后打印
+  let printed = false;
   printWindow.onload = () => {
-    printWindow.print();
+    if (!printed) {
+      printed = true;
+      printWindow.print();
+    }
   };
   // 部分浏览器 onload 不触发，使用延迟回退
   setTimeout(() => {
-    printWindow.print();
+    if (!printed) {
+      printed = true;
+      printWindow.print();
+    }
   }, 500);
 }
 
