@@ -108,7 +108,8 @@ describe('ToolCard 组件', () => {
       );
 
       const button = screen.getByRole('button', { name: /键盘可触发/ });
-      fireEvent.click(button);
+      fireEvent.keyDown(button, { key: 'Enter' });
+      fireEvent.keyUp(button, { key: 'Enter' });
 
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
