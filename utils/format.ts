@@ -19,10 +19,6 @@ export function formatBytes(bytes: number): string {
 
   // KB uses 1 decimal, MB/GB/TB use 2 decimals
   const decimals = unitIndex === 0 ? 1 : 2;
-  const formatted = size.toFixed(decimals);
 
-  // Strip trailing zeros and possible trailing dot
-  const withoutTrailingZeros = parseFloat(formatted).toString();
-
-  return `${withoutTrailingZeros} ${units[unitIndex]}`;
+  return `${size.toFixed(decimals)} ${units[unitIndex]}`;
 }

@@ -58,26 +58,26 @@ describe('storageCleaner utils', () => {
     });
 
     it('should format kilobytes correctly', () => {
-      expect(formatSize(1024)).toBe('1 KB');
+      expect(formatSize(1024)).toBe('1.0 KB');
       expect(formatSize(1536)).toBe('1.5 KB');
-      expect(formatSize(2048)).toBe('2 KB');
+      expect(formatSize(2048)).toBe('2.0 KB');
     });
 
     it('should format megabytes correctly', () => {
-      expect(formatSize(1048576)).toBe('1 MB');
-      expect(formatSize(1572864)).toBe('1.5 MB');
-      expect(formatSize(5242880)).toBe('5 MB');
+      expect(formatSize(1048576)).toBe('1.00 MB');
+      expect(formatSize(1572864)).toBe('1.50 MB');
+      expect(formatSize(5242880)).toBe('5.00 MB');
     });
 
     it('should format gigabytes correctly', () => {
-      expect(formatSize(1073741824)).toBe('1 GB');
-      expect(formatSize(2147483648)).toBe('2 GB');
+      expect(formatSize(1073741824)).toBe('1.00 GB');
+      expect(formatSize(2147483648)).toBe('2.00 GB');
     });
 
     it('should handle edge cases', () => {
       expect(formatSize(1)).toBe('1 B');
       expect(formatSize(1023)).toBe('1023 B');
-      expect(formatSize(1025)).toBe('1 KB');
+      expect(formatSize(1025)).toBe('1.0 KB');
     });
   });
 });
