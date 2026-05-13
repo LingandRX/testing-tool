@@ -90,12 +90,16 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         0,
         topBarStyles.SEARCH_HISTORY_LIMIT,
       );
-      storageUtil.set('app/searchHistory', newHistory).catch((error) => {
-        console.error('保存搜索历史失败:', error);
-      });
       return newHistory;
     });
   };
+
+  // 副作用：搜索历史变化后持久化到 storage
+  useEffect(() => {
+    storageUtil.set('app/searchHistory', searchHistory).catch((error) => {
+      console.error('保存搜索历史失败:', error);
+    });
+  }, [searchHistory]);
 
   const handleSelectFeature = (feature: FeatureConfig) => {
     navigateTo(feature.key);

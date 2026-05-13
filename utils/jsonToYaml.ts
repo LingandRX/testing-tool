@@ -54,8 +54,6 @@ function stringifyYamlString(str: string): string {
     str === 'true' ||
     str === 'false' ||
     /[:#{}[\],&*?|>\-!%@`]/.test(str) ||
-    str.startsWith(' ') ||
-    str.endsWith(' ') ||
     str.includes(' ') ||
     str.includes('\n') ||
     /^\d/.test(str);
