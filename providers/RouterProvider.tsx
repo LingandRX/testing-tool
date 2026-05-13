@@ -173,14 +173,22 @@ export function RouterProvider({
       }
     } catch (error) {
       console.error('加载初始路由数据失败:', error);
-    } finally {
-      setIsLoaded(true);
     }
   }, [defaultRoute, syncKey, syncRoute, visiblePagesKey, pageOrderKey]);
 
   // 组件挂载时加载初始数据
   useEffect(() => {
-    loadInitialData().catch(console.error);
+    let cancelled = false;
+    loadInitialData()
+      .then(() => {
+        if (!cancelled) {
+          setIsLoaded(true);
+        }
+      })
+      .catch(console.error);
+    return () => {
+      cancelled = true;
+    };
   }, [loadInitialData]);
 
   // 当 currentPage 改变时，如果开启了同步，则持久化到存储和本地快照
