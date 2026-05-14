@@ -24,6 +24,11 @@ export type JsonToolsPageMode = 'diff' | 'format' | 'yaml' | 'toml' | 'minify';
 export type Base64ConverterPageMode = 'text' | 'file' | 'image';
 
 /**
+ * Base64 转换器中各子模式的编码/解码方向
+ */
+export type Base64ConvertDirection = 'encode' | 'decode';
+
+/**
  * Markdown 转 HTML 页面预览模式类型定义
  */
 export type MarkdownToHtmlPreviewMode = 'split' | 'preview' | 'html';
@@ -113,6 +118,10 @@ export interface StorageSchema {
   'jsonTools/pageMode': JsonToolsPageMode;
   /** Base64 转换器页面当前子模式 */
   'base64Converter/pageMode': Base64ConverterPageMode;
+  /** Base64 转换器「文件」子模式当前方向 */
+  'base64Converter/fileMode/direction': Base64ConvertDirection;
+  /** Base64 转换器「图像」子模式当前方向 */
+  'base64Converter/imageMode/direction': Base64ConvertDirection;
   /** Markdown 转 HTML 页面当前预览模式 */
   'markdownToHtml/previewMode': MarkdownToHtmlPreviewMode;
   /** HTML 转 Markdown 页面当前预览模式 */

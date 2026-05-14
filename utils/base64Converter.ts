@@ -221,3 +221,131 @@ export function extractMimeTypeFromDataUri(dataUri: string): string {
 export function formatFileSize(bytes: number): string {
   return formatBytes(bytes);
 }
+
+/**
+ * Base64 解码为二进制后的产物
+ */
+export interface Base64ToBlobResult {
+  /** 解码后的 Blob */
+  blob: Blob;
+  /** 推断出的 MIME 类型 */
+  mimeType: string;
+  /** 推荐的扩展名，含点（如 `.png`），无法识别时为 `.bin` */
+  suggestedExtension: string;
+  /** 已去除 data URI 前缀的纯 Base64 字符串 */
+  rawBase64: string;
+}
+
+/**
+ * 已知文件类型魔数签名表。注意：ZIP 头同样会匹配 .docx/.xlsx/.pptx/.apk
+ */
+const MAGIC_BYTE_SIGNATURES: ReadonlyArray<{
+  bytes: readonly number[];
+  mime: string;
+  ext: string;
+}> = [
+  { bytes: [0x89, 0x50, 0x4e, 0x47], mime: 'image/png', ext: '.png' },
+  { bytes: [0xff, 0xd8, 0xff], mime: 'image/jpeg', ext: '.jpg' },
+  { bytes: [0x47, 0x49, 0x46, 0x38], mime: 'image/gif', ext: '.gif' },
+  { bytes: [0x25, 0x50, 0x44, 0x46], mime: 'application/pdf', ext: '.pdf' },
+  { bytes: [0x50, 0x4b, 0x03, 0x04], mime: 'application/zip', ext: '.zip' },
+];
+
+/**
+ * 将 Base64 字符串解码为 Uint8Array
+ *
+ * @param b64 纯 Base64 字符串（不含 data URI 前缀）
+ * @returns 字节序列
+ */
+export function base64ToBytes(b64: string): Uint8Array {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+/**
+ * 根据字节序列前缀识别已知文件类型
+ *
+ * @param bytes 解码后的字节序列
+ * @returns 匹配到的 MIME + 扩展名；未匹配返回 null
+ */
+export function sniffMimeFromBytes(bytes: Uint8Array): { mime: string; ext: string } | null {
+  for (const sig of MAGIC_BYTE_SIGNATURES) {
+    if (bytes.length < sig.bytes.length) continue;
+    let matched = true;
+    for (let i = 0; i < sig.bytes.length; i += 1) {
+      if (bytes[i] !== sig.bytes[i]) {
+        matched = false;
+        break;
+      }
+    }
+    if (matched) return { mime: sig.mime, ext: sig.ext };
+  }
+  return null;
+}
+
+/**
+ * 将 Base64 / data URI 字符串解码为 Blob，自动推断 MIME 与扩展名
+ *
+ * MIME 推断优先级：data URI 前缀 → 字节魔数 → `application/octet-stream`
+ *
+ * @param input Base64 字符串或 data URI
+ * @returns 解码结果
+ * @throws {Error} 输入不是合法 Base64
+ */
+export function base64ToBlob(input: string): Base64ToBlobResult {
+  const trimmed = input.trim();
+  const prefixMatch = trimmed.match(DATA_URI_BASE64_PREFIX);
+  const cleaned = prefixMatch ? trimmed.slice(prefixMatch[0].length) : trimmed;
+
+  if (!isValidBase64(cleaned)) {
+    throw new Error('Invalid Base64 string');
+  }
+
+  const bytes = base64ToBytes(cleaned);
+
+  let mimeType: string;
+  let suggestedExtension: string;
+  if (prefixMatch) {
+    mimeType = extractMimeTypeFromDataUri(trimmed);
+    const sniffed = sniffMimeFromBytes(bytes);
+    suggestedExtension = sniffed?.ext ?? mimeTypeToExtension(mimeType);
+  } else {
+    const sniffed = sniffMimeFromBytes(bytes);
+    mimeType = sniffed?.mime ?? 'application/octet-stream';
+    suggestedExtension = sniffed?.ext ?? '.bin';
+  }
+
+  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: mimeType });
+  return { blob, mimeType, suggestedExtension, rawBase64: cleaned };
+}
+
+/** 极小的 MIME -> 扩展名映射，仅用于带 data URI 前缀但魔数无法识别时 */
+function mimeTypeToExtension(mime: string): string {
+  if (mime.startsWith('image/svg')) return '.svg';
+  if (mime === 'text/plain') return '.txt';
+  if (mime === 'application/json') return '.json';
+  if (mime === 'text/html') return '.html';
+  if (mime === 'text/css') return '.css';
+  return '.bin';
+}
+
+/**
+ * 触发浏览器下载指定 Blob
+ *
+ * @param blob 要下载的 Blob
+ * @param filename 下载文件名
+ */
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}

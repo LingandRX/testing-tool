@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import ImageMode from '../ImageMode';
 
 // Mock CopyButton
@@ -10,6 +10,12 @@ vi.mock('@/components/CopyButton', () => ({
     </button>
   ),
 }));
+
+beforeEach(() => {
+  localStorage.clear();
+});
+
+const waitForStorageReady = () => act(() => Promise.resolve());
 
 describe('ImageMode', () => {
   it('应该渲染图像上传区域', () => {
@@ -100,6 +106,56 @@ describe('ImageMode', () => {
       const img = screen.getByAltText('preview');
       expect(img).toBeInTheDocument();
       expect(img.tagName.toLowerCase()).toBe('img');
+    });
+  });
+
+  it('应该渲染 encode/decode 切换按钮', async () => {
+    render(<ImageMode />);
+    await waitForStorageReady();
+    expect(screen.getAllByText('encode').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('decode')).toBeInTheDocument();
+  });
+
+  it('解码 PNG Base64 后应该显示图像预览', async () => {
+    render(<ImageMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
+    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    await waitFor(() => {
+      expect(screen.getByText('decodedImageOutput')).toBeInTheDocument();
+      const img = screen.getByAltText('decoded preview');
+      expect(img).toBeInTheDocument();
+      expect(img.tagName.toLowerCase()).toBe('img');
+    });
+  });
+
+  it('解码后默认文件名应该为 decoded.png', async () => {
+    render(<ImageMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
+    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    expect(await screen.findByDisplayValue('decoded.png')).toBeInTheDocument();
+  });
+
+  it('解码非法 Base64 应该显示 invalidBase64 错误', async () => {
+    render(<ImageMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    fireEvent.change(input, { target: { value: '!!!not base64' } });
+    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('invalidBase64');
     });
   });
 });

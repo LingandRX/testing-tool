@@ -1,6 +1,6 @@
 {
   "pageTitle": "Base64 Converter",
-  "pageSubtitle": "Encode text, files, and images to Base64",
+  "pageSubtitle": "Encode and decode text, files, and images with Base64",
   "textMode": "Text",
   "fileMode": "File",
   "imageMode": "Image",
@@ -26,5 +26,12 @@
   "invalidBase64": "Invalid Base64 string",
   "binaryDataDetected": "Input appears to be binary data (e.g. an image). Please switch to the Image tab.",
   "imageDataUriHint": "Detected an image data URI — please use the Image tab to decode it.",
-  "switchToImageMode": "Switch to Image mode"
+  "switchToImageMode": "Switch to Image mode",
+  "download": "Download",
+  "decodedFileName": "Decoded file name",
+  "decodeBase64Placeholder": "Enter Base64 or data URI to decode...",
+  "decodedFileOutput": "Decoded File",
+  "decodedImageOutput": "Decoded Image",
+  "inferredMimeType": "Inferred MIME type",
+  "decodedSize": "Decoded size"
 }

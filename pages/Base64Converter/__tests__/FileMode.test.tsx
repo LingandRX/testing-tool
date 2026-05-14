@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import FileMode from '../FileMode';
 
 // Mock CopyButton
@@ -10,6 +10,14 @@ vi.mock('@/components/CopyButton', () => ({
     </button>
   ),
 }));
+
+beforeEach(() => {
+  localStorage.clear();
+});
+
+// useStorageState's async loadState may overwrite user toggle if we click before the
+// initial chrome.storage read settles. Flush pending microtasks first.
+const waitForStorageReady = () => act(() => Promise.resolve());
 
 describe('FileMode', () => {
   it('应该渲染文件上传区域', () => {
@@ -104,6 +112,96 @@ describe('FileMode', () => {
     await waitFor(() => {
       const copyButtons = screen.getAllByTestId('copy-button');
       expect(copyButtons.length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  it('应该渲染 encode/decode 切换按钮', () => {
+    render(<FileMode />);
+    expect(screen.getAllByText('encode').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('decode')).toBeInTheDocument();
+  });
+
+  it('切到 decode 应该显示 Base64 输入框', async () => {
+    render(<FileMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+    expect(await screen.findByPlaceholderText('decodeBase64Placeholder')).toBeInTheDocument();
+  });
+
+  it('解码 PDF Base64 后应该显示 application/pdf 与默认文件名 decoded.pdf', async () => {
+    render(<FileMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    fireEvent.change(input, { target: { value: 'JVBERi0K' } });
+
+    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    await waitFor(() => {
+      expect(screen.getByText('decodedFileOutput')).toBeInTheDocument();
+      expect(screen.getByText(/application\/pdf/)).toBeInTheDocument();
+      expect(screen.getByDisplayValue('decoded.pdf')).toBeInTheDocument();
+    });
+  });
+
+  it('解码后的文件名应该可编辑', async () => {
+    render(<FileMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    fireEvent.change(input, { target: { value: 'JVBERi0K' } });
+    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    const filenameInput = (await screen.findByDisplayValue('decoded.pdf')) as HTMLInputElement;
+    fireEvent.change(filenameInput, { target: { value: 'my-report.pdf' } });
+    expect(filenameInput.value).toBe('my-report.pdf');
+  });
+
+  it('解码后应该显示下载按钮', async () => {
+    render(<FileMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    fireEvent.change(input, { target: { value: 'JVBERi0K' } });
+    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    expect(await screen.findByText('download')).toBeInTheDocument();
+  });
+
+  it('解码非法 Base64 应该显示 invalidBase64 错误', async () => {
+    render(<FileMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    fireEvent.change(input, { target: { value: '!!!not base64' } });
+    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('invalidBase64');
+    });
+  });
+
+  it('切换方向时应该清空解码状态', async () => {
+    render(<FileMode />);
+    await waitForStorageReady();
+    fireEvent.click(screen.getByText('decode'));
+
+    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    fireEvent.change(input, { target: { value: 'JVBERi0K' } });
+    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    await waitFor(() => {
+      expect(screen.getByText('decodedFileOutput')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getAllByText('encode')[0]);
+
+    await waitFor(() => {
+      expect(screen.queryByText('decodedFileOutput')).not.toBeInTheDocument();
     });
   });
 });
