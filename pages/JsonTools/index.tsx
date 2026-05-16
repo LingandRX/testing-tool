@@ -191,7 +191,7 @@ export default function Index() {
                     variant="contained"
                     disabled={!canCompare}
                     onClick={handleCompare}
-                    sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
+                    sx={{ borderRadius: 3, fontWeight: 700, px: 3, whiteSpace: 'nowrap' }}
                   >
                     {t('jsonDiff:compareButton')}
                   </Button>
