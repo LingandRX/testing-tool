@@ -238,15 +238,27 @@ export interface Base64ToBlobResult {
 
 /**
  * 已知文件类型魔数签名表。注意：ZIP 头同样会匹配 .docx/.xlsx/.pptx/.apk
+ *
+ * 签名匹配规则：
+ * - `bytes` 必须匹配文件起始
+ * - 可选的 `tail` 用于多段签名（如 WebP："RIFF" + 偏移 8 处的 "WEBP"）
  */
 const MAGIC_BYTE_SIGNATURES: ReadonlyArray<{
   bytes: readonly number[];
+  tail?: { offset: number; bytes: readonly number[] };
   mime: string;
   ext: string;
 }> = [
   { bytes: [0x89, 0x50, 0x4e, 0x47], mime: 'image/png', ext: '.png' },
   { bytes: [0xff, 0xd8, 0xff], mime: 'image/jpeg', ext: '.jpg' },
   { bytes: [0x47, 0x49, 0x46, 0x38], mime: 'image/gif', ext: '.gif' },
+  { bytes: [0x42, 0x4d], mime: 'image/bmp', ext: '.bmp' },
+  {
+    bytes: [0x52, 0x49, 0x46, 0x46],
+    tail: { offset: 8, bytes: [0x57, 0x45, 0x42, 0x50] },
+    mime: 'image/webp',
+    ext: '.webp',
+  },
   { bytes: [0x25, 0x50, 0x44, 0x46], mime: 'application/pdf', ext: '.pdf' },
   { bytes: [0x50, 0x4b, 0x03, 0x04], mime: 'application/zip', ext: '.zip' },
 ];
@@ -282,7 +294,20 @@ export function sniffMimeFromBytes(bytes: Uint8Array): { mime: string; ext: stri
         break;
       }
     }
-    if (matched) return { mime: sig.mime, ext: sig.ext };
+    if (!matched) continue;
+    if (sig.tail) {
+      const { offset, bytes: tailBytes } = sig.tail;
+      if (bytes.length < offset + tailBytes.length) continue;
+      let tailMatched = true;
+      for (let i = 0; i < tailBytes.length; i += 1) {
+        if (bytes[offset + i] !== tailBytes[i]) {
+          tailMatched = false;
+          break;
+        }
+      }
+      if (!tailMatched) continue;
+    }
+    return { mime: sig.mime, ext: sig.ext };
   }
   return null;
 }
@@ -326,6 +351,9 @@ export function base64ToBlob(input: string): Base64ToBlobResult {
 /** 极小的 MIME -> 扩展名映射，仅用于带 data URI 前缀但魔数无法识别时 */
 function mimeTypeToExtension(mime: string): string {
   if (mime.startsWith('image/svg')) return '.svg';
+  if (mime === 'image/webp') return '.webp';
+  if (mime === 'image/bmp') return '.bmp';
+  if (mime === 'image/x-icon' || mime === 'image/vnd.microsoft.icon') return '.ico';
   if (mime === 'text/plain') return '.txt';
   if (mime === 'application/json') return '.json';
   if (mime === 'text/html') return '.html';

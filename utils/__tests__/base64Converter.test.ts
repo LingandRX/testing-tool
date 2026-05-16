@@ -227,6 +227,50 @@ describe('sniffMimeFromBytes', () => {
     expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'image/gif', ext: '.gif' });
   });
 
+  it('应该识别 BMP', () => {
+    const bytes = new Uint8Array([0x42, 0x4d, 0x36, 0x00, 0x00, 0x00]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'image/bmp', ext: '.bmp' });
+  });
+
+  it('应该识别 WebP（RIFF....WEBP 复合签名）', () => {
+    const bytes = new Uint8Array([
+      0x52,
+      0x49,
+      0x46,
+      0x46, // "RIFF"
+      0x24,
+      0x00,
+      0x00,
+      0x00, // 文件大小占位
+      0x57,
+      0x45,
+      0x42,
+      0x50, // "WEBP"
+      0x56,
+      0x50,
+      0x38,
+      0x20, // "VP8 " 子块
+    ]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'image/webp', ext: '.webp' });
+  });
+
+  it('不应将 WAV（RIFF 容器但非 WEBP）识别为 WebP', () => {
+    const bytes = new Uint8Array([
+      0x52,
+      0x49,
+      0x46,
+      0x46, // "RIFF"
+      0x24,
+      0x00,
+      0x00,
+      0x00,
+      0x57,
+      0x41,
+      0x56,
+      0x45, // "WAVE"
+    ]);
+    expect(sniffMimeFromBytes(bytes)).toBeNull();
+  });
   it('应该识别 PDF', () => {
     const bytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d]);
     expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'application/pdf', ext: '.pdf' });
