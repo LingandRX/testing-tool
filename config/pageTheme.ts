@@ -118,36 +118,6 @@ export const timestampPageStyles = {
   mutedText: (theme: Theme) => alpha(theme.palette.primary.main, 0.4),
   resultBg: (theme: Theme) => alpha(theme.palette.primary.main, 0.05),
   buttonHover: (theme: Theme) => `0 8px 24px ${alpha(theme.palette.primary.main, 0.2)}`,
-  /** 模式切换器 (ToggleButtonGroup) 样式 */
-  MODE_SWITCHER: {
-    width: '100%',
-    mb: 2,
-    borderRadius: 4,
-    bgcolor: (theme: Theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.900'),
-    border: '1px solid',
-    borderColor: 'divider',
-    p: 0.6,
-    '& .MuiToggleButtonGroup-grouped': {
-      flex: 1,
-      border: 'none',
-      borderRadius: 3.5,
-      mx: 0.3,
-      py: 1,
-      fontWeight: 800,
-      fontSize: '0.75rem',
-      color: 'text.secondary',
-      transition: 'color 0.3s',
-      '&:not(:first-of-type)': {
-        borderLeft: 'none',
-        marginLeft: 0.6,
-      },
-      '&.Mui-selected': {
-        bgcolor: 'background.paper',
-        color: 'primary.main',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-      },
-    },
-  },
   /** 统一转换工作台外卡 */
   CONVERSION_CARD: {
     p: 2.5,

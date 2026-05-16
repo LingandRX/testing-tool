@@ -1,16 +1,8 @@
-import {
-  Box,
-  Container,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@mui/material';
+import { Box, Container, MenuItem, Select, Stack, TextField } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { timestampPageStyles, ZONES } from '@/config/pageTheme';
 import LiveClock from './LiveClock';
 import ResultView from './ResultView';
@@ -53,15 +45,14 @@ export default function Index() {
           {/* 左栏：转换工作台 */}
           <Box sx={timestampPageStyles.CONVERSION_CARD}>
             {/* 模式切换 */}
-            <ToggleButtonGroup
+            <SwitchButtonGroup
               value={mode}
-              exclusive
-              onChange={(_, newMode) => newMode && setMode(newMode)}
-              sx={timestampPageStyles.MODE_SWITCHER}
-            >
-              <ToggleButton value="ts2dt">{t('timestamp:tsToDate')}</ToggleButton>
-              <ToggleButton value="dt2ts">{t('timestamp:dateToTs')}</ToggleButton>
-            </ToggleButtonGroup>
+              options={[
+                { value: 'ts2dt', label: t('timestamp:tsToDate') },
+                { value: 'dt2ts', label: t('timestamp:dateToTs') },
+              ]}
+              onChange={(newMode) => setMode(newMode)}
+            />
 
             {/* 输入区 */}
             <Stack spacing={1.5}>
@@ -79,17 +70,17 @@ export default function Index() {
 
               {/* 单位+时区紧凑横排 */}
               <Stack direction="row" spacing={1.5}>
-                <Box sx={timestampPageStyles.UNIT_SWITCHER_CONTAINER}>
-                  {(['ms', 's'] as const).map((u) => (
-                    <Box
-                      key={u}
-                      onClick={() => setUnit(u)}
-                      sx={timestampPageStyles.UNIT_SWITCHER_ITEM(unit === u)}
-                    >
-                      {u === 'ms' ? t('timestamp:unitMs') : t('timestamp:unitS')}
-                    </Box>
-                  ))}
-                </Box>
+                <SwitchButtonGroup
+                  value={unit}
+                  options={[
+                    { value: 'ms', label: t('timestamp:unitMs') },
+                    { value: 's', label: t('timestamp:unitS') },
+                  ]}
+                  onChange={(v) => setUnit(v as 'ms' | 's')}
+                  sx={{
+                    width: 200,
+                  }}
+                />
 
                 <Select
                   fullWidth
