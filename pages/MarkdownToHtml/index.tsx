@@ -12,8 +12,6 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
-import SplitscreenIcon from '@mui/icons-material/Splitscreen';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import CodeIcon from '@mui/icons-material/Code';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PrintIcon from '@mui/icons-material/Print';
@@ -21,7 +19,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
-import { markdownToHtmlPageStyles } from '@/config/pageTheme';
 import { useStorageState } from '@/utils/useStorageState';
 import type { MarkdownToHtmlPreviewMode } from '@/types/storage';
 import {
@@ -184,18 +181,15 @@ export default function MarkdownToHtmlPage() {
             exclusive
             onChange={handleModeChange}
             size="small"
-            sx={markdownToHtmlPageStyles.MODE_SWITCHER}
+            sx={{ borderRadius: 3, flexWrap: 'wrap', gap: 0.5 }}
           >
-            <ToggleButton value="split">
-              <SplitscreenIcon sx={{ fontSize: 16, mr: 0.5 }} />
+            <ToggleButton value="split" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
               {t('splitMode')}
             </ToggleButton>
-            <ToggleButton value="preview">
-              <VisibilityIcon sx={{ fontSize: 16, mr: 0.5 }} />
+            <ToggleButton value="preview" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
               {t('previewMode')}
             </ToggleButton>
-            <ToggleButton value="html">
-              <CodeIcon sx={{ fontSize: 16, mr: 0.5 }} />
+            <ToggleButton value="html" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
               {t('htmlMode')}
             </ToggleButton>
           </ToggleButtonGroup>

@@ -12,16 +12,12 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
-import SplitscreenIcon from '@mui/icons-material/Splitscreen';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import ArticleIcon from '@mui/icons-material/Article';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DownloadIcon from '@mui/icons-material/Download';
 import CodeIcon from '@mui/icons-material/Code';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
-import { htmlToMarkdownPageStyles } from '@/config/pageTheme';
 import { useStorageState } from '@/utils/useStorageState';
 import type { HtmlToMarkdownPreviewMode } from '@/types/storage';
 import { htmlToMarkdown, downloadMarkdownFile, SAMPLE_HTML } from '@/utils/htmlToMarkdown';
@@ -79,18 +75,15 @@ export default function HtmlToMarkdownPage() {
             exclusive
             onChange={handleModeChange}
             size="small"
-            sx={htmlToMarkdownPageStyles.MODE_SWITCHER}
+            sx={{ borderRadius: 3, flexWrap: 'wrap', gap: 0.5 }}
           >
-            <ToggleButton value="split">
-              <SplitscreenIcon sx={{ fontSize: 16, mr: 0.5 }} />
+            <ToggleButton value="split" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
               {t('splitMode')}
             </ToggleButton>
-            <ToggleButton value="preview">
-              <VisibilityIcon sx={{ fontSize: 16, mr: 0.5 }} />
+            <ToggleButton value="preview" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
               {t('previewMode')}
             </ToggleButton>
-            <ToggleButton value="markdown">
-              <ArticleIcon sx={{ fontSize: 16, mr: 0.5 }} />
+            <ToggleButton value="markdown" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
               {t('markdownMode')}
             </ToggleButton>
           </ToggleButtonGroup>
