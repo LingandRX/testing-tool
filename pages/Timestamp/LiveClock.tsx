@@ -23,8 +23,8 @@ const LiveClock = React.memo(({ unit, onUseNow }: LiveClockProps) => {
   }, [onUseNow]);
 
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
+    const tickId = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(tickId);
   }, []);
 
   const displayVal = useMemo(
