@@ -243,7 +243,7 @@ export function useStorageCleaner({
         await loadInfo();
       }
     } catch (err) {
-      showMessage(`${t('common:messages.copyError')}: ${String(err)}`, { severity: 'error' });
+      showMessage(`${t('storageCleaner:cleanError')}: ${String(err)}`, { severity: 'error' });
     } finally {
       setLoading(false);
       setShowConfirm(false);
