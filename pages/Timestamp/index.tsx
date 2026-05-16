@@ -70,7 +70,12 @@ export default function Index() {
               />
 
               {/* 单位+时区紧凑横排 */}
-              <Stack direction="row" spacing={1.5}>
+              <Stack
+                direction="row"
+                spacing={1.5}
+                useFlexGap
+                sx={{ width: '100%', flexWrap: 'wrap' }}
+              >
                 <SwitchButtonGroup
                   value={unit}
                   options={[
@@ -78,14 +83,11 @@ export default function Index() {
                     { value: 's', label: t('timestamp:unitS') },
                   ]}
                   onChange={(v) => setUnit(v as 'ms' | 's')}
-                  sx={{
-                    width: 200,
-                  }}
+                  sx={{ width: 'auto', mb: 0, flexShrink: 0 }}
                   size="small"
                 />
 
                 <Select
-                  fullWidth
                   value={zone}
                   onChange={(e) => setZone(e.target.value as typeof zone)}
                   sx={{
