@@ -8,8 +8,6 @@ import {
   Paper,
   Stack,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -29,6 +27,7 @@ import {
 import type { Base64ToBlobResult, FileToBase64Result } from '@/utils/base64Converter';
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConvertDirection } from '@/types/storage';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
 interface FileInfo {
   name: string;
@@ -83,11 +82,8 @@ export default function FileMode() {
     resetAll();
   };
 
-  const handleDirectionChange = (
-    _: React.MouseEvent<HTMLElement>,
-    next: Base64ConvertDirection | null,
-  ) => {
-    if (!next || next === direction) return;
+  const handleDirectionChange = (next: Base64ConvertDirection) => {
+    if (next === direction) return;
     resetAll();
     setDirection(next);
   };
@@ -163,20 +159,14 @@ export default function FileMode() {
 
   return (
     <>
-      <ToggleButtonGroup
-        size="small"
-        exclusive
+      <SwitchButtonGroup
         value={direction}
+        options={[
+          { value: 'encode', label: t('encode') },
+          { value: 'decode', label: t('decode') },
+        ]}
         onChange={handleDirectionChange}
-        sx={{ borderRadius: 3, alignSelf: 'flex-start' }}
-      >
-        <ToggleButton value="encode" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-          {t('encode')}
-        </ToggleButton>
-        <ToggleButton value="decode" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-          {t('decode')}
-        </ToggleButton>
-      </ToggleButtonGroup>
+      />
 
       {direction === 'encode' && (
         <>

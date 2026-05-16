@@ -1,4 +1,4 @@
-import { Box, Container, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Container, Stack } from '@mui/material';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ImageIcon from '@mui/icons-material/Image';
@@ -10,6 +10,7 @@ import type { Base64ConverterPageMode } from '@/types/storage';
 import TextMode from './TextMode';
 import FileMode from './FileMode';
 import ImageMode from './ImageMode';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
 const VALID_PAGE_MODES: readonly Base64ConverterPageMode[] = ['text', 'file', 'image'];
 
@@ -43,23 +44,15 @@ export default function Index() {
         />
 
         <Stack spacing={2.5}>
-          <ToggleButtonGroup
-            size="small"
-            exclusive
+          <SwitchButtonGroup
             value={pageMode}
-            onChange={(_, v: PageMode | null) => v && setPageMode(v)}
-            sx={{ borderRadius: 3, flexWrap: 'wrap', gap: 0.5 }}
-          >
-            <ToggleButton value="text" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-              {t('base64Converter:textMode')}
-            </ToggleButton>
-            <ToggleButton value="file" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-              {t('base64Converter:fileMode')}
-            </ToggleButton>
-            <ToggleButton value="image" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-              {t('base64Converter:imageMode')}
-            </ToggleButton>
-          </ToggleButtonGroup>
+            options={[
+              { value: 'text', label: t('base64Converter:textMode') },
+              { value: 'file', label: t('base64Converter:fileMode') },
+              { value: 'image', label: t('base64Converter:imageMode') },
+            ]}
+            onChange={(value: PageMode) => setPageMode(value)}
+          />
 
           {pageMode === 'text' && <TextMode onSwitchToImageMode={() => setPageMode('image')} />}
           {pageMode === 'file' && <FileMode />}

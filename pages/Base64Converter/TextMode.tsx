@@ -1,21 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
-import {
-  Alert,
-  alpha,
-  Box,
-  Button,
-  Paper,
-  Stack,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import { Alert, alpha, Box, Button, Paper, Stack, TextField, Typography } from '@mui/material';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
 import { textToBase64, base64ToText } from '@/utils/base64Converter';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
 const IMAGE_DATA_URI_PATTERN = /^\s*data:image\//i;
 
@@ -39,6 +29,16 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   const showImageHint = useMemo(
     () => direction === 'decode' && IMAGE_DATA_URI_PATTERN.test(input),
     [direction, input],
+  );
+
+  const handleDirectionChange = useCallback(
+    (value: 'encode' | 'decode') => {
+      if (value === direction) return;
+      setDirection(value);
+      setOutput('');
+      setError(null);
+    },
+    [direction],
   );
 
   const handleClear = useCallback(() => {
@@ -67,45 +67,14 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   return (
     <>
       <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-        <ToggleButtonGroup
-          size="small"
-          exclusive
+        <SwitchButtonGroup
           value={direction}
-          onChange={(_, v: 'encode' | 'decode' | null) => {
-            if (!v || v === direction) return;
-            setDirection(v);
-            setOutput('');
-            setError(null);
-          }}
-          sx={{ borderRadius: 3 }}
-        >
-          <ToggleButton value="encode" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-            {t('encode')}
-          </ToggleButton>
-          <ToggleButton value="decode" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-            {t('decode')}
-          </ToggleButton>
-        </ToggleButtonGroup>
-
-        <Stack direction="row" spacing={1}>
-          <Button
-            variant="text"
-            onClick={handleClear}
-            startIcon={<DeleteOutlineIcon />}
-            sx={{ borderRadius: 3 }}
-          >
-            {t('clear')}
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleConvert}
-            disabled={!input.trim()}
-            startIcon={<SwapHorizIcon />}
-            sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
-          >
-            {direction === 'encode' ? t('encode') : t('decode')}
-          </Button>
-        </Stack>
+          options={[
+            { value: 'encode', label: t('encode') },
+            { value: 'decode', label: t('decode') },
+          ]}
+          onChange={handleDirectionChange}
+        />
       </Stack>
 
       <TextField
@@ -185,6 +154,26 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
           </Box>
         </Paper>
       )}
+
+      <Stack direction="row" spacing={1}>
+        <Button
+          variant="contained"
+          onClick={handleConvert}
+          disabled={!input.trim()}
+          startIcon={<SwapHorizIcon />}
+          sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
+        >
+          {direction === 'encode' ? t('encode') : t('decode')}
+        </Button>
+        <Button
+          variant="text"
+          onClick={handleClear}
+          startIcon={<DeleteOutlineIcon />}
+          sx={{ borderRadius: 3 }}
+        >
+          {t('clear')}
+        </Button>
+      </Stack>
     </>
   );
 }
