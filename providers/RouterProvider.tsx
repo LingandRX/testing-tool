@@ -1,4 +1,12 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
@@ -211,6 +219,12 @@ export function RouterProvider({
     }
   }, [pageOrder, isLoaded, pageOrderKey]);
 
+  // 用 ref 持有最新 currentPage，避免每次路由跳转都重注册 chrome.storage 监听器
+  const currentPageRef = useRef(currentPage);
+  useEffect(() => {
+    currentPageRef.current = currentPage;
+  }, [currentPage]);
+
   /**
    * 监听存储变化，以便在多个入口（如 Popup 和 Options）之间同步路由和设置
    */
@@ -221,7 +235,7 @@ export function RouterProvider({
       // 同步当前路由
       if (syncRoute && changes[syncKey as string]) {
         const newRoute = changes[syncKey as string].newValue as PageType;
-        if (newRoute && newRoute !== currentPage && isValidPage(newRoute)) {
+        if (newRoute && newRoute !== currentPageRef.current && isValidPage(newRoute)) {
           setCurrentPage(newRoute);
         }
       }
@@ -243,7 +257,7 @@ export function RouterProvider({
 
     chrome.storage.onChanged.addListener(handleStorageChange);
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
-  }, [syncRoute, currentPage, syncKey, visiblePagesKey, pageOrderKey]);
+  }, [syncRoute, syncKey, visiblePagesKey, pageOrderKey]);
 
   /**
    * 跳转到指定页面
