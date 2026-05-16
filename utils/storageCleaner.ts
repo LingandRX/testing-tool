@@ -42,10 +42,15 @@ export function isRestrictedUrl(url?: string): boolean {
 export async function getCookieSize(url: string): Promise<number> {
   try {
     const cookies = await chrome.cookies.getAll({ url });
-    // 估算：名称 + 值 + 域名 + 路径 的长度
+    const encoder = new TextEncoder();
+    // 估算：名称 + 值 + 域名 + 路径 的 UTF-8 字节数
     return cookies.reduce(
       (acc, c) =>
-        acc + c.name.length + c.value.length + (c.domain?.length || 0) + (c.path?.length || 0),
+        acc +
+        encoder.encode(c.name).length +
+        encoder.encode(c.value).length +
+        encoder.encode(c.domain ?? '').length +
+        encoder.encode(c.path ?? '').length,
       0,
     );
   } catch (error) {
@@ -60,7 +65,11 @@ export async function getLocalStorageSize(tabId: number): Promise<number> {
       target: { tabId },
       func: () => {
         try {
-          return Object.entries(localStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+          const encoder = new TextEncoder();
+          return Object.entries(localStorage).reduce(
+            (acc, [k, v]) => acc + encoder.encode(k).length + encoder.encode(v).length,
+            0,
+          );
         } catch {
           return 0;
         }
@@ -79,8 +88,9 @@ export async function getSessionStorageSize(tabId: number): Promise<number> {
       target: { tabId },
       func: () => {
         try {
+          const encoder = new TextEncoder();
           return Object.entries(sessionStorage).reduce(
-            (acc, [k, v]) => acc + k.length + v.length,
+            (acc, [k, v]) => acc + encoder.encode(k).length + encoder.encode(v).length,
             0,
           );
         } catch {
