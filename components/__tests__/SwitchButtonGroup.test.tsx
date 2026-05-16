@@ -51,6 +51,30 @@ describe('SwitchButtonGroup 组件', () => {
     expect(group).toBeInTheDocument();
   });
 
+  it('应支持 size 属性', () => {
+    const { container } = render(
+      <SwitchButtonGroup value="a" options={options} onChange={vi.fn()} size="small" />,
+    );
+
+    const group = container.querySelector('.MuiToggleButtonGroup-root');
+    expect(group).toBeInTheDocument();
+    expect(group).toHaveClass('MuiToggleButtonGroup-root');
+  });
+
+  it('应支持 buttonSx 自定义按钮样式', () => {
+    render(
+      <SwitchButtonGroup
+        value="a"
+        options={options}
+        onChange={vi.fn()}
+        buttonSx={{ textTransform: 'uppercase' }}
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: /选项A/i });
+    expect(button).toBeInTheDocument();
+  });
+
   it('应支持 ReactNode 类型的 label', () => {
     const nodeOptions = [{ value: 'x', label: <span data-testid="custom-label">自定义</span> }];
     render(<SwitchButtonGroup value="x" options={nodeOptions} onChange={vi.fn()} />);

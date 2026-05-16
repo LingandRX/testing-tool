@@ -10,6 +10,8 @@ export interface SwitchButtonGroupProps<T extends string = string> {
   options: SwitchOption<T>[];
   onChange: (value: T) => void;
   sx?: SxProps<Theme>;
+  size?: 'small' | 'medium' | 'large';
+  buttonSx?: SxProps<Theme>;
 }
 
 export default function SwitchButtonGroup<T extends string = string>({
@@ -17,11 +19,14 @@ export default function SwitchButtonGroup<T extends string = string>({
   options,
   onChange,
   sx,
+  size,
+  buttonSx,
 }: SwitchButtonGroupProps<T>) {
   return (
     <ToggleButtonGroup
       value={value}
       exclusive
+      size={size}
       onChange={(_, v) => v && onChange(v)}
       sx={{
         width: '100%',
@@ -58,7 +63,7 @@ export default function SwitchButtonGroup<T extends string = string>({
         <ToggleButton
           key={option.value}
           value={option.value}
-          sx={{ px: 1.5, fontWeight: 700, fontSize: '0.75rem' }}
+          sx={buttonSx ?? { px: 1.5, fontWeight: 700, fontSize: '0.75rem' }}
         >
           {option.label}
         </ToggleButton>
