@@ -52,6 +52,7 @@ export default function Index() {
                 { value: 'dt2ts', label: t('timestamp:dateToTs') },
               ]}
               onChange={(newMode) => setMode(newMode)}
+              size="small"
             />
 
             {/* 输入区 */}
@@ -80,6 +81,7 @@ export default function Index() {
                   sx={{
                     width: 200,
                   }}
+                  size="small"
                 />
 
                 <Select

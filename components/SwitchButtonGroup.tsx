@@ -1,11 +1,11 @@
 import { ToggleButton, ToggleButtonGroup, type SxProps, type Theme } from '@mui/material';
 
-export interface SwitchOption<T extends string = string> {
+export interface SwitchOption<T extends string | number = string> {
   value: T;
   label: React.ReactNode;
 }
 
-export interface SwitchButtonGroupProps<T extends string = string> {
+export interface SwitchButtonGroupProps<T extends string | number = string> {
   value: T;
   options: SwitchOption<T>[];
   onChange: (value: T) => void;
@@ -14,7 +14,7 @@ export interface SwitchButtonGroupProps<T extends string = string> {
   buttonSx?: SxProps<Theme>;
 }
 
-export default function SwitchButtonGroup<T extends string = string>({
+export default function SwitchButtonGroup<T extends string | number = string>({
   value,
   options,
   onChange,
@@ -41,9 +41,7 @@ export default function SwitchButtonGroup<T extends string = string>({
           border: 'none',
           borderRadius: 3.5,
           mx: 0.3,
-          py: 1,
           fontWeight: 800,
-          fontSize: '0.75rem',
           color: 'text.secondary',
           transition: 'color 0.3s',
           '&:not(:first-of-type)': {
@@ -63,7 +61,7 @@ export default function SwitchButtonGroup<T extends string = string>({
         <ToggleButton
           key={option.value}
           value={option.value}
-          sx={buttonSx ?? { px: 1.5, fontWeight: 700, fontSize: '0.75rem' }}
+          sx={buttonSx ?? { px: 1.5, fontWeight: 700, whiteSpace: 'nowrap' }}
         >
           {option.label}
         </ToggleButton>

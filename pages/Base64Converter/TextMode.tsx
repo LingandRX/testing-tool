@@ -74,6 +74,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
             { value: 'decode', label: t('decode') },
           ]}
           onChange={handleDirectionChange}
+          size="small"
         />
       </Stack>
 

@@ -81,4 +81,59 @@ describe('SwitchButtonGroup 组件', () => {
 
     expect(screen.getByTestId('custom-label')).toBeInTheDocument();
   });
+
+  it('默认按钮样式应禁止文字换行', () => {
+    render(<SwitchButtonGroup value="a" options={options} onChange={vi.fn()} />);
+
+    const button = screen.getByRole('button', { name: /选项A/i });
+    expect(button).toHaveStyle('white-space: nowrap');
+  });
+
+  it('buttonSx 传入时应覆盖默认换行样式', () => {
+    render(
+      <SwitchButtonGroup
+        value="a"
+        options={options}
+        onChange={vi.fn()}
+        buttonSx={{ whiteSpace: 'normal' }}
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: /选项A/i });
+    expect(button).toBeInTheDocument();
+    expect(window.getComputedStyle(button).whiteSpace).toBe('normal');
+  });
+
+  describe('number 类型支持', () => {
+    const numberOptions = [
+      { value: 2, label: '2' },
+      { value: 4, label: '4' },
+    ];
+
+    it('应支持 number 类型的 value 渲染', () => {
+      render(<SwitchButtonGroup value={2} options={numberOptions} onChange={vi.fn()} />);
+
+      expect(screen.getByRole('button', { name: /2/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /4/i })).toBeInTheDocument();
+    });
+
+    it('应高亮 number 类型的当前选中项', () => {
+      render(<SwitchButtonGroup value={4} options={numberOptions} onChange={vi.fn()} />);
+
+      const button2 = screen.getByRole('button', { name: /2/i });
+      const button4 = screen.getByRole('button', { name: /4/i });
+
+      expect(button2).not.toHaveClass('Mui-selected');
+      expect(button4).toHaveClass('Mui-selected');
+    });
+
+    it('点击 number 选项时应传回 number 值', () => {
+      const handleChange = vi.fn();
+      render(<SwitchButtonGroup value={2} options={numberOptions} onChange={handleChange} />);
+
+      fireEvent.click(screen.getByRole('button', { name: /4/i }));
+      expect(handleChange).toHaveBeenCalledTimes(1);
+      expect(handleChange).toHaveBeenCalledWith(4);
+    });
+  });
 });

@@ -7,8 +7,6 @@ import {
   Stack,
   Switch,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +20,7 @@ import { formatByteSize } from '@/utils/textStatistics';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { jsonDiffPageStyles } from '@/config/pageTheme';
 import CopyButton from '@/components/CopyButton';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
 /** 缩进大小选项 */
 const INDENT_OPTIONS = [2, 4, 6, 8] as const;
@@ -95,23 +94,12 @@ export default function JsonFormatSection() {
           >
             {t('jsonFormat:indentSize')}
           </Typography>
-          <ToggleButtonGroup
-            size="small"
-            exclusive
+          <SwitchButtonGroup
             value={indentSize}
-            onChange={(_, v: number | null) => v !== null && setIndentSize(v)}
-            sx={{ borderRadius: 3 }}
-          >
-            {INDENT_OPTIONS.map((size) => (
-              <ToggleButton
-                key={size}
-                value={size}
-                sx={{ px: 1.5, fontWeight: 700, fontSize: '0.75rem' }}
-              >
-                {size}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+            onChange={(v) => setIndentSize(v)}
+            options={INDENT_OPTIONS.map((size) => ({ value: size, label: String(size) }))}
+            size="small"
+          />
 
           {/* 键名排序开关 */}
           <FormControlLabel

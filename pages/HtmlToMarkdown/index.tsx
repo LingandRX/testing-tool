@@ -77,6 +77,7 @@ export default function HtmlToMarkdownPage() {
               { value: 'markdown', label: t('markdownMode') },
             ]}
             onChange={handleModeChange}
+            size="small"
           />
 
           <Stack direction="row" spacing={1}>

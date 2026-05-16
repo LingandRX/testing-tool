@@ -52,6 +52,7 @@ export default function Index() {
               { value: 'image', label: t('base64Converter:imageMode') },
             ]}
             onChange={(value: PageMode) => setPageMode(value)}
+            size="small"
           />
 
           {pageMode === 'text' && <TextMode onSwitchToImageMode={() => setPageMode('image')} />}

@@ -166,6 +166,7 @@ export default function FileMode() {
           { value: 'decode', label: t('decode') },
         ]}
         onChange={handleDirectionChange}
+        size="small"
       />
 
       {direction === 'encode' && (

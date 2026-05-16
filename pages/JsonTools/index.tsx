@@ -1,13 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import {
-  Box,
-  Button,
-  Container,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import TransformIcon from '@mui/icons-material/Transform';
@@ -28,6 +20,7 @@ import { jsonToToml } from '@/utils/jsonToToml';
 import { minifyJson } from '@/utils/jsonFormatter';
 import { useStorageState } from '@/utils/useStorageState';
 import type { JsonToolsPageMode } from '@/types/storage';
+import SwtichButtonGroup from '@/components/SwitchButtonGroup';
 
 interface ParseState {
   value: unknown;
@@ -159,29 +152,18 @@ export default function Index() {
 
         <Stack spacing={2.5}>
           {/* 页面模式切换器 */}
-          <ToggleButtonGroup
-            size="small"
-            exclusive
+          <SwtichButtonGroup
             value={pageMode}
-            onChange={(_, v: PageMode | null) => v && setPageMode(v)}
-            sx={{ borderRadius: 3, flexWrap: 'wrap', gap: 0.5 }}
-          >
-            <ToggleButton value="diff" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-              {t('jsonFormat:diffMode')}
-            </ToggleButton>
-            <ToggleButton value="format" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-              {t('jsonFormat:formatMode')}
-            </ToggleButton>
-            <ToggleButton value="yaml" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-              {t('jsonFormat:yamlMode')}
-            </ToggleButton>
-            <ToggleButton value="toml" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-              {t('jsonFormat:tomlMode')}
-            </ToggleButton>
-            <ToggleButton value="minify" sx={{ px: 2, fontWeight: 700, fontSize: '0.75rem' }}>
-              {t('jsonFormat:minifyMode')}
-            </ToggleButton>
-          </ToggleButtonGroup>
+            onChange={(v: PageMode) => setPageMode(v)}
+            options={[
+              { value: 'diff', label: t('jsonFormat:diffMode') },
+              { value: 'format', label: t('jsonFormat:formatMode') },
+              { value: 'yaml', label: t('jsonFormat:yamlMode') },
+              { value: 'toml', label: t('jsonFormat:tomlMode') },
+              { value: 'minify', label: t('jsonFormat:minifyMode') },
+            ]}
+            size="small"
+          />
 
           {pageMode === 'diff' ? (
             <>
@@ -192,20 +174,15 @@ export default function Index() {
                 justifyContent="space-between"
                 alignItems={{ xs: 'stretch', sm: 'center' }}
               >
-                <ToggleButtonGroup
-                  size="small"
-                  exclusive
+                <SwtichButtonGroup
                   value={viewMode}
-                  onChange={(_, v: ViewMode | null) => v && setViewMode(v)}
-                  sx={{ borderRadius: 3 }}
-                >
-                  <ToggleButton value="sideBySide" sx={{ px: 2, fontWeight: 700 }}>
-                    {t('jsonDiff:sideBySideMode')}
-                  </ToggleButton>
-                  <ToggleButton value="unified" sx={{ px: 2, fontWeight: 700 }}>
-                    {t('jsonDiff:unifiedMode')}
-                  </ToggleButton>
-                </ToggleButtonGroup>
+                  onChange={(v: ViewMode) => setViewMode(v)}
+                  options={[
+                    { value: 'sideBySide', label: t('jsonDiff:sideBySideMode') },
+                    { value: 'unified', label: t('jsonDiff:unifiedMode') },
+                  ]}
+                  size="small"
+                />
                 <Stack direction="row" spacing={1}>
                   <Button variant="text" onClick={handleClear} sx={{ borderRadius: 3 }}>
                     {t('jsonDiff:clearButton')}
