@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 interface SectionProps {
   title: string;
   content: unknown;
-  raw: string;
   color: string;
 }
 
@@ -99,13 +98,11 @@ export default function Index() {
               <Section
                 title={t('jwt:headerTitle')}
                 content={result.header}
-                raw={result.raw.header}
                 color="#fb015b" // JWT.io Header Color
               />
               <Section
                 title={t('jwt:payloadTitle')}
                 content={result.payload}
-                raw={result.raw.payload}
                 color="#d63aff" // JWT.io Payload Color
               />
               <Paper
