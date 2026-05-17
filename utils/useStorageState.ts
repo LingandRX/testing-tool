@@ -38,9 +38,12 @@ export const useStorageState = <K extends keyof StorageSchema>(
   useEffect(() => {
     if (hasLoadedFromStorage.current) return;
 
+    let cancelled = false;
+
     const loadState = async () => {
       try {
         const savedValue = await storageUtil.get(key, defaultValue);
+        if (cancelled) return;
         if (savedValue !== undefined) {
           if (validator) {
             setValue(validator(savedValue) ? savedValue : defaultValue);
@@ -51,12 +54,18 @@ export const useStorageState = <K extends keyof StorageSchema>(
       } catch (error) {
         console.error(`加载状态失败 (${key}):`, error);
       } finally {
-        setIsInitialized(true);
-        hasLoadedFromStorage.current = true;
+        if (!cancelled) {
+          setIsInitialized(true);
+          hasLoadedFromStorage.current = true;
+        }
       }
     };
 
     loadState().catch(console.error);
+
+    return () => {
+      cancelled = true;
+    };
   }, [defaultValue, key, validator]);
 
   // Save to storage and localStorage snapshot when value changes (after initial load)

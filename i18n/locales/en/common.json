@@ -25,5 +25,11 @@
   "messages": {
     "copySuccess": "Copied to clipboard",
     "copyError": "Copy failed"
+  },
+  "textInputArea": {
+    "clear": "Clear",
+    "copyContent": "Copy content",
+    "cleared": "Cleared",
+    "placeholder": "placeholder text"
   }
 }

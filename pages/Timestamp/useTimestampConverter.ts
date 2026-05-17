@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import dayjs from '@/utils/dayjs';
 import type { UnitType, ZoneType } from '@/config/pageTheme';
 import { DATE_FORMAT } from '@/config/pageTheme';
@@ -62,11 +62,6 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
       setResult(unit === 'ms' ? String(ms) : String(Math.floor(ms / 1000)));
     }
   }, [mode, tsInput, dtInput, unit, zone, t]);
-
-  useEffect(() => {
-    const timer = setTimeout(convert, 400);
-    return () => clearTimeout(timer);
-  }, [convert]);
 
   const handleUseNow = useCallback(
     (now: number) => {

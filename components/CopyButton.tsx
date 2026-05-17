@@ -45,15 +45,14 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
 
   const handleCopy = async () => {
     if (text) {
-      await copyTextToClipboard(text)
-        .then(() => {
-          showMessage?.('复制成功', { severity: 'success' });
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        })
-        .catch(() => {
-          showMessage?.('复制失败', { severity: 'error' });
-        });
+      const success = await copyTextToClipboard(text);
+      if (success) {
+        showMessage?.('复制成功', { severity: 'success' });
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      } else {
+        showMessage?.('复制失败', { severity: 'error' });
+      }
     } else {
       showMessage?.('无内容可复制', { severity: 'error' });
     }

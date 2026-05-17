@@ -19,7 +19,9 @@ export default defineBackground(() => {
     const { tabId, delay = 0 } = message.data;
 
     const executeReload = () => {
-      browser.tabs.reload(tabId);
+      browser.tabs.reload(tabId).catch((err) => {
+        console.error('Failed to reload tab:', err);
+      });
     };
 
     if (delay > 0) {

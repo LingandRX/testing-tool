@@ -77,16 +77,23 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
 
   // 异步校准：从 chrome.storage 读取持久化值
   useEffect(() => {
+    let cancelled = false;
     storageUtil
       .get(THEME_MODE_KEY, 'system')
       .then((saved) => {
+        if (cancelled) return;
         if (isValidMode(saved)) {
           setModeState(saved);
           updateResolved(saved);
         }
       })
       .catch(console.error)
-      .finally(() => setIsLoaded(true));
+      .finally(() => {
+        if (!cancelled) setIsLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [updateResolved]);
 
   // 监听系统主题变化（仅在 system 模式下生效）

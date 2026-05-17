@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Box, Container, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Box, Container, Paper, Stack, Typography } from '@mui/material';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PageHeader from '@/components/PageHeader';
-import { jwtPageStyles } from '@/config/pageTheme';
-import { formatJson, parseJwt } from '@/utils/jwt';
+import { stringifyJson, parseJwt } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
+import TextInputArea from '@/components/TextInputArea';
 import { useTranslation } from 'react-i18next';
 
 interface SectionProps {
@@ -52,14 +51,14 @@ const Section = ({ title, content, color }: SectionProps) => {
           border: '1px solid rgba(0,0,0,0.05)',
         }}
       >
-        {content ? formatJson(content) : t('jwt:invalidFormat')}
+        {content ? stringifyJson(content) : t('jwt:invalidFormat')}
       </Box>
     </Paper>
   );
 };
 
 export default function Index() {
-  useSnackbar();
+  const { showMessage } = useSnackbar();
   const { t } = useTranslation(['jwt']);
   const [jwtInput, setJwtInput] = useState('');
 
@@ -81,40 +80,19 @@ export default function Index() {
 
         <Stack spacing={2.5}>
           {/* Input Area */}
-          <TextField
-            multiline
-            rows={4}
+          <TextInputArea
+            minRows={4}
             placeholder={t('jwt:placeholder')}
             value={jwtInput}
-            onChange={(e) => {
-              // 自动去除 Bearer 前缀及首尾空白字符/换行
-              const val = e.target.value.replace(/^Bearer\s*/i, '').trim();
-              setJwtInput(val);
+            onChange={(val) => {
+              const cleaned = val.replace(/^Bearer\s*/i, '').trim();
+              setJwtInput(cleaned);
             }}
-            fullWidth
-            sx={jwtPageStyles.INPUT_STYLE}
+            allowCopy={true}
+            showClear={true}
+            showMessage={showMessage}
+            externalError={result?.error}
           />
-
-          {result?.error && (
-            <Paper
-              sx={{
-                p: 2,
-                bgcolor: 'error.lighter',
-                color: 'error.main',
-                borderRadius: 3,
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 1.5,
-                border: '1px solid',
-                borderColor: 'error.light',
-              }}
-            >
-              <ErrorOutlineIcon sx={{ mt: 0.2 }} fontSize="small" />
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {result.error}
-              </Typography>
-            </Paper>
-          )}
 
           {result && !result.error && (
             <Stack spacing={2}>

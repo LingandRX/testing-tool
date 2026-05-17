@@ -47,9 +47,6 @@ function toTomlValue(value: unknown): string {
     return value ? 'true' : 'false';
   }
   if (typeof value === 'number') {
-    if (Number.isInteger(value)) {
-      return String(value);
-    }
     return String(value);
   }
   if (typeof value === 'string') {

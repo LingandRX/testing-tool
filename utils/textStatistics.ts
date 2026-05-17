@@ -1,3 +1,5 @@
+import { formatBytes } from './format';
+
 /**
  * 文本统计信息接口
  */
@@ -57,21 +59,11 @@ export function getTextStats(text: string): TextStats {
 }
 
 /**
- * 格式化字节大小显示
+ * 格式化字节大小显示（兼容旧接口，内部委托给 formatBytes）
  *
  * @param bytes 字节数
- * @returns 格式化后的字符串，例如 "1.2 KB" 或 "100 B"
+ * @returns 格式化后的字符串
  */
 export function formatByteSize(bytes: number): string {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-  const units = ['KB', 'MB', 'GB', 'TB'];
-  let size = bytes / 1024;
-  let unitIndex = 0;
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
-  }
-  return `${size.toFixed(unitIndex > 0 ? 2 : 1)} ${units[unitIndex]}`;
+  return formatBytes(bytes);
 }
