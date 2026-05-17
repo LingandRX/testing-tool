@@ -425,5 +425,11 @@ describe('TextInputArea 组件', () => {
 
       expect(container.firstChild).toHaveStyle({ marginTop: '10px' });
     });
+
+    it('应透传 sx 样式', () => {
+      const { container } = render(<TextInputArea value="" onChange={() => {}} sx={{ mb: 3 }} />);
+
+      expect(container.firstChild).toHaveStyle({ marginBottom: '24px' });
+    });
   });
 });

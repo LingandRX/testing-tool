@@ -30,7 +30,16 @@
  */
 
 import { useRef, useState, useCallback, forwardRef, RefObject } from 'react';
-import { Box, Button, IconButton, TextField, Tooltip, Typography, alpha } from '@mui/material';
+import {
+  Box,
+  Button,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+  alpha,
+  type SxProps,
+} from '@mui/material';
 import type { Theme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -88,6 +97,8 @@ export interface TextInputAreaProps {
   className?: string;
   /** 外层容器样式 */
   style?: React.CSSProperties;
+  /** 外层容器 sx */
+  sx?: SxProps<Theme>;
 
   /** 是否显示字符计数 */
   showCount?: boolean;
@@ -204,6 +215,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     maxLength,
     className = '',
     style,
+    sx: containerSx,
     showCount = false,
     showClear = true,
     allowCopy = false,
@@ -323,7 +335,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const hasTopBar = title || showCount || topActions.length > 0 || topExtra || allowCopy;
 
   return (
-    <Box className={className} style={style}>
+    <Box className={className} style={style} sx={containerSx}>
       {hasTopBar && (
         <Box
           sx={{
