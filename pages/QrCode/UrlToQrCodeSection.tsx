@@ -22,9 +22,15 @@ import { useTranslation } from 'react-i18next';
 interface UrlToQrCodeSectionProps {
   expanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
+  /** 桌面端强制展开（隐藏折叠交互） */
+  forceExpanded?: boolean;
 }
 
-const UrlToQrCodeSection = ({ expanded, onExpandedChange }: UrlToQrCodeSectionProps) => {
+const UrlToQrCodeSection = ({
+  expanded,
+  onExpandedChange,
+  forceExpanded = false,
+}: UrlToQrCodeSectionProps) => {
   const { t } = useTranslation(['qrCode']);
   const { showMessage } = useSnackbar();
   const [urlInput, setUrlInput] = useState('');
@@ -103,9 +109,9 @@ const UrlToQrCodeSection = ({ expanded, onExpandedChange }: UrlToQrCodeSectionPr
 
   return (
     <Accordion
-      expanded={expanded}
-      onChange={(_, isExpanded) => onExpandedChange(isExpanded)}
-      sx={qrCodePageStyles.ACCORDION}
+      expanded={forceExpanded ? true : expanded}
+      onChange={forceExpanded ? undefined : (_, isExpanded) => onExpandedChange(isExpanded)}
+      sx={forceExpanded ? qrCodePageStyles.ACCORDION_DESKTOP : qrCodePageStyles.ACCORDION}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={qrCodePageStyles.ACCORDION_SUMMARY}>
         <Box sx={qrCodePageStyles.ACCORDION_TITLE_ICON}>
@@ -139,7 +145,7 @@ const UrlToQrCodeSection = ({ expanded, onExpandedChange }: UrlToQrCodeSectionPr
             {generating ? t('qrCode:generating') : t('qrCode:generateButton')}
           </Button>
 
-          <Box sx={qrCodePageStyles.QR_PREVIEW_CONTAINER}>
+          <Box className="qr-flex-grow" sx={qrCodePageStyles.QR_PREVIEW_CONTAINER}>
             {qrCodeDataUrl ? (
               <Box sx={qrCodePageStyles.QR_PREVIEW_INNER}>
                 <img src={qrCodeDataUrl} alt="QR Code" style={qrCodePageStyles.QR_PREVIEW_IMAGE} />

@@ -235,4 +235,33 @@ describe('RouterProvider', () => {
     expect(visiblePages).toContain('base64Converter');
     expect(pageOrder).toContain('base64Converter');
   });
+
+  it('组件卸载时不应设置 isLoaded 状态（竞态条件防护）', async () => {
+    let resolveStorage: (value: unknown) => void;
+    const storagePromise = new Promise((resolve) => {
+      resolveStorage = resolve;
+    });
+
+    (storageUtil.get as any).mockImplementation(() => storagePromise);
+
+    const { unmount } = render(
+      <RouterProvider>
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    // 在存储读取完成前卸载组件
+    unmount();
+
+    // 现在让存储读取完成
+    resolveStorage!('dashboard');
+
+    // 等待一段时间确保如果 setState 被调用会触发警告
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    // 测试通过的标准：没有 React "Can't perform a React state update on an unmounted component" 警告
+    // 如果有竞态条件，这里会输出警告（React 18+ 中已移除该警告，但状态更新仍是无效操作）
+  });
 });

@@ -1,6 +1,6 @@
 {
   "pageTitle": "Base64 转换器",
-  "pageSubtitle": "文本、文件与图像的 Base64 编码转换",
+  "pageSubtitle": "文本、文件与图像的 Base64 编码与解码",
   "textMode": "文本",
   "fileMode": "文件",
   "imageMode": "图像",
@@ -22,5 +22,16 @@
   "unsupportedImageType": "不支持的图像格式",
   "conversionFailed": "转换失败",
   "originalSize": "原始大小",
-  "encodedSize": "编码大小"
+  "encodedSize": "编码大小",
+  "invalidBase64": "Base64 字符串无效",
+  "binaryDataDetected": "输入似乎是二进制数据（如图片）。请切换到「图像」选项卡。",
+  "imageDataUriHint": "检测到图片的 data URI，请使用「图像」选项卡进行解码。",
+  "switchToImageMode": "切换到图像模式",
+  "download": "下载",
+  "decodedFileName": "解码后文件名",
+  "decodeBase64Placeholder": "输入需要解码的 Base64 或 data URI...",
+  "decodedFileOutput": "解码文件",
+  "decodedImageOutput": "解码图像",
+  "inferredMimeType": "推断的 MIME 类型",
+  "decodedSize": "解码大小"
 }

@@ -6,19 +6,20 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: [
-      'dist',
-      '.output',
-      '.wxt',
-      'node_modules',
-      'eslint.config.ts',
-      '**/*.test.tsx',
-      '**/*.test.ts',
-      '**/__tests__/**',
-    ],
+    ignores: ['dist', '.output', '.wxt', 'node_modules', 'eslint.config.ts'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    files: ['**/__tests__/**', '**/*.test.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+  },
   {
     files: [
       'hooks/**/*.{ts,tsx}',
@@ -28,6 +29,7 @@ export default [
       'components/**/*.{ts,tsx}',
       'services/**/*.{ts,tsx}',
     ],
+    ignores: ['**/__tests__/**', '**/*.test.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {

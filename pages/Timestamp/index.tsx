@@ -1,16 +1,8 @@
-import {
-  Box,
-  Container,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@mui/material';
+import { Box, Container, MenuItem, Select, Stack, TextField } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { timestampPageStyles, ZONES } from '@/config/pageTheme';
 import LiveClock from './LiveClock';
 import ResultView from './ResultView';
@@ -37,7 +29,7 @@ export default function Index() {
 
   return (
     <Box>
-      <Container sx={{ p: 2 }}>
+      <Container maxWidth="lg" sx={{ p: 2 }}>
         {/* Header */}
         <PageHeader
           title={t('timestamp:pageTitle')}
@@ -45,71 +37,92 @@ export default function Index() {
           icon={<AccessTimeIcon />}
         />
 
-        {/* Live Clock Card */}
-        <LiveClock unit={unit} onUseNow={handleUseNow} onUnitChange={setUnit} />
+        {/* 参考信息：分栏上方全宽单行参考条 */}
+        <LiveClock unit={unit} onUseNow={handleUseNow} />
 
-        {/* Mode Switcher */}
-        <ToggleButtonGroup
-          value={mode}
-          exclusive
-          onChange={(_, newMode) => newMode && setMode(newMode)}
-          sx={timestampPageStyles.MODE_SWITCHER}
-        >
-          <ToggleButton value="ts2dt">{t('timestamp:tsToDate')}</ToggleButton>
-          <ToggleButton value="dt2ts">{t('timestamp:dateToTs')}</ToggleButton>
-        </ToggleButtonGroup>
+        {/* 桌面端 md+ 左右分栏；移动端单栏堆叠 */}
+        <Box sx={timestampPageStyles.LAYOUT_GRID}>
+          {/* 左栏：转换工作台 */}
+          <Box sx={timestampPageStyles.CONVERSION_CARD}>
+            {/* 模式切换 */}
+            <SwitchButtonGroup
+              value={mode}
+              options={[
+                { value: 'ts2dt', label: t('timestamp:tsToDate') },
+                { value: 'dt2ts', label: t('timestamp:dateToTs') },
+              ]}
+              onChange={(newMode) => setMode(newMode)}
+              size="small"
+            />
 
-        {/* Input Area */}
-        <Stack spacing={2} sx={{ mb: 3 }}>
-          <TextField
-            placeholder={
-              mode === 'ts2dt' ? t('timestamp:placeholderTs') : t('timestamp:placeholderDate')
-            }
-            value={mode === 'ts2dt' ? tsInput : dtInput}
-            onChange={(e) => setInput(e.target.value)}
-            error={!!error}
-            helperText={error}
-            fullWidth
-            sx={timestampPageStyles.INPUT_STYLE}
-          />
+            {/* 输入区 */}
+            <Stack spacing={1.5}>
+              <TextField
+                placeholder={
+                  mode === 'ts2dt' ? t('timestamp:placeholderTs') : t('timestamp:placeholderDate')
+                }
+                value={mode === 'ts2dt' ? tsInput : dtInput}
+                onChange={(e) => setInput(e.target.value)}
+                error={!!error}
+                helperText={error}
+                fullWidth
+                sx={timestampPageStyles.INPUT_STYLE}
+              />
 
-          <Stack direction="row" spacing={1.5}>
-            {/* 单位选择按钮组 */}
-            <Box sx={timestampPageStyles.UNIT_SWITCHER_CONTAINER}>
-              {(['ms', 's'] as const).map((u) => (
-                <Box
-                  key={u}
-                  onClick={() => setUnit(u)}
-                  sx={timestampPageStyles.UNIT_SWITCHER_ITEM(unit === u)}
+              {/* 单位+时区紧凑横排 */}
+              <Stack
+                direction="row"
+                spacing={1.5}
+                useFlexGap
+                sx={{ width: '100%', flexWrap: 'wrap' }}
+              >
+                <SwitchButtonGroup
+                  value={unit}
+                  options={[
+                    { value: 'ms', label: t('timestamp:unitMs') },
+                    { value: 's', label: t('timestamp:unitS') },
+                  ]}
+                  onChange={(v) => setUnit(v as 'ms' | 's')}
+                  sx={{ width: 'auto', mb: 0, flexShrink: 0 }}
+                  size="small"
+                />
+
+                <Select
+                  value={zone}
+                  onChange={(e) => setZone(e.target.value as typeof zone)}
+                  sx={{
+                    ...timestampPageStyles.INPUT_STYLE,
+                    flex: 1,
+                    minWidth: 0,
+                    borderRadius: 4,
+                    '& .MuiSelect-select': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    },
+                  }}
+                  MenuProps={timestampPageStyles.SELECT_MENU_PROPS}
                 >
-                  {u === 'ms' ? t('timestamp:unitMs') : t('timestamp:unitS')}
-                </Box>
-              ))}
-            </Box>
+                  {ZONES.map((z) => (
+                    <MenuItem key={z} value={z} sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
+                      {z}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Stack>
+            </Stack>
 
-            <Select
-              fullWidth
-              value={zone}
-              onChange={(e) => setZone(e.target.value as typeof zone)}
-              sx={{ ...timestampPageStyles.INPUT_STYLE, flex: 1, borderRadius: 4 }}
-              MenuProps={timestampPageStyles.SELECT_MENU_PROPS}
-            >
-              {ZONES.map((z) => (
-                <MenuItem key={z} value={z} sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
-                  {z}
-                </MenuItem>
-              ))}
-            </Select>
-          </Stack>
-        </Stack>
+            {/* 立即转换 */}
+            <Button variant="contained" onClick={convert} sx={timestampPageStyles.CONVERT_BUTTON}>
+              {t('timestamp:convertButton')}
+            </Button>
+          </Box>
 
-        {/* Main Action */}
-        <Button fullWidth variant="contained" onClick={convert}>
-          {t('timestamp:convertButton')}
-        </Button>
-
-        {/* Result View */}
-        <ResultView result={result} mode={mode} unit={unit} zone={zone} />
+          {/* 右栏：结果展示卡片 */}
+          <Box sx={timestampPageStyles.RESULT_COLUMN_CARD}>
+            <ResultView result={result} mode={mode} unit={unit} zone={zone} showEmptyPlaceholder />
+          </Box>
+        </Box>
       </Container>
     </Box>
   );

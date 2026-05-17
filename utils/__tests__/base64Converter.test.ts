@@ -8,6 +8,9 @@ import {
   isSupportedImageExtension,
   extractMimeTypeFromDataUri,
   formatFileSize,
+  base64ToBytes,
+  sniffMimeFromBytes,
+  base64ToBlob,
   MAX_FILE_SIZE,
 } from '@/utils/base64Converter';
 
@@ -66,6 +69,28 @@ describe('base64ToText', () => {
   it('应该修剪输入字符串的空白', () => {
     const result = base64ToText('  SGVsbG8=  ');
     expect(result).toBe('Hello');
+  });
+
+  it('应该自动剥离 data:<mime>;base64, 前缀后再解码', () => {
+    // "hello" -> base64 "aGVsbG8="
+    const result = base64ToText('data:text/plain;base64,aGVsbG8=');
+    expect(result).toBe('hello');
+  });
+
+  it('应该剥离带空白的 data URI 前缀', () => {
+    const result = base64ToText('  data:text/plain;base64,aGVsbG8=  ');
+    expect(result).toBe('hello');
+  });
+
+  it('应该对二进制（如 PNG）数据抛出更清晰的错误', () => {
+    // PNG 文件签名 89 50 4E 47 0D 0A 1A 0A 的 Base64 编码
+    const pngSignatureBase64 = 'iVBORw0KGgo=';
+    expect(() => base64ToText(pngSignatureBase64)).toThrow(/binary|二进制|image|图像/i);
+  });
+
+  it('应该对带 data:image/png 前缀的 PNG 数据抛出二进制错误', () => {
+    const pngDataUri = 'data:image/png;base64,iVBORw0KGgo=';
+    expect(() => base64ToText(pngDataUri)).toThrow(/binary|二进制|image|图像/i);
   });
 });
 
@@ -165,5 +190,151 @@ describe('formatFileSize', () => {
 
   it('应该格式化 GB', () => {
     expect(formatFileSize(1073741824)).toBe('1.00 GB');
+  });
+});
+
+describe('base64ToBytes', () => {
+  it('应该解码标准 ASCII Base64 为字节序列', () => {
+    const bytes = base64ToBytes('aGVsbG8=');
+    expect(Array.from(bytes)).toEqual([0x68, 0x65, 0x6c, 0x6c, 0x6f]);
+  });
+
+  it('应该正确解码 PNG 文件签名', () => {
+    // PNG 签名：89 50 4E 47 0D 0A 1A 0A
+    const bytes = base64ToBytes('iVBORw0KGgo=');
+    expect(Array.from(bytes)).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  });
+
+  it('应该返回空 Uint8Array 对于空字符串输入', () => {
+    const bytes = base64ToBytes('');
+    expect(bytes.length).toBe(0);
+  });
+});
+
+describe('sniffMimeFromBytes', () => {
+  it('应该识别 PNG', () => {
+    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'image/png', ext: '.png' });
+  });
+
+  it('应该识别 JPEG', () => {
+    const bytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'image/jpeg', ext: '.jpg' });
+  });
+
+  it('应该识别 GIF', () => {
+    const bytes = new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'image/gif', ext: '.gif' });
+  });
+
+  it('应该识别 BMP', () => {
+    const bytes = new Uint8Array([0x42, 0x4d, 0x36, 0x00, 0x00, 0x00]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'image/bmp', ext: '.bmp' });
+  });
+
+  it('应该识别 WebP（RIFF....WEBP 复合签名）', () => {
+    const bytes = new Uint8Array([
+      0x52,
+      0x49,
+      0x46,
+      0x46, // "RIFF"
+      0x24,
+      0x00,
+      0x00,
+      0x00, // 文件大小占位
+      0x57,
+      0x45,
+      0x42,
+      0x50, // "WEBP"
+      0x56,
+      0x50,
+      0x38,
+      0x20, // "VP8 " 子块
+    ]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'image/webp', ext: '.webp' });
+  });
+
+  it('不应将 WAV（RIFF 容器但非 WEBP）识别为 WebP', () => {
+    const bytes = new Uint8Array([
+      0x52,
+      0x49,
+      0x46,
+      0x46, // "RIFF"
+      0x24,
+      0x00,
+      0x00,
+      0x00,
+      0x57,
+      0x41,
+      0x56,
+      0x45, // "WAVE"
+    ]);
+    expect(sniffMimeFromBytes(bytes)).toBeNull();
+  });
+  it('应该识别 PDF', () => {
+    const bytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'application/pdf', ext: '.pdf' });
+  });
+
+  it('应该识别 ZIP', () => {
+    const bytes = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+    expect(sniffMimeFromBytes(bytes)).toEqual({ mime: 'application/zip', ext: '.zip' });
+  });
+
+  it('应该对未匹配的字节返回 null', () => {
+    const bytes = new Uint8Array([0x00, 0x01, 0x02, 0x03]);
+    expect(sniffMimeFromBytes(bytes)).toBeNull();
+  });
+
+  it('应该对过短的字节返回 null', () => {
+    const bytes = new Uint8Array([0x89]);
+    expect(sniffMimeFromBytes(bytes)).toBeNull();
+  });
+});
+
+describe('base64ToBlob', () => {
+  it('应该优先使用 data URI 中的 MIME 类型', () => {
+    const result = base64ToBlob('data:application/json;base64,eyJhIjoxfQ==');
+    expect(result.mimeType).toBe('application/json');
+    expect(result.blob).toBeInstanceOf(Blob);
+    expect(result.blob.size).toBe(7);
+  });
+
+  it('应该通过魔数识别 PNG', () => {
+    const result = base64ToBlob('iVBORw0KGgo=');
+    expect(result.mimeType).toBe('image/png');
+    expect(result.suggestedExtension).toBe('.png');
+  });
+
+  it('应该通过魔数识别 PDF', () => {
+    // "%PDF-" + 一些字节
+    const result = base64ToBlob('JVBERi0K');
+    expect(result.mimeType).toBe('application/pdf');
+    expect(result.suggestedExtension).toBe('.pdf');
+  });
+
+  it('应该对未匹配的纯 Base64 回退为 application/octet-stream + .bin', () => {
+    const result = base64ToBlob('AAECAwQF');
+    expect(result.mimeType).toBe('application/octet-stream');
+    expect(result.suggestedExtension).toBe('.bin');
+  });
+
+  it('应该 trim 前后空白', () => {
+    const result = base64ToBlob('  iVBORw0KGgo=  ');
+    expect(result.mimeType).toBe('image/png');
+  });
+
+  it('应该对非法 Base64 抛出 Invalid Base64 string', () => {
+    expect(() => base64ToBlob('这不是 base64!')).toThrow('Invalid Base64 string');
+  });
+
+  it('应该返回原始 Base64（已去除 data URI 前缀）', () => {
+    const result = base64ToBlob('data:image/png;base64,iVBORw0KGgo=');
+    expect(result.rawBase64).toBe('iVBORw0KGgo=');
+  });
+
+  it('blob 大小应该等于解码后的字节数', () => {
+    const result = base64ToBlob('aGVsbG8=');
+    expect(result.blob.size).toBe(5);
   });
 });

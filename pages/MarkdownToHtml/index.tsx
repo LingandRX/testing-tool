@@ -7,13 +7,9 @@ import {
   Container,
   Stack,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
   Paper,
 } from '@mui/material';
-import SplitscreenIcon from '@mui/icons-material/Splitscreen';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import CodeIcon from '@mui/icons-material/Code';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PrintIcon from '@mui/icons-material/Print';
@@ -21,7 +17,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
-import { markdownToHtmlPageStyles } from '@/config/pageTheme';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { useStorageState } from '@/utils/useStorageState';
 import type { MarkdownToHtmlPreviewMode } from '@/types/storage';
 import {
@@ -144,8 +140,8 @@ export default function MarkdownToHtmlPage() {
   }, [result.html]);
 
   const handleModeChange = useCallback(
-    (_event: React.MouseEvent<HTMLElement>, newMode: MarkdownToHtmlPreviewMode | null) => {
-      if (newMode) setPreviewMode(newMode);
+    (newMode: MarkdownToHtmlPreviewMode) => {
+      setPreviewMode(newMode);
     },
     [setPreviewMode],
   );
@@ -179,26 +175,16 @@ export default function MarkdownToHtmlPage() {
           flexWrap="wrap"
           gap={1.5}
         >
-          <ToggleButtonGroup
+          <SwitchButtonGroup
             value={previewMode}
-            exclusive
+            options={[
+              { value: 'split', label: t('splitMode') },
+              { value: 'preview', label: t('previewMode') },
+              { value: 'html', label: t('htmlMode') },
+            ]}
             onChange={handleModeChange}
             size="small"
-            sx={markdownToHtmlPageStyles.MODE_SWITCHER}
-          >
-            <ToggleButton value="split">
-              <SplitscreenIcon sx={{ fontSize: 16, mr: 0.5 }} />
-              {t('splitMode')}
-            </ToggleButton>
-            <ToggleButton value="preview">
-              <VisibilityIcon sx={{ fontSize: 16, mr: 0.5 }} />
-              {t('previewMode')}
-            </ToggleButton>
-            <ToggleButton value="html">
-              <CodeIcon sx={{ fontSize: 16, mr: 0.5 }} />
-              {t('htmlMode')}
-            </ToggleButton>
-          </ToggleButtonGroup>
+          />
 
           <Stack direction="row" spacing={1}>
             <Button

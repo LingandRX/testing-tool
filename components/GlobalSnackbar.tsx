@@ -145,6 +145,7 @@ export function GlobalSnackbar({
   onClose,
   severity = defaultProps.severity,
   autoHideDuration = defaultProps.autoHideDuration,
+  anchorOrigin = defaultProps.anchorOrigin,
   showAlert = defaultProps.showAlert,
   hideIcon = defaultProps.hideIcon,
 }: GlobalSnackbarProps): JSX.Element {
@@ -154,7 +155,7 @@ export function GlobalSnackbar({
         open={open}
         autoHideDuration={autoHideDuration}
         onClose={onClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={anchorOrigin}
         disableWindowBlurListener
         sx={{
           zIndex: 999999,

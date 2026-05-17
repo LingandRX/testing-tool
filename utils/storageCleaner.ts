@@ -1,4 +1,5 @@
 import type { CleaningResult, StorageCleanerOptions, StorageCleanResult } from '@/types/storage';
+import { formatBytes } from './format';
 
 const RESTRICTED_PROTOCOLS = [
   'chrome:',
@@ -41,10 +42,15 @@ export function isRestrictedUrl(url?: string): boolean {
 export async function getCookieSize(url: string): Promise<number> {
   try {
     const cookies = await chrome.cookies.getAll({ url });
-    // 估算：名称 + 值 + 域名 + 路径 的长度
+    const encoder = new TextEncoder();
+    // 估算：名称 + 值 + 域名 + 路径 的 UTF-8 字节数
     return cookies.reduce(
       (acc, c) =>
-        acc + c.name.length + c.value.length + (c.domain?.length || 0) + (c.path?.length || 0),
+        acc +
+        encoder.encode(c.name).length +
+        encoder.encode(c.value).length +
+        encoder.encode(c.domain ?? '').length +
+        encoder.encode(c.path ?? '').length,
       0,
     );
   } catch (error) {
@@ -59,7 +65,11 @@ export async function getLocalStorageSize(tabId: number): Promise<number> {
       target: { tabId },
       func: () => {
         try {
-          return Object.entries(localStorage).reduce((acc, [k, v]) => acc + k.length + v.length, 0);
+          const encoder = new TextEncoder();
+          return Object.entries(localStorage).reduce(
+            (acc, [k, v]) => acc + encoder.encode(k).length + encoder.encode(v).length,
+            0,
+          );
         } catch {
           return 0;
         }
@@ -78,8 +88,9 @@ export async function getSessionStorageSize(tabId: number): Promise<number> {
       target: { tabId },
       func: () => {
         try {
+          const encoder = new TextEncoder();
           return Object.entries(sessionStorage).reduce(
-            (acc, [k, v]) => acc + k.length + v.length,
+            (acc, [k, v]) => acc + encoder.encode(k).length + encoder.encode(v).length,
             0,
           );
         } catch {
@@ -94,7 +105,7 @@ export async function getSessionStorageSize(tabId: number): Promise<number> {
   }
 }
 
-export async function getIndexedDBSize(tabId: number): Promise<number> {
+export async function getOriginStorageEstimate(tabId: number): Promise<number> {
   try {
     const [result] = await chrome.scripting.executeScript({
       target: { tabId },
@@ -114,7 +125,7 @@ export async function getIndexedDBSize(tabId: number): Promise<number> {
     });
     return (result?.result as number) || 0;
   } catch (error) {
-    console.error('Failed to get IndexedDB size:', error);
+    console.error('Failed to get origin storage estimate:', error);
     return 0;
   }
 }
@@ -166,13 +177,14 @@ export async function getServiceWorkerCount(tabId: number): Promise<number> {
   }
 }
 
+/**
+ * 格式化字节大小显示（兼容旧接口，内部委托给 formatBytes）
+ *
+ * @param bytes 字节数
+ * @returns 格式化后的字符串
+ */
 export function formatSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  if (bytes < 1024) return `${bytes} B`; // 处理小于 1KB 的情况
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  return formatBytes(bytes);
 }
 
 export async function clearCookies(url: string): Promise<StorageCleanResult> {

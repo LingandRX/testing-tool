@@ -11,7 +11,7 @@ import {
   getCacheStorageSize,
   getCookieSize,
   getCurrentTab,
-  getIndexedDBSize,
+  getOriginStorageEstimate,
   getLocalStorageSize,
   getServiceWorkerCount,
   getSessionStorageSize,
@@ -116,7 +116,7 @@ export function useStorageCleaner({
         getCookieSize(url),
         getLocalStorageSize(tabId),
         getSessionStorageSize(tabId),
-        getIndexedDBSize(tabId),
+        getOriginStorageEstimate(tabId),
         getCacheStorageSize(tabId),
         getServiceWorkerCount(tabId),
       ]);
@@ -243,7 +243,7 @@ export function useStorageCleaner({
         await loadInfo();
       }
     } catch (err) {
-      showMessage(`${t('common:messages.copyError')}: ${String(err)}`, { severity: 'error' });
+      showMessage(`${t('storageCleaner:cleanError')}: ${String(err)}`, { severity: 'error' });
     } finally {
       setLoading(false);
       setShowConfirm(false);

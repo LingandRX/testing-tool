@@ -1,4 +1,12 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
@@ -56,10 +64,6 @@ interface RouterContextType {
   isLoaded: boolean;
   /** 导航到指定页面 */
   navigateTo: (page: PageType) => void;
-  /** 仅在本地（当前组件状态）跳转，不影响其他同步端 */
-  navigateLocal: (page: PageType) => void;
-  /** 强制同步当前路由到存储 */
-  syncNavigation: (page: PageType) => void;
   /** 返回仪表盘 */
   goBack: () => void;
   /** 设置可见页面列表 */
@@ -173,14 +177,22 @@ export function RouterProvider({
       }
     } catch (error) {
       console.error('加载初始路由数据失败:', error);
-    } finally {
-      setIsLoaded(true);
     }
   }, [defaultRoute, syncKey, syncRoute, visiblePagesKey, pageOrderKey]);
 
   // 组件挂载时加载初始数据
   useEffect(() => {
-    loadInitialData().catch(console.error);
+    let cancelled = false;
+    loadInitialData()
+      .then(() => {
+        if (!cancelled) {
+          setIsLoaded(true);
+        }
+      })
+      .catch(console.error);
+    return () => {
+      cancelled = true;
+    };
   }, [loadInitialData]);
 
   // 当 currentPage 改变时，如果开启了同步，则持久化到存储和本地快照
@@ -207,6 +219,12 @@ export function RouterProvider({
     }
   }, [pageOrder, isLoaded, pageOrderKey]);
 
+  // 用 ref 持有最新 currentPage，避免每次路由跳转都重注册 chrome.storage 监听器
+  const currentPageRef = useRef(currentPage);
+  useEffect(() => {
+    currentPageRef.current = currentPage;
+  }, [currentPage]);
+
   /**
    * 监听存储变化，以便在多个入口（如 Popup 和 Options）之间同步路由和设置
    */
@@ -217,7 +235,7 @@ export function RouterProvider({
       // 同步当前路由
       if (syncRoute && changes[syncKey as string]) {
         const newRoute = changes[syncKey as string].newValue as PageType;
-        if (newRoute && newRoute !== currentPage && isValidPage(newRoute)) {
+        if (newRoute && newRoute !== currentPageRef.current && isValidPage(newRoute)) {
           setCurrentPage(newRoute);
         }
       }
@@ -239,27 +257,13 @@ export function RouterProvider({
 
     chrome.storage.onChanged.addListener(handleStorageChange);
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
-  }, [syncRoute, currentPage, syncKey, visiblePagesKey, pageOrderKey]);
+  }, [syncRoute, syncKey, visiblePagesKey, pageOrderKey]);
 
   /**
    * 跳转到指定页面
    */
   const navigateTo = (page: PageType) => {
     setCurrentPage(page);
-  };
-
-  /**
-   * 仅在本地跳转，不触发自动同步（通常由 handleStorageChange 内部调用）
-   */
-  const navigateLocal = (page: PageType) => {
-    setCurrentPage(page);
-  };
-
-  /**
-   * 手动同步导航状态到存储
-   */
-  const syncNavigation = (page: PageType) => {
-    storageUtil.set(syncKey, page as StorageSchema[typeof syncKey]).catch(console.error);
   };
 
   /**
@@ -277,8 +281,6 @@ export function RouterProvider({
         pageOrder,
         isLoaded,
         navigateTo,
-        navigateLocal,
-        syncNavigation,
         goBack,
         setVisiblePages,
         setPageOrder,

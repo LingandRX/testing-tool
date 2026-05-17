@@ -6,5 +6,12 @@
   "payloadTitle": "PAYLOAD: Data",
   "signatureTitle": "Signature",
   "noSignature": "No Signature",
-  "invalidFormat": "Unable to parse"
+  "invalidFormat": "Unable to parse",
+  "errors": {
+    "invalidBase64String": "Invalid base64url string",
+    "failedToDecode": "Failed to decode base64url: ",
+    "invalidFormat": "Invalid JWT format: expected 3 parts separated by .",
+    "parseHeaderFailed": "Failed to parse Header: ",
+    "parsePayloadFailed": "Failed to parse Payload: "
+  }
 }

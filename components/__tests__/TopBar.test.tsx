@@ -28,7 +28,6 @@ const mockRouterValue = {
   pageOrder: ['timestamp'] as PageType[],
   isLoaded: true,
   navigateTo: vi.fn(),
-  navigateLocal: vi.fn(),
   syncNavigation: vi.fn(),
   goBack: vi.fn(),
   setVisiblePages: vi.fn(),

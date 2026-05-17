@@ -18,6 +18,7 @@
   "iso8601": "ISO 8601",
   "utcTime": "UTC 时间",
   "copyTooltip": "复制",
+  "resultEmpty": "请输入并点击转换",
   "errors": {
     "invalidNumber": "无效数字",
     "invalidTimestamp": "无效时间戳",
