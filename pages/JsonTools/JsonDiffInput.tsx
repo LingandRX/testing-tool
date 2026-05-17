@@ -1,5 +1,5 @@
-import { Box, FormHelperText, TextField, Typography } from '@mui/material';
-import { jsonDiffPageStyles } from '@/config/pageTheme';
+import { Box, Typography } from '@mui/material';
+import TextInputArea from '@/components/TextInputArea';
 
 interface JsonDiffInputProps {
   label: string;
@@ -32,21 +32,15 @@ export default function JsonDiffInput({
       >
         {label}
       </Typography>
-      <TextField
-        multiline
-        rows={8}
-        fullWidth
-        placeholder={placeholder}
+      <TextInputArea
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        error={Boolean(error)}
-        sx={jsonDiffPageStyles.INPUT_STYLE}
+        onChange={onChange}
+        placeholder={placeholder}
+        minRows={8}
+        autoResize={false}
+        externalError={error ?? undefined}
+        showClear={true}
       />
-      {error && (
-        <FormHelperText error sx={{ mx: 1.5, mt: 0.5, fontWeight: 600 }}>
-          {error}
-        </FormHelperText>
-      )}
     </Box>
   );
 }

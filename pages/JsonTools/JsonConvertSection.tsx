@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { formatByteSize } from '@/utils/textStatistics';
 import { useSnackbar } from '@/components/GlobalSnackbar';
-import { jsonDiffPageStyles } from '@/config/pageTheme';
 import CopyButton from '@/components/CopyButton';
+import TextInputArea from '@/components/TextInputArea';
 import { validateJson } from '@/utils/jsonFormatter';
 
 /** 转换结果通用接口 */
@@ -113,23 +113,15 @@ export default function JsonConvertSection({
       </Stack>
 
       {/* 输入区 */}
-      <Box>
-        <TextField
-          multiline
-          rows={6}
-          fullWidth
-          placeholder={t(`jsonFormat:${pk}InputPlaceholder`)}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          error={Boolean(error)}
-          sx={jsonDiffPageStyles.INPUT_STYLE}
-        />
-        {error && (
-          <FormHelperText error sx={{ mx: 1.5, mt: 0.5, fontWeight: 600 }}>
-            {t('jsonFormat:invalidJson')}
-          </FormHelperText>
-        )}
-      </Box>
+      <TextInputArea
+        placeholder={t(`jsonFormat:${pk}InputPlaceholder`)}
+        value={input}
+        onChange={setInput}
+        externalError={error || undefined}
+        onClear={() => {
+          setResult(null);
+        }}
+      />
 
       {/* 转换结果 */}
       {result && result.output ? (
