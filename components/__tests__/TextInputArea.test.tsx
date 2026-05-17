@@ -389,6 +389,71 @@ describe('TextInputArea 组件', () => {
     });
   });
 
+  describe('externalError 外部错误', () => {
+    it('设置 externalError 时应显示错误状态', () => {
+      render(<TextInputArea value="内容" onChange={() => {}} externalError="JSON 格式无效" />);
+
+      expect(screen.getByText('JSON 格式无效')).toBeInTheDocument();
+    });
+
+    it('externalError 为空时应隐藏错误状态', () => {
+      const { rerender } = render(
+        <TextInputArea value="内容" onChange={() => {}} externalError="错误" />,
+      );
+
+      expect(screen.getByText('错误')).toBeInTheDocument();
+
+      rerender(<TextInputArea value="内容" onChange={() => {}} externalError="" />);
+
+      expect(screen.queryByText('错误')).not.toBeInTheDocument();
+    });
+
+    it('externalError 优先级高于内部验证错误', () => {
+      render(
+        <TextInputArea
+          value="ab"
+          onChange={() => {}}
+          externalError="外部错误"
+          validateTrigger="onChange"
+          rules={[{ validator: (v) => v.length >= 3, message: '内部验证错误' }]}
+        />,
+      );
+
+      expect(screen.getByText('外部错误')).toBeInTheDocument();
+      expect(screen.queryByText('内部验证错误')).not.toBeInTheDocument();
+    });
+
+    it('externalError 清除后应显示内部验证错误', () => {
+      const { rerender } = render(
+        <TextInputArea
+          value="ab"
+          onChange={() => {}}
+          externalError="外部错误"
+          validateTrigger="onChange"
+          rules={[{ validator: (v) => v.length >= 3, message: '至少3个字符' }]}
+        />,
+      );
+
+      expect(screen.getByText('外部错误')).toBeInTheDocument();
+
+      rerender(
+        <TextInputArea
+          value="ab"
+          onChange={() => {}}
+          validateTrigger="onChange"
+          rules={[{ validator: (v) => v.length >= 3, message: '至少3个字符' }]}
+        />,
+      );
+
+      expect(screen.queryByText('外部错误')).not.toBeInTheDocument();
+
+      const textarea = screen.getByRole('textbox');
+      fireEvent.change(textarea, { target: { value: 'a' } });
+
+      expect(screen.getByText('至少3个字符')).toBeInTheDocument();
+    });
+  });
+
   describe('autoResize', () => {
     it('autoResize=true 时设置 minRows/maxRows', () => {
       const { container } = render(

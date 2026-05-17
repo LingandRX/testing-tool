@@ -124,6 +124,9 @@ export interface TextInputAreaProps {
 
   /** 消息提示回调，用于展示 Toast 通知 */
   showMessage?: (message: string, options?: SnackbarOptions) => void;
+
+  /** 外部错误消息，由父组件控制，优先于内部验证错误 */
+  externalError?: string;
 }
 
 /** ActionButton 内部组件的属性 */
@@ -226,6 +229,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     topExtra,
     title,
     showMessage,
+    externalError,
   } = props;
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -235,6 +239,9 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   /** 通过 value prop 是否存在来判断是否为受控模式 */
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
+
+  /** 外部错误优先级高于内部验证错误 */
+  const displayError = externalError ?? error;
 
   /**
    * 执行所有验证规则
@@ -412,8 +419,8 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
           onBlur={handleBlur}
           disabled={disabled}
           autoFocus={autoFocus}
-          error={Boolean(error)}
-          helperText={error || undefined}
+          error={Boolean(displayError)}
+          helperText={displayError || undefined}
           slotProps={{
             input: { readOnly },
             formHelperText: {
