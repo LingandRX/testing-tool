@@ -192,7 +192,8 @@ export async function clearCookies(url: string): Promise<StorageCleanResult> {
     const cookies = await chrome.cookies.getAll({ url });
     for (const cookie of cookies) {
       const protocol = cookie.secure ? 'https:' : 'http:';
-      const cookieUrl = `${protocol}//${cookie.domain}${cookie.path}`;
+      const domain = cookie.domain.startsWith('.') ? cookie.domain.slice(1) : cookie.domain;
+      const cookieUrl = `${protocol}//${domain}${cookie.path}`;
       await chrome.cookies.remove({
         url: cookieUrl,
         name: cookie.name,
