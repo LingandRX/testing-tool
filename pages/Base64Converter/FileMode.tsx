@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   alpha,
@@ -7,15 +7,15 @@ import {
   CircularProgress,
   Paper,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
+import TextInputArea from '@/components/TextInputArea';
+import type { ToolbarAction } from '@/components/TextInputArea';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import DownloadIcon from '@mui/icons-material/Download';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
+import DecodeResultPaper from '@/components/DecodeResultPaper';
 import {
   fileToBase64,
   isFileSizeValid,
@@ -138,24 +138,36 @@ export default function FileMode() {
     if (file) handleFileSelect(file);
   };
 
-  const handleDecode = useCallback(() => {
-    setError(null);
-    setDecoded(null);
-    try {
-      const res = base64ToBlob(decodeInput);
-      setDecoded(res);
-      setDecodedFileName(`decoded${res.suggestedExtension}`);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : '';
-      const i18nKey = ERROR_MESSAGE_TO_I18N[message];
-      setError(i18nKey ? t(i18nKey) : message || t('conversionFailed'));
-    }
-  }, [decodeInput, t]);
-
   const handleDownload = () => {
     if (!decoded) return;
     downloadBlob(decoded.blob, decodedFileName || `decoded${decoded.suggestedExtension}`);
   };
+
+  const actions: ToolbarAction[] = useMemo(
+    () => [
+      {
+        key: 'decode',
+        label: t('decode'),
+        type: 'primary',
+        position: 'bottom',
+        disabled: (value: string) => !value.trim(),
+        onClick: (value: string, helpers) => {
+          helpers.setError('');
+          setDecoded(null);
+          try {
+            const res = base64ToBlob(value);
+            setDecoded(res);
+            setDecodedFileName(`decoded${res.suggestedExtension}`);
+          } catch (e) {
+            const message = e instanceof Error ? e.message : '';
+            const i18nKey = ERROR_MESSAGE_TO_I18N[message];
+            helpers.setError(i18nKey ? t(i18nKey) : message || t('conversionFailed'));
+          }
+        },
+      },
+    ],
+    [t],
+  );
 
   return (
     <>
@@ -273,34 +285,38 @@ export default function FileMode() {
                   />
                 </Stack>
               </Stack>
-              <Box
-                sx={{
-                  fontFamily: 'monospace',
-                  fontSize: '0.75rem',
-                  wordBreak: 'break-all',
-                  maxHeight: 200,
-                  overflowY: 'auto',
-                  lineHeight: 1.6,
-                  color: 'info.main',
-                  fontWeight: 600,
-                }}
-              >
-                {result.output.length > 2000
-                  ? `${result.output.substring(0, 2000)}...`
-                  : result.output}
-              </Box>
-              <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+              <TextInputArea
+                readOnly
+                value={
+                  result.output.length > 2000
+                    ? `${result.output.substring(0, 2000)}...`
+                    : result.output
+                }
+                showClear={false}
+                showCount
+              />
+              <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 1 }}>
                 <Typography variant="caption" color="text.disabled">
                   {t('originalSize')}: {formatFileSize(result.originalBytes)}
                 </Typography>
                 <Typography variant="caption" color="text.disabled">
                   {t('encodedSize')}: {formatFileSize(result.outputBytes)}
                 </Typography>
+                <Box sx={{ flex: 1 }} />
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={handleClear}
+                  startIcon={<DeleteOutlineIcon />}
+                  sx={{ borderRadius: 2, minWidth: 0 }}
+                >
+                  {t('clear')}
+                </Button>
               </Stack>
             </Paper>
           )}
 
-          {info && (
+          {info && !result && (
             <Button
               variant="text"
               onClick={handleClear}
@@ -315,97 +331,30 @@ export default function FileMode() {
 
       {direction === 'decode' && (
         <>
-          <TextField
-            multiline
-            fullWidth
-            minRows={4}
-            maxRows={10}
+          <TextInputArea
             placeholder={t('decodeBase64Placeholder')}
             value={decodeInput}
-            onChange={(e) => {
-              setDecodeInput(e.target.value);
+            onChange={(v) => {
+              setDecodeInput(v);
               setError(null);
             }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                bgcolor: 'background.paper',
-                borderRadius: 3,
-                fontSize: '0.85rem',
-                fontFamily: 'monospace',
-              },
+            actions={actions}
+            externalError={error || undefined}
+            onClear={() => {
+              setDecoded(null);
+              setDecodedFileName('');
             }}
           />
 
-          <Stack direction="row" spacing={1}>
-            <Button
-              variant="contained"
-              onClick={handleDecode}
-              disabled={!decodeInput.trim()}
-              startIcon={<SwapHorizIcon />}
-              sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
-            >
-              {t('decode')}
-            </Button>
-            <Button
-              variant="text"
-              onClick={handleClear}
-              startIcon={<DeleteOutlineIcon />}
-              sx={{ borderRadius: 3 }}
-            >
-              {t('clear')}
-            </Button>
-          </Stack>
-
-          {error && <Alert severity="error">{error}</Alert>}
-
           {decoded && (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                borderRadius: 3,
-                bgcolor: (theme) => alpha(theme.palette.info.main, 0.04),
-                border: '1px solid',
-                borderColor: (theme) => alpha(theme.palette.info.main, 0.15),
-              }}
-            >
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color="text.secondary"
-                sx={{ mb: 1, display: 'block' }}
-              >
-                {t('decodedFileOutput')}
-              </Typography>
-
-              <Stack direction="row" spacing={2} sx={{ mb: 1.5 }}>
-                <Typography variant="caption" color="text.disabled">
-                  {t('inferredMimeType')}: {decoded.mimeType}
-                </Typography>
-                <Typography variant="caption" color="text.disabled">
-                  {t('decodedSize')}: {formatFileSize(decoded.blob.size)}
-                </Typography>
-              </Stack>
-
-              <TextField
-                size="small"
-                fullWidth
-                label={t('decodedFileName')}
-                value={decodedFileName}
-                onChange={(e) => setDecodedFileName(e.target.value)}
-                sx={{ mb: 1.5 }}
-              />
-
-              <Button
-                variant="contained"
-                onClick={handleDownload}
-                startIcon={<DownloadIcon />}
-                disabled={!decodedFileName.trim()}
-                sx={{ borderRadius: 3, fontWeight: 700 }}
-              >
-                {t('download')}
-              </Button>
-            </Paper>
+            <DecodeResultPaper
+              title={t('decodedFileOutput')}
+              mimeType={decoded.mimeType}
+              blobSize={decoded.blob.size}
+              fileName={decodedFileName}
+              onFileNameChange={setDecodedFileName}
+              onDownload={handleDownload}
+            />
           )}
         </>
       )}

@@ -17,7 +17,6 @@ describe('TextMode', () => {
   it('应该渲染输入框和转换按钮', () => {
     render(<TextMode />);
     expect(screen.getByPlaceholderText('textInputPlaceholder')).toBeInTheDocument();
-    expect(screen.getByText('clear')).toBeInTheDocument();
   });
 
   it('应该将文本编码为 Base64', async () => {
@@ -66,7 +65,7 @@ describe('TextMode', () => {
     fireEvent.click(convertBtn);
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('invalidBase64');
+      expect(screen.getByText('invalidBase64')).toBeInTheDocument();
     });
   });
 
@@ -104,7 +103,7 @@ describe('TextMode', () => {
       expect(screen.getByTestId('copy-button')).toHaveTextContent('SGVsbG8=');
     });
 
-    fireEvent.click(screen.getByText('clear'));
+    fireEvent.click(screen.getByRole('button', { name: 'textInputArea.clear' }));
 
     await waitFor(() => {
       expect(screen.queryByTestId('copy-button')).not.toBeInTheDocument();
@@ -177,7 +176,7 @@ describe('TextMode', () => {
     fireEvent.click(convertBtn);
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('binaryDataDetected');
+      expect(screen.getByText('binaryDataDetected')).toBeInTheDocument();
     });
   });
 });

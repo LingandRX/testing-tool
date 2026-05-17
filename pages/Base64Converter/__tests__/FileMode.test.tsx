@@ -181,7 +181,7 @@ describe('FileMode', () => {
     fireEvent.click(screen.getAllByText('decode')[1]);
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('invalidBase64');
+      expect(screen.getByText('invalidBase64')).toBeInTheDocument();
     });
   });
 

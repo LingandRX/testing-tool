@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Alert, alpha, Box, Button, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, alpha, Button, Paper, Stack, Typography } from '@mui/material';
+import TextInputArea, { type ToolbarAction } from '@/components/TextInputArea';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
 import { textToBase64, base64ToText } from '@/utils/base64Converter';
@@ -26,6 +26,11 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   const [error, setError] = useState<string | null>(null);
   const [direction, setDirection] = useState<'encode' | 'decode'>('encode');
 
+  const actionLabel = direction === 'encode' ? t('encode') : t('decode');
+  const placeholder =
+    direction === 'encode' ? t('textInputPlaceholder') : t('base64InputPlaceholder');
+  const outputLabel = direction === 'encode' ? t('base64Output') : t('textOutput');
+
   const showImageHint = useMemo(
     () => direction === 'decode' && IMAGE_DATA_URI_PATTERN.test(input),
     [direction, input],
@@ -41,70 +46,58 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
     [direction],
   );
 
-  const handleClear = useCallback(() => {
-    setInput('');
-    setOutput('');
-    setError(null);
-  }, []);
-
-  const handleConvert = useCallback(() => {
-    setError(null);
-    try {
-      if (direction === 'encode') {
-        const result = textToBase64(input);
-        setOutput(result.output);
-      } else {
-        const decoded = base64ToText(input);
-        setOutput(decoded);
-      }
-    } catch (e) {
-      const message = e instanceof Error ? e.message : '';
-      const i18nKey = ERROR_MESSAGE_TO_I18N[message];
-      setError(i18nKey ? t(i18nKey) : message || t('conversionFailed'));
-    }
-  }, [input, direction, t]);
+  const actions: ToolbarAction[] = useMemo(
+    () => [
+      {
+        key: 'convert',
+        label: actionLabel,
+        icon: <SwapHorizIcon />,
+        type: 'primary',
+        position: 'bottom',
+        disabled: (value: string) => !value.trim(),
+        onClick: (value: string) => {
+          setError(null);
+          try {
+            if (direction === 'encode') {
+              const result = textToBase64(value);
+              setOutput(result.output);
+            } else {
+              const decoded = base64ToText(value);
+              setOutput(decoded);
+            }
+          } catch (e) {
+            const message = e instanceof Error ? e.message : '';
+            const i18nKey = ERROR_MESSAGE_TO_I18N[message];
+            setError(i18nKey ? t(i18nKey) : message || t('conversionFailed'));
+          }
+        },
+      },
+    ],
+    [direction, t, actionLabel],
+  );
 
   return (
     <>
-      <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-        <SwitchButtonGroup
-          value={direction}
-          options={[
-            { value: 'encode', label: t('encode') },
-            { value: 'decode', label: t('decode') },
-          ]}
-          onChange={handleDirectionChange}
-          size="small"
-        />
-      </Stack>
+      <SwitchButtonGroup
+        value={direction}
+        options={[
+          { value: 'encode', label: t('encode') },
+          { value: 'decode', label: t('decode') },
+        ]}
+        onChange={handleDirectionChange}
+        size="small"
+      />
 
-      <TextField
-        multiline
-        fullWidth
-        minRows={4}
-        maxRows={10}
-        placeholder={
-          direction === 'encode' ? t('textInputPlaceholder') : t('base64InputPlaceholder')
-        }
+      <TextInputArea
+        placeholder={placeholder}
         value={input}
-        onChange={(e) => {
-          setInput(e.target.value);
+        onChange={(v) => {
+          setInput(v);
           setError(null);
         }}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            bgcolor: 'background.paper',
-            borderRadius: 3,
-            fontSize: '0.85rem',
-            fontFamily: 'monospace',
-            transition: 'all 0.2s',
-            '&:hover': { bgcolor: 'action.hover' },
-            '&.Mui-focused': {
-              bgcolor: 'background.paper',
-              boxShadow: (theme) => `0 0 0 4px ${alpha(theme.palette.info.main, 0.1)}`,
-            },
-          },
-        }}
+        actions={actions}
+        externalError={error || undefined}
+        onClear={() => setOutput('')}
       />
 
       {showImageHint && (
@@ -120,8 +113,6 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
         </Alert>
       )}
 
-      {error && <Alert severity="error">{error}</Alert>}
-
       {output && (
         <Paper
           elevation={0}
@@ -135,46 +126,18 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
         >
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
             <Typography variant="caption" fontWeight={700} color="text.secondary">
-              {direction === 'encode' ? t('base64Output') : t('textOutput')}
+              {outputLabel}
             </Typography>
             <CopyButton text={output} showMessage={(_msg, _opts) => {}} />
           </Stack>
-          <Box
-            sx={{
-              fontFamily: 'monospace',
-              fontSize: '0.8rem',
-              wordBreak: 'break-all',
-              maxHeight: 300,
-              overflowY: 'auto',
-              lineHeight: 1.6,
-              color: 'info.main',
-              fontWeight: 600,
-            }}
-          >
-            {output}
-          </Box>
+          <TextInputArea
+            readOnly
+            value={output.length > 2000 ? `${output.substring(0, 2000)}...` : output}
+            showClear={false}
+            showCount
+          />
         </Paper>
       )}
-
-      <Stack direction="row" spacing={1}>
-        <Button
-          variant="contained"
-          onClick={handleConvert}
-          disabled={!input.trim()}
-          startIcon={<SwapHorizIcon />}
-          sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
-        >
-          {direction === 'encode' ? t('encode') : t('decode')}
-        </Button>
-        <Button
-          variant="text"
-          onClick={handleClear}
-          startIcon={<DeleteOutlineIcon />}
-          sx={{ borderRadius: 3 }}
-        >
-          {t('clear')}
-        </Button>
-      </Stack>
     </>
   );
 }
