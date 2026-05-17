@@ -43,6 +43,7 @@ import {
 import type { Theme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useTranslation } from 'react-i18next';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
 /** 文本验证规则 */
@@ -127,6 +128,9 @@ export interface TextInputAreaProps {
 
   /** 外部错误消息，由父组件控制，优先于内部验证错误 */
   externalError?: string;
+
+  /** 清空按钮点击后的额外回调 */
+  onClear?: () => void;
 }
 
 /** ActionButton 内部组件的属性 */
@@ -209,7 +213,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     value: controlledValue,
     defaultValue = '',
     onChange,
-    placeholder = '请输入文本...',
+    placeholder: placeholderProp,
     disabled = false,
     readOnly = false,
     autoFocus = false,
@@ -230,11 +234,15 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     title,
     showMessage,
     externalError,
+    onClear,
   } = props;
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [error, setError] = useState<string>('');
+
+  const { t } = useTranslation('common');
+  const placeholder = placeholderProp ?? t('textInputArea.placeholder');
 
   /** 通过 value prop 是否存在来判断是否为受控模式 */
   const isControlled = controlledValue !== undefined;
@@ -266,7 +274,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newVal = e.target.value;
     if (maxLength && newVal.length > maxLength) {
-      const msg = `最多输入 ${maxLength} 个字符`;
+      const msg = t('charCount', { count: maxLength });
       setError(msg);
       showMessage?.(msg, { severity: 'warning' });
       return;
@@ -290,18 +298,20 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     onChange?.('');
     setError('');
     textareaRef.current?.focus();
-  }, [isControlled, onChange]);
+    showMessage?.(t('textInputArea.cleared'), { severity: 'success' });
+    onClear?.();
+  }, [isControlled, onChange, showMessage, t, onClear]);
 
   /** 复制当前内容到剪贴板 */
   const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(value);
-      showMessage?.('复制成功', { severity: 'success' });
+      showMessage?.(t('messages.copySuccess'), { severity: 'success' });
     } catch {
-      setError('复制失败');
-      showMessage?.('复制失败', { severity: 'error' });
+      setError(t('messages.copyError'));
+      showMessage?.(t('messages.copyError'), { severity: 'error' });
     }
-  }, [value, showMessage]);
+  }, [value, showMessage, t]);
 
   /** 执行工具栏操作：检查禁用状态、验证、调用 onClick */
   const handleAction = useCallback(
@@ -339,7 +349,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const topActions = actions.filter((a) => a.position !== 'bottom');
   const bottomActions = actions.filter((a) => a.position === 'bottom');
 
-  const hasTopBar = title || showCount || topActions.length > 0 || topExtra || allowCopy;
+  const hasTopBar = title || showCount || topActions.length > 0 || topExtra;
 
   return (
     <Box className={className} style={style} sx={containerSx}>
@@ -363,25 +373,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            {allowCopy && value && (
-              <Tooltip title="复制内容">
-                <Button
-                  onClick={handleCopy}
-                  size="small"
-                  startIcon={<ContentCopyIcon sx={{ fontSize: 14 }} />}
-                  sx={{
-                    color: 'text.secondary',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    '&:hover': {
-                      bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
-                    },
-                  }}
-                >
-                  复制
-                </Button>
-              </Tooltip>
-            )}
             {topActions.map((action) => (
               <ActionButton
                 key={action.key}
@@ -446,7 +437,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
               '& textarea': {
                 py: 1.5,
                 px: 1.5,
-                ...(showClear ? { pb: 4 } : {}),
+                ...(showClear || allowCopy || bottomActions.length > 0 ? { pb: 4 } : {}),
               },
             },
             '& .MuiFormHelperText-root': {
@@ -456,42 +447,65 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
           }}
         />
 
-        {showClear && value && !disabled && !readOnly && (
-          <IconButton
-            onClick={handleClear}
-            size="small"
-            title="清空"
+        {(showClear || allowCopy || bottomActions.length > 0) && (
+          <Box
             sx={{
               position: 'absolute',
-              bottom: 8,
-              right: 8,
-              color: 'text.disabled',
-              '&:hover': {
-                color: 'error.main',
-                bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
-              },
+              bottom: displayError ? 32 : 8,
+              right: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
               zIndex: 1,
             }}
           >
-            <CloseIcon sx={{ fontSize: 16 }} />
-          </IconButton>
+            {bottomActions.map((action) => (
+              <ActionButton
+                key={action.key}
+                action={action}
+                value={value}
+                globalDisabled={disabled}
+                variant={action.type === 'primary' ? 'contained' : 'text'}
+                onAction={handleAction}
+              />
+            ))}
+            {allowCopy && value && (
+              <Tooltip title={t('textInputArea.copyContent')}>
+                <IconButton
+                  onClick={handleCopy}
+                  size="small"
+                  sx={{
+                    color: 'text.disabled',
+                    '&:hover': {
+                      color: 'primary.main',
+                      bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                    },
+                  }}
+                >
+                  <ContentCopyIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Tooltip>
+            )}
+            {showClear && value && !disabled && !readOnly && (
+              <Tooltip title={t('textInputArea.clear')}>
+                <IconButton
+                  onClick={handleClear}
+                  size="small"
+                  sx={{
+                    color: 'text.disabled',
+                    '&:hover': {
+                      color: 'error.main',
+                      bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
+                    },
+                  }}
+                >
+                  <CloseIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
         )}
       </Box>
-
-      {bottomActions.length > 0 && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1.5 }}>
-          {bottomActions.map((action) => (
-            <ActionButton
-              key={action.key}
-              action={action}
-              value={value}
-              globalDisabled={disabled}
-              variant={action.type === 'primary' ? 'contained' : 'text'}
-              onAction={handleAction}
-            />
-          ))}
-        </Box>
-      )}
     </Box>
   );
 });

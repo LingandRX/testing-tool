@@ -17,12 +17,12 @@ describe('TextInputArea 组件', () => {
 
     it('默认显示清空按钮', () => {
       render(<TextInputArea value="有内容" onChange={() => {}} />);
-      expect(screen.getByTitle('清空')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'textInputArea.clear' })).toBeInTheDocument();
     });
 
     it('无内容时清空按钮应隐藏', () => {
       render(<TextInputArea value="" onChange={() => {}} />);
-      expect(screen.queryByTitle('清空')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'textInputArea.clear' })).not.toBeInTheDocument();
     });
 
     it('disabled 时清空按钮应隐藏', () => {
@@ -56,7 +56,7 @@ describe('TextInputArea 组件', () => {
       const handleChange = vi.fn();
       render(<TextInputArea value="内容" onChange={handleChange} />);
 
-      fireEvent.click(screen.getByTitle('清空'));
+      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.clear' }));
 
       expect(handleChange).toHaveBeenCalledWith('');
     });
@@ -80,7 +80,7 @@ describe('TextInputArea 组件', () => {
     it('清空按钮应清空内容', () => {
       render(<TextInputArea defaultValue="内容" />);
 
-      fireEvent.click(screen.getByTitle('清空'));
+      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.clear' }));
 
       expect(screen.getByRole('textbox')).toHaveValue('');
     });
@@ -89,17 +89,21 @@ describe('TextInputArea 组件', () => {
   describe('allowCopy 复制功能', () => {
     it('allowCopy 且有内容时显示复制按钮', () => {
       render(<TextInputArea value="可复制的内容" onChange={() => {}} allowCopy />);
-      expect(screen.getByText('复制')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'textInputArea.copyContent' })).toBeInTheDocument();
     });
 
     it('allowCopy 但无内容时隐藏复制按钮', () => {
       render(<TextInputArea value="" onChange={() => {}} allowCopy />);
-      expect(screen.queryByText('复制')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'textInputArea.copyContent' }),
+      ).not.toBeInTheDocument();
     });
 
     it('allowCopy=false 时不显示复制按钮', () => {
       render(<TextInputArea value="内容" onChange={() => {}} />);
-      expect(screen.queryByText('复制')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'textInputArea.copyContent' }),
+      ).not.toBeInTheDocument();
     });
 
     it('复制时调用 showMessage', async () => {
@@ -112,11 +116,11 @@ describe('TextInputArea 组件', () => {
         <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
       );
 
-      fireEvent.click(screen.getByText('复制'));
+      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith('测试');
       await vi.waitFor(() => {
-        expect(showMessage).toHaveBeenCalledWith('复制成功', { severity: 'success' });
+        expect(showMessage).toHaveBeenCalledWith('messages.copySuccess', { severity: 'success' });
       });
     });
 
@@ -130,10 +134,10 @@ describe('TextInputArea 组件', () => {
         <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
       );
 
-      fireEvent.click(screen.getByText('复制'));
+      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
       await vi.waitFor(() => {
-        expect(showMessage).toHaveBeenCalledWith('复制失败', { severity: 'error' });
+        expect(showMessage).toHaveBeenCalledWith('messages.copyError', { severity: 'error' });
       });
     });
   });
@@ -381,11 +385,30 @@ describe('TextInputArea 组件', () => {
       render(
         <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
       );
-      fireEvent.click(screen.getByText('复制'));
+      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
       await vi.waitFor(() => {
-        expect(showMessage).toHaveBeenCalledWith('复制成功', { severity: 'success' });
+        expect(showMessage).toHaveBeenCalledWith('messages.copySuccess', { severity: 'success' });
       });
+    });
+  });
+
+  describe('onClear 回调', () => {
+    it('点击清空按钮时应调用 onClear', () => {
+      const handleClear = vi.fn();
+      render(<TextInputArea value="内容" onChange={() => {}} onClear={handleClear} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.clear' }));
+
+      expect(handleClear).toHaveBeenCalledOnce();
+    });
+
+    it('不传 onClear 时清空按钮应正常工作', () => {
+      render(<TextInputArea defaultValue="内容" />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.clear' }));
+
+      expect(screen.getByRole('textbox')).toHaveValue('');
     });
   });
 
