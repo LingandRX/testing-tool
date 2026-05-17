@@ -2,6 +2,8 @@
  * JWT 解析工具
  */
 
+import i18n from '@/i18n';
+
 export interface JwtHeader {
   alg: string;
   typ?: string;
@@ -36,20 +38,17 @@ export interface JwtResult {
  * @param str Base64URL 编码字符串
  */
 export function decodeBase64Url(str: string): string {
-  // 将 Base64URL 转换为 标准 Base64
   let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
 
-  // 添加填充
   const pad = base64.length % 4;
   if (pad) {
     if (pad === 1) {
-      throw new Error('Invalid base64url string');
+      throw new Error(i18n.t('jwt:errors.invalidBase64String'));
     }
     base64 += new Array(5 - pad).join('=');
   }
 
   try {
-    // 使用 TextDecoder 处理 UTF-8 字符
     const binStr = atob(base64);
     const binLen = binStr.length;
     const bytes = new Uint8Array(binLen);
@@ -59,7 +58,9 @@ export function decodeBase64Url(str: string): string {
     const decoder = new TextDecoder('utf-8');
     return decoder.decode(bytes);
   } catch (e) {
-    throw new Error('Failed to decode base64url: ' + (e instanceof Error ? e.message : String(e)));
+    throw new Error(
+      i18n.t('jwt:errors.failedToDecode') + (e instanceof Error ? e.message : String(e)),
+    );
   }
 }
 
@@ -76,7 +77,7 @@ export function parseJwt(token: string): JwtResult {
       payload: null,
       signature: '',
       raw: { header: '', payload: '', signature: '' },
-      error: 'JWT 格式错误：必须包含三个由 "." 分隔的部分',
+      error: i18n.t('jwt:errors.invalidFormat'),
     };
   }
 
@@ -96,7 +97,8 @@ export function parseJwt(token: string): JwtResult {
     const headerJson = decodeBase64Url(headerB64);
     result.header = JSON.parse(headerJson);
   } catch (e) {
-    result.error = '解析 Header 失败：' + (e instanceof Error ? e.message : String(e));
+    result.error =
+      i18n.t('jwt:errors.parseHeaderFailed') + (e instanceof Error ? e.message : String(e));
     return result;
   }
 
@@ -104,7 +106,8 @@ export function parseJwt(token: string): JwtResult {
     const payloadJson = decodeBase64Url(payloadB64);
     result.payload = JSON.parse(payloadJson);
   } catch (e) {
-    result.error = '解析 Payload 失败：' + (e instanceof Error ? e.message : String(e));
+    result.error =
+      i18n.t('jwt:errors.parsePayloadFailed') + (e instanceof Error ? e.message : String(e));
     return result;
   }
 
