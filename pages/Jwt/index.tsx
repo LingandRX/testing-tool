@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Box, Container, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Box, Container, Paper, Stack, Typography } from '@mui/material';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PageHeader from '@/components/PageHeader';
-import { jwtPageStyles } from '@/config/pageTheme';
 import { stringifyJson, parseJwt } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
+import TextInputArea from '@/components/TextInputArea';
 import { useTranslation } from 'react-i18next';
 
 interface SectionProps {
@@ -59,7 +59,7 @@ const Section = ({ title, content, color }: SectionProps) => {
 };
 
 export default function Index() {
-  useSnackbar();
+  const { showMessage } = useSnackbar();
   const { t } = useTranslation(['jwt']);
   const [jwtInput, setJwtInput] = useState('');
 
@@ -81,18 +81,17 @@ export default function Index() {
 
         <Stack spacing={2.5}>
           {/* Input Area */}
-          <TextField
-            multiline
-            rows={4}
+          <TextInputArea
+            minRows={4}
             placeholder={t('jwt:placeholder')}
             value={jwtInput}
-            onChange={(e) => {
-              // 自动去除 Bearer 前缀及首尾空白字符/换行
-              const val = e.target.value.replace(/^Bearer\s*/i, '').trim();
-              setJwtInput(val);
+            onChange={(val) => {
+              const cleaned = val.replace(/^Bearer\s*/i, '').trim();
+              setJwtInput(cleaned);
             }}
-            fullWidth
-            sx={jwtPageStyles.INPUT_STYLE}
+            allowCopy
+            showClear
+            showMessage={showMessage}
           />
 
           {result?.error && (

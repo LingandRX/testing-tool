@@ -828,38 +828,6 @@ export const textStatisticsPageStyles = {
 } as const;
 
 /**
- * TopBar 组件样式
- */
-export const topBarStyles = {
-  SEARCH_MAX_WIDTH: 400,
-  DROPDOWN_MAX_HEIGHT: 300,
-  Z_INDEX: 1100,
-  DROPDOWN_Z_INDEX: 1200,
-  SEARCH_HISTORY_LIMIT: 10,
-  SEARCH_HISTORY_DISPLAY: 5,
-} as const;
-
-/**
- * JWT 解析工具页面样式
- */
-export const jwtPageStyles = {
-  primaryColor: THEME_COLORS.indigo,
-  cardBg: (theme: Theme) => alpha(theme.palette.info.main, 0.04),
-  cardBorder: (theme: Theme) => alpha(theme.palette.info.main, 0.1),
-  INPUT_STYLE: {
-    '& .MuiOutlinedInput-root': {
-      bgcolor: 'background.paper',
-      borderRadius: 4,
-      fontSize: '0.85rem',
-      fontFamily: 'monospace',
-      transition: 'all 0.2s',
-      '&:hover': { bgcolor: 'action.hover' },
-      '&.Mui-focused': { bgcolor: 'background.paper' },
-    },
-  },
-} as const;
-
-/**
  * Base64 转换器页面样式
  */
 export const base64ConverterPageStyles = {

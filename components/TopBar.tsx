@@ -31,7 +31,15 @@ import { openExtensionPage } from '@/utils/chromeTabs';
 import { useTranslation } from 'react-i18next';
 import { alpha } from '@mui/material/styles';
 import { SUPPORTED_LANGUAGES, normalizeLanguage } from '@/i18n';
-import { topBarStyles } from '@/config/pageTheme';
+
+const topBarStyles = {
+  SEARCH_MAX_WIDTH: 400,
+  DROPDOWN_MAX_HEIGHT: 300,
+  Z_INDEX: 1100,
+  DROPDOWN_Z_INDEX: 1200,
+  SEARCH_HISTORY_LIMIT: 10,
+  SEARCH_HISTORY_DISPLAY: 5,
+};
 
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
