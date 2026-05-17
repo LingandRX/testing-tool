@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { Box, Container, Paper, Stack, Typography } from '@mui/material';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PageHeader from '@/components/PageHeader';
 import { stringifyJson, parseJwt } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
@@ -89,31 +88,11 @@ export default function Index() {
               const cleaned = val.replace(/^Bearer\s*/i, '').trim();
               setJwtInput(cleaned);
             }}
-            allowCopy
-            showClear
+            allowCopy={true}
+            showClear={true}
             showMessage={showMessage}
+            externalError={result?.error}
           />
-
-          {result?.error && (
-            <Paper
-              sx={{
-                p: 2,
-                bgcolor: 'error.lighter',
-                color: 'error.main',
-                borderRadius: 3,
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 1.5,
-                border: '1px solid',
-                borderColor: 'error.light',
-              }}
-            >
-              <ErrorOutlineIcon sx={{ mt: 0.2 }} fontSize="small" />
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {result.error}
-              </Typography>
-            </Paper>
-          )}
 
           {result && !result.error && (
             <Stack spacing={2}>
