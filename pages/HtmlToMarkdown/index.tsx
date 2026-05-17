@@ -227,7 +227,7 @@ export default function HtmlToMarkdownPage() {
                   multiline
                   fullWidth
                   value={result.markdown}
-                  InputProps={{ readOnly: true }}
+                  slotProps={{ input: { readOnly: true } }}
                   sx={{
                     flex: 1,
                     '& .MuiOutlinedInput-root': {
