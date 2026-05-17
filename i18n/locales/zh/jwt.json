@@ -6,5 +6,12 @@
   "payloadTitle": "PAYLOAD: 数据",
   "signatureTitle": "签名",
   "noSignature": "无签名",
-  "invalidFormat": "无法解析"
+  "invalidFormat": "无法解析",
+  "errors": {
+    "invalidBase64String": "无效的 Base64URL 字符串",
+    "failedToDecode": "Base64URL 解码失败：",
+    "invalidFormat": "JWT 格式错误：必须包含三个由 . 分隔的部分",
+    "parseHeaderFailed": "解析 Header 失败：",
+    "parsePayloadFailed": "解析 Payload 失败："
+  }
 }

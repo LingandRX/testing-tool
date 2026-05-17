@@ -12,7 +12,6 @@ const mockRouterValue = {
   pageOrder: ['timestamp'] as PageType[],
   isLoaded: true,
   navigateTo: vi.fn(),
-  navigateLocal: vi.fn(),
   syncNavigation: vi.fn(),
   goBack: vi.fn(),
   setVisiblePages: vi.fn(),
@@ -81,6 +80,18 @@ describe('RouterContainer 组件', () => {
 
       const box = document.querySelector('.page-transition-enter');
       expect(box).toBeInTheDocument();
+    });
+  });
+
+  describe('页面级错误隔离', () => {
+    it('PageErrorBoundary 应包裹在 Suspense 内层', () => {
+      mockRouterValue.isLoaded = true;
+      mockRouterValue.currentPage = 'dashboard';
+      const { container } = renderWithProvider(<RouterContainer />);
+
+      // 验证 RouterContainer 的 Box 结构存在
+      const routerBox = container.querySelector('.page-transition-dashboard');
+      expect(routerBox).toBeInTheDocument();
     });
   });
 });

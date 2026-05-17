@@ -7,21 +7,16 @@ import {
   Container,
   Stack,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
   Paper,
 } from '@mui/material';
-import SplitscreenIcon from '@mui/icons-material/Splitscreen';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import ArticleIcon from '@mui/icons-material/Article';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DownloadIcon from '@mui/icons-material/Download';
 import CodeIcon from '@mui/icons-material/Code';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
-import { htmlToMarkdownPageStyles } from '@/config/pageTheme';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { useStorageState } from '@/utils/useStorageState';
 import type { HtmlToMarkdownPreviewMode } from '@/types/storage';
 import { htmlToMarkdown, downloadMarkdownFile, SAMPLE_HTML } from '@/utils/htmlToMarkdown';
@@ -42,8 +37,8 @@ export default function HtmlToMarkdownPage() {
   const error = result.hasError ? (result.error ?? null) : null;
 
   const handleModeChange = useCallback(
-    (_event: React.MouseEvent<HTMLElement>, newMode: HtmlToMarkdownPreviewMode | null) => {
-      if (newMode) setPreviewMode(newMode);
+    (newMode: HtmlToMarkdownPreviewMode) => {
+      setPreviewMode(newMode);
     },
     [setPreviewMode],
   );
@@ -74,26 +69,16 @@ export default function HtmlToMarkdownPage() {
           flexWrap="wrap"
           gap={1.5}
         >
-          <ToggleButtonGroup
+          <SwitchButtonGroup
             value={previewMode}
-            exclusive
+            options={[
+              { value: 'split', label: t('splitMode') },
+              { value: 'preview', label: t('previewMode') },
+              { value: 'markdown', label: t('markdownMode') },
+            ]}
             onChange={handleModeChange}
             size="small"
-            sx={htmlToMarkdownPageStyles.MODE_SWITCHER}
-          >
-            <ToggleButton value="split">
-              <SplitscreenIcon sx={{ fontSize: 16, mr: 0.5 }} />
-              {t('splitMode')}
-            </ToggleButton>
-            <ToggleButton value="preview">
-              <VisibilityIcon sx={{ fontSize: 16, mr: 0.5 }} />
-              {t('previewMode')}
-            </ToggleButton>
-            <ToggleButton value="markdown">
-              <ArticleIcon sx={{ fontSize: 16, mr: 0.5 }} />
-              {t('markdownMode')}
-            </ToggleButton>
-          </ToggleButtonGroup>
+          />
 
           <Stack direction="row" spacing={1}>
             <Button
@@ -242,7 +227,7 @@ export default function HtmlToMarkdownPage() {
                   multiline
                   fullWidth
                   value={result.markdown}
-                  InputProps={{ readOnly: true }}
+                  slotProps={{ input: { readOnly: true } }}
                   sx={{
                     flex: 1,
                     '& .MuiOutlinedInput-root': {

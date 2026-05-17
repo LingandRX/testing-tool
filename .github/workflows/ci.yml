@@ -49,7 +49,7 @@ jobs:
         run: npm ci
 
       - name: Run TypeScript type check
-        run: npm run compile
+        run: npm run typecheck
 
   test:
     name: Unit Tests

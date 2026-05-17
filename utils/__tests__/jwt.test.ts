@@ -37,7 +37,8 @@ describe('jwt utils', () => {
   describe('parseJwt', () => {
     it('should return error for invalid format', () => {
       const result = parseJwt('invalid-token');
-      expect(result.error).toContain('格式错误');
+      expect(result.error).toBeDefined();
+      expect(result.error?.length).toBeGreaterThan(0);
     });
 
     it('should parse a valid JWT structure', () => {

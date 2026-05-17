@@ -118,34 +118,62 @@ export const timestampPageStyles = {
   mutedText: (theme: Theme) => alpha(theme.palette.primary.main, 0.4),
   resultBg: (theme: Theme) => alpha(theme.palette.primary.main, 0.05),
   buttonHover: (theme: Theme) => `0 8px 24px ${alpha(theme.palette.primary.main, 0.2)}`,
-  /** 模式切换器 (ToggleButtonGroup) 样式 */
-  MODE_SWITCHER: {
-    width: '100%',
-    mb: 2.5,
+  /** 统一转换工作台外卡 */
+  CONVERSION_CARD: {
+    p: 2.5,
     borderRadius: 4,
-    bgcolor: (theme: Theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.900'),
+    bgcolor: 'background.paper',
     border: '1px solid',
     borderColor: 'divider',
-    p: 0.6,
-    '& .MuiToggleButtonGroup-grouped': {
-      flex: 1,
-      border: 'none',
-      borderRadius: 3.5,
-      py: 1,
-      fontWeight: 800,
-      fontSize: '0.75rem',
-      color: 'text.secondary',
-      transition: 'color 0.3s',
-      '&.Mui-selected': {
-        bgcolor: 'background.paper',
-        color: 'primary.main',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-      },
-    },
+    boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+  },
+  /** 桌面端左右分栏布局 (md 断点开始等宽分栏，两栏卡片等高) */
+  LAYOUT_GRID: {
+    display: 'grid',
+    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+    gap: 2,
+    alignItems: 'stretch',
+  },
+  /** 右栏结果卡片（独立卡片样式，与左栏等高） */
+  RESULT_COLUMN_CARD: {
+    p: 2.5,
+    borderRadius: 4,
+    bgcolor: 'background.paper',
+    border: '1px solid',
+    borderColor: 'divider',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  /** 结果区空状态占位（桌面端右栏未转换时） */
+  RESULT_EMPTY_PLACEHOLDER: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'text.disabled',
+    fontSize: '0.85rem',
+    fontWeight: 600,
+    py: 6,
+    textAlign: 'center',
+  },
+  /** 立即转换按钮（缩小+居中，融入卡片） */
+  CONVERT_BUTTON: {
+    display: 'block',
+    mx: 'auto',
+    mt: 2,
+    mb: 0.5,
+    maxWidth: 240,
+    width: '100%',
+    py: 1.1,
+    fontSize: '0.85rem',
+    borderRadius: 3,
   },
   /** 单位切换器样式 */
   UNIT_SWITCHER_CONTAINER: {
-    flex: 1,
+    flexShrink: 0,
+    width: 160,
     display: 'flex',
     bgcolor: 'action.hover',
     p: 0.5,
@@ -156,6 +184,9 @@ export const timestampPageStyles = {
   UNIT_SWITCHER_ITEM: (active: boolean) => ({
     flex: 1,
     py: 0.8,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     textAlign: 'center',
     borderRadius: 3,
     cursor: 'pointer',
@@ -166,65 +197,43 @@ export const timestampPageStyles = {
     color: active ? 'primary.main' : 'text.disabled',
     boxShadow: active ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
   }),
-  /** LiveClock 卡片样式 */
+  /** LiveClock 参考条样式（瘦身为单行） */
   LIVE_CLOCK_CARD: (theme: Theme) => ({
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
     gap: 1.5,
-    p: 1.8,
-    mb: 2.5,
+    px: 1.6,
+    py: 0.8,
+    mb: 2,
     bgcolor: alpha(theme.palette.primary.main, 0.04),
-    borderRadius: 4,
+    borderRadius: 3,
     border: '1px solid',
     borderColor: alpha(theme.palette.primary.main, 0.1),
   }),
   LIVE_CLOCK_LABEL: {
     color: 'primary.main',
     fontWeight: 800,
-    fontSize: '0.6rem',
+    fontSize: '0.65rem',
     textTransform: 'uppercase',
     letterSpacing: 1,
+    whiteSpace: 'nowrap',
   },
   LIVE_CLOCK_VALUE: {
+    flex: 1,
     fontWeight: 800,
     color: 'primary.main',
     fontFamily: 'monospace',
-    fontSize: { xs: '1.1rem', sm: '1.2rem' },
+    fontSize: '0.95rem',
     letterSpacing: '-0.5px',
     lineHeight: 1.2,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
-  LIVE_CLOCK_UNIT_SWITCHER: (theme: Theme) => ({
-    display: 'flex',
-    p: 0.4,
-    bgcolor: alpha(theme.palette.primary.main, 0.08),
-    borderRadius: 2.5,
-    border: '1px solid',
-    borderColor: alpha(theme.palette.primary.main, 0.1),
-  }),
-  LIVE_CLOCK_UNIT_ITEM: (active: boolean) => (theme: Theme) => ({
-    px: { xs: 1, sm: 1.2 },
-    py: 0.35,
-    borderRadius: 2,
-    cursor: 'pointer',
-    fontSize: '0.65rem',
-    fontWeight: 900,
-    transition: 'all 0.2s',
-    bgcolor: active ? 'background.paper' : 'transparent',
-    color: active ? 'primary.main' : alpha(theme.palette.primary.main, 0.4),
-    boxShadow: active ? '0 2px 6px rgba(33, 150, 243, 0.2)' : 'none',
-  }),
   LIVE_CLOCK_ICON_BUTTON: {
     color: 'primary.main',
     bgcolor: 'background.paper',
     boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
     '&:hover': { bgcolor: 'primary.main', color: 'primary.contrastText' },
-  },
-  LIVE_CLOCK_DIVIDER: {
-    mx: 0.5,
-    my: 1,
-    borderColor: (theme: Theme) => alpha(theme.palette.primary.main, 0.1),
   },
   /** ResultView 样式 */
   RESULT_LABEL: {
@@ -235,24 +244,26 @@ export const timestampPageStyles = {
     fontSize: '0.7rem',
   },
   RESULT_MAIN_BOX: (theme: Theme) => ({
-    bgcolor: alpha(theme.palette.primary.main, 0.05),
-    p: 2,
+    bgcolor: alpha(theme.palette.primary.main, 0.12),
+    p: 2.2,
     borderRadius: 4,
     position: 'relative',
-    mb: 2.5,
+    mb: 2,
     border: '1px solid',
-    borderColor: alpha(theme.palette.primary.main, 0.1),
+    borderColor: alpha(theme.palette.primary.main, 0.2),
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
   }),
   RESULT_MAIN_TEXT: {
     fontFamily: 'monospace',
-    fontWeight: 700,
+    fontWeight: 800,
     color: 'primary.main',
     wordBreak: 'break-all',
     pr: 4,
-    fontSize: '1rem',
+    fontSize: '1.35rem',
+    letterSpacing: '-0.5px',
+    lineHeight: 1.2,
   },
   RESULT_EXTRA_STACK: (theme: Theme) => ({
     bgcolor: alpha(theme.palette.primary.main, 0.05),
@@ -264,14 +275,17 @@ export const timestampPageStyles = {
   RESULT_EXTRA_LABEL: {
     color: 'text.disabled',
     fontWeight: 700,
-    fontSize: '0.65rem',
-    pr: 4,
+    fontSize: '0.7rem',
+    pr: 2,
+    whiteSpace: 'nowrap',
   },
   RESULT_EXTRA_VALUE: {
     fontFamily: 'monospace',
     color: 'primary.main',
     fontWeight: 600,
-    fontSize: '0.65rem',
+    fontSize: '0.75rem',
+    wordBreak: 'break-all',
+    textAlign: 'right',
   },
 } as const;
 
@@ -546,6 +560,74 @@ export const storageCleanerPageStyles = {
  */
 export const qrCodePageStyles = {
   primaryColor: THEME_COLORS.success,
+  /** 桌面端左右分栏布局 (md 断点开始等宽分栏，两栏卡片等高) */
+  LAYOUT_GRID: {
+    display: 'grid',
+    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+    gap: 2,
+    alignItems: 'stretch',
+  },
+  /** 桌面端 grid item 包装：撑满 grid row 并把高度传给 Accordion */
+  GRID_CELL: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    '& > .MuiAccordion-root': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+  } as const,
+  /** 桌面端 Accordion 强展开样式：隐藏箭头，禁用 hover/cursor，等高填充 */
+  ACCORDION_DESKTOP: {
+    borderRadius: 4,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    '&:before': { display: 'none' },
+    '& .MuiAccordionSummary-root': {
+      cursor: 'default',
+    },
+    '& .MuiAccordionSummary-expandIconWrapper': {
+      display: 'none',
+    },
+    // 让 Collapse 整条链都 flex 撑满，否则 Details 拿不到剩余高度
+    '& .MuiCollapse-root': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiCollapse-wrapper': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiCollapse-wrapperInner': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiAccordion-region': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiAccordionDetails-root': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    '& .MuiAccordionDetails-root > .MuiStack-root': {
+      flex: 1,
+    },
+    '& .qr-flex-grow': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+  } as const,
   /** 加载状态容器 */
   LOADING_CONTAINER: {
     py: 4,
@@ -559,6 +641,7 @@ export const qrCodePageStyles = {
   ACCORDION: {
     borderRadius: 4,
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+    overflow: 'hidden',
     '&:before': { display: 'none' },
   } as const,
   ACCORDION_SUMMARY: {
@@ -702,6 +785,7 @@ export const dashboardPageStyles = {
       xs: '1fr',
       sm: 'repeat(auto-fill, minmax(300px, 1fr))',
     },
+    gridAutoRows: '1fr',
     gap: 2,
     p: 2,
   },
@@ -744,38 +828,6 @@ export const textStatisticsPageStyles = {
 } as const;
 
 /**
- * TopBar 组件样式
- */
-export const topBarStyles = {
-  SEARCH_MAX_WIDTH: 400,
-  DROPDOWN_MAX_HEIGHT: 300,
-  Z_INDEX: 1100,
-  DROPDOWN_Z_INDEX: 1200,
-  SEARCH_HISTORY_LIMIT: 10,
-  SEARCH_HISTORY_DISPLAY: 5,
-} as const;
-
-/**
- * JWT 解析工具页面样式
- */
-export const jwtPageStyles = {
-  primaryColor: THEME_COLORS.indigo,
-  cardBg: (theme: Theme) => alpha(theme.palette.info.main, 0.04),
-  cardBorder: (theme: Theme) => alpha(theme.palette.info.main, 0.1),
-  INPUT_STYLE: {
-    '& .MuiOutlinedInput-root': {
-      bgcolor: 'background.paper',
-      borderRadius: 4,
-      fontSize: '0.85rem',
-      fontFamily: 'monospace',
-      transition: 'all 0.2s',
-      '&:hover': { bgcolor: 'action.hover' },
-      '&.Mui-focused': { bgcolor: 'background.paper' },
-    },
-  },
-} as const;
-
-/**
  * Base64 转换器页面样式
  */
 export const base64ConverterPageStyles = {
@@ -791,28 +843,6 @@ export const markdownToHtmlPageStyles = {
   primaryColor: THEME_COLORS.purple,
   cardBg: (theme: Theme) => alpha(theme.palette.secondary.main, 0.04),
   cardBorder: (theme: Theme) => alpha(theme.palette.secondary.main, 0.1),
-  MODE_SWITCHER: {
-    borderRadius: 4,
-    bgcolor: (theme: Theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.900'),
-    border: '1px solid',
-    borderColor: 'divider',
-    p: 0.6,
-    '& .MuiToggleButtonGroup-grouped': {
-      border: 'none',
-      borderRadius: 3.5,
-      py: 0.8,
-      px: 1.5,
-      fontWeight: 700,
-      fontSize: '0.75rem',
-      color: 'text.secondary',
-      transition: 'color 0.3s',
-      '&.Mui-selected': {
-        bgcolor: 'background.paper',
-        color: 'primary.main',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-      },
-    },
-  },
 } as const;
 
 /**
@@ -822,28 +852,6 @@ export const htmlToMarkdownPageStyles = {
   primaryColor: THEME_COLORS.purple,
   cardBg: (theme: Theme) => alpha(theme.palette.secondary.main, 0.04),
   cardBorder: (theme: Theme) => alpha(theme.palette.secondary.main, 0.1),
-  MODE_SWITCHER: {
-    borderRadius: 4,
-    bgcolor: (theme: Theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.900'),
-    border: '1px solid',
-    borderColor: 'divider',
-    p: 0.6,
-    '& .MuiToggleButtonGroup-grouped': {
-      border: 'none',
-      borderRadius: 3.5,
-      py: 0.8,
-      px: 1.5,
-      fontWeight: 700,
-      fontSize: '0.75rem',
-      color: 'text.secondary',
-      transition: 'color 0.3s',
-      '&.Mui-selected': {
-        bgcolor: 'background.paper',
-        color: 'primary.main',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-      },
-    },
-  },
 } as const;
 
 /**

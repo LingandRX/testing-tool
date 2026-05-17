@@ -2,6 +2,7 @@ import { Box, CircularProgress } from '@mui/material';
 import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
 import { Suspense, useMemo } from 'react';
+import PageErrorBoundary from '@/components/PageErrorBoundary';
 
 export default function RouterContainer() {
   const { currentPage, isLoaded } = useRouter();
@@ -60,7 +61,7 @@ export default function RouterContainer() {
           </Box>
         }
       >
-        {Component && <Component />}
+        <PageErrorBoundary resetKey={currentPage}>{Component && <Component />}</PageErrorBoundary>
       </Suspense>
     </Box>
   );

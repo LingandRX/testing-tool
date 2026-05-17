@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { alpha, Box, Container, Grid, Paper, TextField, Typography } from '@mui/material';
+import { alpha, Box, Container, Grid, Paper, Typography } from '@mui/material';
 import PageHeader from '@/components/PageHeader';
+import TextInputArea from '@/components/TextInputArea';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
 import { textStatisticsPageStyles } from '@/config/pageTheme';
@@ -38,38 +39,14 @@ export default function Index() {
         />
 
         {/* 文本输入区域 */}
-        <TextField
-          multiline
-          fullWidth
+        <TextInputArea
+          value={text}
+          onChange={setText}
+          placeholder={t('textStatistics:placeholder')}
           minRows={8}
           maxRows={15}
-          placeholder={t('textStatistics:placeholder')}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          sx={{
-            mb: 3,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 4,
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-              transition: 'all 0.2s',
-              '& fieldset': {
-                borderColor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'grey.200',
-              },
-              '&:hover fieldset': {
-                borderColor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'grey.300',
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: textStatisticsPageStyles.primaryColor,
-              },
-            },
-            '& .MuiInputBase-input': {
-              fontSize: '0.9rem',
-              lineHeight: 1.6,
-            },
-          }}
+          showClear={false}
+          sx={{ mb: 3 }}
         />
 
         {/* 统计结果展示区域 */}

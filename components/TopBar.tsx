@@ -31,7 +31,15 @@ import { openExtensionPage } from '@/utils/chromeTabs';
 import { useTranslation } from 'react-i18next';
 import { alpha } from '@mui/material/styles';
 import { SUPPORTED_LANGUAGES, normalizeLanguage } from '@/i18n';
-import { topBarStyles } from '@/config/pageTheme';
+
+const topBarStyles = {
+  SEARCH_MAX_WIDTH: 400,
+  DROPDOWN_MAX_HEIGHT: 300,
+  Z_INDEX: 1100,
+  DROPDOWN_Z_INDEX: 1200,
+  SEARCH_HISTORY_LIMIT: 10,
+  SEARCH_HISTORY_DISPLAY: 5,
+};
 
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
@@ -90,12 +98,16 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         0,
         topBarStyles.SEARCH_HISTORY_LIMIT,
       );
-      storageUtil.set('app/searchHistory', newHistory).catch((error) => {
-        console.error('保存搜索历史失败:', error);
-      });
       return newHistory;
     });
   };
+
+  // 副作用：搜索历史变化后持久化到 storage
+  useEffect(() => {
+    storageUtil.set('app/searchHistory', searchHistory).catch((error) => {
+      console.error('保存搜索历史失败:', error);
+    });
+  }, [searchHistory]);
 
   const handleSelectFeature = (feature: FeatureConfig) => {
     navigateTo(feature.key);

@@ -115,8 +115,13 @@ export default function ToolCard({
                   sx={{
                     color: 'text.secondary',
                     fontWeight: 500,
-                    display: 'block',
                     mt: 0.5,
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    wordBreak: 'break-word',
                   }}
                 >
                   {description}

@@ -25,5 +25,11 @@
   "messages": {
     "copySuccess": "已复制到剪贴板",
     "copyError": "复制失败"
+  },
+  "textInputArea": {
+    "clear": "清空",
+    "copyContent": "复制内容",
+    "cleared": "已清空",
+    "placeholder": "请输入文本"
   }
 }
