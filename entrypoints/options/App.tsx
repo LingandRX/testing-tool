@@ -155,7 +155,7 @@ function SortableFeatureRow({
             flexShrink: 0,
           }}
         >
-          {feature.icon}
+          {feature.icon && <feature.icon sx={{ fontSize: 20 }} />}
         </Box>
 
         {/* 文本信息 */}
