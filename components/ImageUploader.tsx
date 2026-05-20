@@ -4,7 +4,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import ClearIcon from '@mui/icons-material/Clear';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import { useSnackbar } from '@/components/GlobalSnackbar';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface ImageUploaderProps {
   /** 选中的文件 */
@@ -32,7 +32,7 @@ const ImageUploader = ({
   dragging,
   onDraggingChange,
 }: ImageUploaderProps) => {
-  const { t } = useTranslation(['qrCode']);
+  const { t } = useLazyTranslation('qrCode');
   const { showMessage } = useSnackbar();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

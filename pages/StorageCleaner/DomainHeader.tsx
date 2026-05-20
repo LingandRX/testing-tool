@@ -3,7 +3,7 @@ import StorageIcon from '@mui/icons-material/Storage';
 import PageHeader from '@/components/PageHeader';
 import { formatSize } from '@/utils/storageCleaner';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 /**
  * DomainHeader 组件属性接口
@@ -29,7 +29,7 @@ interface DomainHeaderProps {
  * ```
  */
 export default function DomainHeader({ domain, totalSize }: DomainHeaderProps) {
-  const { t } = useTranslation(['storageCleaner']);
+  const { t } = useLazyTranslation('storageCleaner');
   return (
     <PageHeader
       icon={<StorageIcon sx={{ fontSize: 22 }} />}
