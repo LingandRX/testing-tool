@@ -6,7 +6,7 @@ import PageHeader from '@/components/PageHeader';
 import { stringifyJson, parseJwt } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface SectionProps {
   title: string;
@@ -15,7 +15,7 @@ interface SectionProps {
 }
 
 const Section = ({ title, content, color }: SectionProps) => {
-  const { t } = useTranslation(['jwt']);
+  const { t } = useLazyTranslation('jwt');
   return (
     <Paper
       variant="outlined"
@@ -58,7 +58,7 @@ const Section = ({ title, content, color }: SectionProps) => {
 
 export default function Index() {
   const { showMessage } = useSnackbar();
-  const { t } = useTranslation(['jwt']);
+  const { t } = useLazyTranslation('jwt');
   const [jwtInput, setJwtInput] = useState('');
 
   const result = useMemo(() => {

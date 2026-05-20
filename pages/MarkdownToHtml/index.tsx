@@ -14,7 +14,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PrintIcon from '@mui/icons-material/Print';
 import DownloadIcon from '@mui/icons-material/Download';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
@@ -109,7 +109,7 @@ const PREVIEW_STYLES = `
 `;
 
 export default function MarkdownToHtmlPage() {
-  const { t } = useTranslation('markdownToHtml');
+  const { t } = useLazyTranslation('markdownToHtml');
   const [previewMode, setPreviewMode] = useStorageState(
     'markdownToHtml/previewMode',
     'split' as MarkdownToHtmlPreviewMode,

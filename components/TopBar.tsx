@@ -296,7 +296,9 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                           aria-selected={selectedIndex === index}
                           sx={{ py: 1 }}
                         >
-                          <ListItemIcon sx={{ minWidth: 40 }}>{feature.icon}</ListItemIcon>
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            {feature.icon && <feature.icon sx={{ fontSize: 20 }} />}
+                          </ListItemIcon>
                           <ListItemText
                             primary={t(feature.labelKey)}
                             secondary={t(feature.descriptionKey)}
