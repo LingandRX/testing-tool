@@ -2,7 +2,7 @@ import { Box, Button, Typography } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { qrCodePageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface QrCodePreviewProps {
   /** 二维码 Data URL */
@@ -14,7 +14,7 @@ interface QrCodePreviewProps {
 }
 
 const QrCodePreview = ({ qrCodeDataUrl, onDownload, onCopy }: QrCodePreviewProps) => {
-  const { t } = useTranslation(['qrCode']);
+  const { t } = useLazyTranslation('qrCode');
 
   if (!qrCodeDataUrl) {
     return (
