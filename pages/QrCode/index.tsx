@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Box, Container, Grid, useMediaQuery, useTheme } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import QRious from 'qrious';
@@ -12,6 +12,7 @@ import { useSnackbar } from '@/components/GlobalSnackbar';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useDebounce } from '@/utils/useDebounce';
 import type { QrCodeMode, QrCodeGeneratorState, QrCodeParserState } from './types';
 
 export default function Index() {
@@ -44,7 +45,10 @@ export default function Index() {
   // 生成二维码
   const generateQrCode = useCallback(
     async (text: string) => {
-      if (!text) return;
+      if (!text) {
+        setGeneratorState((prev) => ({ ...prev, qrCodeDataUrl: '' }));
+        return;
+      }
 
       try {
         setGeneratorState((prev) => ({ ...prev, generating: true, inputError: '' }));
@@ -63,10 +67,13 @@ export default function Index() {
         });
 
         setGeneratorState((prev) => ({ ...prev, qrCodeDataUrl: qr.toDataURL() }));
-        showMessage(t('qrCode:qrCodeSuccess'), { severity: 'success', autoHideDuration: 1000 });
       } catch (error) {
         console.error('生成二维码失败:', error);
-        showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
+        setGeneratorState((prev) => ({
+          ...prev,
+          inputError: t('qrCode:generateError'),
+        }));
+        showMessage(t('qrCode:generateError'), { severity: 'error', autoHideDuration: 3000 });
       } finally {
         setGeneratorState((prev) => ({ ...prev, generating: false }));
       }
@@ -74,15 +81,25 @@ export default function Index() {
     [t, showMessage],
   );
 
+  // 使用 useRef 存储 generateQrCode 的最新引用，避免无限循环
+  const generateQrCodeRef = useRef(generateQrCode);
+  generateQrCodeRef.current = generateQrCode;
+
+  // 防抖处理输入文本（200ms）
+  const debouncedTextToEncode = useDebounce(generatorState.textToEncode, 200);
+
+  // 当防抖后的文本变化时，自动生成二维码
+  useEffect(() => {
+    if (debouncedTextToEncode && mode === 'generate') {
+      generateQrCodeRef.current(debouncedTextToEncode);
+    }
+  }, [debouncedTextToEncode, mode]);
+
   // 处理右键菜单数据
-  const handleContextMenuData = useCallback(
-    (payload: string) => {
-      setMode('generate');
-      setGeneratorState((prev) => ({ ...prev, textToEncode: payload }));
-      generateQrCode(payload);
-    },
-    [generateQrCode],
-  );
+  const handleContextMenuData = useCallback((payload: string) => {
+    setMode('generate');
+    setGeneratorState((prev) => ({ ...prev, textToEncode: payload }));
+  }, []);
 
   useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
 
@@ -100,12 +117,13 @@ export default function Index() {
         } else {
           const errorMsg = result.error || t('qrCode:noQrDetected');
           setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-          showMessage(errorMsg, { severity: 'error', autoHideDuration: 1000 });
+          showMessage(errorMsg, { severity: 'error', autoHideDuration: 3000 });
         }
       } catch (error) {
         console.error('解析二维码失败:', error);
-        setParserState((prev) => ({ ...prev, parseError: t('qrCode:parseError') }));
-        showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
+        const errorMsg = error instanceof Error ? error.message : t('qrCode:parseError');
+        setParserState((prev) => ({ ...prev, parseError: errorMsg }));
+        showMessage(errorMsg, { severity: 'error', autoHideDuration: 3000 });
       } finally {
         setParserState((prev) => ({ ...prev, parsing: false }));
       }
@@ -121,7 +139,7 @@ export default function Index() {
     link.href = generatorState.qrCodeDataUrl;
     link.download = 'qrcode.png';
     link.click();
-    showMessage(t('qrCode:qrCodeDownloadSuccess'), { severity: 'success', autoHideDuration: 300 });
+    showMessage(t('qrCode:qrCodeDownloadSuccess'), { severity: 'success', autoHideDuration: 1000 });
   }, [generatorState.qrCodeDataUrl, showMessage, t]);
 
   // 复制二维码
@@ -141,9 +159,25 @@ export default function Index() {
       showMessage(t('qrCode:qrCodeCopySuccess'), { severity: 'success', autoHideDuration: 1000 });
     } catch (error) {
       console.error('复制二维码失败:', error);
-      showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
+      showMessage(t('qrCode:copyError'), { severity: 'error', autoHideDuration: 3000 });
     }
   }, [generatorState.qrCodeDataUrl, showMessage, t]);
+
+  // 处理文件选择
+  const handleFileChange = useCallback(
+    (file: File) => {
+      setParserState((prev) => ({
+        ...prev,
+        selectedFile: file,
+        previewUrl: URL.createObjectURL(file),
+        decodedResult: '',
+        parseError: '',
+      }));
+      // 自动解析
+      parseQrCode(file);
+    },
+    [parseQrCode],
+  );
 
   // 清除文件
   const handleClearFile = useCallback(() => {
@@ -158,6 +192,51 @@ export default function Index() {
       parseError: '',
     }));
   }, [parserState.previewUrl]);
+
+  // 全局粘贴事件监听（解析模式下）
+  useEffect(() => {
+    if (mode !== 'parse') return;
+
+    const handlePaste = async (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      // 检查是否有图片
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          e.preventDefault();
+          const file = items[i].getAsFile();
+          if (file) {
+            handleFileChange(file);
+            showMessage(t('qrCode:imagePasted'), { severity: 'success', autoHideDuration: 1000 });
+          }
+          return;
+        }
+      }
+
+      // 检查是否有 Base64 字符串
+      const text = e.clipboardData?.getData('text/plain');
+      if (text && text.startsWith('data:image/')) {
+        e.preventDefault();
+        try {
+          // 将 Base64 转换为 File
+          const response = await fetch(text);
+          const blob = await response.blob();
+          const file = new File([blob], 'pasted-image.png', { type: blob.type });
+          handleFileChange(file);
+          showMessage(t('qrCode:imagePasted'), { severity: 'success', autoHideDuration: 1000 });
+        } catch (error) {
+          console.error('处理 Base64 图片失败:', error);
+          showMessage(t('qrCode:imagePasteError'), { severity: 'error', autoHideDuration: 3000 });
+        }
+      }
+    };
+
+    document.addEventListener('paste', handlePaste);
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+    };
+  }, [mode, handleFileChange, showMessage, t]);
 
   // 模式选项
   const modeOptions = [
@@ -178,18 +257,6 @@ export default function Index() {
           showClear
           allowCopy
           externalError={generatorState.inputError}
-          actions={[
-            {
-              key: 'generate',
-              label: generatorState.generating
-                ? t('qrCode:generating')
-                : t('qrCode:generateButton'),
-              type: 'primary',
-              position: 'bottom',
-              disabled: (value) => !value || generatorState.generating,
-              onClick: (value) => generateQrCode(value),
-            },
-          ]}
           showMessage={showMessage}
         />
       );
@@ -198,15 +265,7 @@ export default function Index() {
     return (
       <ImageUploader
         selectedFile={parserState.selectedFile}
-        onFileChange={(file) => {
-          setParserState((prev) => ({
-            ...prev,
-            selectedFile: file,
-            previewUrl: URL.createObjectURL(file),
-            decodedResult: '',
-            parseError: '',
-          }));
-        }}
+        onFileChange={handleFileChange}
         onClearFile={handleClearFile}
         previewUrl={parserState.previewUrl}
         onPreviewUrlChange={(url) => setParserState((prev) => ({ ...prev, previewUrl: url }))}
