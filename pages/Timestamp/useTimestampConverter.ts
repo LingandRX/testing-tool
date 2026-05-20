@@ -74,41 +74,44 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
   }, [mode, tsInput, dtInput, unit, zone, t]);
 
   // 处理右键菜单传递的数据
-  const handleContextMenuData = useCallback((payload: string) => {
-    const trimmed = payload.trim();
-    if (isTimestampLike(trimmed)) {
-      // 看起来是时间戳，切换到 ts2dt 模式
-      setMode('ts2dt');
-      setTsInput(trimmed);
-      // 如果是 13 位毫秒级时间戳，自动选择 ms 单位
-      const detectedUnit: UnitType = trimmed.length >= 13 ? 'ms' : 's';
-      setUnit(detectedUnit);
-      // 直接执行转换
-      const num = Number(trimmed);
-      if (!isNaN(num)) {
-        const d = detectedUnit === 'ms' ? dayjs(num) : dayjs.unix(num);
-        if (d.isValid()) {
-          setError('');
-          setResult(d.tz('Asia/Shanghai').format(DATE_FORMAT));
-        }
-      }
-    } else {
-      // 尝试作为日期时间解析
-      const d = dayjs(trimmed);
-      if (d.isValid()) {
-        setMode('dt2ts');
-        setDtInput(d.format(DATE_FORMAT));
-        // 直接执行转换
-        const ms = d.valueOf();
-        setError('');
-        setResult(String(ms));
-      } else {
-        // 无法识别，作为时间戳处理
+  const handleContextMenuData = useCallback(
+    (payload: string) => {
+      const trimmed = payload.trim();
+      if (isTimestampLike(trimmed)) {
+        // 看起来是时间戳，切换到 ts2dt 模式
         setMode('ts2dt');
         setTsInput(trimmed);
+        // 如果是 13 位毫秒级时间戳，自动选择 ms 单位
+        const detectedUnit: UnitType = trimmed.length >= 13 ? 'ms' : 's';
+        setUnit(detectedUnit);
+        // 直接执行转换
+        const num = Number(trimmed);
+        if (!isNaN(num)) {
+          const d = detectedUnit === 'ms' ? dayjs(num) : dayjs.unix(num);
+          if (d.isValid()) {
+            setError('');
+            setResult(d.tz(zone).format(DATE_FORMAT));
+          }
+        }
+      } else {
+        // 尝试作为日期时间解析
+        const d = dayjs(trimmed);
+        if (d.isValid()) {
+          setMode('dt2ts');
+          setDtInput(d.format(DATE_FORMAT));
+          // 直接执行转换
+          const ms = d.valueOf();
+          setError('');
+          setResult(String(ms));
+        } else {
+          // 无法识别，作为时间戳处理
+          setMode('ts2dt');
+          setTsInput(trimmed);
+        }
       }
-    }
-  }, []);
+    },
+    [zone],
+  );
 
   useContextMenuData({ featureKey: 'timestamp', onData: handleContextMenuData });
 

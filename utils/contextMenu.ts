@@ -22,6 +22,19 @@ const PARENT_MENU_ID = 'testing-tools-parent';
 
 export const MAX_PAYLOAD_LENGTH = 10000;
 
+/** 菜单项 ID 到 PageType 的映射（仅处理非常规映射） */
+const MENU_ID_TO_PAGE_TYPE: Record<string, PageType> = {
+  'qrCode-page': 'qrCode',
+};
+
+/**
+ * 将菜单项 ID 转换为 PageType
+ * 如果存在显式映射则使用映射，否则直接使用 menuItemId
+ */
+function getMenuPageType(menuItemId: string): PageType {
+  return MENU_ID_TO_PAGE_TYPE[menuItemId] ?? (menuItemId as PageType);
+}
+
 export const CONTEXT_MENU_CONFIGS: ContextMenuItemConfig[] = [
   {
     id: PARENT_MENU_ID,
@@ -81,14 +94,7 @@ export function parseContextMenuClick(
   menuItemId: string,
   info: chrome.contextMenus.OnClickData,
 ): ParseResult {
-  const featureKey = menuItemId as PageType;
-
-  if (menuItemId === 'qrCode-page') {
-    return {
-      success: true,
-      data: { featureKey: 'qrCode', payload: info.pageUrl || '' },
-    };
-  }
+  const featureKey = getMenuPageType(menuItemId);
 
   if (info.selectionText) {
     const text = info.selectionText;

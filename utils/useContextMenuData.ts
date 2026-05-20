@@ -3,7 +3,9 @@ import { storageUtil } from '@/utils/chromeStorage';
 import type { ContextMenuPendingData, PageType } from '@/types/storage';
 
 const STORAGE_KEY = 'contextMenu/pendingData' as const;
-const DATA_EXPIRY_MS = 5000;
+
+/** 右键菜单数据过期时间（毫秒） */
+export const CONTEXT_MENU_DATA_EXPIRY_MS = 5000;
 
 export interface UseContextMenuDataOptions {
   /** 当前页面的功能标识 */
@@ -29,7 +31,7 @@ export function useContextMenuData({ featureKey, onData }: UseContextMenuDataOpt
 
       if (data.featureKey !== featureKey) return;
 
-      if (Date.now() - data.timestamp > DATA_EXPIRY_MS) {
+      if (Date.now() - data.timestamp > CONTEXT_MENU_DATA_EXPIRY_MS) {
         await storageUtil.remove(STORAGE_KEY);
         return;
       }
