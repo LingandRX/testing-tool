@@ -14,7 +14,7 @@ import {
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
 } from '@/config/features';
-import { saveContextMenuData } from '@/utils/useContextMenuData';
+import { saveContextMenuData, clearContextMenuData } from '@/utils/useContextMenuData';
 
 /**
  * 校验是否为合法的页面类型
@@ -204,8 +204,24 @@ export function RouterProvider({
               url.searchParams.delete('feature');
               url.searchParams.delete('payload');
               window.history.replaceState({}, '', url.toString());
+              return;
             }
           }
+
+          // 检查 storage 中的右键菜单待处理数据（用于 openPopup 场景）
+          storageUtil
+            .get('contextMenu/pendingData', undefined)
+            .then((pendingData) => {
+              if (
+                pendingData &&
+                isValidPage(pendingData.featureKey) &&
+                Date.now() - pendingData.timestamp < 5000
+              ) {
+                navigateTo(pendingData.featureKey as PageType);
+                clearContextMenuData().catch(console.error);
+              }
+            })
+            .catch(console.error);
         }
       })
       .catch(console.error);
