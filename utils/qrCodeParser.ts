@@ -35,24 +35,3 @@ export async function parseQrCodeFromFile(file: File): Promise<QrCodeParseResult
     return { success: false, error: errorMsg };
   }
 }
-
-/**
- * 从图片 URL 解析二维码
- * 先下载图片，然后调用 parseQrCodeFromFile
- */
-export async function parseQrCodeFromUrl(imageUrl: string): Promise<QrCodeParseResult> {
-  try {
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-      return { success: false, error: '无法下载图片' };
-    }
-
-    const blob = await response.blob();
-    const file = new File([blob], 'qrcode.jpg', { type: blob.type || 'image/jpeg' });
-
-    return await parseQrCodeFromFile(file);
-  } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : String(err);
-    return { success: false, error: `下载图片失败: ${errorMsg}` };
-  }
-}

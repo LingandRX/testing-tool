@@ -53,12 +53,6 @@ export const CONTEXT_MENU_CONFIGS: ContextMenuItemConfig[] = [
     parentId: PARENT_MENU_ID,
   },
   {
-    id: 'qrCode-image',
-    title: '🖼️ 识别图中的二维码',
-    contexts: [chrome.contextMenus.ContextType.IMAGE],
-    parentId: PARENT_MENU_ID,
-  },
-  {
     id: 'storageCleaner',
     title: '🧹 清理当前网站存储',
     contexts: [chrome.contextMenus.ContextType.PAGE],
@@ -88,22 +82,6 @@ export function parseContextMenuClick(
   info: chrome.contextMenus.OnClickData,
 ): ParseResult {
   const featureKey = menuItemId as PageType;
-
-  if (menuItemId === 'qrCode-image') {
-    const srcUrl = info.srcUrl || '';
-
-    if (srcUrl.startsWith('data:image/')) {
-      return {
-        success: false,
-        error: '无法识别 Base64 内联图片，请使用图片文件 URL',
-      };
-    }
-
-    return {
-      success: true,
-      data: { featureKey: 'qrCode', payload: srcUrl },
-    };
-  }
 
   if (menuItemId === 'qrCode-page') {
     return {

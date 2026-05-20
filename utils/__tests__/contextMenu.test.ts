@@ -12,8 +12,8 @@ describe('contextMenu', () => {
   });
 
   describe('CONTEXT_MENU_CONFIGS', () => {
-    it('应该包含 8 个菜单项配置', () => {
-      expect(CONTEXT_MENU_CONFIGS).toHaveLength(8);
+    it('应该包含 7 个菜单项配置', () => {
+      expect(CONTEXT_MENU_CONFIGS).toHaveLength(7);
     });
 
     it('应该有一个父级菜单项 Testing Tools', () => {
@@ -36,14 +36,6 @@ describe('contextMenu', () => {
       ]);
     });
 
-    it('应该有 1 个 image 上下文的子菜单', () => {
-      const imageMenus = CONTEXT_MENU_CONFIGS.filter(
-        (c) => c.contexts[0] === 'image' && c.parentId === 'testing-tools-parent',
-      );
-      expect(imageMenus).toHaveLength(1);
-      expect(imageMenus[0].id).toBe('qrCode-image');
-    });
-
     it('应该有 2 个 page 上下文的子菜单', () => {
       const pageMenus = CONTEXT_MENU_CONFIGS.filter(
         (c) => c.contexts[0] === 'page' && c.parentId === 'testing-tools-parent',
@@ -57,7 +49,7 @@ describe('contextMenu', () => {
     it('应该为每个配置调用 chrome.contextMenus.create', () => {
       createAllContextMenus();
 
-      expect(chrome.contextMenus.create).toHaveBeenCalledTimes(8);
+      expect(chrome.contextMenus.create).toHaveBeenCalledTimes(7);
     });
 
     it('应该使用正确的参数创建菜单项', () => {
@@ -87,44 +79,6 @@ describe('contextMenu', () => {
       editable: false,
       pageUrl: 'https://example.com',
       ...overrides,
-    });
-
-    it('当点击 qrCode-image 菜单时应返回 qrCode 功能和 srcUrl', () => {
-      const info = createMockOnClickData({
-        srcUrl: 'https://example.com/image.png',
-      });
-
-      const result = parseContextMenuClick('qrCode-image', info);
-
-      expect(result).toEqual({
-        success: true,
-        data: { featureKey: 'qrCode', payload: 'https://example.com/image.png' },
-      });
-    });
-
-    it('当图片为 Base64 内联图时应返回错误', () => {
-      const info = createMockOnClickData({
-        srcUrl:
-          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-      });
-
-      const result = parseContextMenuClick('qrCode-image', info);
-
-      expect(result).toEqual({
-        success: false,
-        error: '无法识别 Base64 内联图片，请使用图片文件 URL',
-      });
-    });
-
-    it('当点击 qrCode-image 菜单但没有 srcUrl 时应返回成功', () => {
-      const info = createMockOnClickData({});
-
-      const result = parseContextMenuClick('qrCode-image', info);
-
-      expect(result).toEqual({
-        success: true,
-        data: { featureKey: 'qrCode', payload: '' },
-      });
     });
 
     it('当点击 qrCode-page 菜单时应返回 qrCode 功能和 pageUrl', () => {
