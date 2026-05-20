@@ -5,10 +5,10 @@ import QrCodeToUrlSection from '@/pages/QrCode/QrCodeToUrlSection';
 import { useStorageState } from '@/utils/useStorageState';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import PageHeader from '@/components/PageHeader';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 export default function Index() {
-  const { t } = useTranslation(['qrCode']);
+  const { t } = useLazyTranslation('qrCode');
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 

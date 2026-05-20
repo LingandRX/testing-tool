@@ -13,7 +13,7 @@ import {
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DownloadIcon from '@mui/icons-material/Download';
 import CodeIcon from '@mui/icons-material/Code';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
@@ -25,7 +25,7 @@ const isValidPreviewMode = (val: unknown): val is HtmlToMarkdownPreviewMode =>
   typeof val === 'string' && ['split', 'preview', 'markdown'].includes(val);
 
 export default function HtmlToMarkdownPage() {
-  const { t } = useTranslation('htmlToMarkdown');
+  const { t } = useLazyTranslation('htmlToMarkdown');
   const [previewMode, setPreviewMode] = useStorageState(
     'htmlToMarkdown/previewMode',
     'split' as HtmlToMarkdownPreviewMode,

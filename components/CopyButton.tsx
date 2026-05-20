@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
@@ -42,6 +42,13 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   showMessage,
 }) => {
   const [copied, setCopied] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const handleCopy = async () => {
     if (text) {
@@ -49,7 +56,8 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       if (success) {
         showMessage?.('复制成功', { severity: 'success' });
         setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => setCopied(false), 1500);
       } else {
         showMessage?.('复制失败', { severity: 'error' });
       }
