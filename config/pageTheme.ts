@@ -719,7 +719,7 @@ export const qrCodePageStyles = {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: 200,
+      height: 250,
       border: '2px dashed',
       borderColor: dragging || hasFile ? 'success.main' : 'divider',
       borderRadius: 3,
