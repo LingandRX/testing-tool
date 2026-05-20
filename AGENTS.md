@@ -16,7 +16,7 @@ This file provides guidance to AI agents (such as Gemini, Codex, etc.) when work
 - `npm run build:firefox` - 构建 Firefox 浏览器的生产版本
 - `npm run zip` - 打包 Chrome 扩展为 ZIP 文件
 - `npm run zip:firefox` - 打包 Firefox 扩展为 ZIP 文件
-- `npm run compile` - 执行 TypeScript 类型检查（`tsc --noEmit`）
+- `npm run typecheck` - 执行 TypeScript 类型检查（`tsc --noEmit`）
 - `npm run lint` - 运行 ESLint 静态代码检查
 
 ### 测试

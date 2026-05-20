@@ -214,11 +214,7 @@ export default function HtmlToMarkdownPage() {
                   <Typography variant="caption" sx={{ color: 'text.disabled' }}>
                     {t('charCount', { count: result.markdownLength })}
                   </Typography>
-                  <CopyButton
-                    text={result.markdown}
-                    showMessage={(_msg, _opts) => {}}
-                    size="small"
-                  />
+                  <CopyButton text={result.markdown} size="small" />
                 </Stack>
               </Box>
 

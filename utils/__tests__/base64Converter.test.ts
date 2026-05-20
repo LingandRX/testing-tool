@@ -77,6 +77,11 @@ describe('base64ToText', () => {
     expect(result).toBe('hello');
   });
 
+  it('应该处理带参数（如 charset）的 data URI 前缀', () => {
+    const result = base64ToText('data:text/plain;charset=utf-8;base64,aGVsbG8=');
+    expect(result).toBe('hello');
+  });
+
   it('应该剥离带空白的 data URI 前缀', () => {
     const result = base64ToText('  data:text/plain;base64,aGVsbG8=  ');
     expect(result).toBe('hello');
@@ -166,6 +171,13 @@ describe('extractMimeTypeFromDataUri', () => {
   it('应该从 data URI 中提取 MIME 类型', () => {
     expect(extractMimeTypeFromDataUri('data:image/png;base64,iVBOR')).toBe('image/png');
     expect(extractMimeTypeFromDataUri('data:text/plain;base64,SGVsbG8=')).toBe('text/plain');
+  });
+
+  it('应该从带参数的 data URI 中提取 MIME 类型', () => {
+    expect(extractMimeTypeFromDataUri('data:text/plain;charset=utf-8;base64,SGVsbG8=')).toBe(
+      'text/plain',
+    );
+    expect(extractMimeTypeFromDataUri('data:image/svg+xml;base64,PHN2Zw==')).toBe('image/svg+xml');
   });
 
   it('应该对无效的 data URI 返回默认类型', () => {
@@ -331,6 +343,12 @@ describe('base64ToBlob', () => {
   it('应该返回原始 Base64（已去除 data URI 前缀）', () => {
     const result = base64ToBlob('data:image/png;base64,iVBORw0KGgo=');
     expect(result.rawBase64).toBe('iVBORw0KGgo=');
+  });
+
+  it('应该处理带参数的 data URI 前缀', () => {
+    const result = base64ToBlob('data:text/plain;charset=utf-8;base64,aGVsbG8=');
+    expect(result.rawBase64).toBe('aGVsbG8=');
+    expect(result.mimeType).toBe('text/plain');
   });
 
   it('blob 大小应该等于解码后的字节数', () => {

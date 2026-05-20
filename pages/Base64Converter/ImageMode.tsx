@@ -291,17 +291,8 @@ export default function ImageMode() {
                   {t('base64Output')}
                 </Typography>
                 <Stack direction="row" spacing={1}>
-                  <CopyButton
-                    text={result.rawBase64}
-                    tooltip={t('copyRaw')}
-                    showMessage={() => {}}
-                  />
-                  <CopyButton
-                    text={result.output}
-                    tooltip={t('copyDataUri')}
-                    color="info"
-                    showMessage={() => {}}
-                  />
+                  <CopyButton text={result.rawBase64} tooltip={t('copyRaw')} />
+                  <CopyButton text={result.output} tooltip={t('copyDataUri')} color="info" />
                 </Stack>
               </Stack>
               <Box
