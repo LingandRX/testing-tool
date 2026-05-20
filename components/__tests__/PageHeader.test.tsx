@@ -5,6 +5,10 @@ import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import PageHeader, { type PageHeaderProps } from '@/components/PageHeader';
 
+vi.mock('@/config/features', () => ({
+  getEntryPointType: vi.fn(() => 'sidepanel'),
+}));
+
 const theme = createTheme();
 
 function renderWithTheme(ui: React.ReactElement) {
@@ -115,6 +119,16 @@ describe('PageHeader 组件系统', () => {
       const { container } = renderWithTheme(<PageHeader {...defaultProps} sx={{ mt: 3 }} />);
       const outerElement = container.firstChild;
       expect(outerElement).toBeTruthy();
+    });
+  });
+
+  describe('PageHeader 入口点隐藏', () => {
+    it('popup 模式下应返回 null', async () => {
+      const { getEntryPointType } = await import('@/config/features');
+      vi.mocked(getEntryPointType).mockReturnValue('popup');
+
+      const { container } = renderWithTheme(<PageHeader {...defaultProps} />);
+      expect(container.innerHTML).toBe('');
     });
   });
 });
