@@ -4,7 +4,7 @@ import dayjs from '@/utils/dayjs';
 import CopyButton from '@/components/CopyButton';
 import type { UnitType } from '@/config/pageTheme';
 import { DATE_FORMAT, timestampPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface ResultViewProps {
   result: string;
@@ -17,7 +17,7 @@ interface ResultViewProps {
 
 const ResultView = React.memo(
   ({ result, mode, unit, zone, showEmptyPlaceholder = false }: ResultViewProps) => {
-    const { t } = useTranslation(['timestamp']);
+    const { t } = useLazyTranslation('timestamp');
 
     const extraInfo = useMemo(() => {
       if (!result) return null;

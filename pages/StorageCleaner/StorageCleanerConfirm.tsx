@@ -10,7 +10,7 @@ import {
 import type { StorageCleanerOptions } from '@/types/storage';
 import Button from '@/components/Button';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 export interface StorageCleanerConfirmProps {
   open: boolean;
@@ -25,7 +25,7 @@ export function StorageCleanerConfirm({
   onConfirm,
   options,
 }: StorageCleanerConfirmProps) {
-  const { t } = useTranslation(['storageCleaner']);
+  const { t } = useLazyTranslation('storageCleaner');
 
   const selectedOptions = Object.entries(options)
     .filter(([_, value]) => value)

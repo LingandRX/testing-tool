@@ -126,6 +126,20 @@ export interface StorageSchema {
   'htmlToMarkdown/previewMode': HtmlToMarkdownPreviewMode;
   /** 语言偏好设置 */
   'app/language': string;
+  /** 右键菜单待处理数据 */
+  'contextMenu/pendingData': ContextMenuPendingData;
+}
+
+/**
+ * 右键菜单待处理数据
+ */
+export interface ContextMenuPendingData {
+  /** 功能标识 */
+  featureKey: PageType;
+  /** 捕获的文本或图片 URL */
+  payload: string;
+  /** 数据创建时间戳 */
+  timestamp: number;
 }
 
 /**
