@@ -1,31 +1,48 @@
 {
   "pageTitle": "QR Code Tools",
   "pageSubtitle": "Generate and parse QR codes",
+
+  "generateMode": "Generate QR Code",
+  "parseMode": "Parse QR Code",
+
   "urlToQr": "URL to QR Code",
   "qrToUrl": "QR Code to URL",
-  "urlInputLabel": "Enter URL",
-  "urlInputPlaceholder": "https://example.com",
+
+  "urlInputLabel": "Enter URL or Text",
+  "urlInputPlaceholder": "Enter URL or text content, QR code will be generated automatically",
   "generateButton": "Generate QR Code",
   "generating": "Generating...",
+
   "qrCodeWillShow": "QR code will be shown here",
   "downloadButton": "Download QR Code",
   "copyQrButton": "Copy QR Code Image",
+
   "qrCodeSuccess": "QR code generated successfully",
   "qrCodeDownloadSuccess": "QR code downloaded successfully",
   "qrCodeCopySuccess": "QR code copied to clipboard",
+
   "selectImage": "Please select a QR code image",
   "parseSuccess": "QR code parsed successfully",
-  "noQrDetected": "No QR code detected",
+  "noQrDetected": "No QR code detected, please ensure the image is clear and contains a QR code",
   "parseError": "Failed to parse QR code, please try again",
-  "imagePasted": "Image pasted successfully",
+  "generateError": "Failed to generate QR code, please check the input",
+  "copyError": "Copy failed, please try again",
+
+  "imagePasted": "Image pasted, parsing...",
   "imagePasteError": "Failed to paste image, please try again",
   "imageCleared": "Image cleared",
   "clickToUpload": "Click, drag, or paste to upload QR code image",
-  "supportFormats": "Supports PNG, JPG, WEBP formats",
+  "supportFormats": "Supports PNG, JPG, WEBP, Base64 formats",
+
   "parseButton": "Parse QR Code",
   "parsing": "Parsing...",
   "resultLabel": "Parsing Result",
   "copyTooltip": "Copy",
-  "enterUrlError": "Please enter a URL",
-  "clickToChange": "Click to change image"
+
+  "enterUrlError": "Please enter URL or text",
+  "clickToChange": "Click to change image",
+
+  "pasteHint": "Supports Ctrl+V to paste images or Base64 strings",
+  "autoGenerateHint": "QR code will be generated automatically after input",
+  "autoParseHint": "QR code will be parsed automatically after upload"
 }

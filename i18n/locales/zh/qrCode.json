@@ -1,31 +1,48 @@
 {
   "pageTitle": "二维码工具",
   "pageSubtitle": "生成和解析二维码",
+
+  "generateMode": "生成二维码",
+  "parseMode": "解析二维码",
+
   "urlToQr": "URL 转二维码",
   "qrToUrl": "二维码转 URL",
-  "urlInputLabel": "输入 URL",
-  "urlInputPlaceholder": "https://example.com",
+
+  "urlInputLabel": "输入 URL 或文本",
+  "urlInputPlaceholder": "请输入 URL 或文本内容，将自动生成二维码",
   "generateButton": "生成二维码",
   "generating": "生成中...",
+
   "qrCodeWillShow": "二维码将显示在这里",
   "downloadButton": "下载二维码",
   "copyQrButton": "复制二维码",
+
   "qrCodeSuccess": "二维码生成成功",
   "qrCodeDownloadSuccess": "二维码下载成功",
   "qrCodeCopySuccess": "二维码已复制到剪贴板",
+
   "selectImage": "请选择二维码图片",
   "parseSuccess": "二维码解析成功",
-  "noQrDetected": "未检测到二维码",
+  "noQrDetected": "未检测到二维码，请确保图片清晰且包含二维码",
   "parseError": "解析二维码失败，请重试",
-  "imagePasted": "图片粘贴成功",
+  "generateError": "生成二维码失败，请检查输入内容",
+  "copyError": "复制失败，请重试",
+
+  "imagePasted": "图片粘贴成功，正在解析...",
   "imagePasteError": "粘贴图片失败，请重试",
   "imageCleared": "图片已清除",
   "clickToUpload": "点击、拖拽或粘贴上传二维码图片",
-  "supportFormats": "支持 PNG、JPG、WEBP 格式",
+  "supportFormats": "支持 PNG、JPG、WEBP、Base64 格式",
+
   "parseButton": "解析二维码",
   "parsing": "解析中...",
   "resultLabel": "解析结果",
   "copyTooltip": "复制",
-  "enterUrlError": "请输入 URL",
-  "clickToChange": "点击更换图片"
+
+  "enterUrlError": "请输入 URL 或文本",
+  "clickToChange": "点击更换图片",
+
+  "pasteHint": "支持 Ctrl+V 粘贴图片或 Base64 字符串",
+  "autoGenerateHint": "输入内容后将自动生成二维码",
+  "autoParseHint": "上传图片后将自动解析二维码"
 }

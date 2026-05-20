@@ -40,8 +40,9 @@ export default defineBackground(() => {
     try {
       await browser.action.openPopup();
     } catch (err) {
-      console.error('[Context Menu] 打开 popup 失败:', err);
-      // 打开失败时清除残留数据，避免下次打开 popup 时误触发
+      // openPopup 在无活动窗口时会失败（如窗口失焦、特殊页面等）
+      // 数据已保存到 storage，用户手动打开 popup 仍可正常使用
+      console.warn('[Context Menu] 自动打开 popup 失败，请手动点击扩展图标:', err);
       await chrome.storage.local.remove('contextMenu/pendingData');
     }
   });
