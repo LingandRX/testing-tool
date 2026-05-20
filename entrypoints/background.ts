@@ -1,8 +1,36 @@
 import '../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
-import { MessageAction, onMessage } from '@/utils/messages';
+import { MessageAction, onMessage, sendMessage } from '@/utils/messages';
+import { createAllContextMenus, parseContextMenuClick } from '@/utils/contextMenu';
 
 export default defineBackground(() => {
+  browser.runtime.onInstalled.addListener(() => {
+    createAllContextMenus();
+  });
+
+  browser.contextMenus.onClicked.addListener(async (info, _tab) => {
+    const result = parseContextMenuClick(info.menuItemId as string, info);
+    if (!result) return;
+
+    const { featureKey, payload } = result;
+
+    try {
+      const sidePanelState = await browser.storage.local.get('sidePanelOpen');
+      const isSidePanelOpen = sidePanelState.sidePanelOpen === true;
+
+      if (isSidePanelOpen) {
+        await sendMessage(MessageAction.CONTEXT_MENU_CLICKED, { featureKey, payload });
+        return;
+      }
+    } catch {
+      // sidepanel 未打开或无法通信，继续执行其他方案
+    }
+
+    const optionsUrl = chrome.runtime.getURL('/entrypoints/options/index.html');
+    const params = new URLSearchParams({ feature: featureKey, payload });
+    await browser.tabs.create({ url: `${optionsUrl}?${params.toString()}` });
+  });
+
   // 监听扩展图标点击事件，打开侧边栏
   browser.action.onClicked.addListener(async (tab) => {
     if (tab.id) {
