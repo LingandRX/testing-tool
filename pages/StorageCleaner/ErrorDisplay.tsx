@@ -1,14 +1,14 @@
 import { Box, Container, Typography } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface ErrorDisplayProps {
   error: string;
 }
 
 export default function ErrorDisplay({ error }: ErrorDisplayProps) {
-  const { t } = useTranslation(['storageCleaner']);
+  const { t } = useLazyTranslation('storageCleaner');
   return (
     <Container sx={storageCleanerPageStyles.ERROR_DISPLAY_CONTAINER}>
       <Box sx={{ width: '100%', maxWidth: 320 }}>

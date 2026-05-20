@@ -2,6 +2,24 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QrCodePage from '../index';
 
+// Mock useLazyTranslation
+vi.mock('@/utils/useLazyTranslation', () => ({
+  useLazyTranslation: () => ({
+    t: (key: string) => key,
+    i18n: { changeLanguage: vi.fn(), language: 'zh-CN' },
+    isLoaded: true,
+  }),
+}));
+
+// Mock getEntryPointType
+vi.mock('@/config/features', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/config/features')>();
+  return {
+    ...actual,
+    getEntryPointType: () => 'sidepanel',
+  };
+});
+
 // Mock 子组件
 vi.mock('@/components/QrCodePreview', () => ({
   default: () => <div data-testid="qr-code-preview">QrCodePreview</div>,

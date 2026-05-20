@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { formatByteSize } from '@/utils/textStatistics';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import CopyButton from '@/components/CopyButton';
@@ -43,7 +43,7 @@ export default function JsonConvertSection({
   convertFunction,
   convertButtonKey = 'convertButton',
 }: JsonConvertSectionProps) {
-  const { t } = useTranslation(['jsonFormat']);
+  const { t } = useLazyTranslation('jsonFormat');
   const { showMessage } = useSnackbar();
 
   const [input, setInput] = useState('');

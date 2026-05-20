@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import {
   formatJson,
   validateJson,
@@ -32,7 +32,7 @@ const INDENT_OPTIONS = [2, 4, 6, 8] as const;
  * 支持一键复制格式化后的 JSON。
  */
 export default function JsonFormatSection() {
-  const { t } = useTranslation(['jsonFormat']);
+  const { t } = useLazyTranslation('jsonFormat');
   const { showMessage } = useSnackbar();
 
   const [input, setInput] = useState('');

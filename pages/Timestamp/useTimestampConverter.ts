@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import dayjs from '@/utils/dayjs';
 import type { UnitType, ZoneType } from '@/config/pageTheme';
 import { DATE_FORMAT } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 
 export interface UseTimestampConverterReturn {
@@ -34,7 +34,7 @@ function isTimestampLike(input: string): boolean {
 }
 
 export function useTimestampConverter(): UseTimestampConverterReturn {
-  const { t } = useTranslation(['timestamp']);
+  const { t } = useLazyTranslation('timestamp');
   const [mode, setMode] = useState<'ts2dt' | 'dt2ts'>('ts2dt');
   const [tsInput, setTsInput] = useState(() => String(Date.now()));
   const [dtInput, setDtInput] = useState(() => dayjs().format(DATE_FORMAT));

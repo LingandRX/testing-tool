@@ -2,14 +2,14 @@ import { Alert, Box } from '@mui/material';
 import type { CleaningResult } from '@/types/storage';
 import { formatCleaningResult } from '@/utils/storageCleaner';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface CleaningResultProps {
   result: CleaningResult | null;
 }
 
 export default function CleaningResult({ result }: CleaningResultProps) {
-  const { t } = useTranslation(['storageCleaner']);
+  const { t } = useLazyTranslation('storageCleaner');
   if (!result) return null;
 
   return (

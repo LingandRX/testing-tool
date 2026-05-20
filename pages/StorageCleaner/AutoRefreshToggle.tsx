@@ -1,6 +1,6 @@
 import { Box, Switch, Typography } from '@mui/material';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface AutoRefreshToggleProps {
   autoRefresh: boolean;
@@ -8,7 +8,7 @@ interface AutoRefreshToggleProps {
 }
 
 export default function AutoRefreshToggle({ autoRefresh, onChange }: AutoRefreshToggleProps) {
-  const { t } = useTranslation(['storageCleaner']);
+  const { t } = useLazyTranslation('storageCleaner');
   return (
     <Box sx={storageCleanerPageStyles.AUTO_REFRESH_CONTAINER}>
       <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.8rem', px: 1.2 }}>

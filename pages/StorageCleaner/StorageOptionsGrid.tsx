@@ -2,7 +2,7 @@ import { Box, Checkbox, Divider, Grid, Typography } from '@mui/material';
 import type { StorageCleanerOptions } from '@/types/storage';
 import OptionItem from './OptionItem';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface StorageOptionsGridProps {
   options: StorageCleanerOptions;
@@ -21,7 +21,7 @@ export default function StorageOptionsGrid({
   onOptionChange,
   onSelectAll,
 }: StorageOptionsGridProps) {
-  const { t } = useTranslation(['storageCleaner']);
+  const { t } = useLazyTranslation('storageCleaner');
 
   const optionKeys: { key: keyof StorageCleanerOptions; isCount?: boolean }[] = [
     { key: 'localStorage' },
