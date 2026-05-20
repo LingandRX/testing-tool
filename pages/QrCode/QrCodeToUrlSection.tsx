@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -7,116 +7,66 @@ import {
   Box,
   Button,
   CircularProgress,
-  IconButton,
   InputAdornment,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
-import ImageIcon from '@mui/icons-material/Image';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ClearIcon from '@mui/icons-material/Clear';
 import CopyButton from '@/components/CopyButton';
+import ImageUploader from '@/components/ImageUploader';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 import { useTranslation } from 'react-i18next';
-
-interface QrCodeToUrlSectionProps {
-  expanded: boolean;
-  onExpandedChange: (expanded: boolean) => void;
-  /** 桌面端强制展开（隐藏折叠交互） */
-  forceExpanded?: boolean;
-}
+import type { QrCodeParserProps } from './types';
 
 const QrCodeToUrlSection = ({
+  decodedResult,
+  onDecodedResultChange,
+  parsing,
+  onParsingChange,
+  parseError,
+  onParseErrorChange,
+  selectedFile,
+  onFileChange,
+  onClearFile,
+  previewUrl,
+  onPreviewUrlChange,
+  dragging,
+  onDraggingChange,
   expanded,
   onExpandedChange,
   forceExpanded = false,
-}: QrCodeToUrlSectionProps) => {
+}: QrCodeParserProps) => {
   const { t } = useTranslation(['qrCode']);
   const { showMessage } = useSnackbar();
-  const [qrCodeFile, setQrCodeFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>('');
-  const [parsedUrl, setParsedUrl] = useState('');
-  const [parseError, setParseError] = useState('');
-  const [parsing, setParsing] = useState(false);
-  const [dragging, setDragging] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // 清理预览 URL，防止内存泄漏
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  const handleFileChange = useCallback((file: File) => {
-    setQrCodeFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
-    setParseError('');
-    setParsedUrl('');
-  }, []);
-
-  const handleClearFile = () => {
-    setQrCodeFile(null);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setPreviewUrl('');
-    setParsedUrl('');
-    setParseError('');
-    showMessage(t('qrCode:imageCleared'), {
-      severity: 'success',
-      autoHideDuration: 1000,
-    });
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFileChange(e.target.files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragging(false);
-    const droppedFile = e.dataTransfer.files?.[0];
-    if (droppedFile) {
-      handleFileChange(droppedFile);
-    }
-  };
+  const handleClearFile = useCallback(() => {
+    onClearFile();
+    onDecodedResultChange('');
+    onParseErrorChange('');
+  }, [onClearFile, onDecodedResultChange, onParseErrorChange]);
 
   const parseQrCode = async () => {
-    if (!qrCodeFile) {
+    if (!selectedFile) {
       showMessage(t('qrCode:selectImage'), { severity: 'error', autoHideDuration: 300 });
       return;
     }
 
     try {
-      setParsing(true);
-      setParseError('');
-      setParsedUrl('');
+      onParsingChange(true);
+      onParseErrorChange('');
+      onDecodedResultChange('');
 
-      const result = await parseQrCodeFromFile(qrCodeFile);
+      const result = await parseQrCodeFromFile(selectedFile);
 
       if (result.success && result.data) {
-        setParsedUrl(result.data);
+        onDecodedResultChange(result.data);
         showMessage(t('qrCode:parseSuccess'), { severity: 'success', autoHideDuration: 1000 });
       } else {
+        onParseErrorChange(result.error || t('qrCode:noQrDetected'));
         showMessage(result.error || t('qrCode:noQrDetected'), {
           severity: 'error',
           autoHideDuration: 1000,
@@ -124,48 +74,12 @@ const QrCodeToUrlSection = ({
       }
     } catch (error) {
       console.error('解析二维码失败:', error);
+      onParseErrorChange(t('qrCode:parseError'));
       showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
     } finally {
-      setParsing(false);
+      onParsingChange(false);
     }
   };
-
-  // 监听粘贴事件
-  useEffect(() => {
-    const handlePaste = async (e: ClipboardEvent) => {
-      if (!expanded) return;
-
-      const items = e.clipboardData?.items;
-      if (!items) return;
-
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.startsWith('image/')) {
-          e.preventDefault();
-
-          const file = items[i].getAsFile();
-          if (file) {
-            try {
-              handleFileChange(file);
-              showMessage(t('qrCode:imagePasted'), { severity: 'success', autoHideDuration: 1000 });
-            } catch (error) {
-              console.error('处理粘贴图片失败:', error);
-              showMessage(t('qrCode:imagePasteError'), {
-                severity: 'error',
-                autoHideDuration: 3000,
-              });
-            }
-          }
-          break;
-        }
-      }
-    };
-
-    document.addEventListener('paste', handlePaste);
-
-    return () => {
-      document.removeEventListener('paste', handlePaste);
-    };
-  }, [expanded, showMessage, handleFileChange, t]);
 
   return (
     <Accordion
@@ -183,64 +97,15 @@ const QrCodeToUrlSection = ({
       </AccordionSummary>
       <AccordionDetails>
         <Stack spacing={3}>
-          <Box
-            className="qr-flex-grow"
-            sx={qrCodePageStyles.DROPZONE(dragging, !!qrCodeFile)}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleInputChange}
-              style={{ display: 'none' }}
-              id="qr-code-upload"
-            />
-            <label
-              htmlFor="qr-code-upload"
-              style={{ cursor: 'pointer', textAlign: 'center', width: '100%' }}
-            >
-              {qrCodeFile ? (
-                <Box sx={qrCodePageStyles.IMAGE_PREVIEW_WRAPPER}>
-                  <Box sx={qrCodePageStyles.IMAGE_PREVIEW_BOX}>
-                    <img
-                      src={previewUrl}
-                      alt="QR Code Preview"
-                      style={qrCodePageStyles.IMAGE_PREVIEW_IMG}
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleClearFile();
-                      }}
-                      sx={qrCodePageStyles.CLEAR_BUTTON}
-                    >
-                      <ClearIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                    {qrCodeFile.name}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {t('qrCode:clickToChange')}
-                  </Typography>
-                </Box>
-              ) : (
-                <>
-                  <ImageIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {t('qrCode:clickToUpload')}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {t('qrCode:supportFormats')}
-                  </Typography>
-                </>
-              )}
-            </label>
-          </Box>
+          <ImageUploader
+            selectedFile={selectedFile}
+            onFileChange={onFileChange}
+            onClearFile={handleClearFile}
+            previewUrl={previewUrl}
+            onPreviewUrlChange={onPreviewUrlChange}
+            dragging={dragging}
+            onDraggingChange={onDraggingChange}
+          />
 
           <Button
             variant="contained"
@@ -255,7 +120,7 @@ const QrCodeToUrlSection = ({
           <Box sx={qrCodePageStyles.RESULT_INPUT}>
             <TextField
               label={t('qrCode:resultLabel')}
-              value={parsedUrl}
+              value={decodedResult}
               fullWidth
               variant="outlined"
               slotProps={{
@@ -264,7 +129,7 @@ const QrCodeToUrlSection = ({
                   endAdornment: (
                     <InputAdornment position="end">
                       <CopyButton
-                        text={parsedUrl}
+                        text={decodedResult}
                         tooltip={t('qrCode:copyTooltip')}
                         size="small"
                         color={qrCodePageStyles.primaryColor}

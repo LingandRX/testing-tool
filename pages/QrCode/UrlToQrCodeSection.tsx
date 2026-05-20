@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -11,39 +11,36 @@ import {
   Typography,
 } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import DownloadIcon from '@mui/icons-material/Download';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import QRious from 'qrious';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { useTranslation } from 'react-i18next';
 import { useContextMenuData } from '@/utils/useContextMenuData';
-
-interface UrlToQrCodeSectionProps {
-  expanded: boolean;
-  onExpandedChange: (expanded: boolean) => void;
-  /** 桌面端强制展开（隐藏折叠交互） */
-  forceExpanded?: boolean;
-}
+import QrCodePreview from '@/components/QrCodePreview';
+import type { QrCodeGeneratorProps } from './types';
 
 const UrlToQrCodeSection = ({
+  textToEncode,
+  onTextChange,
+  qrCodeDataUrl,
+  onQrCodeDataUrlChange,
+  generating,
+  onGeneratingChange,
+  inputError,
+  onInputErrorChange,
   expanded,
   onExpandedChange,
   forceExpanded = false,
-}: UrlToQrCodeSectionProps) => {
+}: QrCodeGeneratorProps) => {
   const { t } = useTranslation(['qrCode']);
   const { showMessage } = useSnackbar();
-  const [urlInput, setUrlInput] = useState('');
-  const [urlError, setUrlError] = useState('');
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
-  const [generating, setGenerating] = useState(false);
 
   const generateQrCodeFromUrl = useCallback(
     async (url: string) => {
       try {
-        setGenerating(true);
-        setUrlError('');
+        onGeneratingChange(true);
+        onInputErrorChange('');
 
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
           url = 'https://' + url;
@@ -57,40 +54,40 @@ const UrlToQrCodeSection = ({
           background: '#FFFFFF',
         });
 
-        setQrCodeDataUrl(qr.toDataURL());
+        onQrCodeDataUrlChange(qr.toDataURL());
         showMessage(t('qrCode:qrCodeSuccess'), { severity: 'success', autoHideDuration: 1000 });
       } catch (error) {
         console.error('生成二维码失败:', error);
         showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
       } finally {
-        setGenerating(false);
+        onGeneratingChange(false);
       }
     },
-    [t, showMessage],
+    [t, showMessage, onGeneratingChange, onInputErrorChange, onQrCodeDataUrlChange],
   );
 
   const handleContextMenuData = useCallback(
     (payload: string) => {
-      setUrlInput(payload);
+      onTextChange(payload);
       onExpandedChange(true);
       generateQrCodeFromUrl(payload);
     },
-    [onExpandedChange, generateQrCodeFromUrl],
+    [onExpandedChange, generateQrCodeFromUrl, onTextChange],
   );
 
   useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
 
   const handleUrlInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrlInput(e.target.value);
-    setUrlError('');
+    onTextChange(e.target.value);
+    onInputErrorChange('');
   };
 
   const generateQrCode = async () => {
-    if (!urlInput) {
-      setUrlError(t('qrCode:enterUrlError'));
+    if (!textToEncode) {
+      onInputErrorChange(t('qrCode:enterUrlError'));
       return;
     }
-    await generateQrCodeFromUrl(urlInput);
+    await generateQrCodeFromUrl(textToEncode);
   };
 
   const downloadQrCode = () => {
@@ -142,12 +139,12 @@ const UrlToQrCodeSection = ({
           <TextField
             label={t('qrCode:urlInputLabel')}
             placeholder={t('qrCode:urlInputPlaceholder')}
-            value={urlInput}
+            value={textToEncode}
             onChange={handleUrlInputChange}
             fullWidth
             variant="outlined"
-            error={!!urlError}
-            helperText={urlError}
+            error={!!inputError}
+            helperText={inputError}
             sx={qrCodePageStyles.INPUT_STYLE}
           />
 
@@ -161,38 +158,12 @@ const UrlToQrCodeSection = ({
             {generating ? t('qrCode:generating') : t('qrCode:generateButton')}
           </Button>
 
-          <Box className="qr-flex-grow" sx={qrCodePageStyles.QR_PREVIEW_CONTAINER}>
-            {qrCodeDataUrl ? (
-              <Box sx={qrCodePageStyles.QR_PREVIEW_INNER}>
-                <img src={qrCodeDataUrl} alt="QR Code" style={qrCodePageStyles.QR_PREVIEW_IMAGE} />
-                <Box sx={qrCodePageStyles.QR_PREVIEW_ACTIONS}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<DownloadIcon />}
-                    onClick={downloadQrCode}
-                    sx={qrCodePageStyles.DOWNLOAD_BUTTON}
-                  >
-                    {t('qrCode:downloadButton')}
-                  </Button>
-                  <Button
-                    variant="contained"
-                    startIcon={<ContentCopyIcon />}
-                    onClick={copyQrCode}
-                    sx={qrCodePageStyles.COPY_BUTTON}
-                  >
-                    {t('qrCode:copyQrButton')}
-                  </Button>
-                </Box>
-              </Box>
-            ) : (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={qrCodePageStyles.PLACEHOLDER_TEXT}
-              >
-                {t('qrCode:qrCodeWillShow')}
-              </Typography>
-            )}
+          <Box className="qr-flex-grow">
+            <QrCodePreview
+              qrCodeDataUrl={qrCodeDataUrl}
+              onDownload={downloadQrCode}
+              onCopy={copyQrCode}
+            />
           </Box>
         </Stack>
       </AccordionDetails>
