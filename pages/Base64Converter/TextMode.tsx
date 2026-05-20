@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
 import { textToBase64, base64ToText } from '@/utils/base64Converter';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
+import { useContextMenuData } from '@/utils/useContextMenuData';
 
 const IMAGE_DATA_URI_PATTERN = /^\s*data:image\//i;
 
@@ -25,6 +26,25 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   const [output, setOutput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [direction, setDirection] = useState<'encode' | 'decode'>('encode');
+
+  const handleContextMenuData = useCallback(
+    (payload: string) => {
+      setInput(payload);
+      setDirection('decode');
+      setError(null);
+      try {
+        const decoded = base64ToText(payload);
+        setOutput(decoded);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : '';
+        const i18nKey = ERROR_MESSAGE_TO_I18N[message];
+        setError(i18nKey ? t(i18nKey) : message || t('conversionFailed'));
+      }
+    },
+    [t],
+  );
+
+  useContextMenuData({ featureKey: 'base64Converter', onData: handleContextMenuData });
 
   const actionLabel = direction === 'encode' ? t('encode') : t('decode');
   const placeholder =

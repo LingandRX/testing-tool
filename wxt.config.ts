@@ -16,6 +16,7 @@ export default defineConfig({
       'tabs',
       'cookies',
       'sidePanel',
+      'contextMenus',
     ],
     host_permissions: ['<all_urls>'],
     action: {
