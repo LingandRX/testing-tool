@@ -7,13 +7,14 @@ import {
   useRef,
   useState,
 } from 'react';
-import type { PageType, StorageSchema } from '@/types/storage';
+import type { PageType, StorageSchema, ContextMenuPendingData } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
   getAllFeatureKeys,
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
 } from '@/config/features';
+import { saveContextMenuData, CONTEXT_MENU_DATA_EXPIRY_MS } from '@/utils/useContextMenuData';
 
 /**
  * 校验是否为合法的页面类型
@@ -187,6 +188,40 @@ export function RouterProvider({
       .then(() => {
         if (!cancelled) {
           setIsLoaded(true);
+
+          // 检查 URL 参数中的右键菜单数据
+          if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const feature = params.get('feature') as PageType | null;
+            const payload = params.get('payload');
+
+            if (feature && payload && isValidPage(feature)) {
+              saveContextMenuData({ featureKey: feature, payload }).catch(console.error);
+              navigateTo(feature);
+
+              // 清理 URL 参数
+              const url = new URL(window.location.href);
+              url.searchParams.delete('feature');
+              url.searchParams.delete('payload');
+              window.history.replaceState({}, '', url.toString());
+              return;
+            }
+          }
+
+          // 检查 storage 中的右键菜单待处理数据（用于 openPopup 场景）
+          storageUtil
+            .get('contextMenu/pendingData', undefined)
+            .then((pendingData) => {
+              if (
+                pendingData &&
+                isValidPage(pendingData.featureKey) &&
+                Date.now() - pendingData.timestamp < CONTEXT_MENU_DATA_EXPIRY_MS
+              ) {
+                navigateTo(pendingData.featureKey as PageType);
+                // 不在这里清除数据，让目标页面的 useContextMenuData 来消费和清除
+              }
+            })
+            .catch(console.error);
         }
       })
       .catch(console.error);
@@ -251,6 +286,18 @@ export function RouterProvider({
         const newOrder = changes[pageOrderKey as string].newValue;
         if (isValidPageList(newOrder)) {
           setPageOrder(newOrder);
+        }
+      }
+      // 监听右键菜单数据变化，自动跳转到对应页面（用于 popup 已打开的场景）
+      if (changes['contextMenu/pendingData']) {
+        const newData = changes['contextMenu/pendingData']
+          .newValue as ContextMenuPendingData | null;
+        if (
+          newData &&
+          isValidPage(newData.featureKey) &&
+          Date.now() - newData.timestamp < CONTEXT_MENU_DATA_EXPIRY_MS
+        ) {
+          setCurrentPage(newData.featureKey as PageType);
         }
       }
     };
