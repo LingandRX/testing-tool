@@ -9,8 +9,7 @@ import { useQrCodeContext } from '../contexts/QrCodeContext';
 export default function ParsePanel() {
   const { t } = useLazyTranslation('qrCode');
   const { showMessage } = useSnackbar();
-  const { parserState, setParserState, parseQrCode, handleFileChange, handleClearFile } =
-    useQrCodeContext();
+  const { parserState, setParserState, handleFileChange, handleClearFile } = useQrCodeContext();
 
   // 全局粘贴事件监听
   const handlePaste = useCallback(
@@ -77,21 +76,8 @@ export default function ParsePanel() {
           readOnly
           showClear={false}
           allowCopy
+          placeholder=""
           externalError={parserState.parseError}
-          actions={[
-            {
-              key: 'parse',
-              label: parserState.parsing ? t('qrCode:parsing') : t('qrCode:parseButton'),
-              type: 'primary',
-              position: 'bottom',
-              disabled: !parserState.selectedFile || parserState.parsing,
-              onClick: () => {
-                if (parserState.selectedFile) {
-                  parseQrCode(parserState.selectedFile);
-                }
-              },
-            },
-          ]}
           showMessage={showMessage}
         />
       </Grid>
