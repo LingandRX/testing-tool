@@ -1,5 +1,6 @@
 import { alpha, Box, Stack, SxProps, Theme, Typography, useTheme } from '@mui/material';
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
+import { getEntryPointType } from '@/config/features';
 
 /**
  * PageHeader 组件属性接口
@@ -64,6 +65,11 @@ export default function PageHeader({
 }: PageHeaderProps) {
   const theme = useTheme();
   const resolvedIconColor = iconColor ?? theme.palette.primary.main;
+  const entryPointType = useMemo(() => getEntryPointType(), []);
+
+  if (entryPointType === 'popup') {
+    return null;
+  }
 
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5, ...sx }}>
