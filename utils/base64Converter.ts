@@ -78,8 +78,8 @@ export function textToBase64(text: string): TextToBase64Result {
   };
 }
 
-/** 匹配 data URI 的 base64 前缀，如 "data:image/png;base64," */
-const DATA_URI_BASE64_PREFIX = /^data:[^;,]+;base64,/i;
+/** 匹配 data URI 的 base64 前缀，如 "data:image/png;base64,"（允许中间含参数） */
+const DATA_URI_BASE64_PREFIX = /^data:[^,]+;base64,/i;
 
 /**
  * 将 Base64 字符串解码为文本
@@ -208,7 +208,7 @@ export function fileToBase64(file: File): Promise<FileToBase64Result> {
  * @returns MIME 类型
  */
 export function extractMimeTypeFromDataUri(dataUri: string): string {
-  const match = dataUri.match(/^data:([^;]+);base64,/);
+  const match = dataUri.match(/^data:([^;,]+)[^,]*;base64,/);
   return match ? match[1] : 'application/octet-stream';
 }
 

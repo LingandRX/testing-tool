@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatSize, isRestrictedUrl } from '@/utils/storageCleaner';
+import { clearCookies, formatSize, isRestrictedUrl } from '@/utils/storageCleaner';
 
 describe('storageCleaner utils', () => {
   describe('isRestrictedUrl', () => {
@@ -78,6 +78,56 @@ describe('storageCleaner utils', () => {
       expect(formatSize(1)).toBe('1 B');
       expect(formatSize(1023)).toBe('1023 B');
       expect(formatSize(1025)).toBe('1.0 KB');
+    });
+  });
+
+  describe('clearCookies', () => {
+    it('should strip leading dot from cookie domain when removing cookies', async () => {
+      const mockCookies = [
+        { name: 'session', domain: '.example.com', path: '/', secure: true, storeId: '0' },
+        { name: 'auth', domain: '.example.com', path: '/api', secure: false, storeId: '0' },
+      ];
+      (chrome.cookies.getAll as any).mockResolvedValue(mockCookies);
+      (chrome.cookies.remove as any).mockResolvedValue(undefined);
+
+      const result = await clearCookies('https://example.com');
+
+      expect(result).toEqual({ success: true, count: 2 });
+      expect(chrome.cookies.remove).toHaveBeenCalledWith({
+        url: 'https://example.com/',
+        name: 'session',
+        storeId: '0',
+      });
+      expect(chrome.cookies.remove).toHaveBeenCalledWith({
+        url: 'http://example.com/api',
+        name: 'auth',
+        storeId: '0',
+      });
+    });
+
+    it('should handle domains without leading dot', async () => {
+      const mockCookies = [
+        { name: 'pref', domain: 'sub.example.com', path: '/path', secure: true, storeId: '0' },
+      ];
+      (chrome.cookies.getAll as any).mockResolvedValue(mockCookies);
+      (chrome.cookies.remove as any).mockResolvedValue(undefined);
+
+      const result = await clearCookies('https://sub.example.com');
+
+      expect(result).toEqual({ success: true, count: 1 });
+      expect(chrome.cookies.remove).toHaveBeenCalledWith({
+        url: 'https://sub.example.com/path',
+        name: 'pref',
+        storeId: '0',
+      });
+    });
+
+    it('should return error when operation fails', async () => {
+      (chrome.cookies.getAll as any).mockRejectedValue(new Error('Permission denied'));
+
+      const result = await clearCookies('https://example.com');
+
+      expect(result).toEqual({ success: false, error: 'Error: Permission denied' });
     });
   });
 });
