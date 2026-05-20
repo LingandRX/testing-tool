@@ -7,10 +7,10 @@ import { timestampPageStyles, ZONES } from '@/config/pageTheme';
 import LiveClock from './LiveClock';
 import ResultView from './ResultView';
 import { useTimestampConverter } from './useTimestampConverter';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 export default function Index() {
-  const { t } = useTranslation(['timestamp']);
+  const { t } = useLazyTranslation('timestamp');
   const {
     mode,
     tsInput,

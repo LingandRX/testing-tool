@@ -1,8 +1,9 @@
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
 import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
 import { Suspense, useMemo } from 'react';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
+import PageSkeleton from '@/components/PageSkeleton';
 
 export default function RouterContainer() {
   const { currentPage, isLoaded } = useRouter();
@@ -16,18 +17,7 @@ export default function RouterContainer() {
   }, []);
 
   if (!isLoaded) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-        }}
-      >
-        <CircularProgress size={32} />
-      </Box>
-    );
+    return <PageSkeleton variant={currentPage === 'dashboard' ? 'dashboard' : 'tool'} />;
   }
 
   const currentFeature = FEATURES.find((f) => f.key === currentPage);
@@ -47,19 +37,7 @@ export default function RouterContainer() {
       }}
     >
       <Suspense
-        fallback={
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flex: 1,
-              minHeight: 200,
-            }}
-          >
-            <CircularProgress size={32} />
-          </Box>
-        }
+        fallback={<PageSkeleton variant={currentPage === 'dashboard' ? 'dashboard' : 'tool'} />}
       >
         <PageErrorBoundary resetKey={currentPage}>{Component && <Component />}</PageErrorBoundary>
       </Suspense>

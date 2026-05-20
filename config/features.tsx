@@ -1,4 +1,5 @@
-import { type ComponentType, lazy, ReactNode } from 'react';
+import { type ComponentType, lazy } from 'react';
+import type { SvgIconProps } from '@mui/material/SvgIcon';
 import type { PageType } from '@/types/storage';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -38,8 +39,8 @@ export interface FeatureConfig {
   descriptionKey: string;
   /** 主题颜色键（用于仪表盘卡片，映射到 theme.palette[key].main） */
   themeColorKey?: PaletteColorKey;
-  /** 图标组件（用于仪表盘卡片） */
-  icon?: ReactNode;
+  /** 图标组件引用（用于仪表盘卡片，按需实例化） */
+  icon?: ComponentType<SvgIconProps>;
   /** 默认是否在仪表盘显示 */
   defaultVisible: boolean;
   /** 不同显示模式对应的组件 */
@@ -70,7 +71,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:timestamp.title',
     descriptionKey: 'features:timestamp.description',
     themeColorKey: 'primary',
-    icon: <AccessTimeIcon sx={{ fontSize: 20 }} />,
+    icon: AccessTimeIcon,
     defaultVisible: true,
     components: {
       popup: TimestampPage,
@@ -83,7 +84,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:storageCleaner.title',
     descriptionKey: 'features:storageCleaner.description',
     themeColorKey: 'warning',
-    icon: <StorageIcon sx={{ fontSize: 20 }} />,
+    icon: StorageIcon,
     defaultVisible: true,
     components: {
       popup: StorageCleanerPage,
@@ -96,7 +97,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:qrCode.title',
     descriptionKey: 'features:qrCode.description',
     themeColorKey: 'success',
-    icon: <QrCodeIcon sx={{ fontSize: 20 }} />,
+    icon: QrCodeIcon,
     defaultVisible: true,
     components: {
       popup: QrCodePage,
@@ -109,7 +110,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:textStatistics.title',
     descriptionKey: 'features:textStatistics.description',
     themeColorKey: 'secondary',
-    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
+    icon: DescriptionIcon,
     defaultVisible: true,
     components: {
       popup: TextStatisticsPage,
@@ -122,7 +123,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:jwt.title',
     descriptionKey: 'features:jwt.description',
     themeColorKey: 'info',
-    icon: <VpnKeyIcon sx={{ fontSize: 20 }} />,
+    icon: VpnKeyIcon,
     defaultVisible: true,
     components: {
       popup: JwtPage,
@@ -135,7 +136,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:jsonDiff.title',
     descriptionKey: 'features:jsonDiff.description',
     themeColorKey: 'primary',
-    icon: <CompareArrowsIcon sx={{ fontSize: 20 }} />,
+    icon: CompareArrowsIcon,
     defaultVisible: true,
     components: {
       popup: JsonToolsPage,
@@ -148,7 +149,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:base64Converter.title',
     descriptionKey: 'features:base64Converter.description',
     themeColorKey: 'info',
-    icon: <TransformIcon sx={{ fontSize: 20 }} />,
+    icon: TransformIcon,
     defaultVisible: true,
     components: {
       popup: Base64ConverterPage,
@@ -161,7 +162,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:markdownToHtml.title',
     descriptionKey: 'features:markdownToHtml.description',
     themeColorKey: 'secondary',
-    icon: <CodeIcon sx={{ fontSize: 20 }} />,
+    icon: CodeIcon,
     defaultVisible: true,
     components: {
       popup: MarkdownToHtmlPage,
@@ -174,7 +175,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:htmlToMarkdown.title',
     descriptionKey: 'features:htmlToMarkdown.description',
     themeColorKey: 'secondary',
-    icon: <ArticleIcon sx={{ fontSize: 20 }} />,
+    icon: ArticleIcon,
     defaultVisible: true,
     components: {
       popup: HtmlToMarkdownPage,

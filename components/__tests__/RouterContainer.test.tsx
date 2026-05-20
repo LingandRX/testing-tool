@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import RouterContainer from '@/components/RouterContainer';
 import { RouterProvider } from '@/providers/RouterProvider';
 import { SnackbarProvider } from '@/components/GlobalSnackbar';
@@ -37,10 +37,12 @@ describe('RouterContainer 组件', () => {
   };
 
   describe('渲染测试', () => {
-    it('isLoaded 为 false 时应渲染加载状态', () => {
+    it('isLoaded 为 false 时应渲染骨架屏', () => {
       mockRouterValue.isLoaded = false;
-      renderWithProvider(<RouterContainer />);
-      expect(screen.getByRole('progressbar')).toBeInTheDocument();
+      const { container } = renderWithProvider(<RouterContainer />);
+      // 骨架屏使用 Skeleton 组件
+      const skeletons = container.querySelectorAll('.MuiSkeleton-root');
+      expect(skeletons.length).toBeGreaterThan(0);
     });
 
     it('isLoaded 为 true 时应渲染页面内容', () => {

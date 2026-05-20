@@ -5,7 +5,7 @@ import TextInputArea from '@/components/TextInputArea';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
 import { textStatisticsPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 /**
  * 文本统计页面组件
@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
  * 提供实时的文本分析功能，包括字符数、单词数、行数和字节大小。
  */
 export default function Index() {
-  const { t } = useTranslation(['textStatistics']);
+  const { t } = useLazyTranslation('textStatistics');
   const [text, setText] = useState('');
 
   // 实时计算统计信息，使用 useMemo 优化性能

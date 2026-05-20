@@ -9,11 +9,11 @@ import StorageOptionsGrid from './StorageOptionsGrid';
 import AutoRefreshToggle from './AutoRefreshToggle';
 import ErrorDisplay from './ErrorDisplay';
 import CleaningResult from './CleaningResult';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 export default function Index() {
   const { showMessage } = useSnackbar();
-  const { t } = useTranslation(['storageCleaner']);
+  const { t } = useLazyTranslation('storageCleaner');
   const {
     domain,
     error,

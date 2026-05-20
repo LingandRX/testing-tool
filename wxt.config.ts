@@ -41,6 +41,9 @@ export default defineConfig({
           comments: false,
         },
       },
+
+      // 3. 调整 chunk 大小警告阈值
+      chunkSizeWarningLimit: 600,
     },
   }),
 });

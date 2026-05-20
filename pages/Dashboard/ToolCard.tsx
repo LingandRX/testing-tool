@@ -6,7 +6,8 @@
  */
 import { alpha, Box, Card, CardActionArea, Stack, Typography, useTheme } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import React from 'react';
+import type { SvgIconProps } from '@mui/material/SvgIcon';
+import type { ComponentType } from 'react';
 import type { PaletteColorKey } from '@/config/features';
 
 /**
@@ -21,8 +22,8 @@ interface ToolCardProps {
   snapshot?: React.ReactNode;
   /** 主题色键，映射到 theme.palette[key].main */
   colorKey: PaletteColorKey;
-  /** 工具图标元素 */
-  icon: React.ReactNode;
+  /** 图标组件引用 */
+  icon: ComponentType<SvgIconProps>;
   /** 卡片点击事件处理函数 */
   onClick: () => void;
 }
@@ -38,7 +39,7 @@ export default function ToolCard({
   description,
   snapshot,
   colorKey,
-  icon,
+  icon: IconComponent,
   onClick,
 }: ToolCardProps) {
   const theme = useTheme();
@@ -93,7 +94,7 @@ export default function ToolCard({
                 color: colorCode,
               }}
             >
-              {icon}
+              <IconComponent sx={{ fontSize: 20 }} />
             </Box>
             <Box>
               <Typography
