@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import type { PageType, StorageSchema } from '@/types/storage';
+import type { PageType, StorageSchema, ContextMenuPendingData } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
   getAllFeatureKeys,
@@ -286,6 +286,14 @@ export function RouterProvider({
         const newOrder = changes[pageOrderKey as string].newValue;
         if (isValidPageList(newOrder)) {
           setPageOrder(newOrder);
+        }
+      }
+      // 监听右键菜单数据变化，自动跳转到对应页面（用于 popup 已打开的场景）
+      if (changes['contextMenu/pendingData']) {
+        const newData = changes['contextMenu/pendingData']
+          .newValue as ContextMenuPendingData | null;
+        if (newData && isValidPage(newData.featureKey) && Date.now() - newData.timestamp < 5000) {
+          setCurrentPage(newData.featureKey as PageType);
         }
       }
     };
