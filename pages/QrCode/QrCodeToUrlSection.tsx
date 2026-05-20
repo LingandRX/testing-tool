@@ -20,8 +20,9 @@ import ClearIcon from '@mui/icons-material/Clear';
 import CopyButton from '@/components/CopyButton';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import { useSnackbar } from '@/components/GlobalSnackbar';
-import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
+import { parseQrCodeFromFile, parseQrCodeFromUrl } from '@/utils/qrCodeParser';
 import { useTranslation } from 'react-i18next';
+import { useContextMenuData } from '@/utils/useContextMenuData';
 
 interface QrCodeToUrlSectionProps {
   expanded: boolean;
@@ -45,6 +46,39 @@ const QrCodeToUrlSection = ({
   const [dragging, setDragging] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 处理右键菜单传递的图片 URL
+  const handleContextMenuData = useCallback(
+    async (imageUrl: string) => {
+      try {
+        setParsing(true);
+        setParseError('');
+        setParsedUrl('');
+        setPreviewUrl(imageUrl);
+
+        const result = await parseQrCodeFromUrl(imageUrl);
+
+        if (result.success && result.data) {
+          setParsedUrl(result.data);
+          showMessage(t('qrCode:parseSuccess'), { severity: 'success', autoHideDuration: 1000 });
+        } else {
+          setParseError(result.error || t('qrCode:noQrDetected'));
+          showMessage(result.error || t('qrCode:noQrDetected'), {
+            severity: 'error',
+            autoHideDuration: 1000,
+          });
+        }
+      } catch (error) {
+        console.error('解析二维码失败:', error);
+        showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
+      } finally {
+        setParsing(false);
+      }
+    },
+    [showMessage, t],
+  );
+
+  useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
 
   // 清理预览 URL，防止内存泄漏
   useEffect(() => {
