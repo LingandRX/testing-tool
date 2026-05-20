@@ -14,6 +14,7 @@ import {
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
 } from '@/config/features';
+import { saveContextMenuData } from '@/utils/useContextMenuData';
 
 /**
  * 校验是否为合法的页面类型
@@ -187,6 +188,24 @@ export function RouterProvider({
       .then(() => {
         if (!cancelled) {
           setIsLoaded(true);
+
+          // 检查 URL 参数中的右键菜单数据
+          if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const feature = params.get('feature') as PageType | null;
+            const payload = params.get('payload');
+
+            if (feature && payload && isValidPage(feature)) {
+              saveContextMenuData({ featureKey: feature, payload }).catch(console.error);
+              navigateTo(feature);
+
+              // 清理 URL 参数
+              const url = new URL(window.location.href);
+              url.searchParams.delete('feature');
+              url.searchParams.delete('payload');
+              window.history.replaceState({}, '', url.toString());
+            }
+          }
         }
       })
       .catch(console.error);

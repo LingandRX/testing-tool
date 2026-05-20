@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { alpha, Box, Container, Grid, Paper, Typography } from '@mui/material';
 import PageHeader from '@/components/PageHeader';
 import TextInputArea from '@/components/TextInputArea';
@@ -6,6 +6,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
 import { textStatisticsPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useContextMenuData } from '@/utils/useContextMenuData';
 
 /**
  * 文本统计页面组件
@@ -15,6 +16,12 @@ import { useLazyTranslation } from '@/utils/useLazyTranslation';
 export default function Index() {
   const { t } = useLazyTranslation('textStatistics');
   const [text, setText] = useState('');
+
+  const handleContextMenuData = useCallback((payload: string) => {
+    setText(payload);
+  }, []);
+
+  useContextMenuData({ featureKey: 'textStatistics', onData: handleContextMenuData });
 
   // 实时计算统计信息，使用 useMemo 优化性能
   // 对于 10,000 字符以上的文本，Intl.Segmenter 也能保持良好的性能
