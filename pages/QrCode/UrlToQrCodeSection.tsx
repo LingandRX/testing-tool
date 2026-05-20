@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -18,6 +18,7 @@ import QRious from 'qrious';
 import { qrCodePageStyles } from '@/config/pageTheme';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { useTranslation } from 'react-i18next';
+import { useContextMenuData } from '@/utils/useContextMenuData';
 
 interface UrlToQrCodeSectionProps {
   expanded: boolean;
@@ -38,6 +39,47 @@ const UrlToQrCodeSection = ({
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [generating, setGenerating] = useState(false);
 
+  const generateQrCodeFromUrl = useCallback(
+    async (url: string) => {
+      try {
+        setGenerating(true);
+        setUrlError('');
+
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+
+        const qr = new QRious({
+          value: url,
+          size: 250,
+          level: 'H',
+          foreground: '#000000',
+          background: '#FFFFFF',
+        });
+
+        setQrCodeDataUrl(qr.toDataURL());
+        showMessage(t('qrCode:qrCodeSuccess'), { severity: 'success', autoHideDuration: 1000 });
+      } catch (error) {
+        console.error('生成二维码失败:', error);
+        showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
+      } finally {
+        setGenerating(false);
+      }
+    },
+    [t, showMessage],
+  );
+
+  const handleContextMenuData = useCallback(
+    (payload: string) => {
+      setUrlInput(payload);
+      onExpandedChange(true);
+      generateQrCodeFromUrl(payload);
+    },
+    [onExpandedChange, generateQrCodeFromUrl],
+  );
+
+  useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
+
   const handleUrlInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUrlInput(e.target.value);
     setUrlError('');
@@ -48,33 +90,7 @@ const UrlToQrCodeSection = ({
       setUrlError(t('qrCode:enterUrlError'));
       return;
     }
-
-    try {
-      setGenerating(true);
-      setUrlError('');
-
-      let url = urlInput;
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-
-      // 使用 QRious 替代 qrcode 库，体积更小
-      const qr = new QRious({
-        value: url,
-        size: 250,
-        level: 'H',
-        foreground: '#000000',
-        background: '#FFFFFF',
-      });
-
-      setQrCodeDataUrl(qr.toDataURL());
-      showMessage(t('qrCode:qrCodeSuccess'), { severity: 'success', autoHideDuration: 1000 });
-    } catch (error) {
-      console.error('生成二维码失败:', error);
-      showMessage(t('qrCode:parseError'), { severity: 'error', autoHideDuration: 300 });
-    } finally {
-      setGenerating(false);
-    }
+    await generateQrCodeFromUrl(urlInput);
   };
 
   const downloadQrCode = () => {
