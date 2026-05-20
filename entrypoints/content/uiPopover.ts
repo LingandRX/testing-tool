@@ -1,0 +1,247 @@
+const POPOVER_ID = 'testing-tools-popover';
+const POPOVER_STYLE_ID = 'testing-tools-popover-style';
+
+function injectStyles(): void {
+  if (document.getElementById(POPOVER_STYLE_ID)) return;
+
+  const style = document.createElement('style');
+  style.id = POPOVER_STYLE_ID;
+  style.textContent = `
+    #${POPOVER_ID} {
+      position: fixed;
+      z-index: 2147483647;
+      max-width: 400px;
+      min-width: 200px;
+      padding: 12px 16px;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      pointer-events: none;
+    }
+
+    #${POPOVER_ID}.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    #${POPOVER_ID} .popover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #${POPOVER_ID} .popover-title {
+      font-weight: 600;
+      font-size: 12px;
+      color: #a0a0b0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #${POPOVER_ID} .popover-close {
+      background: none;
+      border: none;
+      color: #808090;
+      cursor: pointer;
+      padding: 2px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    #${POPOVER_ID} .popover-close:hover {
+      color: #e0e0e0;
+    }
+
+    #${POPOVER_ID} .popover-content {
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+
+    #${POPOVER_ID} .popover-label {
+      color: #808090;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    #${POPOVER_ID} .popover-value {
+      color: #ffffff;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    #${POPOVER_ID} .popover-value:last-child {
+      margin-bottom: 0;
+    }
+
+    #${POPOVER_ID} .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    #${POPOVER_ID} .stat-item {
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    #${POPOVER_ID} .stat-label {
+      font-size: 11px;
+      color: #808090;
+    }
+
+    #${POPOVER_ID} .stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function getOrCreatePopover(): HTMLElement {
+  let popover = document.getElementById(POPOVER_ID);
+  if (!popover) {
+    injectStyles();
+    popover = document.createElement('div');
+    popover.id = POPOVER_ID;
+    document.body.appendChild(popover);
+  }
+  return popover;
+}
+
+function positionPopover(popover: HTMLElement, x: number, y: number): void {
+  const rect = popover.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  let left = x;
+  let top = y;
+
+  if (left + rect.width > viewportWidth - 16) {
+    left = viewportWidth - rect.width - 16;
+  }
+  if (left < 16) {
+    left = 16;
+  }
+
+  if (top + rect.height > viewportHeight - 16) {
+    top = y - rect.height - 8;
+  }
+  if (top < 16) {
+    top = 16;
+  }
+
+  popover.style.left = `${left}px`;
+  popover.style.top = `${top}px`;
+}
+
+let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+
+export function showPopover(
+  x: number,
+  y: number,
+  content: string,
+  title?: string,
+  duration: number = 5000,
+): void {
+  const popover = getOrCreatePopover();
+
+  const titleHtml = title
+    ? `<div class="popover-header">
+         <span class="popover-title">${title}</span>
+         <button class="popover-close" onclick="this.closest('#${POPOVER_ID}').classList.remove('visible')">&times;</button>
+       </div>`
+    : '';
+
+  popover.innerHTML = `
+    ${titleHtml}
+    <div class="popover-content">${content}</div>
+  `;
+
+  popover.classList.remove('visible');
+
+  requestAnimationFrame(() => {
+    positionPopover(popover, x, y);
+    popover.classList.add('visible');
+  });
+
+  if (hideTimeout) {
+    clearTimeout(hideTimeout);
+  }
+
+  if (duration > 0) {
+    hideTimeout = setTimeout(() => {
+      hidePopover();
+    }, duration);
+  }
+}
+
+export function hidePopover(): void {
+  const popover = document.getElementById(POPOVER_ID);
+  if (popover) {
+    popover.classList.remove('visible');
+  }
+  if (hideTimeout) {
+    clearTimeout(hideTimeout);
+    hideTimeout = null;
+  }
+}
+
+export function showTimestampResult(x: number, y: number, timestamp: string, result: string): void {
+  const content = `
+    <div class="popover-label">输入时间戳</div>
+    <div class="popover-value">${timestamp}</div>
+    <div class="popover-label">转换结果</div>
+    <div class="popover-value">${result}</div>
+  `;
+  showPopover(x, y, content, '⏰ 时间戳转换');
+}
+
+export function showTextStatsResult(
+  x: number,
+  y: number,
+  text: string,
+  stats: { characters: number; words: number; lines: number; bytes: number },
+): void {
+  const truncatedText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+  const content = `
+    <div class="popover-label">选中文本</div>
+    <div class="popover-value">${truncatedText}</div>
+    <div class="stat-grid">
+      <div class="stat-item">
+        <div class="stat-label">字符</div>
+        <div class="stat-value">${stats.characters}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">单词</div>
+        <div class="stat-value">${stats.words}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">行数</div>
+        <div class="stat-value">${stats.lines}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">字节</div>
+        <div class="stat-value">${stats.bytes}</div>
+      </div>
+    </div>
+  `;
+  showPopover(x, y, content, '📊 文本统计');
+}
