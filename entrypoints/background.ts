@@ -10,9 +10,15 @@ export default defineBackground(() => {
 
   browser.contextMenus.onClicked.addListener(async (info, _tab) => {
     const result = parseContextMenuClick(info.menuItemId as string, info);
-    if (!result) return;
 
-    const { featureKey, payload } = result;
+    if (!result.success || !result.data) {
+      if (result.error) {
+        console.warn('[Context Menu]', result.error);
+      }
+      return;
+    }
+
+    const { featureKey, payload } = result.data;
 
     try {
       const sidePanelState = await browser.storage.local.get('sidePanelOpen');

@@ -3,6 +3,7 @@ import {
   CONTEXT_MENU_CONFIGS,
   createAllContextMenus,
   parseContextMenuClick,
+  MAX_PAYLOAD_LENGTH,
 } from '@/utils/contextMenu';
 
 describe('contextMenu', () => {
@@ -96,19 +97,33 @@ describe('contextMenu', () => {
       const result = parseContextMenuClick('qrCode-image', info);
 
       expect(result).toEqual({
-        featureKey: 'qrCode',
-        payload: 'https://example.com/image.png',
+        success: true,
+        data: { featureKey: 'qrCode', payload: 'https://example.com/image.png' },
       });
     });
 
-    it('当点击 qrCode-image 菜单但没有 srcUrl 时应返回空字符串', () => {
+    it('当图片为 Base64 内联图时应返回错误', () => {
+      const info = createMockOnClickData({
+        srcUrl:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      });
+
+      const result = parseContextMenuClick('qrCode-image', info);
+
+      expect(result).toEqual({
+        success: false,
+        error: '无法识别 Base64 内联图片，请使用图片文件 URL',
+      });
+    });
+
+    it('当点击 qrCode-image 菜单但没有 srcUrl 时应返回成功', () => {
       const info = createMockOnClickData({});
 
       const result = parseContextMenuClick('qrCode-image', info);
 
       expect(result).toEqual({
-        featureKey: 'qrCode',
-        payload: '',
+        success: true,
+        data: { featureKey: 'qrCode', payload: '' },
       });
     });
 
@@ -120,8 +135,8 @@ describe('contextMenu', () => {
       const result = parseContextMenuClick('qrCode-page', info);
 
       expect(result).toEqual({
-        featureKey: 'qrCode',
-        payload: 'https://example.com/page',
+        success: true,
+        data: { featureKey: 'qrCode', payload: 'https://example.com/page' },
       });
     });
 
@@ -133,8 +148,8 @@ describe('contextMenu', () => {
       const result = parseContextMenuClick('jwt', info);
 
       expect(result).toEqual({
-        featureKey: 'jwt',
-        payload: 'selected text',
+        success: true,
+        data: { featureKey: 'jwt', payload: 'selected text' },
       });
     });
 
@@ -146,8 +161,8 @@ describe('contextMenu', () => {
       const result = parseContextMenuClick('timestamp', info);
 
       expect(result).toEqual({
-        featureKey: 'timestamp',
-        payload: '1234567890',
+        success: true,
+        data: { featureKey: 'timestamp', payload: '1234567890' },
       });
     });
 
@@ -159,19 +174,22 @@ describe('contextMenu', () => {
       const result = parseContextMenuClick('storageCleaner', info);
 
       expect(result).toEqual({
-        featureKey: 'storageCleaner',
-        payload: 'https://example.com',
+        success: true,
+        data: { featureKey: 'storageCleaner', payload: 'https://example.com' },
       });
     });
 
-    it('当没有 selectionText 和 pageUrl 时应返回 null', () => {
+    it('当没有 selectionText 和 pageUrl 时应返回错误', () => {
       const info = createMockOnClickData({
         pageUrl: undefined,
       });
 
       const result = parseContextMenuClick('someMenu', info);
 
-      expect(result).toBeNull();
+      expect(result).toEqual({
+        success: false,
+        error: '无法获取有效数据',
+      });
     });
 
     it('selectionText 优先于 pageUrl', () => {
@@ -183,8 +201,34 @@ describe('contextMenu', () => {
       const result = parseContextMenuClick('jwt', info);
 
       expect(result).toEqual({
-        featureKey: 'jwt',
-        payload: 'selected text',
+        success: true,
+        data: { featureKey: 'jwt', payload: 'selected text' },
+      });
+    });
+
+    it('当文本超过最大长度限制时应截断', () => {
+      const longText = 'a'.repeat(MAX_PAYLOAD_LENGTH + 1000);
+      const info = createMockOnClickData({
+        selectionText: longText,
+      });
+
+      const result = parseContextMenuClick('textStatistics', info);
+
+      expect(result.success).toBe(true);
+      expect(result.data?.payload.length).toBe(MAX_PAYLOAD_LENGTH);
+    });
+
+    it('当文本未超过最大长度限制时应保持原样', () => {
+      const shortText = 'short text';
+      const info = createMockOnClickData({
+        selectionText: shortText,
+      });
+
+      const result = parseContextMenuClick('textStatistics', info);
+
+      expect(result).toEqual({
+        success: true,
+        data: { featureKey: 'textStatistics', payload: 'short text' },
       });
     });
   });
