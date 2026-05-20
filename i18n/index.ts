@@ -4,60 +4,20 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { storageUtil } from '@/utils/chromeStorage';
 import dayjs from 'dayjs';
 
-// 导入语言文件
+// 同步加载全局命名空间（所有页面都需要）
 import commonZh from './locales/zh/common.json';
 import featuresZh from './locales/zh/features.json';
 import commonEn from './locales/en/common.json';
 import featuresEn from './locales/en/features.json';
-import timestampZh from './locales/zh/timestamp.json';
-import timestampEn from './locales/en/timestamp.json';
-import storageCleanerZh from './locales/zh/storageCleaner.json';
-import storageCleanerEn from './locales/en/storageCleaner.json';
-import qrCodeZh from './locales/zh/qrCode.json';
-import qrCodeEn from './locales/en/qrCode.json';
-import textStatisticsZh from './locales/zh/textStatistics.json';
-import textStatisticsEn from './locales/en/textStatistics.json';
-import jwtZh from './locales/zh/jwt.json';
-import jwtEn from './locales/en/jwt.json';
-import jsonDiffZh from './locales/zh/jsonDiff.json';
-import jsonDiffEn from './locales/en/jsonDiff.json';
-import jsonFormatZh from './locales/zh/jsonFormat.json';
-import jsonFormatEn from './locales/en/jsonFormat.json';
-import base64ConverterZh from './locales/zh/base64Converter.json';
-import base64ConverterEn from './locales/en/base64Converter.json';
-import markdownToHtmlZh from './locales/zh/markdownToHtml.json';
-import markdownToHtmlEn from './locales/en/markdownToHtml.json';
-import htmlToMarkdownZh from './locales/zh/htmlToMarkdown.json';
-import htmlToMarkdownEn from './locales/en/htmlToMarkdown.json';
 
 const resources = {
   zh: {
     common: commonZh,
     features: featuresZh,
-    timestamp: timestampZh,
-    storageCleaner: storageCleanerZh,
-    qrCode: qrCodeZh,
-    textStatistics: textStatisticsZh,
-    jwt: jwtZh,
-    jsonDiff: jsonDiffZh,
-    jsonFormat: jsonFormatZh,
-    base64Converter: base64ConverterZh,
-    markdownToHtml: markdownToHtmlZh,
-    htmlToMarkdown: htmlToMarkdownZh,
   },
   en: {
     common: commonEn,
     features: featuresEn,
-    timestamp: timestampEn,
-    storageCleaner: storageCleanerEn,
-    qrCode: qrCodeEn,
-    textStatistics: textStatisticsEn,
-    jwt: jwtEn,
-    jsonDiff: jsonDiffEn,
-    jsonFormat: jsonFormatEn,
-    base64Converter: base64ConverterEn,
-    markdownToHtml: markdownToHtmlEn,
-    htmlToMarkdown: htmlToMarkdownEn,
   },
 };
 
@@ -120,20 +80,7 @@ i18n
     resources,
     fallbackLng: 'en',
     lng: syncLng || undefined,
-    ns: [
-      'common',
-      'features',
-      'timestamp',
-      'storageCleaner',
-      'qrCode',
-      'textStatistics',
-      'jwt',
-      'jsonDiff',
-      'jsonFormat',
-      'base64Converter',
-      'markdownToHtml',
-      'htmlToMarkdown',
-    ],
+    ns: ['common', 'features'],
     defaultNS: 'common',
     debug: false,
     interpolation: {

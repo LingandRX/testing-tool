@@ -2,7 +2,7 @@ import { Box, Container, Stack } from '@mui/material';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ImageIcon from '@mui/icons-material/Image';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
 import { base64ConverterPageStyles } from '@/config/pageTheme';
 import { useStorageState } from '@/utils/useStorageState';
@@ -20,7 +20,7 @@ const isValidPageMode = (val: unknown): val is Base64ConverterPageMode =>
 type PageMode = Base64ConverterPageMode;
 
 export default function Index() {
-  const { t } = useTranslation(['base64Converter']);
+  const { t } = useLazyTranslation('base64Converter');
   const [pageMode, setPageMode] = useStorageState(
     'base64Converter/pageMode',
     'text',

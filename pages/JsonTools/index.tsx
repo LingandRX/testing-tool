@@ -4,7 +4,7 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import TransformIcon from '@mui/icons-material/Transform';
 import CompressIcon from '@mui/icons-material/Compress';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
 import { jsonDiffPageStyles } from '@/config/pageTheme';
 import JsonDiffInput from './JsonDiffInput';
@@ -46,7 +46,7 @@ const isValidPageMode = (val: unknown): val is JsonToolsPageMode =>
 type PageMode = JsonToolsPageMode;
 
 export default function Index() {
-  const { t } = useTranslation(['jsonDiff', 'jsonFormat']);
+  const { t } = useLazyTranslation(['jsonDiff', 'jsonFormat']);
   const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
   const [leftInput, setLeftInput] = useState('');
   const [rightInput, setRightInput] = useState('');
