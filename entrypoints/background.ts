@@ -32,7 +32,7 @@ export default defineBackground(() => {
       // sidepanel 未打开或无法通信，继续执行其他方案
     }
 
-    const optionsUrl = chrome.runtime.getURL('/entrypoints/options/index.html');
+    const optionsUrl = chrome.runtime.getURL('/options.html');
     const params = new URLSearchParams({ feature: featureKey, payload });
     await browser.tabs.create({ url: `${optionsUrl}?${params.toString()}` });
   });
