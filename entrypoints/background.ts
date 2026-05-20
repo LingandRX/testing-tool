@@ -32,9 +32,9 @@ export default defineBackground(() => {
       // sidepanel 未打开或无法通信，继续执行其他方案
     }
 
-    const optionsUrl = chrome.runtime.getURL('/options.html');
+    const popupUrl = chrome.runtime.getURL('/popup.html');
     const params = new URLSearchParams({ feature: featureKey, payload });
-    await browser.tabs.create({ url: `${optionsUrl}?${params.toString()}` });
+    await browser.tabs.create({ url: `${popupUrl}?${params.toString()}` });
   });
 
   // 监听扩展图标点击事件，打开侧边栏
