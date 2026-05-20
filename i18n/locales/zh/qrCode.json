@@ -5,8 +5,8 @@
   "generateMode": "生成二维码",
   "parseMode": "解析二维码",
 
-  "urlToQr": "URL 转二维码",
-  "qrToUrl": "二维码转 URL",
+  "urlToQr": "文本转二维码",
+  "qrToUrl": "二维码转文本",
 
   "urlInputLabel": "输入 URL 或文本",
   "urlInputPlaceholder": "请输入 URL 或文本内容，将自动生成二维码",

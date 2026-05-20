@@ -5,8 +5,8 @@
   "generateMode": "Generate QR Code",
   "parseMode": "Parse QR Code",
 
-  "urlToQr": "URL to QR Code",
-  "qrToUrl": "QR Code to URL",
+  "urlToQr": "Text to QR Code",
+  "qrToUrl": "QR Code to Text",
 
   "urlInputLabel": "Enter URL or Text",
   "urlInputPlaceholder": "Enter URL or text content, QR code will be generated automatically",
