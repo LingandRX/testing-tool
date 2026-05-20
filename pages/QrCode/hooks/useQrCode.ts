@@ -162,13 +162,19 @@ export function useQrCode(): QrCodeContextValue {
   // 处理文件选择
   const handleFileChange = useCallback(
     (file: File) => {
-      setParserState((prev) => ({
-        ...prev,
-        selectedFile: file,
-        previewUrl: URL.createObjectURL(file),
-        decodedResult: '',
-        parseError: '',
-      }));
+      setParserState((prev) => {
+        // 释放旧的预览 URL
+        if (prev.previewUrl) {
+          URL.revokeObjectURL(prev.previewUrl);
+        }
+        return {
+          ...prev,
+          selectedFile: file,
+          previewUrl: URL.createObjectURL(file),
+          decodedResult: '',
+          parseError: '',
+        };
+      });
       // 自动解析
       parseQrCode(file);
     },
