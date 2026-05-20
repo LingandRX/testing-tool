@@ -2,6 +2,7 @@ import '../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
 import { MessageAction, onMessage, sendMessage } from '@/utils/messages';
 import { createAllContextMenus, parseContextMenuClick } from '@/utils/contextMenu';
+import { saveContextMenuData } from '@/utils/useContextMenuData';
 
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
@@ -32,9 +33,15 @@ export default defineBackground(() => {
       // sidepanel 未打开或无法通信，继续执行其他方案
     }
 
-    const popupUrl = chrome.runtime.getURL('/popup.html');
-    const params = new URLSearchParams({ feature: featureKey, payload });
-    await browser.tabs.create({ url: `${popupUrl}?${params.toString()}` });
+    // 保存数据到 storage，popup 打开后会读取
+    await saveContextMenuData({ featureKey, payload });
+
+    // 打开 popup 弹窗
+    try {
+      await browser.action.openPopup();
+    } catch (err) {
+      console.error('[Context Menu] 打开 popup 失败:', err);
+    }
   });
 
   // 监听扩展图标点击事件，打开侧边栏
