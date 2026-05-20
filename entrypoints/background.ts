@@ -41,6 +41,8 @@ export default defineBackground(() => {
       await browser.action.openPopup();
     } catch (err) {
       console.error('[Context Menu] 打开 popup 失败:', err);
+      // 打开失败时清除残留数据，避免下次打开 popup 时误触发
+      await chrome.storage.local.remove('contextMenu/pendingData');
     }
   });
 
