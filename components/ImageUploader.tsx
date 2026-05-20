@@ -36,15 +36,6 @@ const ImageUploader = ({
   const { showMessage } = useSnackbar();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 清理预览 URL，防止内存泄漏
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
   const handleFileChange = useCallback(
     (file: File) => {
       onFileChange(file);
