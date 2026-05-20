@@ -685,8 +685,8 @@ export const qrCodePageStyles = {
     width: '100%',
   } as const,
   QR_PREVIEW_IMAGE: {
-    maxWidth: '100%',
-    height: 'auto',
+    width: 250,
+    height: 250,
     display: 'block',
   } as const,
   QR_PREVIEW_ACTIONS: {
@@ -719,7 +719,7 @@ export const qrCodePageStyles = {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: 200,
+      height: 250,
       border: '2px dashed',
       borderColor: dragging || hasFile ? 'success.main' : 'divider',
       borderRadius: 3,

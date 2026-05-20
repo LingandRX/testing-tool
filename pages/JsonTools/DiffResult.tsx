@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { jsonDiffPageStyles, surfaceTint } from '@/config/pageTheme';
 import JsonTree from './JsonTree';
 import type { DiffNode, DiffResult as DiffResultType, DiffType, ViewMode } from './types';
@@ -12,7 +12,7 @@ interface DiffResultProps {
 }
 
 export default function DiffResult({ result, viewMode, activePath }: DiffResultProps) {
-  const { t } = useTranslation(['jsonDiff']);
+  const { t } = useLazyTranslation('jsonDiff');
 
   if (viewMode === 'sideBySide') {
     return (

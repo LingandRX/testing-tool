@@ -1,7 +1,7 @@
 import { Box, IconButton, Typography } from '@mui/material';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { jsonDiffPageStyles } from '@/config/pageTheme';
 
 interface DiffNavigatorProps {
@@ -13,7 +13,7 @@ interface DiffNavigatorProps {
 }
 
 export default function DiffNavigator({ total, currentIndex, onPrev, onNext }: DiffNavigatorProps) {
-  const { t } = useTranslation(['jsonDiff']);
+  const { t } = useLazyTranslation('jsonDiff');
 
   if (total === 0) {
     return (

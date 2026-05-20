@@ -3,6 +3,7 @@ import { defineExtensionMessaging } from '@webext-core/messaging';
 export enum MessageAction {
   RELOAD_TAB = 'reloadTab',
   SIDE_PANEL_STATE_CHANGED = 'sidePanelStateChanged',
+  CONTEXT_MENU_CLICKED = 'contextMenuClicked',
 }
 
 export interface MessageResponse {
@@ -11,9 +12,15 @@ export interface MessageResponse {
   error?: string;
 }
 
+export interface ContextMenuClickedPayload {
+  featureKey: string;
+  payload: string;
+}
+
 export interface ProtocolMap {
   [MessageAction.RELOAD_TAB](data: { tabId: number; delay?: number }): MessageResponse;
   [MessageAction.SIDE_PANEL_STATE_CHANGED](data: { isOpen: boolean }): void;
+  [MessageAction.CONTEXT_MENU_CLICKED](data: ContextMenuClickedPayload): void;
 }
 
 export const { sendMessage, onMessage } = defineExtensionMessaging<ProtocolMap>();

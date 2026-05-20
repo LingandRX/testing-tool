@@ -5,7 +5,7 @@ import CopyButton from '@/components/CopyButton';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import type { UnitType } from '@/config/pageTheme';
 import { timestampPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface LiveClockProps {
   unit: UnitType;
@@ -14,7 +14,7 @@ interface LiveClockProps {
 
 const LiveClock = React.memo(({ unit, onUseNow }: LiveClockProps) => {
   const [now, setNow] = useState(() => Date.now());
-  const { t } = useTranslation(['timestamp']);
+  const { t } = useLazyTranslation('timestamp');
   const { showMessage } = useSnackbar();
   const onUseNowRef = useRef(onUseNow);
 
