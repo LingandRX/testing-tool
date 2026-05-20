@@ -128,7 +128,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
             <Typography variant="caption" fontWeight={700} color="text.secondary">
               {outputLabel}
             </Typography>
-            <CopyButton text={output} showMessage={(_msg, _opts) => {}} />
+            <CopyButton text={output} />
           </Stack>
           <TextInputArea
             readOnly
