@@ -12,7 +12,15 @@ export interface ContextMenuClickedInfo {
   payload: string;
 }
 
+export interface ParseResult {
+  success: boolean;
+  data?: ContextMenuClickedInfo;
+  error?: string;
+}
+
 const PARENT_MENU_ID = 'testing-tools-parent';
+
+export const MAX_PAYLOAD_LENGTH = 10000;
 
 export const CONTEXT_MENU_CONFIGS: ContextMenuItemConfig[] = [
   {
@@ -78,36 +86,54 @@ export function createAllContextMenus(): void {
 export function parseContextMenuClick(
   menuItemId: string,
   info: chrome.contextMenus.OnClickData,
-): ContextMenuClickedInfo | null {
+): ParseResult {
   const featureKey = menuItemId as PageType;
 
   if (menuItemId === 'qrCode-image') {
+    const srcUrl = info.srcUrl || '';
+
+    if (srcUrl.startsWith('data:image/')) {
+      return {
+        success: false,
+        error: '无法识别 Base64 内联图片，请使用图片文件 URL',
+      };
+    }
+
     return {
-      featureKey: 'qrCode',
-      payload: info.srcUrl || '',
+      success: true,
+      data: { featureKey: 'qrCode', payload: srcUrl },
     };
   }
 
   if (menuItemId === 'qrCode-page') {
     return {
-      featureKey: 'qrCode',
-      payload: info.pageUrl || '',
+      success: true,
+      data: { featureKey: 'qrCode', payload: info.pageUrl || '' },
     };
   }
 
   if (info.selectionText) {
+    const text = info.selectionText;
+
+    if (text.length > MAX_PAYLOAD_LENGTH) {
+      return {
+        success: true,
+        data: { featureKey, payload: text.substring(0, MAX_PAYLOAD_LENGTH) },
+      };
+    }
+
     return {
-      featureKey,
-      payload: info.selectionText,
+      success: true,
+      data: { featureKey, payload: text },
     };
   }
 
   if (info.pageUrl) {
     return {
-      featureKey,
-      payload: info.pageUrl,
+      success: true,
+      data: { featureKey, payload: info.pageUrl },
     };
   }
 
-  return null;
+  return { success: false, error: '无法获取有效数据' };
 }
