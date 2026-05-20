@@ -1,7 +1,7 @@
 import { Box, Checkbox, Typography } from '@mui/material';
 import { formatSize } from '@/utils/storageCleaner';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface OptionItemProps {
   labelKey: string;
@@ -18,7 +18,7 @@ export default function OptionItem({
   isCount = false,
   onChange,
 }: OptionItemProps) {
-  const { t } = useTranslation(['storageCleaner']);
+  const { t } = useLazyTranslation('storageCleaner');
   return (
     <Box sx={storageCleanerPageStyles.OPTION_ITEM(checked)}>
       <Box sx={{ flex: 1, minWidth: 0, mr: 1.5 }}>

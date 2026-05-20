@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Box, Container, Paper, Stack, Typography } from '@mui/material';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
@@ -7,6 +7,7 @@ import { stringifyJson, parseJwt } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useContextMenuData } from '@/utils/useContextMenuData';
 
 interface SectionProps {
   title: string;
@@ -60,6 +61,13 @@ export default function Index() {
   const { showMessage } = useSnackbar();
   const { t } = useLazyTranslation('jwt');
   const [jwtInput, setJwtInput] = useState('');
+
+  const handleContextMenuData = useCallback((payload: string) => {
+    const cleaned = payload.replace(/^Bearer\s*/i, '').trim();
+    setJwtInput(cleaned);
+  }, []);
+
+  useContextMenuData({ featureKey: 'jwt', onData: handleContextMenuData });
 
   const result = useMemo(() => {
     if (!jwtInput.trim()) {

@@ -1,5 +1,6 @@
-import { alpha, Box, Stack, SxProps, Theme, Typography } from '@mui/material';
-import { ReactNode } from 'react';
+import { alpha, Box, Stack, SxProps, Theme, Typography, useTheme } from '@mui/material';
+import { ReactNode, useMemo } from 'react';
+import { getEntryPointType } from '@/config/features';
 
 /**
  * PageHeader 组件属性接口
@@ -7,7 +8,7 @@ import { ReactNode } from 'react';
 export interface PageHeaderProps {
   /** 要显示的图标组件 */
   icon: ReactNode;
-  /** 图标的颜色，默认为 '#1976d2'（蓝色） */
+  /** 图标的颜色，默认使用主题 primary.main 色 */
   iconColor?: string;
   /** 主标题文本 */
   title: string;
@@ -53,7 +54,7 @@ export interface PageHeaderProps {
  */
 export default function PageHeader({
   icon,
-  iconColor = '#1976d2',
+  iconColor,
   title,
   subtitle,
   badge,
@@ -62,6 +63,14 @@ export default function PageHeader({
   subtitleSx,
   sx,
 }: PageHeaderProps) {
+  const theme = useTheme();
+  const resolvedIconColor = iconColor ?? theme.palette.primary.main;
+  const entryPointType = useMemo(() => getEntryPointType(), []);
+
+  if (entryPointType === 'popup') {
+    return null;
+  }
+
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5, ...sx }}>
       {/* 图标容器 */}
@@ -69,8 +78,8 @@ export default function PageHeader({
         sx={{
           p: 1,
           borderRadius: 2.5,
-          bgcolor: alpha(iconColor, 0.1),
-          color: iconColor,
+          bgcolor: alpha(resolvedIconColor, 0.1),
+          color: resolvedIconColor,
           display: 'flex',
           ...iconSx,
         }}

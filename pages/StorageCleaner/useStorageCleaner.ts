@@ -18,7 +18,7 @@ import {
   isRestrictedUrl,
 } from '@/utils/storageCleaner';
 import { MessageAction, sendMessage } from '@/utils/messages';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
   localStorage: true,
@@ -66,7 +66,7 @@ export interface UseStorageCleanerOptions {
 export function useStorageCleaner({
   showMessage,
 }: UseStorageCleanerOptions): UseStorageCleanerReturn {
-  const { t } = useTranslation(['storageCleaner', 'common']);
+  const { t } = useLazyTranslation(['storageCleaner', 'common']);
   const [domain, setDomain] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
