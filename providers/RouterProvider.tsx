@@ -14,7 +14,7 @@ import {
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
 } from '@/config/features';
-import { saveContextMenuData, clearContextMenuData } from '@/utils/useContextMenuData';
+import { saveContextMenuData } from '@/utils/useContextMenuData';
 
 /**
  * 校验是否为合法的页面类型
@@ -218,7 +218,7 @@ export function RouterProvider({
                 Date.now() - pendingData.timestamp < 5000
               ) {
                 navigateTo(pendingData.featureKey as PageType);
-                clearContextMenuData().catch(console.error);
+                // 不在这里清除数据，让目标页面的 useContextMenuData 来消费和清除
               }
             })
             .catch(console.error);
