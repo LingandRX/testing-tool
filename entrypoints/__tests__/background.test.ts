@@ -42,14 +42,14 @@ describe('background 菜单注册与分流', () => {
       );
     });
 
-    it('应该创建图片二维码识别子菜单', () => {
+    it('应该创建网页链接转二维码子菜单', () => {
       createAllContextMenus();
 
       expect(chrome.contextMenus.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: 'qrCode-image',
-          title: '🖼️ 识别图中的二维码',
-          contexts: ['image'],
+          id: 'qrCode-page',
+          title: '🔗 网页链接转二维码',
+          contexts: ['page'],
         }),
       );
     });
@@ -76,35 +76,6 @@ describe('background 菜单注册与分流', () => {
       expect(result).toEqual({
         success: true,
         data: { featureKey: 'jwt', payload: 'test-token' },
-      });
-    });
-
-    it('当点击 qrCode-image 时应返回 qrCode 功能和 srcUrl', () => {
-      const info = createMockOnClickData({
-        menuItemId: 'qrCode-image',
-        srcUrl: 'https://example.com/image.png',
-      });
-
-      const result = parseContextMenuClick('qrCode-image', info);
-
-      expect(result).toEqual({
-        success: true,
-        data: { featureKey: 'qrCode', payload: 'https://example.com/image.png' },
-      });
-    });
-
-    it('当图片为 Base64 内联图时应返回错误', () => {
-      const info = createMockOnClickData({
-        menuItemId: 'qrCode-image',
-        srcUrl:
-          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-      });
-
-      const result = parseContextMenuClick('qrCode-image', info);
-
-      expect(result).toEqual({
-        success: false,
-        error: '无法识别 Base64 内联图片，请使用图片文件 URL',
       });
     });
 
