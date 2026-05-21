@@ -7,20 +7,14 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { getTheme } from '@/config/theme';
 import { storageUtil } from '@/utils/chromeStorage';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type ResolvedThemeMode = 'light' | 'dark';
 
 interface ThemeModeContextType {
-  /** 用户显式选择的模式（含 system） */
   mode: ThemeMode;
-  /** 实际解析后的模式（不含 system） */
   resolvedMode: ResolvedThemeMode;
-  /** 切换模式 */
   setMode: (mode: ThemeMode) => void;
 }
 
@@ -57,9 +51,6 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
   const [resolvedMode, setResolvedMode] = useState<ResolvedThemeMode>(
     mode === 'system' ? getSystemMode() : mode,
   );
-  const [, setIsLoaded] = useState(false);
-
-  const muiTheme = useMemo(() => getTheme(resolvedMode), [resolvedMode]);
 
   const updateResolved = useCallback((nextMode: ThemeMode) => {
     setResolvedMode(nextMode === 'system' ? getSystemMode() : nextMode);
@@ -75,7 +66,6 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
     [updateResolved],
   );
 
-  // 异步校准：从 chrome.storage 读取持久化值
   useEffect(() => {
     let cancelled = false;
     storageUtil
@@ -87,16 +77,12 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
           updateResolved(saved);
         }
       })
-      .catch(console.error)
-      .finally(() => {
-        if (!cancelled) setIsLoaded(true);
-      });
+      .catch(console.error);
     return () => {
       cancelled = true;
     };
   }, [updateResolved]);
 
-  // 监听系统主题变化（仅在 system 模式下生效）
   useEffect(() => {
     if (mode !== 'system') return;
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -107,7 +93,6 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
     return () => mq.removeEventListener('change', handler);
   }, [mode]);
 
-  // 跨入口同步：监听 chrome.storage.onChanged
   useEffect(() => {
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
       if (changes[THEME_MODE_KEY]) {
@@ -122,19 +107,16 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
   }, [mode, updateResolved]);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', resolvedMode === 'dark');
+  }, [resolvedMode]);
+
   const contextValue = useMemo(
     () => ({ mode, resolvedMode, setMode }),
     [mode, resolvedMode, setMode],
   );
 
-  return (
-    <ThemeModeContext.Provider value={contextValue}>
-      <ThemeProvider theme={muiTheme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
-    </ThemeModeContext.Provider>
-  );
+  return <ThemeModeContext.Provider value={contextValue}>{children}</ThemeModeContext.Provider>;
 }
 
 export function useThemeMode(): ThemeModeContextType {
