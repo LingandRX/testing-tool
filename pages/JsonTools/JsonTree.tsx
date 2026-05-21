@@ -1,7 +1,4 @@
-import { Box, Collapse, useTheme } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { surfaceTint } from '@/config/pageTheme';
 import type { DiffNode, DiffType } from './types';
 
 export type TreeSide = 'left' | 'right';
@@ -43,19 +40,19 @@ const getValueForSide = (node: DiffNode, side: TreeSide): unknown => {
   return side === 'left' ? node.oldValue : node.newValue;
 };
 
-const getRowBg = (type: DiffType, side: TreeSide, theme: Theme): string | undefined => {
+const getRowBg = (type: DiffType, side: TreeSide): string | undefined => {
   if (!shouldRenderOnSide(type, side)) return undefined;
-  if (type === 'added') return surfaceTint(theme, theme.palette.success.main, 0.15);
-  if (type === 'removed') return surfaceTint(theme, theme.palette.error.main, 0.15);
-  if (type === 'modified') return surfaceTint(theme, theme.palette.warning.main, 0.15);
+  if (type === 'added') return 'bg-green-50';
+  if (type === 'removed') return 'bg-red-50';
+  if (type === 'modified') return 'bg-amber-50';
   return undefined;
 };
 
 const getValueColor = (type: DiffType, side: TreeSide): string | undefined => {
   if (!shouldRenderOnSide(type, side)) return undefined;
-  if (type === 'added') return 'success.main';
-  if (type === 'removed') return 'error.main';
-  if (type === 'modified') return 'warning.main';
+  if (type === 'added') return 'text-green-600';
+  if (type === 'removed') return 'text-red-600';
+  if (type === 'modified') return 'text-amber-600';
   return undefined;
 };
 
@@ -74,7 +71,6 @@ const NodeRow = ({
   // 'auto' = follow defaults + activePath; otherwise user explicitly toggled
   const [override, setOverride] = useState<'auto' | 'open' | 'closed'>('auto');
   const rowRef = useRef<HTMLDivElement | null>(null);
-  const theme = useTheme();
 
   const onActivePath = Boolean(
     activePath &&
@@ -99,13 +95,17 @@ const NodeRow = ({
 
   if (!shouldRenderOnSide(node.type, side)) {
     // 渲染占位空行以保持左右两侧高度一致
-    return <Box sx={{ pl: depth * 1.5, color: 'transparent', userSelect: 'none' }}>·</Box>;
+    return (
+      <div className="text-transparent select-none" style={{ paddingLeft: `${depth * 1.5}rem` }}>
+        ·
+      </div>
+    );
   }
 
   const value = getValueForSide(node, side);
   const isContainer = isContainerValue(value) && Array.isArray(node.children);
   const isArray = Array.isArray(value);
-  const bg = getRowBg(node.type, side, theme);
+  const bg = getRowBg(node.type, side);
   const valueColor = getValueColor(node.type, side);
   const isActive = activePath === node.path;
 
@@ -116,50 +116,29 @@ const NodeRow = ({
     const open = isArray ? '[' : '{';
     const close = isArray ? ']' : '}';
     return (
-      <Box ref={rowRef}>
-        <Box
+      <div ref={rowRef}>
+        <div
           onClick={() => setOverride(expanded ? 'closed' : 'open')}
-          sx={{
-            cursor: 'pointer',
-            pl: depth * 1.5,
-            pr: 1,
-            py: 0.2,
-            bgcolor: bg,
-            outline: isActive ? '2px solid' : 'none',
-            outlineColor: 'primary.main',
-            borderRadius: 0.5,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            whiteSpace: 'nowrap',
-            '&:hover': { bgcolor: bg ?? 'action.hover' },
-          }}
+          className={`cursor-pointer pr-1 py-0.5 ${bg ?? ''} ${
+            isActive ? 'ring-2 ring-blue-500 rounded' : ''
+          } flex items-center gap-1 whitespace-nowrap hover:${bg ? 'bg-opacity-80' : 'bg-gray-50'}`}
+          style={{ paddingLeft: `${depth * 1.5}rem` }}
         >
-          <Box component="span" sx={{ width: 12, color: 'text.secondary', fontSize: '0.7rem' }}>
-            {expanded ? '▾' : '▸'}
-          </Box>
+          <span className="w-3 text-gray-500 text-[11px]">{expanded ? '▾' : '▸'}</span>
           {!isRoot && (
-            <Box component="span" sx={{ color: 'text.primary', fontWeight: 700 }}>
-              {isArrayKeyDisplay(node.key)}:
-            </Box>
+            <span className="text-gray-900 font-bold">{isArrayKeyDisplay(node.key)}:</span>
           )}
-          <Box component="span" sx={{ color: 'text.secondary' }}>
-            {open}
-          </Box>
+          <span className="text-gray-500">{open}</span>
+          {!expanded && <span className="text-gray-400 italic">{summarize(value)}</span>}
           {!expanded && (
-            <Box component="span" sx={{ color: 'text.disabled', fontStyle: 'italic' }}>
-              {summarize(value)}
-            </Box>
-          )}
-          {!expanded && (
-            <Box component="span" sx={{ color: 'text.secondary' }}>
+            <span className="text-gray-500">
               {close}
               {isLastChild ? '' : ','}
-            </Box>
+            </span>
           )}
-        </Box>
-        <Collapse in={expanded} unmountOnExit>
-          <Box>
+        </div>
+        {expanded && (
+          <div>
             {node.children.map((child, idx) => (
               <NodeRow
                 key={child.path}
@@ -171,52 +150,37 @@ const NodeRow = ({
                 isLastChild={idx === node.children!.length - 1}
               />
             ))}
-          </Box>
-          <Box
-            sx={{
-              pl: depth * 1.5,
-              color: 'text.secondary',
-              whiteSpace: 'nowrap',
-              ml: '17px',
-            }}
+          </div>
+        )}
+        {expanded && (
+          <div
+            className="text-gray-500 whitespace-nowrap"
+            style={{ paddingLeft: `${depth * 1.5 + 1.0625}rem` }}
           >
             {close}
             {isLastChild ? '' : ','}
-          </Box>
-        </Collapse>
-      </Box>
+          </div>
+        )}
+      </div>
     );
   }
 
   // 叶子节点
   return (
-    <Box
+    <div
       ref={rowRef}
-      sx={{
-        pl: depth * 1.5,
-        pr: 1,
-        py: 0.2,
-        bgcolor: bg,
-        outline: isActive ? '2px solid' : 'none',
-        outlineColor: 'primary.main',
-        borderRadius: 0.5,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0.5,
-        whiteSpace: 'nowrap',
-      }}
+      className={`pr-1 py-0.5 ${bg ?? ''} ${
+        isActive ? 'ring-2 ring-blue-500 rounded' : ''
+      } flex items-center gap-1 whitespace-nowrap`}
+      style={{ paddingLeft: `${depth * 1.5}rem` }}
     >
-      <Box component="span" sx={{ width: 12 }} />
-      {!isRoot && (
-        <Box component="span" sx={{ color: 'text.primary', fontWeight: 700 }}>
-          {isArrayKeyDisplay(node.key)}:
-        </Box>
-      )}
-      <Box component="span" sx={{ color: valueColor ?? 'text.primary' }}>
+      <span className="w-3" />
+      {!isRoot && <span className="text-gray-900 font-bold">{isArrayKeyDisplay(node.key)}:</span>}
+      <span className={valueColor ?? 'text-gray-900'}>
         {formatPrimitive(value)}
         {isLastChild ? '' : ','}
-      </Box>
-    </Box>
+      </span>
+    </div>
   );
 };
 
@@ -242,21 +206,7 @@ export default function JsonTree({
 }: JsonTreeProps) {
   const sideKey = useMemo(() => side, [side]);
   return (
-    <Box
-      sx={{
-        p: 1.5,
-        borderRadius: 3,
-        bgcolor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider',
-        fontFamily: 'monospace',
-        fontSize: '0.8rem',
-        overflowX: 'auto',
-        minHeight: 200,
-        maxHeight: 480,
-        overflowY: 'auto',
-      }}
-    >
+    <div className="p-3 rounded-lg bg-white border border-gray-200 font-mono text-sm overflow-x-auto min-h-[200px] max-h-[480px] overflow-y-auto">
       <NodeRow
         node={node}
         side={sideKey}
@@ -265,7 +215,7 @@ export default function JsonTree({
         activePath={activePath}
         isLastChild
       />
-    </Box>
+    </div>
   );
 }
 
