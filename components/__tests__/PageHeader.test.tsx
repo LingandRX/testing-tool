@@ -1,19 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import CloseIcon from '@mui/icons-material/Close';
 import { render, screen } from '@testing-library/react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import PageHeader, { type PageHeaderProps } from '@/components/PageHeader';
 
 vi.mock('@/config/features', () => ({
   getEntryPointType: vi.fn(() => 'sidepanel'),
 }));
-
-const theme = createTheme();
-
-function renderWithTheme(ui: React.ReactElement) {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>);
-}
 
 describe('PageHeader 组件系统', () => {
   beforeEach(() => {
@@ -26,99 +17,75 @@ describe('PageHeader 组件系统', () => {
   });
 
   const defaultProps: PageHeaderProps = {
-    icon: <AccessTimeIcon />,
+    icon: <span data-testid="test-icon">⏰</span>,
     title: '时间戳转换',
     subtitle: 'Unix 毫秒数转换与格式化',
   };
 
   describe('PageHeader UI 渲染', () => {
     it('应渲染页面标题栏&副标题', () => {
-      renderWithTheme(<PageHeader {...defaultProps} />);
+      render(<PageHeader {...defaultProps} />);
       expect(screen.getByText('时间戳转换')).toBeInTheDocument();
       expect(screen.getByText('Unix 毫秒数转换与格式化')).toBeInTheDocument();
     });
 
     it('应渲染图标', () => {
-      renderWithTheme(<PageHeader {...defaultProps} />);
-      expect(screen.getByTestId('AccessTimeIcon')).toBeInTheDocument();
+      render(<PageHeader {...defaultProps} />);
+      expect(screen.getByTestId('test-icon')).toBeInTheDocument();
     });
 
     it('应渲染自定义图标&图标颜色', () => {
-      renderWithTheme(<PageHeader {...defaultProps} icon={<CloseIcon />} iconColor="#FF0000" />);
-      expect(screen.getByTestId('CloseIcon')).toBeInTheDocument();
-      expect(screen.getByTestId('CloseIcon')).toHaveStyle('color: #FF0000;');
+      render(
+        <PageHeader
+          {...defaultProps}
+          icon={<span data-testid="custom-icon">X</span>}
+          iconColor="#FF0000"
+        />,
+      );
+      expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
     });
 
-    it('应默认使用主题 primary 色', () => {
-      renderWithTheme(<PageHeader {...defaultProps} icon={<CloseIcon />} />);
-      expect(screen.getByTestId('CloseIcon')).toHaveStyle(`color: ${theme.palette.primary.main};`);
+    it('应默认使用蓝色作为 primary 色', () => {
+      render(<PageHeader {...defaultProps} />);
+      const iconContainer = screen.getByTestId('test-icon').parentElement;
+      expect(iconContainer).toHaveStyle('background-color: #3b82f615');
+      expect(iconContainer).toHaveStyle('color: #3b82f6');
     });
 
     it('应渲染 badge 组件', () => {
       const badge = <span data-testid="test-badge">New</span>;
-      renderWithTheme(<PageHeader {...defaultProps} badge={badge} />);
+      render(<PageHeader {...defaultProps} badge={badge} />);
       expect(screen.getByTestId('test-badge')).toBeInTheDocument();
-      expect(screen.getByText('New')).toBeInTheDocument();
     });
 
-    it('应渲染 badge 与 title 并排布局', () => {
-      const badge = <span data-testid="side-badge">v1.0</span>;
-      renderWithTheme(<PageHeader {...defaultProps} badge={badge} />);
+    it('应支持自定义 iconSx', () => {
+      render(<PageHeader {...defaultProps} iconSx={{ borderRadius: '8px' }} />);
+      const iconContainer = screen.getByTestId('test-icon').parentElement;
+      expect(iconContainer).toHaveStyle('border-radius: 8px');
+    });
+
+    it('应支持自定义 titleSx', () => {
+      render(<PageHeader {...defaultProps} titleSx={{ fontSize: '1.2rem' }} />);
       const title = screen.getByText('时间戳转换');
-      const badgeEl = screen.getByTestId('side-badge');
-      expect(title).toBeInTheDocument();
-      expect(badgeEl).toBeInTheDocument();
-    });
-  });
-
-  describe('PageHeader 条件渲染', () => {
-    it('subtitle 为 undefined 时不应渲染副标题', () => {
-      const { container } = renderWithTheme(
-        <PageHeader icon={<AccessTimeIcon />} title="仅标题" />,
-      );
-      const captionElements = container.querySelectorAll('p');
-      expect(captionElements.length).toBe(0);
+      expect(title).toHaveStyle('font-size: 1.2rem');
     });
 
-    it('subtitle 为空字符串时不应渲染副标题', () => {
-      const { container } = renderWithTheme(
-        <PageHeader icon={<AccessTimeIcon />} title="标题" subtitle="" />,
-      );
-      const captionElements = container.querySelectorAll('p');
-      expect(captionElements.length).toBe(0);
+    it('应支持自定义 subtitleSx', () => {
+      render(<PageHeader {...defaultProps} subtitleSx={{ color: 'red' }} />);
+      const subtitle = screen.getByText('Unix 毫秒数转换与格式化');
+      expect(subtitle).toHaveStyle('color: rgb(255, 0, 0)');
     });
 
-    it('badge 为 undefined 时不应渲染 badge 区域', () => {
-      renderWithTheme(<PageHeader {...defaultProps} />);
-      expect(screen.queryByText('v1.0')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('PageHeader 样式扩展', () => {
-    it('iconSx 应作为属性传递给图标容器', () => {
-      const { container } = renderWithTheme(
-        <PageHeader {...defaultProps} iconSx={{ border: '2px solid red' }} />,
-      );
-      const iconContainer = container.querySelector('div');
-      expect(iconContainer).toBeTruthy();
-    });
-
-    it('titleSx 应作为属性传递给标题', () => {
-      renderWithTheme(<PageHeader {...defaultProps} titleSx={{ fontWeight: 'bold' }} />);
-      const titleEl = screen.getByText('时间戳转换');
-      expect(titleEl).toBeInTheDocument();
-    });
-
-    it('subtitleSx 应作为属性传递给副标题', () => {
-      renderWithTheme(<PageHeader {...defaultProps} subtitleSx={{ color: 'red' }} />);
-      const subtitleEl = screen.getByText('Unix 毫秒数转换与格式化');
-      expect(subtitleEl).toBeInTheDocument();
-    });
-
-    it('sx 应作为属性传递给外层容器', () => {
-      const { container } = renderWithTheme(<PageHeader {...defaultProps} sx={{ mt: 3 }} />);
+    it('应支持自定义 sx', () => {
+      const { container } = render(<PageHeader {...defaultProps} sx={{ marginBottom: '2rem' }} />);
       const outerElement = container.firstChild;
-      expect(outerElement).toBeTruthy();
+      expect(outerElement).toHaveStyle('margin-bottom: 2rem');
+    });
+
+    it('无副标题时不渲染副标题区域', () => {
+      const { container } = render(<PageHeader icon={defaultProps.icon} title="仅标题" />);
+      const subtitles = container.querySelectorAll('.text-gray-500');
+      expect(subtitles.length).toBe(0);
     });
   });
 
@@ -127,7 +94,7 @@ describe('PageHeader 组件系统', () => {
       const { getEntryPointType } = await import('@/config/features');
       vi.mocked(getEntryPointType).mockReturnValue('popup');
 
-      const { container } = renderWithTheme(<PageHeader {...defaultProps} />);
+      const { container } = render(<PageHeader {...defaultProps} />);
       expect(container.innerHTML).toBe('');
     });
   });

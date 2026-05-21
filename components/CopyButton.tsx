@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { IconButton, Tooltip } from '@mui/material';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import CheckIcon from '@mui/icons-material/Check';
+import { Copy, Check } from 'lucide-react';
 import { copyTextToClipboard } from '@/utils/clipboard';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
@@ -66,34 +64,41 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
     }
   };
 
+  const sizeClasses = {
+    small: 'h-8 w-8',
+    medium: 'h-10 w-10',
+    large: 'h-12 w-12',
+  };
+
+  const iconSize = size === 'small' ? 14 : size === 'medium' ? 16 : 18;
+
+  const colorClasses: Record<string, string> = {
+    primary: 'text-blue-600 hover:bg-blue-50',
+    secondary: 'text-gray-600 hover:bg-gray-50',
+    success: 'text-green-600 hover:bg-green-50',
+    error: 'text-red-600 hover:bg-red-50',
+    info: 'text-blue-600 hover:bg-blue-50',
+    warning: 'text-amber-600 hover:bg-amber-50',
+  };
+
+  const colorClass = colorClasses[color] || `text-[${color}] hover:bg-gray-50`;
+
   return (
-    <Tooltip title={tooltip}>
-      <IconButton
-        size={size}
-        onClick={handleCopy}
-        style={style}
-        sx={{
-          color: copied ? 'success.main' : color,
-          bgcolor: 'background.paper',
-          boxShadow: (theme) =>
-            `0 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)'}`,
-          '&:hover': {
-            bgcolor: copied
-              ? 'success.main'
-              : !['primary', 'secondary', 'success', 'error', 'info', 'warning'].includes(color)
-                ? color
-                : `${color}.main`,
-            color: 'background.paper',
-          },
-        }}
-      >
-        {copied ? (
-          <CheckIcon fontSize={size === 'small' ? 'small' : 'medium'} />
-        ) : (
-          <ContentCopyIcon fontSize={size === 'small' ? 'small' : 'medium'} />
-        )}
-      </IconButton>
-    </Tooltip>
+    <button
+      type="button"
+      onClick={handleCopy}
+      title={tooltip}
+      style={style}
+      className={`${sizeClasses[size]} rounded-md flex items-center justify-center transition-all ${
+        copied ? 'text-green-600 bg-green-50' : colorClass
+      } bg-white shadow-sm hover:shadow-md`}
+    >
+      {copied ? (
+        <Check style={{ width: iconSize, height: iconSize }} />
+      ) : (
+        <Copy style={{ width: iconSize, height: iconSize }} />
+      )}
+    </button>
   );
 };
 

@@ -1,8 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import { Box, Button, Paper, Typography } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   children: ReactNode;
@@ -45,75 +43,30 @@ export class PageErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            p: 3,
-            minHeight: 200,
-          }}
-        >
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              textAlign: 'center',
-              borderRadius: 4,
-              border: '1px solid',
-              borderColor: 'error.light',
-              bgcolor: 'rgba(211, 47, 47, 0.04)',
-              maxWidth: 400,
-              width: '100%',
-            }}
-          >
-            <ErrorOutlineIcon color="error" sx={{ fontSize: 48, mb: 1.5 }} />
-            <Typography variant="h6" fontWeight={700} gutterBottom color="error.main">
-              该页面加载失败
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <div className="flex flex-col items-center justify-center flex-1 p-4 min-h-[200px]">
+          <div className="p-6 text-center rounded-xl border border-red-200 bg-red-50 max-w-md w-full">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-red-600 mb-2">该页面加载失败</h3>
+            <p className="text-sm text-gray-500 mb-4">
               页面在加载或渲染时遇到错误，您可以重试或切换到其他工具。
-            </Typography>
+            </p>
             {this.state.error && (
-              <Box
-                sx={{
-                  mb: 2,
-                  p: 1.5,
-                  bgcolor: (theme: Theme) =>
-                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.100',
-                  borderRadius: 2,
-                  textAlign: 'left',
-                  maxHeight: '160px',
-                  overflow: 'auto',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  component="pre"
-                  sx={{
-                    fontFamily: 'monospace',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-all',
-                    color: 'error.dark',
-                  }}
-                >
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg text-left max-h-[160px] overflow-auto">
+                <pre className="font-mono text-xs whitespace-pre-wrap break-all text-red-700">
                   {this.state.error.toString()}
-                </Typography>
-              </Box>
+                </pre>
+              </div>
             )}
             <Button
-              variant="contained"
-              color="error"
-              startIcon={<RefreshIcon />}
+              variant="default"
               onClick={this.handleRetry}
-              sx={{ borderRadius: 2, fontWeight: 700 }}
+              className="rounded-lg font-bold bg-red-600 hover:bg-red-700 text-white"
             >
+              <RefreshCw className="mr-2 h-4 w-4" />
               重试
             </Button>
-          </Paper>
-        </Box>
+          </div>
+        </div>
       );
     }
 

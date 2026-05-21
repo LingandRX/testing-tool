@@ -2,13 +2,13 @@
  * DecodeResultPaper
  *
  * FileMode 与 ImageMode 通用的 decode 结果展示组件。
- * 提取了二者 decode 输出区完全一致的 Paper 结构：
+ * 提取了二者 decode 输出区完全一致的结构：
  *   标题 → 可选预览（children）→ 文件信息 → 文件名输入 → 下载按钮
  *
  * FileMode 直接使用，ImageMode 通过 children 传入图片预览。
  */
-import { alpha, Button, Paper, Stack, TextField, Typography } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
+import { Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { formatFileSize } from '@/utils/base64Converter';
 import { useTranslation } from 'react-i18next';
 
@@ -41,59 +41,46 @@ export default function DecodeResultPaper({
   const { t } = useTranslation('base64Converter');
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 2,
-        borderRadius: 3,
-        bgcolor: (theme) => alpha(theme.palette.info.main, 0.04),
-        border: '1px solid',
-        borderColor: (theme) => alpha(theme.palette.info.main, 0.15),
-      }}
-    >
+    <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
       {/* 标题 */}
-      <Typography
-        variant="caption"
-        fontWeight={700}
-        color="text.secondary"
-        sx={{ mb: 1, display: 'block' }}
-      >
-        {title}
-      </Typography>
+      <span className="block mb-2 text-xs font-bold text-gray-500">{title}</span>
 
       {/* 可选预览内容（ImageMode 的图片） */}
       {children}
 
       {/* 文件信息 */}
-      <Stack direction="row" spacing={2} sx={{ mb: 1.5 }}>
-        <Typography variant="caption" color="text.disabled">
+      <div className="flex gap-4 mb-3">
+        <span className="text-xs text-gray-400">
           {t('inferredMimeType')}: {mimeType}
-        </Typography>
-        <Typography variant="caption" color="text.disabled">
+        </span>
+        <span className="text-xs text-gray-400">
           {t('decodedSize')}: {formatFileSize(blobSize)}
-        </Typography>
-      </Stack>
+        </span>
+      </div>
 
       {/* 文件名输入 */}
-      <TextField
-        size="small"
-        fullWidth
-        label={t('decodedFileName')}
-        value={fileName}
-        onChange={(e) => onFileNameChange(e.target.value)}
-        sx={{ mb: 1.5 }}
-      />
+      <div className="mb-3">
+        <label className="block text-xs font-medium text-gray-500 mb-1">
+          {t('decodedFileName')}
+        </label>
+        <input
+          type="text"
+          value={fileName}
+          onChange={(e) => onFileNameChange(e.target.value)}
+          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
 
       {/* 下载按钮 */}
       <Button
-        variant="contained"
+        variant="default"
         onClick={onDownload}
-        startIcon={<DownloadIcon />}
         disabled={!fileName.trim()}
-        sx={{ borderRadius: 3, fontWeight: 700 }}
+        className="w-full rounded-lg font-bold"
       >
+        <Download className="mr-2 h-4 w-4" />
         {t('download')}
       </Button>
-    </Paper>
+    </div>
   );
 }
