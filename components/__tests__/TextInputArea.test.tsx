@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import TextInputArea from '@/components/TextInputArea';
 
 describe('TextInputArea 组件', () => {
@@ -107,38 +108,32 @@ describe('TextInputArea 组件', () => {
     });
 
     it('复制时调用 showMessage', async () => {
+      const user = userEvent.setup();
       const showMessage = vi.fn();
-      Object.assign(navigator, {
-        clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
-      });
+      const writeTextSpy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
       render(
         <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
       );
 
-      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
+      await user.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('测试');
-      await vi.waitFor(() => {
-        expect(showMessage).toHaveBeenCalledWith('messages.copySuccess', { severity: 'success' });
-      });
+      expect(writeTextSpy).toHaveBeenCalledWith('测试');
+      expect(showMessage).toHaveBeenCalledWith('messages.copySuccess', { severity: 'success' });
     });
 
     it('复制失败时调用 showMessage 错误提示', async () => {
+      const user = userEvent.setup();
       const showMessage = vi.fn();
-      Object.assign(navigator, {
-        clipboard: { writeText: vi.fn().mockRejectedValue(new Error('失败')) },
-      });
+      vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('失败'));
 
       render(
         <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
       );
 
-      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
+      await user.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
-      await vi.waitFor(() => {
-        expect(showMessage).toHaveBeenCalledWith('messages.copyError', { severity: 'error' });
-      });
+      expect(showMessage).toHaveBeenCalledWith('messages.copyError', { severity: 'error' });
     });
   });
 
@@ -377,19 +372,16 @@ describe('TextInputArea 组件', () => {
 
   describe('showMessage prop', () => {
     it('复制成功时调用 showMessage', async () => {
+      const user = userEvent.setup();
       const showMessage = vi.fn();
-      Object.assign(navigator, {
-        clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
-      });
+      vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
       render(
         <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
       );
-      fireEvent.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
+      await user.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
-      await vi.waitFor(() => {
-        expect(showMessage).toHaveBeenCalledWith('messages.copySuccess', { severity: 'success' });
-      });
+      expect(showMessage).toHaveBeenCalledWith('messages.copySuccess', { severity: 'success' });
     });
   });
 
