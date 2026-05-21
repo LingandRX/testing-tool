@@ -1,7 +1,7 @@
 import { type ComponentType, lazy } from 'react';
 import type { SvgIconProps } from '@mui/material/SvgIcon';
 import type { PageType } from '@/types/storage';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { Clock } from 'lucide-react';
 import StorageIcon from '@mui/icons-material/Storage';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -71,7 +71,7 @@ export const FEATURES: FeatureConfig[] = [
     labelKey: 'features:timestamp.title',
     descriptionKey: 'features:timestamp.description',
     themeColorKey: 'primary',
-    icon: AccessTimeIcon,
+    icon: Clock,
     defaultVisible: true,
     components: {
       popup: TimestampPage,
