@@ -1,6 +1,4 @@
-import { Box, Container, Typography } from '@mui/material';
-import WarningIcon from '@mui/icons-material/Warning';
-import { storageCleanerPageStyles } from '@/config/pageTheme';
+import { AlertCircle } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface ErrorDisplayProps {
@@ -10,35 +8,16 @@ interface ErrorDisplayProps {
 export default function ErrorDisplay({ error }: ErrorDisplayProps) {
   const { t } = useLazyTranslation('storageCleaner');
   return (
-    <Container sx={storageCleanerPageStyles.ERROR_DISPLAY_CONTAINER}>
-      <Box sx={{ width: '100%', maxWidth: 320 }}>
-        <Box sx={storageCleanerPageStyles.ERROR_DISPLAY_BOX}>
-          <WarningIcon sx={{ fontSize: 36, color: 'error.main', mb: 2 }} />
-          <Typography
-            variant="body1"
-            color="error.main"
-            sx={{
-              fontSize: '0.9rem',
-              fontWeight: 700,
-              lineHeight: 1.4,
-              mb: 3,
-            }}
-          >
-            {error}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              lineHeight: 1.4,
-            }}
-          >
+    <div className="py-8 flex justify-center items-center min-h-[200px] sm:min-h-[400px] text-center">
+      <div className="w-full max-w-[320px]">
+        <div className="flex flex-col items-center justify-center rounded-lg p-6 shadow-lg border border-red-200 bg-red-50">
+          <AlertCircle className="h-9 w-9 text-red-500 mb-3" />
+          <p className="text-sm font-bold leading-relaxed mb-4 text-red-600">{error}</p>
+          <p className="text-xs font-medium leading-relaxed text-gray-500">
             {t('storageCleaner:errorStandardOnly')}
-          </Typography>
-        </Box>
-      </Box>
-    </Container>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
