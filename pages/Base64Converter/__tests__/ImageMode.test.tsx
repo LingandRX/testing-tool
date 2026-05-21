@@ -18,14 +18,16 @@ beforeEach(() => {
 const waitForStorageReady = () => act(() => Promise.resolve());
 
 describe('ImageMode', () => {
-  it('应该渲染图像上传区域', () => {
+  it('应该渲染图像上传区域', async () => {
     render(<ImageMode />);
+    await waitForStorageReady();
     expect(screen.getByText('clickOrDropToImage')).toBeInTheDocument();
     expect(screen.getByText('supportedFormats')).toBeInTheDocument();
   });
 
   it('应该接受有效的图像文件', async () => {
     render(<ImageMode />);
+    await waitForStorageReady();
 
     const file = new File(['fake-image-data'], 'test.png', { type: 'image/png' });
     const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -39,6 +41,7 @@ describe('ImageMode', () => {
 
   it('应该拒绝非图像文件', async () => {
     render(<ImageMode />);
+    await waitForStorageReady();
 
     const file = new File(['not an image'], 'test.txt', { type: 'text/plain' });
     const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -51,6 +54,7 @@ describe('ImageMode', () => {
 
   it('应该拒绝超出大小限制的图像', async () => {
     render(<ImageMode />);
+    await waitForStorageReady();
 
     const largeContent = new Uint8Array(11 * 1024 * 1024);
     const file = new File([largeContent], 'large.png', { type: 'image/png' });
@@ -65,6 +69,7 @@ describe('ImageMode', () => {
 
   it('应该通过扩展名识别图像', async () => {
     render(<ImageMode />);
+    await waitForStorageReady();
 
     // 没有 MIME 类型但有正确扩展名
     const file = new File(['fake'], 'test.jpg');
@@ -78,6 +83,7 @@ describe('ImageMode', () => {
 
   it('点击清除按钮应该清空图像状态', async () => {
     render(<ImageMode />);
+    await waitForStorageReady();
 
     const file = new File(['fake'], 'test.png', { type: 'image/png' });
     const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -97,6 +103,7 @@ describe('ImageMode', () => {
 
   it('应该显示图像预览', async () => {
     render(<ImageMode />);
+    await waitForStorageReady();
 
     const file = new File(['fake-image'], 'test.png', { type: 'image/png' });
     const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement;
