@@ -1,20 +1,5 @@
 import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
-import {
-  alpha,
-  Box,
-  CircularProgress,
-  IconButton,
-  Paper,
-  Stack,
-  Switch,
-  Tab,
-  Tabs,
-  Tooltip,
-  Typography,
-} from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { Settings, RefreshCw, GripVertical } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -43,12 +28,19 @@ import {
 import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
 import PageHeader from '@/components/PageHeader';
-import { useTheme, type PaletteColor, type Theme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import type { PaletteColorKey } from '@/config/features';
 
-const getPaletteColor = (theme: Theme, key: PaletteColorKey): PaletteColor =>
-  (theme.palette as unknown as Record<string, PaletteColor>)[key];
+const PALETTE_COLORS: Record<PaletteColorKey, string> = {
+  primary: '#1976d2',
+  success: '#2e7d32',
+  warning: '#e65100',
+  error: '#c62828',
+  secondary: '#9c27b0',
+  info: '#0288d1',
+};
+
+const getColorCode = (key: PaletteColorKey): string => PALETTE_COLORS[key];
 
 const isValidPage = (page: unknown): page is PageType => {
   return typeof page === 'string' && (getAllFeatureKeys() as string[]).includes(page);
@@ -75,7 +67,6 @@ function SortableFeatureRow({
   isDisabled,
   onToggle,
 }: SortableFeatureRowProps) {
-  const theme = useTheme();
   const { t } = useTranslation(['features']);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: pageKey,
@@ -85,131 +76,85 @@ function SortableFeatureRow({
   if (!feature) return null;
 
   const colorKey = feature.themeColorKey ?? 'primary';
-  const colorCode = getPaletteColor(theme, colorKey).main;
+  const colorCode = getColorCode(colorKey);
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 1 : 'auto',
     position: 'relative' as const,
+    backgroundColor: isDragging ? `${colorCode}0a` : 'transparent',
+    boxShadow: isDragging ? '0 8px 20px rgba(0,0,0,0.08)' : 'none',
   };
 
   return (
-    <Box
+    <div
       ref={setNodeRef}
       style={style}
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        p: { xs: 2, sm: 2.5 },
-        borderBottom: isLast ? 'none' : '1px solid',
-        borderColor: 'divider',
-        bgcolor: isDragging ? alpha(colorCode, 0.04) : 'transparent',
-        boxShadow: isDragging ? `0 8px 20px ${alpha('#000', 0.08)}` : 'none',
-        transition: 'background-color 0.2s, box-shadow 0.2s',
-        '&:hover': {
-          bgcolor: alpha(colorCode, 0.02),
-        },
-        '&:hover .drag-handle': {
-          color: 'text.secondary',
-        },
-      }}
+      className={`flex items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-gray-50 ${
+        isLast ? '' : 'border-b border-gray-200'
+      }`}
     >
-      <Stack
-        direction="row"
-        spacing={{ xs: 1.5, sm: 2 }}
-        alignItems="center"
-        sx={{ flex: 1, minWidth: 0 }}
-      >
-        {/* 拖拽手柄 - 整行可拖,手柄是视觉暗示 */}
-        <Box
-          className="drag-handle"
+      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+        {/* 拖拽手柄 */}
+        <div
+          className="drag-handle text-gray-300 cursor-grab touch-none transition-colors duration-200 hover:text-gray-500 active:cursor-grabbing"
           {...attributes}
           {...listeners}
-          sx={{
-            color: alpha(theme.palette.text.primary, 0.2),
-            display: 'flex',
-            cursor: 'grab',
-            touchAction: 'none',
-            transition: 'color 0.2s',
-            '&:active': { cursor: 'grabbing' },
-            '&:hover': { color: 'text.secondary' },
-          }}
           aria-label={`拖拽以调整 ${t(feature.labelKey)} 的位置`}
         >
-          <DragIndicatorIcon fontSize="small" />
-        </Box>
+          <GripVertical size={16} />
+        </div>
 
         {/* 功能图标 */}
-        <Box
-          sx={{
-            width: 36,
-            height: 36,
-            borderRadius: 2.5,
-            bgcolor: alpha(colorCode, 0.1),
+        <div
+          className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0"
+          style={{
+            backgroundColor: `${colorCode}1a`,
             color: colorCode,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
           }}
         >
-          {feature.icon && <feature.icon sx={{ fontSize: 20 }} />}
-        </Box>
+          {feature.icon && <feature.icon size={20} />}
+        </div>
 
         {/* 文本信息 */}
-        <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              fontWeight: 700,
-              color: 'text.primary',
-              fontSize: '0.95rem',
-              lineHeight: 1.3,
-            }}
-          >
+        <div className="min-w-0 flex-1">
+          <div className="font-bold text-[0.95rem] leading-tight text-gray-900">
             {t(feature.labelKey)}
-          </Typography>
+          </div>
           {feature.descriptionKey && (
-            <Tooltip title={t(feature.descriptionKey)} placement="top-start" enterDelay={400}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{
-                  fontWeight: 500,
-                  mt: 0.25,
-                  display: '-webkit-box',
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: 1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  wordBreak: 'break-word',
-                }}
-              >
-                {t(feature.descriptionKey)}
-              </Typography>
-            </Tooltip>
+            <div
+              className="text-xs text-gray-500 font-medium mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap"
+              title={t(feature.descriptionKey)}
+            >
+              {t(feature.descriptionKey)}
+            </div>
           )}
-        </Box>
-      </Stack>
+        </div>
+      </div>
 
-      <Switch
-        color="primary"
-        checked={isChecked}
-        onChange={() => onToggle(pageKey)}
+      {/* 开关 */}
+      <button
+        type="button"
+        role="switch"
+        aria-checked={isChecked}
         disabled={isDisabled}
-      />
-    </Box>
+        onClick={() => onToggle(pageKey)}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+          isChecked ? 'bg-blue-600' : 'bg-gray-200'
+        } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+            isChecked ? 'translate-x-6' : 'translate-x-1'
+          }`}
+        />
+      </button>
+    </div>
   );
 }
 
-/**
- * Options 设置页面主组件
- * 支持对不同窗口入口的功能显示和排序进行独立配置
- */
 export default function App() {
-  const theme = useTheme();
   const { t } = useTranslation(['features', 'common']);
 
   const initialWindowType = useMemo(() => {
@@ -360,120 +305,64 @@ export default function App() {
 
   if (!isLoaded) {
     return (
-      <Box
-        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}
-      >
-        <CircularProgress size={24} />
-      </Box>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 
   return (
-    <Box
-      className="app"
-      sx={{
-        minHeight: '100vh',
-        bgcolor: 'background.default',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <div className="app min-h-screen bg-gray-50 flex flex-col">
       <PageErrorBoundary>
         {/* 顶部标题与导航栏 */}
-        <Box
-          sx={{
-            width: '100%',
-            bgcolor: 'background.paper',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            pt: { xs: 3, sm: 5 },
-            pb: 0,
-            px: { xs: 2, sm: 4 },
-          }}
-        >
-          <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+        <div className="w-full bg-white border-b border-gray-200 pt-8 sm:pt-12 pb-0 px-4 sm:px-8">
+          <div className="max-w-3xl mx-auto">
             <PageHeader
-              icon={<SettingsIcon />}
-              iconColor={theme.palette.primary.main}
+              icon={<Settings size={20} />}
+              iconColor="#1976d2"
               title="应用设置"
               subtitle="针对不同窗口类型独立配置 Dashboard 中显示的功能及其排序"
               sx={{ marginBottom: '1rem' }}
             />
             {/* Tab 与恢复按钮同行 */}
-            <Stack
-              direction="row"
-              alignItems="flex-end"
-              justifyContent="space-between"
-              sx={{ borderBottom: 'none' }}
-            >
-              <Tabs
-                value={windowType}
-                onChange={handleWindowTypeChange}
-                indicatorColor="primary"
-                textColor="primary"
-                sx={{
-                  flex: 1,
-                  minHeight: 'auto',
-                  '& .MuiTab-root': {
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    textTransform: 'none',
-                    minWidth: { xs: 100, sm: 140 },
-                    letterSpacing: '0.3px',
-                  },
-                  '& .MuiTabs-indicator': {
-                    height: 3,
-                    borderRadius: '3px 3px 0 0',
-                  },
-                }}
+            <div className="flex items-end justify-between border-b-0">
+              <div className="flex-1 flex">
+                {(['popup', 'sidepanel', 'tab'] as WindowType[]).map((type) => (
+                  <button
+                    key={type}
+                    onClick={(e) => handleWindowTypeChange(e, type)}
+                    className={`px-4 sm:px-6 py-2 text-[0.9rem] font-bold transition-colors duration-200 ${
+                      windowType === type
+                        ? 'text-blue-600 border-b-2 border-blue-600'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {type === 'popup' ? 'Popup 窗口' : type === 'sidepanel' ? '侧边栏' : '标签页'}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={handleRestoreDefaults}
+                className="mb-1 ml-2 p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                title="恢复当前模式默认"
               >
-                <Tab value="popup" label="Popup 窗口" />
-                <Tab value="sidepanel" label="侧边栏" />
-                <Tab value="tab" label="标签页" />
-              </Tabs>
-              <Tooltip title="恢复当前模式默认" placement="top">
-                <IconButton
-                  onClick={handleRestoreDefaults}
-                  size="small"
-                  sx={{
-                    mb: 1,
-                    ml: 1,
-                    color: 'text.secondary',
-                    '&:hover': {
-                      color: 'primary.main',
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
-                    },
-                  }}
-                  aria-label="恢复当前模式默认"
-                >
-                  <RefreshIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          </Box>
-        </Box>
+                <RefreshCw size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* 主内容区域 */}
-        <Box sx={{ flex: 1, p: { xs: 2, sm: 4 } }}>
-          <Box sx={{ maxWidth: 800, mx: 'auto' }}>
-            <Paper
-              elevation={0}
-              sx={{
-                borderRadius: 4,
-                border: '1px solid',
-                borderColor: 'divider',
-                overflow: 'hidden',
-                bgcolor: 'background.paper',
-                boxShadow: '0 4px 24px rgba(0,0,0,0.03)',
-              }}
-            >
+        <div className="flex-1 p-4 sm:p-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm">
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
               >
                 <SortableContext items={pageOrder} strategy={verticalListSortingStrategy}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <div className="flex flex-col">
                     {pageOrder.map((key, index, array) => {
                       const isChecked = visiblePages.includes(key);
                       const isDisabled = isChecked && visiblePages.length === 1;
@@ -488,15 +377,15 @@ export default function App() {
                         />
                       );
                     })}
-                  </Box>
+                  </div>
                 </SortableContext>
               </DndContext>
-            </Paper>
-          </Box>
-        </Box>
+            </div>
+          </div>
+        </div>
       </PageErrorBoundary>
 
       <GlobalSnackbar {...snackbarProps} />
-    </Box>
+    </div>
   );
 }

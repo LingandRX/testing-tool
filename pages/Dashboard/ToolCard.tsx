@@ -1,12 +1,6 @@
-/**
- * ToolCard 组件 - 工具卡片
- *
- * 用于在仪表盘中展示各个工具功能的卡片组件，支持图标、标题、描述、
- * 快照内容展示，具备悬停动画效果。
- */
 import { ChevronRight } from 'lucide-react';
 import type { ComponentType } from 'react';
-import type { SvgIconProps } from '@mui/material/SvgIcon';
+import type { LucideProps } from 'lucide-react';
 import type { PaletteColorKey } from '@/config/features';
 
 const PALETTE_COLORS: Record<PaletteColorKey, string> = {
@@ -23,7 +17,7 @@ interface ToolCardProps {
   description?: string;
   snapshot?: React.ReactNode;
   colorKey: PaletteColorKey;
-  icon: ComponentType<SvgIconProps>;
+  icon: ComponentType<LucideProps>;
   onClick: () => void;
 }
 
@@ -68,7 +62,7 @@ export default function ToolCard({
                 color: colorCode,
               }}
             >
-              <IconComponent sx={{ fontSize: 20 }} />
+              <IconComponent size={20} />
             </div>
             <div>
               <span className="font-bold text-sm leading-tight text-gray-900 flex items-center gap-1">
