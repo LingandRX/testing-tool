@@ -1,5 +1,6 @@
 import { defineConfig } from 'wxt';
 import type { Plugin } from 'vite';
+import postcssConfig from './postcss.config.js';
 
 /**
  * 仅在 HTML 多入口构建（popup / options / sidepanel）中启用 manualChunks 拆分 vendor。
@@ -93,6 +94,9 @@ export default defineConfig({
         format: { ascii_only: true, comments: false },
       },
       chunkSizeWarningLimit: 600,
+    },
+    css: {
+      postcss: postcssConfig,
     },
   }),
 });
