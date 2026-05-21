@@ -1,46 +1,27 @@
-import { Box } from '@mui/material';
-import StorageIcon from '@mui/icons-material/Storage';
+import { Database } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { formatSize } from '@/utils/storageCleaner';
 import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
-/**
- * DomainHeader 组件属性接口
- */
 interface DomainHeaderProps {
-  /** 当前域名 */
   domain: string;
-  /** 已占用的存储大小（字节） */
   totalSize: number;
 }
 
-/**
- * DomainHeader - 存储清理页面标题栏组件
- *
- * 使用 PageHeader 组件构建，显示域名和已占用存储空间大小
- *
- * @example
- * ```tsx
- * <DomainHeader
- *   domain="example.com"
- *   totalSize={1048576}
- * />
- * ```
- */
 export default function DomainHeader({ domain, totalSize }: DomainHeaderProps) {
   const { t } = useLazyTranslation('storageCleaner');
   return (
     <PageHeader
-      icon={<StorageIcon sx={{ fontSize: 22 }} />}
+      icon={<Database size={22} />}
       iconColor={storageCleanerPageStyles.warningColor}
       title={t('storageCleaner:pageTitle')}
       subtitle={domain || t('storageCleaner:loading')}
       badge={
         totalSize > 0 ? (
-          <Box sx={storageCleanerPageStyles.DOMAIN_HEADER_BADGE}>
+          <span className="inline-block px-2 py-0.5 rounded-md font-extrabold text-[0.7rem] bg-amber-50 text-amber-600 shadow-sm transition-all hover:bg-amber-100">
             {t('storageCleaner:occupied', { size: formatSize(totalSize) })}
-          </Box>
+          </span>
         ) : null
       }
       iconSx={{
