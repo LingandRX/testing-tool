@@ -1,5 +1,3 @@
-import { Box, Switch, Typography } from '@mui/material';
-import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface AutoRefreshToggleProps {
@@ -10,17 +8,19 @@ interface AutoRefreshToggleProps {
 export default function AutoRefreshToggle({ autoRefresh, onChange }: AutoRefreshToggleProps) {
   const { t } = useLazyTranslation('storageCleaner');
   return (
-    <Box sx={storageCleanerPageStyles.AUTO_REFRESH_CONTAINER}>
-      <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.8rem', px: 1.2 }}>
+    <div className="mb-3 p-4 rounded-lg bg-white border border-gray-200 flex justify-between items-center shadow-sm transition-all hover:shadow-md">
+      <span className="text-sm font-bold text-gray-700 px-3">
         {t('storageCleaner:autoRefresh')}
-      </Typography>
-      <Switch
-        size="small"
-        checked={autoRefresh}
-        onChange={(e) => onChange(e.target.checked)}
-        color="warning"
-        sx={storageCleanerPageStyles.AUTO_REFRESH_SWITCH}
-      />
-    </Box>
+      </span>
+      <label className="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          checked={autoRefresh}
+          onChange={(e) => onChange(e.target.checked)}
+          className="sr-only peer"
+        />
+        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500" />
+      </label>
+    </div>
   );
 }

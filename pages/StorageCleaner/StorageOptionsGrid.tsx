@@ -1,7 +1,5 @@
-import { Box, Checkbox, Divider, Grid, Typography } from '@mui/material';
 import type { StorageCleanerOptions } from '@/types/storage';
 import OptionItem from './OptionItem';
-import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface StorageOptionsGridProps {
@@ -17,7 +15,7 @@ export default function StorageOptionsGrid({
   options,
   sizes,
   allSelected,
-  someSelected,
+  someSelected: _someSelected,
   onOptionChange,
   onSelectAll,
 }: StorageOptionsGridProps) {
@@ -33,11 +31,11 @@ export default function StorageOptionsGrid({
   ];
 
   return (
-    <Box sx={storageCleanerPageStyles.OPTIONS_GRID_CONTAINER}>
-      <Box sx={{ p: 1.2 }}>
-        <Grid container spacing={1.5}>
+    <div className="mb-3 border rounded-lg bg-white shadow-sm overflow-hidden transition-all hover:shadow-md">
+      <div className="p-3">
+        <div className="grid grid-cols-2 gap-3">
           {optionKeys.map(({ key, isCount }) => (
-            <Grid size={6} key={key}>
+            <div key={key}>
               <OptionItem
                 labelKey={`storageCleaner:options.${key}`}
                 checked={options[key]}
@@ -45,28 +43,20 @@ export default function StorageOptionsGrid({
                 isCount={isCount}
                 onChange={() => onOptionChange(key)}
               />
-            </Grid>
+            </div>
           ))}
-        </Grid>
-      </Box>
-      <Divider sx={{ mx: 0, borderColor: 'divider' }} />
-      <Box sx={storageCleanerPageStyles.OPTIONS_GRID_FOOTER}>
-        <Typography
-          variant="body2"
-          fontWeight={700}
-          sx={{ color: 'text.secondary', fontSize: '0.7rem', px: 0 }}
-        >
-          {t('storageCleaner:selectAll')}
-        </Typography>
-        <Checkbox
-          size="small"
+        </div>
+      </div>
+      <div className="border-t" />
+      <div className="flex justify-between items-center px-5 py-2 transition-colors hover:bg-gray-50 rounded-b-lg">
+        <span className="text-xs font-bold text-gray-500">{t('storageCleaner:selectAll')}</span>
+        <input
+          type="checkbox"
           checked={allSelected}
-          indeterminate={someSelected}
           onChange={(e) => onSelectAll(e.target.checked)}
-          color="warning"
-          sx={storageCleanerPageStyles.OPTIONS_GRID_CHECKBOX}
+          className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
         />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

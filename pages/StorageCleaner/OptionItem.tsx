@@ -1,6 +1,4 @@
-import { Box, Checkbox, Typography } from '@mui/material';
 import { formatSize } from '@/utils/storageCleaner';
-import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface OptionItemProps {
@@ -20,32 +18,37 @@ export default function OptionItem({
 }: OptionItemProps) {
   const { t } = useLazyTranslation('storageCleaner');
   return (
-    <Box sx={storageCleanerPageStyles.OPTION_ITEM(checked)}>
-      <Box sx={{ flex: 1, minWidth: 0, mr: 1.5 }}>
-        <Typography
-          variant="body2"
-          fontWeight={700}
-          sx={storageCleanerPageStyles.OPTION_ITEM_LABEL(checked)}
+    <div
+      className={`flex justify-between items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+        checked
+          ? 'bg-amber-50 border border-amber-200'
+          : 'bg-transparent border border-transparent hover:bg-gray-50 hover:shadow-sm'
+      }`}
+    >
+      <div className="flex-1 min-w-0 mr-3">
+        <span
+          className={`block text-xs leading-tight truncate transition-colors ${
+            checked ? 'text-amber-700 font-bold' : 'text-gray-900 font-bold'
+          }`}
         >
           {t(labelKey)}
-        </Typography>
+        </span>
         {size !== undefined && size > 0 ? (
-          <Typography variant="caption" sx={storageCleanerPageStyles.OPTION_ITEM_SIZE}>
+          <span className="block text-[10px] font-semibold text-gray-500 mt-0.5 opacity-80">
             {isCount ? `${size} ${t('storageCleaner:countUnit')}` : formatSize(size)}
-          </Typography>
+          </span>
         ) : (
-          <Typography variant="caption" sx={storageCleanerPageStyles.OPTION_ITEM_NO_DATA}>
+          <span className="block text-[10px] font-medium text-gray-400 mt-0.5 italic">
             {t('storageCleaner:noData')}
-          </Typography>
+          </span>
         )}
-      </Box>
-      <Checkbox
-        size="small"
+      </div>
+      <input
+        type="checkbox"
         checked={checked}
         onChange={onChange}
-        color="warning"
-        sx={storageCleanerPageStyles.OPTION_ITEM_CHECKBOX}
+        className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
       />
-    </Box>
+    </div>
   );
 }
