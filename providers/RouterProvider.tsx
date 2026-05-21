@@ -152,8 +152,14 @@ export function RouterProvider({
     );
     return mergeWithDefaults(snapshot, getDefaultPageOrder());
   });
-  // 加载完成标识
-  const [isLoaded, setIsLoaded] = useState(false);
+  // 加载完成标识：如果快照数据有效，直接标记为已加载，避免首屏骨架屏
+  const [isLoaded, setIsLoaded] = useState(() => {
+    const snapshotKey = localStorage.getItem(`snapshot/${syncKey as string}`);
+    const snapshotVisible = localStorage.getItem(`snapshot/${visiblePagesKey as string}`);
+    const snapshotOrder = localStorage.getItem(`snapshot/${pageOrderKey as string}`);
+    // 快照数据存在且通过校验，说明之前已加载过，可跳过骨架屏
+    return !!(snapshotKey && snapshotVisible && snapshotOrder);
+  });
   /**
    * 从存储中加载初始路由数据
    */
