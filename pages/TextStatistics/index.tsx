@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import { alpha, Box, Container, Grid, Paper, Typography } from '@mui/material';
+import { FileText } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import TextInputArea from '@/components/TextInputArea';
-import DescriptionIcon from '@mui/icons-material/Description';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
 import { textStatisticsPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
@@ -35,13 +34,13 @@ export default function Index() {
   ];
 
   return (
-    <Box>
-      <Container sx={{ p: 2 }}>
+    <div>
+      <div className="p-2">
         {/* 头部区域 */}
         <PageHeader
           title={t('textStatistics:pageTitle')}
           subtitle={t('textStatistics:pageSubtitle')}
-          icon={<DescriptionIcon />}
+          icon={<FileText />}
           iconColor={textStatisticsPageStyles.primaryColor}
         />
 
@@ -57,58 +56,27 @@ export default function Index() {
         />
 
         {/* 统计结果展示区域 */}
-        <Grid container spacing={2}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
           {statItems.map((item) => (
-            <Grid size={{ xs: 12, md: 3 }} key={item.label}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  textAlign: 'center',
-                  borderRadius: 4,
-                  bgcolor: textStatisticsPageStyles.cardBg,
-                  border: '1px solid',
-                  borderColor: textStatisticsPageStyles.cardBorder,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', // 平滑的切换动画
-                  minHeight: { xs: '64px', md: '90px' },
-                  display: 'flex',
-                  flexDirection: { xs: 'row', md: 'column' }, // 小屏幕横向排列提高空间利用率
-                  alignItems: 'center',
-                  justifyContent: { xs: 'space-between', md: 'center' },
-                  px: { xs: 3, md: 2 },
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: () =>
-                      `0 4px 12px ${alpha(textStatisticsPageStyles.primaryColor, 0.15)}`,
-                    borderColor: textStatisticsPageStyles.primaryColor,
-                  },
-                  lineHeight: 1.6,
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
-                }}
+            <div
+              key={item.label}
+              className="p-2 text-center rounded-2xl border transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] min-h-[64px] md:min-h-[90px] flex flex-row md:flex-col items-center justify-between md:justify-center px-3 md:px-2 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(156,39,176,0.15)] hover:border-purple-600"
+              style={{
+                backgroundColor: `${textStatisticsPageStyles.primaryColor}0a`,
+                borderColor: `${textStatisticsPageStyles.primaryColor}1a`,
+              }}
+            >
+              <span className="text-gray-500 whitespace-nowrap mb-0 md:mb-1">{item.label}</span>
+              <span
+                className="break-all font-semibold"
+                style={{ color: textStatisticsPageStyles.primaryColor }}
               >
-                <Typography
-                  color="text.secondary"
-                  sx={{
-                    mb: { xs: 0, md: 0.5 },
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {item.label}
-                </Typography>
-                <Typography
-                  sx={{
-                    color: textStatisticsPageStyles.primaryColor, // 高亮显示核心数值
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  {item.value}
-                </Typography>
-              </Paper>
-            </Grid>
+                {item.value}
+              </span>
+            </div>
           ))}
-        </Grid>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
