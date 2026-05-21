@@ -1,5 +1,5 @@
 import { Box, Container, MenuItem, Select, Stack, TextField } from '@mui/material';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { Clock } from 'lucide-react';
 import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
@@ -34,7 +34,7 @@ export default function Index() {
         <PageHeader
           title={t('timestamp:pageTitle')}
           subtitle={t('timestamp:pageSubtitle')}
-          icon={<AccessTimeIcon />}
+          icon={<Clock />}
         />
 
         {/* 参考信息：分栏上方全宽单行参考条 */}
