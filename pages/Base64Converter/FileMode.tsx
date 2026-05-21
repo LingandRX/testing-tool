@@ -1,18 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import {
-  Alert,
-  alpha,
-  Box,
-  Button,
-  CircularProgress,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Upload, Trash2 } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
 import type { ToolbarAction } from '@/components/TextInputArea';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
 import DecodeResultPaper from '@/components/DecodeResultPaper';
@@ -183,34 +172,18 @@ export default function FileMode() {
 
       {direction === 'encode' && (
         <>
-          <Box
+          <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 180,
-              border: '2px dashed',
-              borderColor: isDragging ? 'info.main' : info ? 'info.main' : 'divider',
-              borderRadius: 3,
-              p: 4,
-              bgcolor: (theme) =>
-                isDragging
-                  ? alpha(theme.palette.info.main, 0.08)
-                  : info
-                    ? alpha(theme.palette.info.main, 0.04)
-                    : 'action.hover',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: 'info.main',
-                bgcolor: (theme) => alpha(theme.palette.info.main, 0.04),
-              },
-            }}
+            className={`flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed rounded-xl p-8 cursor-pointer transition-all duration-200 ${
+              isDragging
+                ? 'border-blue-500 bg-blue-50'
+                : info
+                  ? 'border-blue-500 bg-blue-50/50'
+                  : 'border-gray-300 bg-gray-50 hover:border-blue-500 hover:bg-blue-50/50'
+            }`}
           >
             <input
               ref={fileInputRef}
@@ -222,60 +195,47 @@ export default function FileMode() {
               }}
             />
             {isLoading ? (
-              <CircularProgress size={40} />
+              <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
             ) : info ? (
-              <Stack spacing={1} alignItems="center">
-                <UploadFileIcon sx={{ fontSize: 40, color: 'info.main' }} />
-                <Typography variant="body2" fontWeight={700}>
-                  {info.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
+              <div className="flex flex-col items-center gap-1">
+                <Upload className="w-10 h-10 text-blue-600" />
+                <span className="text-sm font-bold">{info.name}</span>
+                <span className="text-xs text-gray-500">
                   {formatFileSize(info.size)} · {info.type}
-                </Typography>
-                <Typography variant="caption" color="text.disabled">
-                  {t('clickOrDropToReplace')}
-                </Typography>
-              </Stack>
+                </span>
+                <span className="text-xs text-gray-400">{t('clickOrDropToReplace')}</span>
+              </div>
             ) : (
-              <Stack spacing={1} alignItems="center">
-                <UploadFileIcon sx={{ fontSize: 40, color: 'text.disabled' }} />
-                <Typography variant="body2" color="text.secondary" fontWeight={600}>
+              <div className="flex flex-col items-center gap-1">
+                <Upload className="w-10 h-10 text-gray-400" />
+                <span className="text-sm text-gray-500 font-semibold">
                   {t('clickOrDropToFile')}
-                </Typography>
-                <Typography variant="caption" color="text.disabled">
+                </span>
+                <span className="text-xs text-gray-400">
                   {t('maxFileSize', { max: `${MAX_FILE_SIZE / 1024 / 1024} MB` })}
-                </Typography>
-              </Stack>
+                </span>
+              </div>
             )}
-          </Box>
+          </div>
 
-          {error && <Alert severity="error">{error}</Alert>}
+          {error && (
+            <div
+              role="alert"
+              className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700"
+            >
+              {error}
+            </div>
+          )}
 
           {result && (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                borderRadius: 3,
-                bgcolor: (theme) => alpha(theme.palette.info.main, 0.04),
-                border: '1px solid',
-                borderColor: (theme) => alpha(theme.palette.info.main, 0.15),
-              }}
-            >
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ mb: 1 }}
-              >
-                <Typography variant="caption" fontWeight={700} color="text.secondary">
-                  {t('base64Output')}
-                </Typography>
-                <Stack direction="row" spacing={1}>
+            <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-bold text-gray-500">{t('base64Output')}</span>
+                <div className="flex gap-1">
                   <CopyButton text={result.rawBase64} tooltip={t('copyRaw')} />
                   <CopyButton text={result.output} tooltip={t('copyDataUri')} color="info" />
-                </Stack>
-              </Stack>
+                </div>
+              </div>
               <TextInputArea
                 readOnly
                 value={
@@ -286,36 +246,35 @@ export default function FileMode() {
                 showClear={false}
                 showCount
               />
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 1 }}>
-                <Typography variant="caption" color="text.disabled">
+              <div className="flex items-center gap-4 mt-2">
+                <span className="text-xs text-gray-400">
                   {t('originalSize')}: {formatFileSize(result.originalBytes)}
-                </Typography>
-                <Typography variant="caption" color="text.disabled">
+                </span>
+                <span className="text-xs text-gray-400">
                   {t('encodedSize')}: {formatFileSize(result.outputBytes)}
-                </Typography>
-                <Box sx={{ flex: 1 }} />
-                <Button
-                  variant="text"
-                  size="small"
+                </span>
+                <div className="flex-1" />
+                <button
+                  type="button"
                   onClick={handleClear}
-                  startIcon={<DeleteOutlineIcon />}
-                  sx={{ borderRadius: 2, minWidth: 0 }}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
                 >
+                  <Trash2 className="w-3 h-3" />
                   {t('clear')}
-                </Button>
-              </Stack>
-            </Paper>
+                </button>
+              </div>
+            </div>
           )}
 
           {info && !result && (
-            <Button
-              variant="text"
+            <button
+              type="button"
               onClick={handleClear}
-              startIcon={<DeleteOutlineIcon />}
-              sx={{ borderRadius: 3 }}
+              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
             >
+              <Trash2 className="w-4 h-4" />
               {t('clear')}
-            </Button>
+            </button>
           )}
         </>
       )}

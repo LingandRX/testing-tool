@@ -1,17 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import {
-  Alert,
-  alpha,
-  Box,
-  Button,
-  CircularProgress,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Image, Trash2 } from 'lucide-react';
 import TextInputArea, { type ToolbarAction } from '@/components/TextInputArea';
-import ImageIcon from '@mui/icons-material/Image';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
 import DecodeResultPaper from '@/components/DecodeResultPaper';
@@ -189,34 +178,18 @@ export default function ImageMode() {
 
       {direction === 'encode' && (
         <>
-          <Box
+          <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => imageInputRef.current?.click()}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 180,
-              border: '2px dashed',
-              borderColor: isDragging ? 'info.main' : info ? 'info.main' : 'divider',
-              borderRadius: 3,
-              p: 4,
-              bgcolor: (theme) =>
-                isDragging
-                  ? alpha(theme.palette.info.main, 0.08)
-                  : info
-                    ? alpha(theme.palette.info.main, 0.04)
-                    : 'action.hover',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: 'info.main',
-                bgcolor: (theme) => alpha(theme.palette.info.main, 0.04),
-              },
-            }}
+            className={`flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed rounded-xl p-8 cursor-pointer transition-all duration-200 ${
+              isDragging
+                ? 'border-blue-500 bg-blue-50'
+                : info
+                  ? 'border-blue-500 bg-blue-50/50'
+                  : 'border-gray-300 bg-gray-50 hover:border-blue-500 hover:bg-blue-50/50'
+            }`}
           >
             <input
               ref={imageInputRef}
@@ -229,108 +202,76 @@ export default function ImageMode() {
               }}
             />
             {isLoading ? (
-              <CircularProgress size={40} />
+              <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
             ) : info ? (
-              <Stack spacing={1} alignItems="center">
+              <div className="flex flex-col items-center gap-1">
                 {result && (
-                  <Box
-                    component="img"
+                  <img
                     src={result.output}
                     alt="preview"
-                    sx={{
-                      maxWidth: '100%',
-                      maxHeight: 160,
-                      borderRadius: 2,
-                      objectFit: 'contain',
-                    }}
+                    className="max-w-full max-h-40 rounded-lg object-contain mb-2"
                   />
                 )}
-                <Typography variant="body2" fontWeight={700}>
-                  {info.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <span className="text-sm font-bold">{info.name}</span>
+                <span className="text-xs text-gray-500">
                   {formatFileSize(info.size)} · {info.type}
-                </Typography>
-                <Typography variant="caption" color="text.disabled">
-                  {t('clickOrDropToReplace')}
-                </Typography>
-              </Stack>
+                </span>
+                <span className="text-xs text-gray-400">{t('clickOrDropToReplace')}</span>
+              </div>
             ) : (
-              <Stack spacing={1} alignItems="center">
-                <ImageIcon sx={{ fontSize: 40, color: 'text.disabled' }} />
-                <Typography variant="body2" color="text.secondary" fontWeight={600}>
+              <div className="flex flex-col items-center gap-1">
+                <Image className="w-10 h-10 text-gray-400" />
+                <span className="text-sm text-gray-500 font-semibold">
                   {t('clickOrDropToImage')}
-                </Typography>
-                <Typography variant="caption" color="text.disabled">
-                  {t('supportedFormats')}
-                </Typography>
-              </Stack>
+                </span>
+                <span className="text-xs text-gray-400">{t('supportedFormats')}</span>
+              </div>
             )}
-          </Box>
+          </div>
 
-          {error && <Alert severity="error">{error}</Alert>}
+          {error && (
+            <div
+              role="alert"
+              className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700"
+            >
+              {error}
+            </div>
+          )}
 
           {result && (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                borderRadius: 3,
-                bgcolor: (theme) => alpha(theme.palette.info.main, 0.04),
-                border: '1px solid',
-                borderColor: (theme) => alpha(theme.palette.info.main, 0.15),
-              }}
-            >
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ mb: 1 }}
-              >
-                <Typography variant="caption" fontWeight={700} color="text.secondary">
-                  {t('base64Output')}
-                </Typography>
-                <Stack direction="row" spacing={1}>
+            <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-bold text-gray-500">{t('base64Output')}</span>
+                <div className="flex gap-1">
                   <CopyButton text={result.rawBase64} tooltip={t('copyRaw')} />
                   <CopyButton text={result.output} tooltip={t('copyDataUri')} color="info" />
-                </Stack>
-              </Stack>
-              <Box
-                sx={{
-                  fontFamily: 'monospace',
-                  fontSize: '0.75rem',
-                  wordBreak: 'break-all',
-                  maxHeight: 200,
-                  overflowY: 'auto',
-                  lineHeight: 1.6,
-                  color: 'info.main',
-                  fontWeight: 600,
-                }}
-              >
+                </div>
+              </div>
+              <div className="font-mono text-xs break-all max-h-[200px] overflow-y-auto leading-relaxed text-blue-600 font-semibold">
                 {result.output.length > 2000
                   ? `${result.output.substring(0, 2000)}...`
                   : result.output}
-              </Box>
-              <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-                <Typography variant="caption" color="text.disabled">
+              </div>
+              <div className="flex gap-4 mt-2">
+                <span className="text-xs text-gray-400">
                   {t('originalSize')}: {formatFileSize(result.originalBytes)}
-                </Typography>
-                <Typography variant="caption" color="text.disabled">
+                </span>
+                <span className="text-xs text-gray-400">
                   {t('encodedSize')}: {formatFileSize(result.outputBytes)}
-                </Typography>
-              </Stack>
-            </Paper>
+                </span>
+              </div>
+            </div>
           )}
 
           {info && (
-            <Button
-              variant="text"
+            <button
+              type="button"
               onClick={handleClear}
-              startIcon={<DeleteOutlineIcon />}
-              sx={{ borderRadius: 3 }}
+              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
             >
+              <Trash2 className="w-4 h-4" />
               {t('clear')}
-            </Button>
+            </button>
           )}
         </>
       )}
@@ -361,17 +302,10 @@ export default function ImageMode() {
               onFileNameChange={setDecodedFileName}
               onDownload={handleDownload}
             >
-              <Box
-                component="img"
+              <img
                 src={`data:${decoded.mimeType};base64,${decoded.rawBase64}`}
                 alt="decoded preview"
-                sx={{
-                  maxWidth: '100%',
-                  maxHeight: 160,
-                  borderRadius: 2,
-                  objectFit: 'contain',
-                  mb: 1.5,
-                }}
+                className="max-w-full max-h-40 rounded-lg object-contain mb-3"
               />
             </DecodeResultPaper>
           )}
