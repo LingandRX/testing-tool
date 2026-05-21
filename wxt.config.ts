@@ -21,16 +21,6 @@ function manualChunksForHtmlOnly(): Plugin {
         if (id.includes('/react-dom/') || (id.includes('/react/') && !id.includes('/react-dom/'))) {
           return 'vendor-react';
         }
-        // MUI + Emotion
-        if (
-          id.includes('@mui/') ||
-          id.includes('@emotion/') ||
-          id.includes('hoist-non-react-statics') ||
-          id.includes('csstype') ||
-          id.includes('@popperjs/')
-        ) {
-          return 'vendor-mui';
-        }
         // 国际化
         if (
           id.includes('i18next') ||
