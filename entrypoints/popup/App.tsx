@@ -3,12 +3,10 @@ import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { SnackbarProvider } from '@/components/GlobalSnackbar';
-import { Box } from '@mui/material';
 import { getEntryPointType } from '@/config/features';
 import { useMemo } from 'react';
 
 export default function App() {
-  // 打开Chrome扩展选项页面，需确保manifest中已配置options_page或options_ui
   const handleOpenOptions = () => {
     chrome.runtime.openOptionsPage().catch(console.error);
   };
@@ -37,33 +35,12 @@ export default function App() {
       pageOrderKey={routerConfig.pageOrderKey}
     >
       <SnackbarProvider initialOptions={{ autoHideDuration: 1500 }}>
-        <Box
-          className="app"
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '400px',
-            maxWidth: '400px',
-            minWidth: '400px',
-            height: '600px',
-            minHeight: '600px',
-            overflow: 'hidden',
-            backgroundColor: 'background.default',
-            // 仅在明确的大屏幕（如独立页面或侧边栏拉伸）下才允许扩展
-            '@media screen and (min-width: 600px)': {
-              width: '100vw',
-              maxWidth: 'none',
-              minWidth: 'none',
-              height: '100vh',
-              minHeight: 'none',
-            },
-          }}
-        >
+        <div className="app flex flex-col w-[400px] max-w-[400px] min-w-[400px] h-[600px] min-h-[600px] overflow-hidden bg-background sm:w-screen sm:max-w-none sm:min-w-0 sm:h-screen sm:min-h-0">
           <TopBar onOpenOptions={handleOpenOptions} />
           <ErrorBoundary>
             <RouterContainer />
           </ErrorBoundary>
-        </Box>
+        </div>
       </SnackbarProvider>
     </RouterProvider>
   );
