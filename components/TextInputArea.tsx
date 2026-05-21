@@ -30,19 +30,7 @@
  */
 
 import { useRef, useState, useCallback, forwardRef, RefObject } from 'react';
-import {
-  Box,
-  Button,
-  IconButton,
-  TextField,
-  Tooltip,
-  Typography,
-  alpha,
-  type SxProps,
-} from '@mui/material';
-import type { Theme } from '@mui/material/styles';
-import CloseIcon from '@mui/icons-material/Close';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { X, Copy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 
@@ -99,7 +87,7 @@ export interface TextInputAreaProps {
   /** 外层容器样式 */
   style?: React.CSSProperties;
   /** 外层容器 sx */
-  sx?: SxProps<Theme>;
+  sx?: React.CSSProperties;
 
   /** 是否显示字符计数 */
   showCount?: boolean;
@@ -155,7 +143,7 @@ function ActionButton({
   action,
   value,
   globalDisabled,
-  variant = 'text',
+  variant: _variant = 'text',
   onAction,
   size = 'small',
   compact,
@@ -163,42 +151,31 @@ function ActionButton({
   const isBtnDisabled =
     typeof action.disabled === 'function' ? action.disabled(value) : action.disabled || !value;
 
-  const typeStyles: Record<string, unknown> = {};
+  const typeClasses: Record<string, string> = {
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    danger: 'text-red-600 hover:bg-red-50',
+    default: 'text-gray-500 hover:bg-gray-50',
+  };
 
-  if (action.type === 'primary') {
-    if (variant !== 'contained') {
-      typeStyles.bgcolor = 'primary.main';
-      typeStyles.color = 'primary.contrastText';
-      typeStyles['&:hover'] = { bgcolor: 'primary.dark' };
-    }
-  } else if (action.type === 'danger') {
-    typeStyles.color = 'error.main';
-    typeStyles['&:hover'] = {
-      bgcolor: (theme: Theme) => alpha(theme.palette.error.main, 0.08),
-    };
-  } else {
-    typeStyles.color = 'text.secondary';
-    typeStyles['&:hover'] = {
-      bgcolor: (theme: Theme) => alpha(theme.palette.grey[500], 0.1),
-    };
-  }
+  const sizeClasses = {
+    small: 'text-xs px-2 py-1',
+    medium: 'text-sm px-3 py-1.5',
+  };
 
   return (
-    <Button
+    <button
+      type="button"
       onClick={() => onAction(action)}
       disabled={isBtnDisabled || globalDisabled}
-      size={size}
-      variant={variant}
-      startIcon={action.icon}
-      sx={{
-        fontWeight: 600,
-        borderRadius: 2,
-        ...typeStyles,
-        ...(compact ? { fontSize: '0.75rem', px: 1.5, minWidth: 0 } : { fontSize: '0.8rem' }),
-      }}
+      className={`rounded-md font-semibold transition-colors ${sizeClasses[size]} ${
+        typeClasses[action.type || 'default']
+      } ${compact ? 'text-xs px-2 min-w-0' : 'text-sm'} ${
+        isBtnDisabled || globalDisabled ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
     >
+      {action.icon && <span className="mr-1">{action.icon}</span>}
       {action.label}
-    </Button>
+    </button>
   );
 }
 
@@ -352,27 +329,15 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const hasTopBar = title || showCount || topActions.length > 0 || topExtra;
 
   return (
-    <Box className={className} style={style} sx={containerSx}>
+    <div className={className} style={{ ...style, ...containerSx }}>
       {hasTopBar && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mb: 1,
-            px: 0.5,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            {title && (
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                {title}
-              </Typography>
-            )}
+        <div className="flex items-center justify-between mb-2 px-1">
+          <div className="flex items-center gap-3">
+            {title && <span className="text-sm font-semibold text-gray-500">{title}</span>}
             {topExtra}
-          </Box>
+          </div>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <div className="flex items-center gap-1">
             {topActions.map((action) => (
               <ActionButton
                 key={action.key}
@@ -384,80 +349,44 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
               />
             ))}
             {showCount && (
-              <Typography
-                variant="caption"
-                sx={{ color: 'text.disabled', fontVariantNumeric: 'tabular-nums', ml: 0.5 }}
-              >
+              <span className="text-xs text-gray-400 tabular-nums ml-1">
                 {value.length}
                 {maxLength ? ` / ${maxLength}` : ''}
-              </Typography>
+              </span>
             )}
-          </Box>
-        </Box>
+          </div>
+        </div>
       )}
 
-      <Box sx={{ position: 'relative' }}>
-        <TextField
-          inputRef={handleInputRef}
-          multiline
-          fullWidth
-          minRows={autoResize ? minRows : undefined}
-          maxRows={autoResize ? maxRows : undefined}
-          rows={autoResize ? undefined : minRows}
+      <div className="relative">
+        <textarea
+          ref={handleInputRef}
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
           disabled={disabled}
           autoFocus={autoFocus}
-          error={Boolean(displayError)}
-          helperText={displayError || undefined}
-          slotProps={{
-            input: { readOnly },
-            formHelperText: {
-              sx: { mx: 1.5, fontWeight: 600, '&.Mui-error': { color: 'error.main' } },
-            },
+          readOnly={readOnly}
+          rows={autoResize ? undefined : minRows}
+          style={{
+            minHeight: autoResize ? `${minRows * 1.5}rem` : undefined,
+            maxHeight: autoResize ? `${maxRows * 1.5}rem` : undefined,
           }}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              bgcolor: 'background.paper',
-              borderRadius: 3,
-              fontSize: '0.875rem',
-              fontFamily: 'monospace',
-              lineHeight: 1.6,
-              transition: 'all 0.2s',
-              '&:hover': { bgcolor: 'action.hover' },
-              '&.Mui-focused': {
-                bgcolor: 'background.paper',
-                boxShadow: (theme) => `${alpha(theme.palette.primary.main, 0.08)} 0 0 0 3px`,
-              },
-              '&.Mui-error': {
-                boxShadow: (theme) => `${alpha(theme.palette.error.main, 0.08)} 0 0 0 3px`,
-              },
-              '& textarea': {
-                py: 1.5,
-                px: 1.5,
-                ...(showClear || allowCopy || bottomActions.length > 0 ? { pb: 4 } : {}),
-              },
-            },
-            '& .MuiFormHelperText-root': {
-              mx: 0,
-              mt: 0.5,
-            },
-          }}
+          className={`w-full rounded-lg border ${
+            displayError ? 'border-red-300' : 'border-gray-200'
+          } bg-white px-3 py-3 font-mono text-sm leading-relaxed transition-all resize-y ${
+            showClear || allowCopy || bottomActions.length > 0 ? 'pb-10' : ''
+          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white hover:bg-gray-50 ${
+            displayError ? 'focus:ring-red-500' : ''
+          }`}
         />
 
         {(showClear || allowCopy || bottomActions.length > 0) && (
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: displayError ? 32 : 8,
-              right: 12,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              zIndex: 1,
-            }}
+          <div
+            className={`absolute right-3 flex items-center gap-1 z-10 ${
+              displayError ? 'bottom-8' : 'bottom-2'
+            }`}
           >
             {bottomActions.map((action) => (
               <ActionButton
@@ -470,43 +399,31 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
               />
             ))}
             {allowCopy && value && (
-              <Tooltip title={t('textInputArea.copyContent')}>
-                <IconButton
-                  onClick={handleCopy}
-                  size="small"
-                  sx={{
-                    color: 'text.disabled',
-                    '&:hover': {
-                      color: 'primary.main',
-                      bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
-                    },
-                  }}
-                >
-                  <ContentCopyIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Tooltip>
+              <button
+                type="button"
+                onClick={handleCopy}
+                title={t('textInputArea.copyContent')}
+                className="p-1 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
             )}
             {showClear && value && !disabled && !readOnly && (
-              <Tooltip title={t('textInputArea.clear')}>
-                <IconButton
-                  onClick={handleClear}
-                  size="small"
-                  sx={{
-                    color: 'text.disabled',
-                    '&:hover': {
-                      color: 'error.main',
-                      bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
-                    },
-                  }}
-                >
-                  <CloseIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Tooltip>
+              <button
+                type="button"
+                onClick={handleClear}
+                title={t('textInputArea.clear')}
+                className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
             )}
-          </Box>
+          </div>
         )}
-      </Box>
-    </Box>
+
+        {displayError && <p className="mt-1 text-xs font-semibold text-red-500">{displayError}</p>}
+      </div>
+    </div>
   );
 });
 

@@ -1,5 +1,3 @@
-import { ToggleButton, ToggleButtonGroup, type SxProps, type Theme } from '@mui/material';
-
 export interface SwitchOption<T extends string | number = string> {
   value: T;
   label: React.ReactNode;
@@ -9,9 +7,9 @@ export interface SwitchButtonGroupProps<T extends string | number = string> {
   value: T;
   options: SwitchOption<T>[];
   onChange: (value: T) => void;
-  sx?: SxProps<Theme>;
+  sx?: React.CSSProperties;
   size?: 'small' | 'medium' | 'large';
-  buttonSx?: SxProps<Theme>;
+  buttonSx?: React.CSSProperties;
 }
 
 export default function SwitchButtonGroup<T extends string | number = string>({
@@ -19,53 +17,37 @@ export default function SwitchButtonGroup<T extends string | number = string>({
   options,
   onChange,
   sx,
-  size,
+  size = 'medium',
   buttonSx,
 }: SwitchButtonGroupProps<T>) {
+  const sizeClasses = {
+    small: 'text-xs',
+    medium: 'text-sm',
+    large: 'text-base',
+  };
+
   return (
-    <ToggleButtonGroup
-      value={value}
-      exclusive
-      size={size}
-      onChange={(_, v) => v && onChange(v)}
-      sx={{
-        width: '100%',
-        mb: 2,
-        borderRadius: 4,
-        bgcolor: (theme: Theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.900'),
-        border: '1px solid',
-        borderColor: 'divider',
-        p: 0.6,
-        '& .MuiToggleButtonGroup-grouped': {
-          flex: 1,
-          border: 'none',
-          borderRadius: 3.5,
-          mx: 0.3,
-          fontWeight: 800,
-          color: 'text.secondary',
-          transition: 'color 0.3s',
-          '&:not(:first-of-type)': {
-            borderLeft: 'none',
-            marginLeft: 0.6,
-          },
-          '&.Mui-selected': {
-            bgcolor: 'background.paper',
-            color: 'primary.main',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-          },
-        },
-        ...sx,
-      }}
+    <div
+      className="w-full mb-4 rounded-xl border border-gray-200 bg-gray-50 p-1.5 flex gap-1"
+      style={sx}
     >
       {options.map((option) => (
-        <ToggleButton
+        <button
           key={option.value}
-          value={option.value}
-          sx={buttonSx ?? { px: 1.5, fontWeight: 700, whiteSpace: 'nowrap' }}
+          type="button"
+          onClick={() => onChange(option.value)}
+          className={`flex-1 px-3 py-1.5 rounded-lg font-bold whitespace-nowrap transition-all ${
+            sizeClasses[size]
+          } ${
+            value === option.value
+              ? 'bg-white text-blue-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+          }`}
+          style={buttonSx}
         >
           {option.label}
-        </ToggleButton>
+        </button>
       ))}
-    </ToggleButtonGroup>
+    </div>
   );
 }

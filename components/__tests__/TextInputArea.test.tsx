@@ -334,7 +334,7 @@ describe('TextInputArea 组件', () => {
       );
 
       const btn = screen.getByText('主要');
-      expect(btn).toHaveClass('MuiButton-contained');
+      expect(btn).toHaveClass('bg-blue-600', 'text-white');
     });
   });
 
@@ -346,7 +346,7 @@ describe('TextInputArea 组件', () => {
 
     it('不设置 title 时不渲染标题', () => {
       const { container } = render(<TextInputArea value="" onChange={() => {}} />);
-      expect(container.querySelector('.MuiTypography-body2')).not.toBeInTheDocument();
+      expect(container.querySelector('.text-gray-500')).not.toBeInTheDocument();
     });
   });
 
@@ -507,7 +507,9 @@ describe('TextInputArea 组件', () => {
     });
 
     it('应透传 sx 样式', () => {
-      const { container } = render(<TextInputArea value="" onChange={() => {}} sx={{ mb: 3 }} />);
+      const { container } = render(
+        <TextInputArea value="" onChange={() => {}} sx={{ marginBottom: '24px' }} />,
+      );
 
       expect(container.firstChild).toHaveStyle({ marginBottom: '24px' });
     });
