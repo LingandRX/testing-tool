@@ -1,4 +1,3 @@
-import { Grid } from '@mui/material';
 import TextInputArea from '@/components/TextInputArea';
 import QrCodePreview from '@/components/QrCodePreview';
 import { useSnackbar } from '@/components/GlobalSnackbar';
@@ -11,8 +10,8 @@ export default function GeneratePanel() {
   const { generatorState, setTextToEncode, downloadQrCode, copyQrCode } = useQrCodeContext();
 
   return (
-    <Grid container spacing={3}>
-      <Grid size={{ xs: 12, md: 6 }}>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
         <TextInputArea
           title={t('qrCode:urlInputLabel')}
           value={generatorState.textToEncode}
@@ -24,14 +23,14 @@ export default function GeneratePanel() {
           externalError={generatorState.inputError}
           showMessage={showMessage}
         />
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
+      </div>
+      <div>
         <QrCodePreview
           qrCodeDataUrl={generatorState.qrCodeDataUrl}
           onDownload={downloadQrCode}
           onCopy={copyQrCode}
         />
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 }

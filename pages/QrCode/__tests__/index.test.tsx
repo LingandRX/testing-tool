@@ -85,7 +85,7 @@ describe('QrCodePage', () => {
 
   it('应该渲染双栏布局容器', () => {
     const { container } = render(<QrCodePage />);
-    const gridContainer = container.querySelector('.MuiGrid-container');
+    const gridContainer = container.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
     expect(gridContainer).toBeInTheDocument();
   });
 });
