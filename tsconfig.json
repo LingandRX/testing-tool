@@ -26,7 +26,11 @@
     "target": "ESNext",
 
     "types": ["chrome", "webextension-polyfill", "@testing-library/jest-dom", "vitest/globals"],
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   // 确保包含你的源代码目录
   "include": [
@@ -39,6 +43,8 @@
     "types/**/*",
     "assets/**/*",
     "hooks/**/*",
+    "lib/**/*",
+    "src/**/*",
     ".wxt/types/**/*.ts",
     ".wxt/types/*.d.ts",
     "eslint.config.ts"
