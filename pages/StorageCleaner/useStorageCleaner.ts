@@ -144,7 +144,9 @@ export function useStorageCleaner({
   }, [t]);
 
   const loadInfoRef = useRef(loadInfo);
-  loadInfoRef.current = loadInfo;
+  useEffect(() => {
+    loadInfoRef.current = loadInfo;
+  });
 
   const debouncedLoadInfo = useCallback(() => {
     if (debounceTimerRef.current) {

@@ -74,7 +74,9 @@ export function useQrCode(): QrCodeContextValue {
 
   // 使用 useRef 存储 generateQrCode 的最新引用，避免无限循环
   const generateQrCodeRef = useRef(generateQrCode);
-  generateQrCodeRef.current = generateQrCode;
+  useEffect(() => {
+    generateQrCodeRef.current = generateQrCode;
+  });
 
   // 防抖处理输入文本（200ms）
   const debouncedTextToEncode = useDebounce(generatorState.textToEncode, 200);
