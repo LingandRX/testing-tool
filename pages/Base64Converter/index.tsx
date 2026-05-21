@@ -1,7 +1,4 @@
-import { Box, Container, Stack } from '@mui/material';
-import TextFieldsIcon from '@mui/icons-material/TextFields';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import ImageIcon from '@mui/icons-material/Image';
+import { Type, Upload, Image } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
 import { base64ConverterPageStyles } from '@/config/pageTheme';
@@ -28,14 +25,14 @@ export default function Index() {
   );
 
   const modeIcon: Record<PageMode, React.ReactNode> = {
-    text: <TextFieldsIcon />,
-    file: <UploadFileIcon />,
-    image: <ImageIcon />,
+    text: <Type />,
+    file: <Upload />,
+    image: <Image />,
   };
 
   return (
-    <Box>
-      <Container sx={{ p: 2 }}>
+    <div>
+      <div className="p-2">
         <PageHeader
           title={t('base64Converter:pageTitle')}
           subtitle={t('base64Converter:pageSubtitle')}
@@ -43,7 +40,7 @@ export default function Index() {
           iconColor={base64ConverterPageStyles.primaryColor}
         />
 
-        <Stack spacing={2.5}>
+        <div className="flex flex-col gap-6">
           <SwitchButtonGroup
             value={pageMode}
             options={[
@@ -58,8 +55,8 @@ export default function Index() {
           {pageMode === 'text' && <TextMode onSwitchToImageMode={() => setPageMode('image')} />}
           {pageMode === 'file' && <FileMode />}
           {pageMode === 'image' && <ImageMode />}
-        </Stack>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
