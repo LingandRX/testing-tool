@@ -1,15 +1,13 @@
+import { Button } from '@/components/ui/button';
 import {
-  Box,
-  Chip,
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-  Typography,
-} from '@mui/material';
+} from '@/components/ui/dialog';
 import type { StorageCleanerOptions } from '@/types/storage';
-import Button from '@/components/Button';
-import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 export interface StorageCleanerConfirmProps {
@@ -32,69 +30,53 @@ export function StorageCleanerConfirm({
     .map(([key, _]) => t(`storageCleaner:options.${key as keyof StorageCleanerOptions}`));
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullWidth
-      maxWidth="xs"
-      slotProps={{
-        paper: {
-          sx: storageCleanerPageStyles.CONFIRM_DIALOG_PAPER,
-        },
-      }}
-    >
-      <DialogTitle sx={storageCleanerPageStyles.CONFIRM_DIALOG_TITLE}>
-        {t('storageCleaner:confirmTitle')}
-      </DialogTitle>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="sm:max-w-[400px] p-6">
+        <DialogHeader>
+          <DialogTitle className="text-center text-xl font-bold tracking-tight">
+            {t('storageCleaner:confirmTitle')}
+          </DialogTitle>
+        </DialogHeader>
 
-      <DialogContent sx={storageCleanerPageStyles.CONFIRM_DIALOG_CONTENT}>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={storageCleanerPageStyles.CONFIRM_DIALOG_DESC}
-        >
-          {t('storageCleaner:confirmDesc')}
-        </Typography>
+        <div className="text-center">
+          <DialogDescription className="mb-4 text-sm font-medium text-muted-foreground">
+            {t('storageCleaner:confirmDesc')}
+          </DialogDescription>
 
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2, justifyContent: 'center', mb: 4 }}>
-          {selectedOptions.map((label) => (
-            <Chip
-              key={label}
-              label={label}
-              size="small"
-              sx={storageCleanerPageStyles.CONFIRM_DIALOG_CHIP}
-            />
-          ))}
-        </Box>
+          <div className="flex flex-wrap gap-2 justify-center mb-6">
+            {selectedOptions.map((label) => (
+              <span
+                key={label}
+                className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
 
-        <Box sx={storageCleanerPageStyles.CONFIRM_DIALOG_WARNING_BOX}>
-          <Typography variant="caption" sx={storageCleanerPageStyles.CONFIRM_DIALOG_WARNING_TEXT}>
-            <span role="img" aria-label="warning">
-              ⚠️
-            </span>{' '}
-            {t('storageCleaner:irreversible')}
-          </Typography>
-        </Box>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 border border-dashed border-red-200">
+            <span className="text-xs font-bold text-red-600 flex items-center gap-1">
+              <span role="img" aria-label="warning">
+                ⚠️
+              </span>{' '}
+              {t('storageCleaner:irreversible')}
+            </span>
+          </div>
+        </div>
+
+        <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:justify-end sm:gap-3 pt-4">
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+            {t('common:buttons.cancel')}
+          </Button>
+          <Button
+            variant="default"
+            onClick={onConfirm}
+            className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white"
+          >
+            {t('storageCleaner:confirmAction')}
+          </Button>
+        </DialogFooter>
       </DialogContent>
-
-      <DialogActions sx={{ p: 3, pt: 1, gap: 2 }}>
-        <Button
-          variant="text"
-          onClick={onClose}
-          fullWidth
-          sx={storageCleanerPageStyles.CONFIRM_DIALOG_CANCEL}
-        >
-          {t('common:buttons.cancel')}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={onConfirm}
-          fullWidth
-          sx={storageCleanerPageStyles.CONFIRM_DIALOG_CONFIRM}
-        >
-          {t('storageCleaner:confirmAction')}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }

@@ -1,8 +1,6 @@
-import { Box, CircularProgress, Container } from '@mui/material';
-import Button from '@/components/Button';
+import { Button } from '@/components/ui/button';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import StorageCleanerConfirm from '@/pages/StorageCleaner/StorageCleanerConfirm';
-import { storageCleanerPageStyles } from '@/config/pageTheme';
 import { useStorageCleaner } from './useStorageCleaner';
 import DomainHeader from './DomainHeader';
 import StorageOptionsGrid from './StorageOptionsGrid';
@@ -38,9 +36,9 @@ export default function Index() {
 
   if (isInitializing) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-        <CircularProgress size={24} color="warning" />
-      </Box>
+      <div className="flex justify-center py-8">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+      </div>
     );
   }
 
@@ -49,8 +47,8 @@ export default function Index() {
   }
 
   return (
-    <Box>
-      <Container sx={{ py: 2 }}>
+    <div>
+      <div className="p-2">
         <DomainHeader domain={domain} totalSize={totalSize} />
 
         <StorageOptionsGrid
@@ -65,17 +63,16 @@ export default function Index() {
         <AutoRefreshToggle autoRefresh={autoRefresh} onChange={handleAutoRefreshChange} />
 
         <Button
-          variant="contained"
+          variant="default"
           onClick={() => setShowConfirm(true)}
-          sx={storageCleanerPageStyles.CONFIRM_DIALOG_CONFIRM}
           disabled={isDisabled}
-          fullWidth
+          className="w-full bg-amber-500 hover:bg-amber-600 text-white"
         >
           {loading ? t('storageCleaner:cleaning') : t('storageCleaner:cleanNow')}
         </Button>
 
         <CleaningResult result={result} />
-      </Container>
+      </div>
 
       <StorageCleanerConfirm
         open={showConfirm}
@@ -83,6 +80,6 @@ export default function Index() {
         onConfirm={handleClean}
         options={options}
       />
-    </Box>
+    </div>
   );
 }
