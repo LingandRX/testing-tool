@@ -4,9 +4,6 @@
  * 用于 Suspense fallback 和初始加载状态，提供平滑的视觉过渡
  * 避免白屏闪烁，减少布局偏移
  */
-import { Box, Skeleton, Stack, useTheme } from '@mui/material';
-import { alpha } from '@mui/material';
-
 interface PageSkeletonProps {
   /** 骨架屏类型 */
   variant?: 'dashboard' | 'tool';
@@ -16,30 +13,19 @@ interface PageSkeletonProps {
  * 仪表盘卡片骨架屏
  */
 function DashboardCardSkeleton() {
-  const theme = useTheme();
-  const borderColor = alpha(theme.palette.divider, 0.5);
-
   return (
-    <Box
-      sx={{
-        borderRadius: 4,
-        border: '1px solid',
-        borderColor,
-        p: 2.5,
-        height: 100,
-      }}
-    >
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <Skeleton variant="rounded" width={40} height={40} sx={{ borderRadius: 3 }} />
-          <Box>
-            <Skeleton variant="text" width={100} height={20} />
-            <Skeleton variant="text" width={140} height={14} sx={{ mt: 0.5 }} />
-          </Box>
-        </Stack>
-        <Skeleton variant="circular" width={12} height={12} />
-      </Stack>
-    </Box>
+    <div className="rounded-xl border border-gray-200 p-5 h-[100px]">
+      <div className="flex justify-between items-start">
+        <div className="flex gap-3 items-center">
+          <div className="w-10 h-10 rounded-lg bg-gray-200 animate-pulse" />
+          <div>
+            <div className="w-24 h-5 bg-gray-200 rounded animate-pulse" />
+            <div className="w-32 h-3.5 bg-gray-200 rounded animate-pulse mt-1.5" />
+          </div>
+        </div>
+        <div className="w-3 h-3 rounded-full bg-gray-200 animate-pulse" />
+      </div>
+    </div>
   );
 }
 
@@ -48,24 +34,24 @@ function DashboardCardSkeleton() {
  */
 function ToolPageSkeleton() {
   return (
-    <Box sx={{ p: 2.5 }}>
+    <div className="p-5">
       {/* 标题区域 */}
-      <Skeleton variant="text" width={180} height={28} sx={{ mb: 2 }} />
+      <div className="w-44 h-7 bg-gray-200 rounded animate-pulse mb-4" />
 
       {/* 输入区域 */}
-      <Skeleton variant="rounded" width="100%" height={120} sx={{ borderRadius: 3, mb: 2 }} />
+      <div className="w-full h-[120px] bg-gray-200 rounded-xl animate-pulse mb-4" />
 
       {/* 控制栏 */}
-      <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-        <Skeleton variant="rounded" width={100} height={36} sx={{ borderRadius: 2 }} />
-        <Skeleton variant="rounded" width={80} height={36} sx={{ borderRadius: 2 }} />
-        <Box sx={{ flex: 1 }} />
-        <Skeleton variant="rounded" width={90} height={36} sx={{ borderRadius: 2 }} />
-      </Stack>
+      <div className="flex gap-2 mb-4">
+        <div className="w-24 h-9 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="w-20 h-9 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="flex-1" />
+        <div className="w-22 h-9 bg-gray-200 rounded-lg animate-pulse" />
+      </div>
 
       {/* 结果区域 */}
-      <Skeleton variant="rounded" width="100%" height={160} sx={{ borderRadius: 3 }} />
-    </Box>
+      <div className="w-full h-[160px] bg-gray-200 rounded-xl animate-pulse" />
+    </div>
   );
 }
 
@@ -81,22 +67,11 @@ export default function PageSkeleton({ variant = 'dashboard' }: PageSkeletonProp
   }
 
   return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(auto-fill, minmax(300px, 1fr))',
-        },
-        gridAutoRows: '1fr',
-        gap: 2,
-        p: 2,
-      }}
-    >
+    <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-fr gap-4 p-4">
       {Array.from({ length: 6 }).map((_, index) => (
         <DashboardCardSkeleton key={index} />
       ))}
-    </Box>
+    </div>
   );
 }
 

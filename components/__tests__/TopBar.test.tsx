@@ -61,18 +61,18 @@ describe('TopBar 组件', () => {
     it('不在 dashboard 时应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.getByTestId('ArrowBackIosNewIcon')).toBeInTheDocument();
+      expect(screen.getByLabelText('common:buttons.back')).toBeInTheDocument();
     });
 
     it('在 dashboard 上不应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'dashboard';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.queryByTestId('ArrowBackIosNewIcon')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('common:buttons.back')).not.toBeInTheDocument();
     });
 
     it('应渲染设置按钮', () => {
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.getByTestId('SettingsIcon')).toBeInTheDocument();
+      expect(screen.getByLabelText('common:buttons.settings')).toBeInTheDocument();
     });
   });
 
@@ -81,7 +81,7 @@ describe('TopBar 组件', () => {
       const handleOpenOptions = vi.fn();
       renderWithProvider(<TopBar onOpenOptions={handleOpenOptions} />);
 
-      fireEvent.click(screen.getByTestId('SettingsIcon'));
+      fireEvent.click(screen.getByLabelText('common:buttons.settings'));
       expect(handleOpenOptions).toHaveBeenCalledTimes(1);
     });
 
@@ -89,7 +89,7 @@ describe('TopBar 组件', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
 
-      fireEvent.click(screen.getByTestId('ArrowBackIosNewIcon'));
+      fireEvent.click(screen.getByLabelText('common:buttons.back'));
       expect(mockRouterValue.goBack).toHaveBeenCalledTimes(1);
     });
   });

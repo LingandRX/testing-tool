@@ -1,4 +1,3 @@
-import { alpha, Box, Stack, SxProps, Theme, Typography, useTheme } from '@mui/material';
 import { ReactNode, useMemo } from 'react';
 import { getEntryPointType } from '@/config/features';
 
@@ -17,13 +16,13 @@ export interface PageHeaderProps {
   /** 在标题右侧显示的徽章/标签组件（可选） */
   badge?: ReactNode;
   /** 图标容器的自定义样式 */
-  iconSx?: SxProps<Theme>;
+  iconSx?: React.CSSProperties;
   /** 标题文本的自定义样式 */
-  titleSx?: SxProps<Theme>;
+  titleSx?: React.CSSProperties;
   /** 副标题文本的自定义样式 */
-  subtitleSx?: SxProps<Theme>;
+  subtitleSx?: React.CSSProperties;
   /** 整个组件的自定义样式 */
-  sx?: SxProps<Theme>;
+  sx?: React.CSSProperties;
 }
 
 /**
@@ -54,7 +53,7 @@ export interface PageHeaderProps {
  */
 export default function PageHeader({
   icon,
-  iconColor,
+  iconColor = '#3b82f6',
   title,
   subtitle,
   badge,
@@ -63,8 +62,6 @@ export default function PageHeader({
   subtitleSx,
   sx,
 }: PageHeaderProps) {
-  const theme = useTheme();
-  const resolvedIconColor = iconColor ?? theme.palette.primary.main;
   const entryPointType = useMemo(() => getEntryPointType(), []);
 
   if (entryPointType === 'popup') {
@@ -72,44 +69,34 @@ export default function PageHeader({
   }
 
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5, ...sx }}>
+    <div className="flex items-center gap-3 mb-6" style={sx}>
       {/* 图标容器 */}
-      <Box
-        sx={{
-          p: 1,
-          borderRadius: 2.5,
-          bgcolor: alpha(resolvedIconColor, 0.1),
-          color: resolvedIconColor,
-          display: 'flex',
+      <div
+        className="p-2 rounded-lg flex items-center"
+        style={{
+          backgroundColor: `${iconColor}15`,
+          color: iconColor,
           ...iconSx,
         }}
       >
         {icon}
-      </Box>
+      </div>
       {/* 标题区域 */}
-      <Box sx={{ flex: 1 }}>
+      <div className="flex-1">
         {/* 标题行（含徽章） */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography
-            variant="subtitle1"
-            fontWeight={900}
-            sx={{ letterSpacing: '-0.5px', lineHeight: 1.2, ...titleSx }}
-          >
+        <div className="flex justify-between items-center">
+          <span className="text-base font-extrabold tracking-tight leading-tight" style={titleSx}>
             {title}
-          </Typography>
+          </span>
           {badge}
-        </Stack>
+        </div>
         {/* 副标题 */}
         {subtitle && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontWeight: 600, ...subtitleSx }}
-          >
+          <span className="text-xs font-semibold text-gray-500" style={subtitleSx}>
             {subtitle}
-          </Typography>
+          </span>
         )}
-      </Box>
-    </Stack>
+      </div>
+    </div>
   );
 }

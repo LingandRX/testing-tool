@@ -40,8 +40,8 @@ describe('RouterContainer 组件', () => {
     it('isLoaded 为 false 时应渲染骨架屏', () => {
       mockRouterValue.isLoaded = false;
       const { container } = renderWithProvider(<RouterContainer />);
-      // 骨架屏使用 Skeleton 组件
-      const skeletons = container.querySelectorAll('.MuiSkeleton-root');
+      // 骨架屏使用 animate-pulse 类
+      const skeletons = container.querySelectorAll('.animate-pulse');
       expect(skeletons.length).toBeGreaterThan(0);
     });
 

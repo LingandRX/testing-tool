@@ -1,4 +1,3 @@
-import { Box } from '@mui/material';
 import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
 import { Suspense, useMemo } from 'react';
@@ -24,23 +23,15 @@ export default function RouterContainer() {
   const Component = currentFeature ? currentFeature.components[entryPointType] : null;
 
   return (
-    <Box
+    <div
       key={currentPage} // Trigger animation on navigation
-      className={animationClass}
-      sx={{
-        flex: 1,
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        scrollbarGutter: 'stable',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      className={`${animationClass} flex-1 overflow-y-auto overflow-x-hidden scrollbar-gutter-stable flex flex-col`}
     >
       <Suspense
         fallback={<PageSkeleton variant={currentPage === 'dashboard' ? 'dashboard' : 'tool'} />}
       >
         <PageErrorBoundary resetKey={currentPage}>{Component && <Component />}</PageErrorBoundary>
       </Suspense>
-    </Box>
+    </div>
   );
 }
