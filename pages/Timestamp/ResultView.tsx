@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { Box, Fade, Stack, Typography } from '@mui/material';
 import dayjs from '@/utils/dayjs';
 import CopyButton from '@/components/CopyButton';
 import type { UnitType } from '@/config/pageTheme';
@@ -38,60 +37,57 @@ const ResultView = React.memo(
     if (!result) {
       if (!showEmptyPlaceholder) return null;
       return (
-        <Box sx={timestampPageStyles.RESULT_EMPTY_PLACEHOLDER}>{t('timestamp:resultEmpty')}</Box>
+        <div className="flex-1 flex items-center justify-center text-gray-400 text-sm font-semibold py-12 text-center">
+          {t('timestamp:resultEmpty')}
+        </div>
       );
     }
 
     return (
-      <Fade in={!!result}>
-        <Box>
-          <Typography variant="caption" sx={timestampPageStyles.RESULT_LABEL}>
-            {t('timestamp:resultLabel')}
-          </Typography>
+      <div className="animate-in fade-in duration-300">
+        <span className="block text-gray-500 mb-3 text-xs font-bold">
+          {t('timestamp:resultLabel')}
+        </span>
 
-          <Box sx={timestampPageStyles.RESULT_MAIN_BOX}>
-            <Typography variant="body1" sx={timestampPageStyles.RESULT_MAIN_TEXT}>
-              {result}
-            </Typography>
-            <CopyButton
-              text={result}
-              tooltip={t('timestamp:copyResultTooltip')}
-              size="small"
-              color={timestampPageStyles.primaryColor}
-            />
-          </Box>
+        <div className="bg-blue-50 p-5 rounded-xl relative mb-4 border border-blue-200 flex justify-between items-center">
+          <span className="font-mono font-bold text-blue-700 break-all pr-4 text-xl tracking-tight leading-tight">
+            {result}
+          </span>
+          <CopyButton
+            text={result}
+            tooltip={t('timestamp:copyResultTooltip')}
+            size="small"
+            color={timestampPageStyles.primaryColor}
+          />
+        </div>
 
-          <Stack spacing={1.2} sx={timestampPageStyles.RESULT_EXTRA_STACK}>
-            {[
-              { label: t('timestamp:relativeTime'), value: extraInfo?.relative },
-              { label: t('timestamp:iso8601'), value: extraInfo?.iso },
-              { label: t('timestamp:utcTime'), value: extraInfo?.utc },
-            ].map((item) => (
-              <Box
-                key={item.label}
-                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-              >
-                <Typography variant="caption" sx={timestampPageStyles.RESULT_EXTRA_LABEL}>
-                  {item.label}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-                  <Typography variant="caption" sx={timestampPageStyles.RESULT_EXTRA_VALUE}>
-                    {item.value}
-                  </Typography>
-                  {item.value && (
-                    <CopyButton
-                      text={item.value}
-                      tooltip={t('timestamp:copyTooltip')}
-                      size="small"
-                      color={timestampPageStyles.primaryColor}
-                    />
-                  )}
-                </Box>
-              </Box>
-            ))}
-          </Stack>
-        </Box>
-      </Fade>
+        <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex flex-col gap-3">
+          {[
+            { label: t('timestamp:relativeTime'), value: extraInfo?.relative },
+            { label: t('timestamp:iso8601'), value: extraInfo?.iso },
+            { label: t('timestamp:utcTime'), value: extraInfo?.utc },
+          ].map((item) => (
+            <div key={item.label} className="flex justify-between items-center">
+              <span className="text-gray-400 font-bold text-xs pr-2 whitespace-nowrap">
+                {item.label}
+              </span>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="font-mono text-blue-700 font-semibold text-xs break-all text-right">
+                  {item.value}
+                </span>
+                {item.value && (
+                  <CopyButton
+                    text={item.value}
+                    tooltip={t('timestamp:copyTooltip')}
+                    size="small"
+                    color={timestampPageStyles.primaryColor}
+                  />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     );
   },
 );
