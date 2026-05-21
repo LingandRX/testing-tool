@@ -77,7 +77,7 @@ export default function Index() {
                     { value: 's', label: t('timestamp:unitS') },
                   ]}
                   onChange={(v) => setUnit(v as 'ms' | 's')}
-                  sx={{ width: 'auto', mb: 0, flexShrink: 0 }}
+                  sx={{ width: 'auto', marginBottom: 0, flexShrink: 0 }}
                   size="small"
                 />
 

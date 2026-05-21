@@ -80,7 +80,7 @@ export default function JsonFormatSection() {
             value={indentSize}
             onChange={(v) => setIndentSize(v)}
             options={INDENT_OPTIONS.map((size) => ({ value: size, label: String(size) }))}
-            sx={{ width: 'auto', mb: 0, flexShrink: 0 }}
+            sx={{ width: 'auto', marginBottom: 0, flexShrink: 0 }}
             size="small"
           />
 
