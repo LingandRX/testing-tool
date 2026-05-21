@@ -1,14 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Button,
-  FormControlLabel,
-  FormHelperText,
-  Stack,
-  Switch,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import {
   formatJson,
@@ -18,7 +9,6 @@ import {
 } from '@/utils/jsonFormatter';
 import { formatByteSize } from '@/utils/textStatistics';
 import { useSnackbar } from '@/components/GlobalSnackbar';
-import { jsonDiffPageStyles } from '@/config/pageTheme';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
@@ -78,22 +68,14 @@ export default function JsonFormatSection() {
   };
 
   return (
-    <Stack spacing={2.5}>
+    <div className="flex flex-col gap-6">
       {/* 工具栏 */}
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={1.5}
-        justifyContent="space-between"
-        alignItems={{ xs: 'stretch', sm: 'center' }}
-      >
-        <Stack direction="row" spacing={1.5} alignItems="center">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
+        <div className="flex gap-3 items-center">
           {/* 缩进选择 */}
-          <Typography
-            variant="caption"
-            sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.7rem' }}
-          >
+          <span className="text-[11px] font-extrabold text-gray-500">
             {t('jsonFormat:indentSize')}
-          </Typography>
+          </span>
           <SwitchButtonGroup
             value={indentSize}
             onChange={(v) => setIndentSize(v)}
@@ -103,134 +85,79 @@ export default function JsonFormatSection() {
           />
 
           {/* 键名排序开关 */}
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={sortKeys}
-                onChange={(e) => setSortKeys(e.target.checked)}
-              />
-            }
-            label={
-              <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.7rem' }}>
-                {t('jsonFormat:sortKeys')}
-              </Typography>
-            }
-            sx={{ ml: 1 }}
-          />
-        </Stack>
+          <label className="flex items-center gap-2 ml-2">
+            <input
+              type="checkbox"
+              checked={sortKeys}
+              onChange={(e) => setSortKeys(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+            />
+            <span className="text-xs font-bold">{t('jsonFormat:sortKeys')}</span>
+          </label>
+        </div>
 
-        <Stack direction="row" spacing={1}>
-          <Button variant="text" onClick={handleClear} sx={{ borderRadius: 3 }}>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleClear} className="rounded-lg">
             {t('jsonFormat:clearButton')}
           </Button>
           <Button
-            variant="contained"
+            variant="default"
             disabled={!canFormat}
             onClick={handleFormat}
-            sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
+            className="rounded-lg font-bold px-4"
           >
             {t('jsonFormat:formatButton')}
           </Button>
-        </Stack>
-      </Stack>
+        </div>
+      </div>
 
       {/* 输入区 */}
-      <Box>
-        <TextField
-          multiline
-          rows={6}
-          fullWidth
+      <div>
+        <textarea
           placeholder={t('jsonFormat:inputPlaceholder')}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          error={Boolean(error)}
-          sx={jsonDiffPageStyles.INPUT_STYLE}
+          rows={6}
+          className={`w-full rounded-lg border ${
+            error ? 'border-red-300' : 'border-gray-200'
+          } p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y`}
         />
         {error && (
-          <FormHelperText error sx={{ mx: 1.5, mt: 0.5, fontWeight: 600 }}>
+          <p className="mx-3 mt-1 text-xs font-semibold text-red-500">
             {t('jsonFormat:invalidJson')}
-          </FormHelperText>
+          </p>
         )}
-      </Box>
+      </div>
 
       {/* 格式化结果 */}
       {result && result.formatted ? (
-        <Box
-          sx={{
-            position: 'relative',
-            borderRadius: 3,
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            overflow: 'hidden',
-          }}
-        >
+        <div className="relative rounded-lg bg-white border border-gray-200 overflow-hidden">
           {/* 结果头部 */}
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
-              px: 2,
-              py: 1,
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-            }}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Typography
-                variant="caption"
-                sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.7rem' }}
-              >
+          <div className="flex justify-between items-center px-4 py-2 border-b border-gray-200 bg-gray-50">
+            <div className="flex gap-4 items-center">
+              <span className="text-[11px] font-extrabold text-gray-500">
                 {t('jsonFormat:outputLabel')}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+              </span>
+              <span className="text-[10px] text-gray-400">
                 {t('jsonFormat:originalSize')}: {formatByteSize(result.originalBytes)}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+              </span>
+              <span className="text-[10px] text-gray-400">
                 {t('jsonFormat:formattedSize')}: {formatByteSize(result.formattedBytes)}
-              </Typography>
-            </Stack>
+              </span>
+            </div>
             <CopyButton text={result.formatted} showMessage={showMessage} />
-          </Stack>
+          </div>
 
           {/* 格式化内容 */}
-          <Box
-            sx={{
-              p: 2,
-              fontFamily: 'monospace',
-              fontSize: '0.8rem',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-all',
-              maxHeight: 400,
-              overflowY: 'auto',
-              lineHeight: 1.6,
-            }}
-          >
+          <div className="p-4 font-mono text-sm whitespace-pre-wrap break-all max-h-[400px] overflow-y-auto leading-relaxed">
             {result.formatted}
-          </Box>
-        </Box>
+          </div>
+        </div>
       ) : (
-        <Box
-          sx={{
-            p: 3,
-            borderRadius: 3,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-            border: '1px dashed',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'grey.300',
-            textAlign: 'center',
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-            {t('jsonFormat:emptyHint')}
-          </Typography>
-        </Box>
+        <div className="p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-center">
+          <p className="text-sm font-semibold text-gray-500">{t('jsonFormat:emptyHint')}</p>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 }

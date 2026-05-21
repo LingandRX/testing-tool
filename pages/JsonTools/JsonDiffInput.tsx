@@ -1,4 +1,3 @@
-import { Box, Typography } from '@mui/material';
 import TextInputArea from '@/components/TextInputArea';
 
 interface JsonDiffInputProps {
@@ -17,21 +16,10 @@ export default function JsonDiffInput({
   error,
 }: JsonDiffInputProps) {
   return (
-    <Box sx={{ flex: 1, minWidth: 0 }}>
-      <Typography
-        variant="caption"
-        sx={{
-          display: 'block',
-          mb: 0.6,
-          fontWeight: 800,
-          fontSize: '0.7rem',
-          letterSpacing: 0.4,
-          color: 'text.secondary',
-          textTransform: 'uppercase',
-        }}
-      >
+    <div className="flex-1 min-w-0">
+      <span className="block mb-1.5 text-[11px] font-extrabold tracking-wider text-gray-500 uppercase">
         {label}
-      </Typography>
+      </span>
       <TextInputArea
         value={value}
         onChange={onChange}
@@ -41,7 +29,7 @@ export default function JsonDiffInput({
         externalError={error ?? undefined}
         showClear={true}
       />
-    </Box>
+    </div>
   );
 }
 

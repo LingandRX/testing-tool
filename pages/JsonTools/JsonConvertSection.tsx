@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { formatByteSize } from '@/utils/textStatistics';
 import { useSnackbar } from '@/components/GlobalSnackbar';
@@ -88,29 +88,24 @@ export default function JsonConvertSection({
   };
 
   return (
-    <Stack spacing={2.5}>
+    <div className="flex flex-col gap-6">
       {/* 工具栏 */}
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={1.5}
-        justifyContent="space-between"
-        alignItems={{ xs: 'stretch', sm: 'center' }}
-      >
-        <Box />
-        <Stack direction="row" spacing={1}>
-          <Button variant="text" onClick={handleClear} sx={{ borderRadius: 3 }}>
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
+        <div />
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleClear} className="rounded-lg">
             {t('jsonFormat:clearButton')}
           </Button>
           <Button
-            variant="contained"
+            variant="default"
             disabled={!canConvert}
             onClick={handleConvert}
-            sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
+            className="rounded-lg font-bold px-4"
           >
             {t(`jsonFormat:${convertButtonKey}`)}
           </Button>
-        </Stack>
-      </Stack>
+        </div>
+      </div>
 
       {/* 输入区 */}
       <TextInputArea
@@ -125,81 +120,33 @@ export default function JsonConvertSection({
 
       {/* 转换结果 */}
       {result && result.output ? (
-        <Box
-          sx={{
-            position: 'relative',
-            borderRadius: 3,
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            overflow: 'hidden',
-          }}
-        >
+        <div className="relative rounded-lg bg-white border border-gray-200 overflow-hidden">
           {/* 结果头部 */}
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
-              px: 2,
-              py: 1,
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-            }}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Typography
-                variant="caption"
-                sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.7rem' }}
-              >
+          <div className="flex justify-between items-center px-4 py-2 border-b border-gray-200 bg-gray-50">
+            <div className="flex gap-4 items-center">
+              <span className="text-[11px] font-extrabold text-gray-500">
                 {t(`jsonFormat:${pk}OutputLabel`)}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+              </span>
+              <span className="text-[10px] text-gray-400">
                 {t('jsonFormat:originalSize')}: {formatByteSize(result.originalBytes)}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+              </span>
+              <span className="text-[10px] text-gray-400">
                 {t('jsonFormat:formattedSize')}: {formatByteSize(result.outputBytes)}
-              </Typography>
-            </Stack>
+              </span>
+            </div>
             <CopyButton text={result.output} showMessage={showMessage} />
-          </Stack>
+          </div>
 
           {/* 转换内容 */}
-          <Box
-            sx={{
-              p: 2,
-              fontFamily: 'monospace',
-              fontSize: '0.8rem',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-all',
-              maxHeight: 400,
-              overflowY: 'auto',
-              lineHeight: 1.6,
-            }}
-          >
+          <div className="p-4 font-mono text-sm whitespace-pre-wrap break-all max-h-[400px] overflow-y-auto leading-relaxed">
             {result.output}
-          </Box>
-        </Box>
+          </div>
+        </div>
       ) : (
-        <Box
-          sx={{
-            p: 3,
-            borderRadius: 3,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-            border: '1px dashed',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'grey.300',
-            textAlign: 'center',
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-            {t(`jsonFormat:${pk}EmptyHint`)}
-          </Typography>
-        </Box>
+        <div className="p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-center">
+          <p className="text-sm font-semibold text-gray-500">{t(`jsonFormat:${pk}EmptyHint`)}</p>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 }

@@ -1,12 +1,8 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { Box, Button, Container, Stack, Typography } from '@mui/material';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import DataObjectIcon from '@mui/icons-material/DataObject';
-import TransformIcon from '@mui/icons-material/Transform';
-import CompressIcon from '@mui/icons-material/Compress';
+import { Button } from '@/components/ui/button';
+import { GitCompareArrows, Braces, ArrowRightLeft, Minimize2 } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
-import { jsonDiffPageStyles } from '@/config/pageTheme';
 import JsonDiffInput from './JsonDiffInput';
 import DiffResult from './DiffResult';
 import DiffNavigator from './DiffNavigator';
@@ -20,7 +16,7 @@ import { jsonToToml } from '@/utils/jsonToToml';
 import { minifyJson } from '@/utils/jsonFormatter';
 import { useStorageState } from '@/utils/useStorageState';
 import type { JsonToolsPageMode } from '@/types/storage';
-import SwtichButtonGroup from '@/components/SwitchButtonGroup';
+import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
 interface ParseState {
   value: unknown;
@@ -118,11 +114,11 @@ export default function Index() {
   };
 
   const modeIcon: Record<PageMode, React.ReactNode> = {
-    diff: <CompareArrowsIcon />,
-    format: <DataObjectIcon />,
-    yaml: <TransformIcon />,
-    toml: <TransformIcon />,
-    minify: <CompressIcon />,
+    diff: <GitCompareArrows className="h-5 w-5" />,
+    format: <Braces className="h-5 w-5" />,
+    yaml: <ArrowRightLeft className="h-5 w-5" />,
+    toml: <ArrowRightLeft className="h-5 w-5" />,
+    minify: <Minimize2 className="h-5 w-5" />,
   };
 
   const yamlConvert: ConvertFunction = useCallback((text: string) => {
@@ -141,18 +137,18 @@ export default function Index() {
   }, []);
 
   return (
-    <Box>
-      <Container sx={{ p: 2 }}>
+    <div>
+      <div className="p-2">
         <PageHeader
           title={t(modeTitles[pageMode].title)}
           subtitle={t(modeTitles[pageMode].subtitle)}
           icon={modeIcon[pageMode]}
-          iconColor={jsonDiffPageStyles.primaryColor}
+          iconColor="#3b82f6"
         />
 
-        <Stack spacing={2.5}>
+        <div className="flex flex-col gap-6">
           {/* 页面模式切换器 */}
-          <SwtichButtonGroup
+          <SwitchButtonGroup
             value={pageMode}
             onChange={(v: PageMode) => setPageMode(v)}
             options={[
@@ -168,13 +164,8 @@ export default function Index() {
           {pageMode === 'diff' ? (
             <>
               {/* 工具栏 */}
-              <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                spacing={1.5}
-                justifyContent="space-between"
-                alignItems={{ xs: 'stretch', sm: 'center' }}
-              >
-                <SwtichButtonGroup
+              <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
+                <SwitchButtonGroup
                   value={viewMode}
                   onChange={(v: ViewMode) => setViewMode(v)}
                   options={[
@@ -183,23 +174,23 @@ export default function Index() {
                   ]}
                   size="small"
                 />
-                <Stack direction="row" spacing={1}>
-                  <Button variant="text" onClick={handleClear} sx={{ borderRadius: 3 }}>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handleClear} className="rounded-lg">
                     {t('jsonDiff:clearButton')}
                   </Button>
                   <Button
-                    variant="contained"
+                    variant="default"
                     disabled={!canCompare}
                     onClick={handleCompare}
-                    sx={{ borderRadius: 3, fontWeight: 700, px: 3, whiteSpace: 'nowrap' }}
+                    className="rounded-lg font-bold px-4 whitespace-nowrap"
                   >
                     {t('jsonDiff:compareButton')}
                   </Button>
-                </Stack>
-              </Stack>
+                </div>
+              </div>
 
               {/* 输入区 */}
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+              <div className="flex flex-col md:flex-row gap-4">
                 <JsonDiffInput
                   label={t('jsonDiff:leftLabel')}
                   placeholder={t('jsonDiff:leftPlaceholder')}
@@ -214,7 +205,7 @@ export default function Index() {
                   onChange={setRightInput}
                   error={rightError}
                 />
-              </Stack>
+              </div>
 
               {/* 差异展示 */}
               {diffResult ? (
@@ -228,22 +219,9 @@ export default function Index() {
                   <DiffResult result={diffResult} viewMode={viewMode} activePath={activePath} />
                 </>
               ) : (
-                <Box
-                  sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-                    border: '1px dashed',
-                    borderColor: (theme) =>
-                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'grey.300',
-                    textAlign: 'center',
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                    {t('jsonDiff:emptyHint')}
-                  </Typography>
-                </Box>
+                <div className="p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-center">
+                  <p className="text-sm font-semibold text-gray-500">{t('jsonDiff:emptyHint')}</p>
+                </div>
               )}
             </>
           ) : pageMode === 'format' ? (
@@ -259,8 +237,8 @@ export default function Index() {
               convertButtonKey="minifyButton"
             />
           )}
-        </Stack>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
