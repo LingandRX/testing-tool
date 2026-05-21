@@ -42,7 +42,7 @@
     "dayjs": "^1.11.19",
     "i18next": "^26.0.8",
     "i18next-browser-languagedetector": "^8.2.1",
-    "marked": "^18.0.3",
+    "marked": "^18.0.4",
     "qr-scanner": "^1.4.2",
     "qrious": "^4.0.2",
     "react": "^19.2.3",
