@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Alert, alpha, Button, Paper, Stack, Typography } from '@mui/material';
+import { ArrowLeftRight } from 'lucide-react';
 import TextInputArea, { type ToolbarAction } from '@/components/TextInputArea';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
 import { textToBase64, base64ToText } from '@/utils/base64Converter';
@@ -71,7 +70,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
       {
         key: 'convert',
         label: actionLabel,
-        icon: <SwapHorizIcon />,
+        icon: <ArrowLeftRight />,
         type: 'primary',
         position: 'bottom',
         disabled: (value: string) => !value.trim(),
@@ -121,42 +120,31 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
       />
 
       {showImageHint && (
-        <Alert
-          severity="info"
-          action={
-            <Button color="info" size="small" onClick={onSwitchToImageMode}>
-              {t('switchToImageMode')}
-            </Button>
-          }
-        >
-          {t('imageDataUriHint')}
-        </Alert>
+        <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 border border-blue-200">
+          <span className="text-sm text-blue-700">{t('imageDataUriHint')}</span>
+          <button
+            type="button"
+            onClick={onSwitchToImageMode}
+            className="px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
+          >
+            {t('switchToImageMode')}
+          </button>
+        </div>
       )}
 
       {output && (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 2,
-            borderRadius: 3,
-            bgcolor: (theme) => alpha(theme.palette.info.main, 0.04),
-            border: '1px solid',
-            borderColor: (theme) => alpha(theme.palette.info.main, 0.15),
-          }}
-        >
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-            <Typography variant="caption" fontWeight={700} color="text.secondary">
-              {outputLabel}
-            </Typography>
+        <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-bold text-gray-500">{outputLabel}</span>
             <CopyButton text={output} />
-          </Stack>
+          </div>
           <TextInputArea
             readOnly
             value={output.length > 2000 ? `${output.substring(0, 2000)}...` : output}
             showClear={false}
             showCount
           />
-        </Paper>
+        </div>
       )}
     </>
   );
