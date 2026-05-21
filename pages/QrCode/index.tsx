@@ -28,14 +28,14 @@ export default function Index() {
             subtitle={t('qrCode:pageSubtitle')}
             icon={<QrCode />}
             iconColor={qrCodePageStyles.primaryColor}
-            sx={{ mb: 2.5 }}
+            sx={{ marginBottom: '0.625rem' }}
           />
 
           <SwitchButtonGroup
             value={qrCode.mode}
             options={modeOptions}
             onChange={qrCode.setMode}
-            sx={{ mb: 3 }}
+            sx={{ marginBottom: '0.75rem' }}
           />
 
           {qrCode.mode === 'generate' ? <GeneratePanel /> : <ParsePanel />}

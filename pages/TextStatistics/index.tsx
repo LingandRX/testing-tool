@@ -52,7 +52,7 @@ export default function Index() {
           minRows={8}
           maxRows={15}
           showClear={false}
-          sx={{ mb: 3 }}
+          sx={{ marginBottom: '0.75rem' }}
         />
 
         {/* 统计结果展示区域 */}

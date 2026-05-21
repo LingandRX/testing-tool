@@ -43,7 +43,12 @@ export default function DomainHeader({ domain, totalSize }: DomainHeaderProps) {
           </Box>
         ) : null
       }
-      iconSx={storageCleanerPageStyles.DOMAIN_HEADER_ICON}
+      iconSx={{
+        padding: '0.3rem',
+        borderRadius: '0.75rem',
+        boxShadow: '0 2px 8px rgba(245, 158, 11, 0.15)',
+        transition: 'all 0.2s',
+      }}
       titleSx={{
         fontSize: '1rem',
       }}
@@ -53,10 +58,10 @@ export default function DomainHeader({ domain, totalSize }: DomainHeaderProps) {
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-        mt: 0.3,
+        marginTop: '0.3rem',
         fontSize: '0.75rem',
       }}
-      sx={{ mb: 3 }}
+      sx={{ marginBottom: '0.75rem' }}
     />
   );
 }

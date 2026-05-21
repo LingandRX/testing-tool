@@ -397,7 +397,7 @@ export default function App() {
               iconColor={theme.palette.primary.main}
               title="应用设置"
               subtitle="针对不同窗口类型独立配置 Dashboard 中显示的功能及其排序"
-              sx={{ mb: 4 }}
+              sx={{ marginBottom: '1rem' }}
             />
             {/* Tab 与恢复按钮同行 */}
             <Stack
