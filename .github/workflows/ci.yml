@@ -23,12 +23,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run ESLint
-        run: npx eslint . --max-warnings=0
+        run: npm run lint
 
   typecheck:
     name: TypeScript Check
@@ -41,12 +42,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run TypeScript type check
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
   test:
     name: Unit Tests
@@ -59,12 +61,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run tests with coverage
-        run: npx vitest run --coverage
+        run: npm run test:coverage
 
   build:
     name: Build (${{ matrix.browser }})
@@ -82,10 +85,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build (Chrome)
         if: matrix.browser == 'chrome'
-        run: npx wxt build
+        run: npm run build
