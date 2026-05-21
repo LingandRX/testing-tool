@@ -1,5 +1,4 @@
-import { Box, Container, useMediaQuery, useTheme } from '@mui/material';
-import QrCodeIcon from '@mui/icons-material/QrCode';
+import { QrCode } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { qrCodePageStyles } from '@/config/pageTheme';
@@ -12,8 +11,6 @@ import type { QrCodeMode } from './types';
 
 export default function Index() {
   const { t } = useLazyTranslation('qrCode');
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const qrCode = useQrCode();
 
   // 模式选项
@@ -24,15 +21,12 @@ export default function Index() {
 
   return (
     <QrCodeContext.Provider value={qrCode}>
-      <Box>
-        <Container
-          maxWidth={isDesktop ? 'lg' : false}
-          sx={{ py: 2, maxWidth: isDesktop ? undefined : 400 }}
-        >
+      <div>
+        <div className="py-2 max-w-[400px] md:max-w-none">
           <PageHeader
             title={t('qrCode:pageTitle')}
             subtitle={t('qrCode:pageSubtitle')}
-            icon={<QrCodeIcon />}
+            icon={<QrCode />}
             iconColor={qrCodePageStyles.primaryColor}
             sx={{ mb: 2.5 }}
           />
@@ -45,8 +39,8 @@ export default function Index() {
           />
 
           {qrCode.mode === 'generate' ? <GeneratePanel /> : <ParsePanel />}
-        </Container>
-      </Box>
+        </div>
+      </div>
     </QrCodeContext.Provider>
   );
 }

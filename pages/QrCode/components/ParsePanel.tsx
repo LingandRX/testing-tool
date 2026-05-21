@@ -1,5 +1,4 @@
 import { useEffect, useCallback } from 'react';
-import { Grid } from '@mui/material';
 import TextInputArea from '@/components/TextInputArea';
 import ImageUploader from '@/components/ImageUploader';
 import { useSnackbar } from '@/components/GlobalSnackbar';
@@ -57,8 +56,8 @@ export default function ParsePanel() {
   }, [handlePaste]);
 
   return (
-    <Grid container spacing={3}>
-      <Grid size={{ xs: 12, md: 6 }}>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
         <ImageUploader
           selectedFile={parserState.selectedFile}
           onFileChange={handleFileChange}
@@ -68,8 +67,8 @@ export default function ParsePanel() {
           dragging={parserState.dragging}
           onDraggingChange={(dragging) => setParserState((prev) => ({ ...prev, dragging }))}
         />
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
+      </div>
+      <div>
         <TextInputArea
           title={t('qrCode:resultLabel')}
           value={parserState.decodedResult}
@@ -80,7 +79,7 @@ export default function ParsePanel() {
           externalError={parserState.parseError}
           showMessage={showMessage}
         />
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 }

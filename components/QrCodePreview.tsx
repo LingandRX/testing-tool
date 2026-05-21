@@ -1,7 +1,4 @@
-import { Box, Button, Typography } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { qrCodePageStyles } from '@/config/pageTheme';
+import { Download, Copy } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface QrCodePreviewProps {
@@ -18,38 +15,36 @@ const QrCodePreview = ({ qrCodeDataUrl, onDownload, onCopy }: QrCodePreviewProps
 
   if (!qrCodeDataUrl) {
     return (
-      <Box sx={qrCodePageStyles.QR_PREVIEW_CONTAINER}>
-        <Typography variant="body2" color="text.secondary" sx={qrCodePageStyles.PLACEHOLDER_TEXT}>
-          {t('qrCode:qrCodeWillShow')}
-        </Typography>
-      </Box>
+      <div className="flex flex-col justify-center items-center min-h-[200px] border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
+        <span className="text-sm text-gray-500 text-center">{t('qrCode:qrCodeWillShow')}</span>
+      </div>
     );
   }
 
   return (
-    <Box sx={qrCodePageStyles.QR_PREVIEW_CONTAINER}>
-      <Box sx={qrCodePageStyles.QR_PREVIEW_INNER}>
-        <img src={qrCodeDataUrl} alt="QR Code" style={qrCodePageStyles.QR_PREVIEW_IMAGE} />
-        <Box sx={qrCodePageStyles.QR_PREVIEW_ACTIONS}>
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
+    <div className="flex flex-col justify-center items-center min-h-[200px] border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
+      <div className="flex flex-col items-center w-full">
+        <img src={qrCodeDataUrl} alt="QR Code" className="w-[250px] h-[250px] block" />
+        <div className="flex gap-2 mt-4">
+          <button
+            type="button"
             onClick={onDownload}
-            sx={qrCodePageStyles.DOWNLOAD_BUTTON}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-green-700 bg-white border border-green-600 rounded-lg hover:bg-green-50 transition-colors"
           >
+            <Download className="w-4 h-4" />
             {t('qrCode:downloadButton')}
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<ContentCopyIcon />}
+          </button>
+          <button
+            type="button"
             onClick={onCopy}
-            sx={qrCodePageStyles.COPY_BUTTON}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
           >
+            <Copy className="w-4 h-4" />
             {t('qrCode:copyQrButton')}
-          </Button>
-        </Box>
-      </Box>
-    </Box>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
