@@ -1,19 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Alert,
-  alpha,
-  Box,
-  Button,
-  Container,
-  Stack,
-  TextField,
-  Typography,
-  Paper,
-} from '@mui/material';
-import CodeIcon from '@mui/icons-material/Code';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import PrintIcon from '@mui/icons-material/Print';
-import DownloadIcon from '@mui/icons-material/Download';
+import { Code, Trash2, Printer, Download } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
@@ -121,7 +107,6 @@ export default function MarkdownToHtmlPage() {
   const result = useMemo(() => markdownToHtml(markdown), [markdown]);
   const error = result.hasError ? (result.error ?? null) : null;
 
-  // 更新 iframe 预览内容
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe || !iframe.contentDocument) return;
@@ -163,18 +148,12 @@ export default function MarkdownToHtmlPage() {
   const showPreview = previewMode !== 'html';
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      <PageHeader title={t('pageTitle')} subtitle={t('pageSubtitle')} icon={<CodeIcon />} />
+    <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <PageHeader title={t('pageTitle')} subtitle={t('pageSubtitle')} icon={<Code size={20} />} />
 
-      <Stack spacing={2}>
+      <div className="flex flex-col gap-4">
         {/* 工具栏 */}
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          flexWrap="wrap"
-          gap={1.5}
-        >
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <SwitchButtonGroup
             value={previewMode}
             options={[
@@ -186,200 +165,96 @@ export default function MarkdownToHtmlPage() {
             size="small"
           />
 
-          <Stack direction="row" spacing={1}>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<DeleteOutlineIcon />}
+          <div className="flex gap-2">
+            <button
               onClick={handleClear}
-              sx={{ borderRadius: 2 }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
+              <Trash2 size={14} />
               {t('clear')}
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<PrintIcon />}
+            </button>
+            <button
               onClick={handlePrint}
-              sx={{ borderRadius: 2 }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
+              <Printer size={14} />
               {t('print')}
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<DownloadIcon />}
+            </button>
+            <button
               onClick={handleDownload}
-              sx={{ borderRadius: 2 }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
+              <Download size={14} />
               {t('download')}
-            </Button>
-          </Stack>
-        </Stack>
+            </button>
+          </div>
+        </div>
 
         {/* 错误提示 */}
         {error && (
-          <Alert severity="error" sx={{ borderRadius: 2 }}>
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
             {error}
-          </Alert>
+          </div>
         )}
 
         {/* 主内容区 */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: showInput && showPreview ? '1fr 1fr' : '1fr',
-            },
-            gap: 2,
-            minHeight: 500,
-          }}
+        <div
+          className={`grid gap-4 min-h-[500px] ${
+            showInput && showPreview ? 'md:grid-cols-2' : 'grid-cols-1'
+          }`}
         >
           {/* Markdown 输入区 */}
           {showInput && (
-            <Paper
-              elevation={0}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 3,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                  {t('inputLabel')}
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+            <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 bg-blue-50/50 border-b border-gray-200">
+                <span className="text-xs font-bold text-gray-500">{t('inputLabel')}</span>
+                <span className="text-xs text-gray-400">
                   {t('charCount', { count: markdown.length })}
-                </Typography>
-              </Box>
-              <TextField
-                multiline
-                fullWidth
+                </span>
+              </div>
+              <textarea
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
                 placeholder={t('inputPlaceholder')}
-                sx={{
-                  flex: 1,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 0,
-                    fontFamily: 'monospace',
-                    fontSize: '0.85rem',
-                    lineHeight: 1.6,
-                    alignItems: 'flex-start',
-                    '& fieldset': { border: 'none' },
-                  },
-                  '& .MuiInputBase-input': {
-                    py: 2,
-                    px: 2,
-                    minHeight: 400,
-                  },
-                }}
+                className="flex-1 min-h-[400px] p-4 font-mono text-[0.85rem] leading-relaxed resize-none focus:outline-none"
               />
-            </Paper>
+            </div>
           )}
 
           {/* 预览/输出区 */}
           {showPreview && (
-            <Paper
-              elevation={0}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 3,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+            <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 bg-blue-50/50 border-b border-gray-200">
+                <span className="text-xs font-bold text-gray-500">
                   {(previewMode as string) === 'html' ? t('htmlOutputLabel') : t('previewLabel')}
-                </Typography>
-                <Stack direction="row" spacing={0.5} alignItems="center">
-                  <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                </span>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-gray-400">
                     {t('charCount', { count: result.htmlLength })}
-                  </Typography>
+                  </span>
                   <CopyButton text={result.html} size="small" />
-                </Stack>
-              </Box>
+                </div>
+              </div>
 
               {(previewMode as string) === 'html' ? (
-                <TextField
-                  multiline
-                  fullWidth
+                <textarea
                   value={result.html}
-                  InputProps={{ readOnly: true }}
-                  sx={{
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 0,
-                      fontFamily: 'monospace',
-                      fontSize: '0.8rem',
-                      lineHeight: 1.5,
-                      alignItems: 'flex-start',
-                      '& fieldset': { border: 'none' },
-                    },
-                    '& .MuiInputBase-input': {
-                      py: 2,
-                      px: 2,
-                      minHeight: 400,
-                    },
-                  }}
+                  readOnly
+                  className="flex-1 min-h-[400px] p-4 font-mono text-[0.8rem] leading-relaxed resize-none focus:outline-none bg-gray-50"
                 />
               ) : (
-                <Box
-                  sx={{
-                    flex: 1,
-                    p: 2,
-                    minHeight: 400,
-                    overflow: 'auto',
-                    bgcolor: 'background.paper',
-                  }}
-                >
+                <div className="flex-1 p-4 min-h-[400px] overflow-auto bg-white">
                   <iframe
                     ref={iframeRef}
                     title="markdown-preview"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      minHeight: 380,
-                      border: 'none',
-                      background: 'transparent',
-                    }}
+                    className="w-full h-full min-h-[380px] border-none bg-transparent"
                   />
-                </Box>
+                </div>
               )}
-            </Paper>
+            </div>
           )}
-        </Box>
-      </Stack>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }
