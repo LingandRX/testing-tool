@@ -1,122 +1,98 @@
 # AGENTS.md
 
-This file provides guidance to AI agents (such as Gemini, Codex, etc.) when working with the code in this repository.
-
-## 项目概述
-
-**Testing Tools** 是一个基于 WXT (Web Extension Toolkit) 框架的现代化浏览器扩展项目. 它提供了一系列实用的开发和测试工具，包括时间戳转换、存储管理、文本统计、JWT 解析及二维码工具.
+WXT 浏览器扩展项目 (React 19 + TypeScript + MUI v7)。
 
 ## 核心命令
 
-### 开发与构建
-
-- `npm run dev` - 启动 Chrome 浏览器的开发模式（支持 HMR）
-- `npm run dev:firefox` - 启动 Firefox 浏览器的开发模式
-- `npm run build` - 构建 Chrome 浏览器的生产版本
-- `npm run build:firefox` - 构建 Firefox 浏览器的生产版本
-- `npm run zip` - 打包 Chrome 扩展为 ZIP 文件
-- `npm run zip:firefox` - 打包 Firefox 扩展为 ZIP 文件
-- `npm run typecheck` - 执行 TypeScript 类型检查（`tsc --noEmit`）
-- `npm run lint` - 运行 ESLint 静态代码检查
-
-### 测试
-
-- `npm run test` - 运行所有单元测试（单次执行）
-- `npm run test:watch` - 启动 Vitest 交互式监视模式
-- `npm run test:coverage` - 运行测试并生成代码覆盖率报告
-
-**运行单个测试文件：**
-
 ```bash
-npx vitest run path/to/your.test.ts
+npm run dev              # Chrome 开发模式 (HMR)
+npm run dev:firefox      # Firefox 开发模式
+npm run build            # Chrome 生产构建
+npm run build:firefox    # Firefox 生产构建
+npm run lint             # ESLint (--max-warnings=0)
+npm run typecheck        # tsc --noEmit
+npm run test             # vitest run (单次执行)
+npm run test:watch       # vitest 监视模式
+npm run test:coverage    # 带覆盖率的测试
 ```
 
-### 依赖管理
+运行单个测试: `npx vitest run path/to/file.test.ts`
 
-- `npm install` - 安装项目依赖
-- `postinstall` 钩子会自动运行 `wxt prepare` 以生成必要的类型定义和入口点.
-- `prepare` 钩子会自动初始化 Husky 以进行 Git 提交前检查.
+## 验证流程
 
-## 项目架构与目录结构
+CI 执行顺序: `lint → typecheck → test → build` (build 依赖前三者)。
 
-### 技术栈
+Pre-commit hook (lint-staged) 顺序:
 
-- **框架**: WXT v0.20.6 (Web Extension Toolkit)
-- **前端**: React 19 + TypeScript 5
-- **UI 库**: Material UI (MUI) @7.x + Emotion
-- **日期处理**: dayjs (集成 UTC 和 Timezone 插件)
-- **通信**: `@webext-core/messaging` (用于 Entrypoints 间通信)
-- **测试**: Vitest + Testing Library (jsdom 环境)
-- **代码规范**: ESLint v9 + Prettier + Husky + lint-staged
+1. `prettier --write`
+2. `eslint --fix --max-warnings=0`
+3. `tsc --noEmit`
 
-### 目录结构
+提交前确保三者通过。
 
-```text
-├── components/           # 原子级 UI 组件
-│   ├── __tests__/        # 组件单元测试
-│   ├── PageHeader.tsx    # 标准页面头部
-│   ├── ToolCard.tsx      # 仪表盘卡片基础
-│   └── ...
-├── config/               # 核心配置与元数据
-│   ├── features.tsx      # 功能特性定义（路由与元数据的单一事实来源）
-│   ├── pageTheme.ts      # 页面级主题与样式常量
-│   └── theme.ts          # MUI 全局主题配置
-├── entrypoints/          # 浏览器扩展入口点
-│   ├── background.ts     # 后台 Service Worker (消息中转与生命周期)
-│   ├── content.ts        # 注入页面的内容脚本
-│   ├── popup/            # 弹窗界面主入口
-│   ├── options/          # 选项页面主入口
-│   └── sidepanel/        # 侧边栏界面主入口
-├── pages/                # 功能模块页面组件
-│   ├── DashboardPage.tsx # 仪表盘/首页
-│   ├── Jwt/index.tsx       # JWT 解析工具
-│   ├── QrCode/index.tsx    # 二维码工具
-│   ├── StorageCleaner/index.tsx # 存储清理工具
-│   ├── TextStatistics/index.tsx # 文本统计工具
-│   └── Timestamp/index.tsx # 时间戳转换工具
-├── providers/            # React Context Providers (Router, Theme 等)
-├── utils/                # 业务逻辑与工具函数
-│   ├── chromeStorage.ts  # 类型安全的 Chrome Storage 封装
-│   ├── jwt.ts            # JWT 解析逻辑
-│   ├── textStatistics.ts # 文本分析逻辑
-│   └── ...
-├── types/                # 全局 TypeScript 类型声明
-└── public/               # 静态资源 (图标等)
+## 项目结构
+
+```
+config/features.tsx    # 功能定义（路由 + 元数据的单一事实来源）
+config/pageTheme.ts    # 页面级主题常量
+config/theme.ts        # MUI 全局主题
+entrypoints/           # 扩展入口点 (popup/, options/, sidepanel/, background.ts, content.ts)
+pages/                 # 功能页面组件 (懒加载)
+components/            # 可复用 UI 组件
+providers/             # React Context (Router, Theme 等)
+utils/                 # 工具函数与服务抽象
+types/                 # TypeScript 类型声明
+i18n/locales/{zh,en}/  # 国际化资源 (common.json, features.json)
 ```
 
-## 核心功能说明
+## 关键架构决策
 
-### 1. 路由与功能发现
+**路由**: 不使用 React Router。通过 `config/features.tsx` 的 `FEATURES` 数组管理，`RouterProvider` 根据 `PageType` 渲染对应组件。
 
-项目不使用传统的 React Router，而是通过 `config/features.tsx` 中的 `FEATURES` 数组统一管理.
+**存储**: 所有 Chrome Storage 键必须在 `types/storage.d.ts` 的 `StorageSchema` 中定义。使用 `utils/chromeStorage.ts` 及其 Hook。
 
-- 每个功能都有一个唯一的 `PageType` (如 `timestamp`, `jwt`).
-- `RouterProvider` 负责维护当前的页面状态，并根据 `FEATURES` 配置渲染对应的组件.
+**通信**: 使用 `@webext-core/messaging`，协议定义在 `utils/messages.ts`。
 
-### 2. 存储管理 (Chrome Storage)
+**路径别名**: `@/` 映射到项目根目录 (已在 tsconfig 和 vitest.config 中配置)。
 
-- 统一使用 `utils/chromeStorage.ts` 及其对应的 Hook.
-- 所有的存储键值必须在 `types/storage.d.ts` 的 `StorageSchema` 中定义，以确保存储的类型安全.
+## 测试环境
 
-### 3. 消息通信 (Messaging)
+- 环境: jsdom
+- 全局变量: `vitest/globals` (describe, it, expect 等无需导入)
+- Setup 文件: `vitest.setup.ts` 自动 mock:
+  - `chrome.*` API (storage, tabs, runtime, cookies 等)
+  - `react-i18next` (返回 key 作为翻译)
+  - `window.matchMedia`
+- 测试文件命名: `__tests__/*.test.{ts,tsx}` 或 `*.test.{ts,tsx}`
 
-- 使用 `@webext-core/messaging` 进行 Popup, Sidepanel, Background 和 Content Script 之间的通信.
-- 消息协议定义在 `utils/messages.ts` 中.
+## i18n
 
-### 4. 样式系统
+- 命名空间: `common` (默认), `features`
+- 翻译键格式: `namespace:key` (如 `features:timestamp.title`)
+- 语言: `zh` (默认), `en`
+- 添加新翻译: 编辑 `i18n/locales/{zh,en}/{common,features}.json`
 
-- 基于 MUI v7 的 `Box`, `Stack`, `Paper` 等组件构建.
-- 页面特定的复杂样式应在 `config/pageTheme.ts` 中统一定义，以保持视觉一致性.
+## 新功能开发清单
 
-## AI 代理开发准则
+1. 在 `types/storage.d.ts` 添加 `PageType` 联合类型
+2. 在 `config/features.tsx` 的 `FEATURES` 数组添加配置
+3. 在 `pages/` 创建页面组件 (懒加载)
+4. 在 `i18n/locales/{zh,en}/features.json` 添加翻译
+5. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
+6. 添加对应的单元测试
 
-1.  **类型安全**: 始终优先使用 TypeScript 接口和类型. 不要使用 `any`.
-2.  **组件化**: 新功能应拆分为 `pages/` 中的页面组件和 `components/` 中的通用组件.
-3.  **单元测试**: 每次修改逻辑或添加新功能后，必须在对应的 `__tests__` 目录下增加测试用例.
-4.  **单一事实来源**: 功能的添加、修改或删除应首先从 `config/features.tsx` 开始.
-5.  **跨浏览器兼容**: WXT 处理了大部分差异，但涉及原生 API (如 `chrome.cookies`) 时，请确保逻辑在 Firefox 和 Chrome 下均有效.
-6.  **i18n**: 目前主要使用中文 UI，但在开发时请注意提取硬编码字符串，以便未来国际化.
+## 代码规范
 
-## 权限管理
+- 禁止使用 `any` (测试文件除外)
+- 未使用变量/参数: 使用 `_` 前缀 (如 `_unused`)
+- 样式: 复杂页面样式放 `config/pageTheme.ts`，简单样式用 MUI `sx` prop
+- 格式: Prettier (100 字符宽, 单引号, 尾逗号)
 
-所有新申请的浏览器权限必须同步更新至 `wxt.config.ts` 的 `manifest.permissions` 中.
+## 技术栈版本
+
+- WXT: ^0.20.26
+- React: ^19.2.6
+- MUI: ^7.3.8
+- TypeScript: ^5.9.3
+- Vitest: ^4.1.7
+- i18next: ^26.2.0
