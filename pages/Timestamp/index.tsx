@@ -1,9 +1,7 @@
-import { Box, Container, MenuItem, Select, Stack, TextField } from '@mui/material';
 import { Clock } from 'lucide-react';
-import Button from '@/components/Button';
 import PageHeader from '@/components/PageHeader';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
-import { timestampPageStyles, ZONES } from '@/config/pageTheme';
+import { ZONES } from '@/config/pageTheme';
 import LiveClock from './LiveClock';
 import ResultView from './ResultView';
 import { useTimestampConverter } from './useTimestampConverter';
@@ -28,8 +26,8 @@ export default function Index() {
   } = useTimestampConverter();
 
   return (
-    <Box>
-      <Container maxWidth="lg" sx={{ p: 2 }}>
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto p-4">
         {/* Header */}
         <PageHeader
           title={t('timestamp:pageTitle')}
@@ -41,9 +39,9 @@ export default function Index() {
         <LiveClock unit={unit} onUseNow={handleUseNow} />
 
         {/* 桌面端 md+ 左右分栏；移动端单栏堆叠 */}
-        <Box sx={timestampPageStyles.LAYOUT_GRID}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
           {/* 左栏：转换工作台 */}
-          <Box sx={timestampPageStyles.CONVERSION_CARD}>
+          <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-sm">
             {/* 模式切换 */}
             <SwitchButtonGroup
               value={mode}
@@ -56,26 +54,22 @@ export default function Index() {
             />
 
             {/* 输入区 */}
-            <Stack spacing={1.5}>
-              <TextField
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
                 placeholder={
                   mode === 'ts2dt' ? t('timestamp:placeholderTs') : t('timestamp:placeholderDate')
                 }
                 value={mode === 'ts2dt' ? tsInput : dtInput}
                 onChange={(e) => setInput(e.target.value)}
-                error={!!error}
-                helperText={error}
-                fullWidth
-                sx={timestampPageStyles.INPUT_STYLE}
+                className={`w-full px-4 py-2.5 rounded-lg border ${
+                  error ? 'border-red-500' : 'border-gray-300'
+                } bg-white text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
               />
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 
               {/* 单位+时区紧凑横排 */}
-              <Stack
-                direction="row"
-                spacing={1.5}
-                useFlexGap
-                sx={{ width: '100%', flexWrap: 'wrap' }}
-              >
+              <div className="flex flex-wrap gap-3 w-full">
                 <SwitchButtonGroup
                   value={unit}
                   options={[
@@ -87,43 +81,35 @@ export default function Index() {
                   size="small"
                 />
 
-                <Select
+                <select
                   value={zone}
                   onChange={(e) => setZone(e.target.value as typeof zone)}
-                  sx={{
-                    ...timestampPageStyles.INPUT_STYLE,
-                    flex: 1,
-                    minWidth: 0,
-                    borderRadius: 4,
-                    '& .MuiSelect-select': {
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    },
-                  }}
-                  MenuProps={timestampPageStyles.SELECT_MENU_PROPS}
+                  className="flex-1 min-w-0 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
                   {ZONES.map((z) => (
-                    <MenuItem key={z} value={z} sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
+                    <option key={z} value={z} className="text-sm font-semibold">
                       {z}
-                    </MenuItem>
+                    </option>
                   ))}
-                </Select>
-              </Stack>
-            </Stack>
+                </select>
+              </div>
+            </div>
 
             {/* 立即转换 */}
-            <Button variant="contained" onClick={convert} sx={timestampPageStyles.CONVERT_BUTTON}>
+            <button
+              onClick={convert}
+              className="block mx-auto mt-4 mb-1 max-w-[240px] w-full py-2.5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
+            >
               {t('timestamp:convertButton')}
-            </Button>
-          </Box>
+            </button>
+          </div>
 
           {/* 右栏：结果展示卡片 */}
-          <Box sx={timestampPageStyles.RESULT_COLUMN_CARD}>
+          <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-sm h-full flex flex-col">
             <ResultView result={result} mode={mode} unit={unit} zone={zone} showEmptyPlaceholder />
-          </Box>
-        </Box>
-      </Container>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
