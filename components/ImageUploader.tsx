@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Box, IconButton, Typography } from '@mui/material';
-import ImageIcon from '@mui/icons-material/Image';
-import ClearIcon from '@mui/icons-material/Clear';
-import { qrCodePageStyles } from '@/config/pageTheme';
+import { Image, X } from 'lucide-react';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
@@ -115,9 +112,14 @@ const ImageUploader = ({
   }, [showMessage, handleFileChange, t]);
 
   return (
-    <Box
-      className="qr-flex-grow"
-      sx={qrCodePageStyles.DROPZONE(dragging, !!selectedFile)}
+    <div
+      className={`flex flex-col items-center justify-center h-[250px] border-2 border-dashed rounded-xl p-4 cursor-pointer transition-all duration-200 ${
+        dragging
+          ? 'border-green-600 bg-green-50'
+          : selectedFile
+            ? 'border-green-600 bg-green-50/50'
+            : 'border-gray-300 bg-gray-50 hover:border-green-600 hover:bg-green-50/50'
+      }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -127,52 +129,42 @@ const ImageUploader = ({
         type="file"
         accept="image/*"
         onChange={handleInputChange}
-        style={{ display: 'none' }}
+        className="hidden"
         id="qr-code-upload"
       />
-      <label
-        htmlFor="qr-code-upload"
-        style={{ cursor: 'pointer', textAlign: 'center', width: '100%' }}
-      >
+      <label htmlFor="qr-code-upload" className="cursor-pointer text-center w-full">
         {selectedFile ? (
-          <Box sx={qrCodePageStyles.IMAGE_PREVIEW_WRAPPER}>
-            <Box sx={qrCodePageStyles.IMAGE_PREVIEW_BOX}>
+          <div className="text-center w-full relative">
+            <div className="relative inline-block">
               <img
                 src={previewUrl}
                 alt="QR Code Preview"
-                style={qrCodePageStyles.IMAGE_PREVIEW_IMG}
+                className="max-w-full max-h-40 rounded-lg object-contain"
               />
-              <IconButton
-                size="small"
+              <button
+                type="button"
+                data-testid="ClearIcon"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleClearFile();
                 }}
-                sx={qrCodePageStyles.CLEAR_BUTTON}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
               >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              {selectedFile.name}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('qrCode:clickToChange')}
-            </Typography>
-          </Box>
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+            <span className="block text-sm text-gray-500 mt-2">{selectedFile.name}</span>
+            <span className="block text-xs text-gray-400">{t('qrCode:clickToChange')}</span>
+          </div>
         ) : (
           <>
-            <ImageIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {t('qrCode:clickToUpload')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('qrCode:supportFormats')}
-            </Typography>
+            <Image data-testid="ImageIcon" className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+            <span className="block text-sm text-gray-500 mb-1">{t('qrCode:clickToUpload')}</span>
+            <span className="block text-xs text-gray-400">{t('qrCode:supportFormats')}</span>
           </>
         )}
       </label>
-    </Box>
+    </div>
   );
 };
 
