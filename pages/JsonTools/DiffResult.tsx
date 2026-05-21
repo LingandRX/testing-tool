@@ -1,7 +1,4 @@
-import { Box, Stack, Typography, useTheme } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
-import { jsonDiffPageStyles, surfaceTint } from '@/config/pageTheme';
 import JsonTree from './JsonTree';
 import type { DiffNode, DiffResult as DiffResultType, DiffType, ViewMode } from './types';
 
@@ -16,41 +13,30 @@ export default function DiffResult({ result, viewMode, activePath }: DiffResultP
 
   if (viewMode === 'sideBySide') {
     return (
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="stretch">
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+      <div className="flex flex-col md:flex-row gap-4 items-stretch">
+        <div className="flex-1 min-w-0">
           <SectionLabel text={t('jsonDiff:leftLabel')} />
           <JsonTree node={result.root} side="left" activePath={activePath} />
-        </Box>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+        </div>
+        <div className="flex-1 min-w-0">
           <SectionLabel text={t('jsonDiff:rightLabel')} />
           <JsonTree node={result.root} side="right" activePath={activePath} />
-        </Box>
-      </Stack>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Box sx={jsonDiffPageStyles.TREE_CONTAINER}>
+    <div className="p-3 rounded-lg bg-white border border-gray-200 font-mono text-sm overflow-x-auto min-h-[200px] max-h-[480px] overflow-y-auto">
       <UnifiedView node={result.root} depth={0} activePath={activePath} />
-    </Box>
+    </div>
   );
 }
 
 const SectionLabel = ({ text }: { text: string }) => (
-  <Typography
-    variant="caption"
-    sx={{
-      display: 'block',
-      mb: 0.6,
-      fontWeight: 800,
-      fontSize: '0.7rem',
-      letterSpacing: 0.4,
-      color: 'text.secondary',
-      textTransform: 'uppercase',
-    }}
-  >
+  <span className="block mb-1.5 text-[11px] font-extrabold tracking-wider text-gray-500 uppercase">
     {text}
-  </Typography>
+  </span>
 );
 
 const formatPrimitive = (v: unknown): string => {
@@ -71,17 +57,17 @@ const prefixForType = (type: DiffType): string => {
   return '  ';
 };
 
-const colorForType = (type: DiffType): string | undefined => {
-  if (type === 'added') return jsonDiffPageStyles.addedText;
-  if (type === 'removed') return jsonDiffPageStyles.removedText;
-  if (type === 'modified') return jsonDiffPageStyles.modifiedText;
-  return undefined;
+const colorForType = (type: DiffType): string => {
+  if (type === 'added') return 'text-green-600';
+  if (type === 'removed') return 'text-red-600';
+  if (type === 'modified') return 'text-amber-600';
+  return 'text-gray-900';
 };
 
-const bgForType = (type: DiffType, theme: Theme): string | undefined => {
-  if (type === 'added') return surfaceTint(theme, theme.palette.success.main, 0.15);
-  if (type === 'removed') return surfaceTint(theme, theme.palette.error.main, 0.15);
-  if (type === 'modified') return surfaceTint(theme, theme.palette.warning.main, 0.15);
+const bgForType = (type: DiffType): string | undefined => {
+  if (type === 'added') return 'bg-green-50';
+  if (type === 'removed') return 'bg-red-50';
+  if (type === 'modified') return 'bg-amber-50';
   return undefined;
 };
 
@@ -177,29 +163,18 @@ interface UnifiedRowProps {
 }
 
 const UnifiedRow = ({ depth, type, text, active, multiline }: UnifiedRowProps) => {
-  const theme = useTheme();
   const color = colorForType(type);
-  const bg = bgForType(type, theme);
+  const bg = bgForType(type);
   return (
-    <Box
-      sx={{
-        pl: depth * 1.5,
-        pr: 1,
-        py: 0.2,
-        bgcolor: bg,
-        color: color ?? 'text.primary',
-        outline: active ? '2px solid' : 'none',
-        outlineColor: 'primary.main',
-        borderRadius: 0.5,
-        whiteSpace: multiline ? 'pre' : 'nowrap',
-        fontFamily: 'monospace',
-      }}
+    <div
+      className={`${bg ?? ''} ${color} ${active ? 'ring-2 ring-blue-500 rounded' : ''} ${
+        multiline ? 'whitespace-pre' : 'whitespace-nowrap'
+      } font-mono`}
+      style={{ paddingLeft: `${depth * 1.5}rem`, paddingRight: '0.25rem', paddingBlock: '0.2rem' }}
     >
-      <Box component="span" sx={{ fontWeight: 800 }}>
-        {prefixForType(type)}
-      </Box>
-      <Box component="span">{text}</Box>
-    </Box>
+      <span className="font-extrabold">{prefixForType(type)}</span>
+      <span>{text}</span>
+    </div>
   );
 };
 

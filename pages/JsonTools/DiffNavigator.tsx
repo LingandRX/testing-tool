@@ -1,8 +1,5 @@
-import { Box, IconButton, Typography } from '@mui/material';
-import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
-import { jsonDiffPageStyles } from '@/config/pageTheme';
 
 interface DiffNavigatorProps {
   total: number;
@@ -17,29 +14,34 @@ export default function DiffNavigator({ total, currentIndex, onPrev, onNext }: D
 
   if (total === 0) {
     return (
-      <Box sx={jsonDiffPageStyles.NAVIGATOR}>
-        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-          {t('jsonDiff:noDiffs')}
-        </Typography>
-      </Box>
+      <div className="flex items-center justify-center gap-3 p-2.5 rounded-lg bg-blue-50 border border-blue-200">
+        <span className="text-sm font-bold text-gray-500">{t('jsonDiff:noDiffs')}</span>
+      </div>
     );
   }
 
   return (
-    <Box sx={jsonDiffPageStyles.NAVIGATOR}>
-      <IconButton size="small" aria-label={t('jsonDiff:previousDiff')} onClick={onPrev}>
-        <NavigateBeforeIcon />
-      </IconButton>
-      <Typography
-        variant="body2"
-        sx={{ fontWeight: 800, fontFamily: 'monospace', minWidth: 60, textAlign: 'center' }}
+    <div className="flex items-center justify-center gap-3 p-2.5 rounded-lg bg-blue-50 border border-blue-200">
+      <button
+        type="button"
+        aria-label={t('jsonDiff:previousDiff')}
+        onClick={onPrev}
+        className="p-1 rounded-md hover:bg-blue-100 transition-colors"
       >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <span className="text-sm font-extrabold font-mono min-w-[60px] text-center">
         {currentIndex + 1} / {total}
-      </Typography>
-      <IconButton size="small" aria-label={t('jsonDiff:nextDiff')} onClick={onNext}>
-        <NavigateNextIcon />
-      </IconButton>
-    </Box>
+      </span>
+      <button
+        type="button"
+        aria-label={t('jsonDiff:nextDiff')}
+        onClick={onNext}
+        className="p-1 rounded-md hover:bg-blue-100 transition-colors"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+    </div>
   );
 }
 
