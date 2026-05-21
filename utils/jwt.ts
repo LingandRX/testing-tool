@@ -60,6 +60,7 @@ export function decodeBase64Url(str: string): string {
   } catch (e) {
     throw new Error(
       i18n.t('jwt:errors.failedToDecode') + (e instanceof Error ? e.message : String(e)),
+      { cause: e },
     );
   }
 }

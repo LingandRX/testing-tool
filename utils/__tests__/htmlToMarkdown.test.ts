@@ -230,8 +230,8 @@ describe('downloadMarkdownFile', () => {
     };
 
     vi.spyOn(document, 'createElement').mockReturnValue(mockLink as any);
-    vi.spyOn(document.body, 'appendChild').mockImplementation(appendChildSpy);
-    vi.spyOn(document.body, 'removeChild').mockImplementation(removeChildSpy);
+    vi.spyOn(document.body, 'appendChild').mockImplementation(appendChildSpy as any);
+    vi.spyOn(document.body, 'removeChild').mockImplementation(removeChildSpy as any);
   });
 
   afterEach(() => {
