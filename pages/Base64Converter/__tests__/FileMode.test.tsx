@@ -20,14 +20,16 @@ beforeEach(() => {
 const waitForStorageReady = () => act(() => Promise.resolve());
 
 describe('FileMode', () => {
-  it('应该渲染文件上传区域', () => {
+  it('应该渲染文件上传区域', async () => {
     render(<FileMode />);
+    await waitForStorageReady();
     expect(screen.getByText('clickOrDropToFile')).toBeInTheDocument();
     expect(screen.getByText('maxFileSize')).toBeInTheDocument();
   });
 
   it('应该处理有效的文件选择', async () => {
     render(<FileMode />);
+    await waitForStorageReady();
 
     const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
 
@@ -43,6 +45,7 @@ describe('FileMode', () => {
 
   it('应该拒绝超出大小限制的文件', async () => {
     render(<FileMode />);
+    await waitForStorageReady();
 
     // 创建一个超过 10MB 的文件
     const largeContent = new Uint8Array(11 * 1024 * 1024);
@@ -58,6 +61,7 @@ describe('FileMode', () => {
 
   it('点击清除按钮应该清空文件状态', async () => {
     render(<FileMode />);
+    await waitForStorageReady();
 
     const file = new File(['test'], 'test.txt', { type: 'text/plain' });
     const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -77,6 +81,7 @@ describe('FileMode', () => {
 
   it('应该显示文件大小和类型信息', async () => {
     render(<FileMode />);
+    await waitForStorageReady();
 
     const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
     const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -91,6 +96,7 @@ describe('FileMode', () => {
 
   it('应该显示原始大小和编码大小', async () => {
     render(<FileMode />);
+    await waitForStorageReady();
 
     const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
     const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -104,6 +110,7 @@ describe('FileMode', () => {
 
   it('应该提供复制按钮', async () => {
     render(<FileMode />);
+    await waitForStorageReady();
 
     const file = new File(['test'], 'test.txt', { type: 'text/plain' });
     const hiddenInput = document.querySelector('input[type="file"]') as HTMLInputElement;
