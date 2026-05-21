@@ -6,7 +6,6 @@ import { SnackbarProvider } from '@/components/GlobalSnackbar';
 import { Box } from '@mui/material';
 import { getEntryPointType } from '@/config/features';
 import { useMemo } from 'react';
-import { Button } from '@/components/ui/button';
 
 export default function App() {
   // 打开Chrome扩展选项页面，需确保manifest中已配置options_page或options_ui
@@ -64,9 +63,6 @@ export default function App() {
           <ErrorBoundary>
             <RouterContainer />
           </ErrorBoundary>
-          <Button variant="outline" className="m-4">
-            测试 Tailwind CSS 按钮
-          </Button>
         </Box>
       </SnackbarProvider>
     </RouterProvider>
