@@ -26,15 +26,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Package Chrome extension
-        run: npx wxt zip
+        run: npm run zip
 
       - name: Package Firefox extension
-        run: npx wxt zip -b firefox
+        run: npm run zip:firefox
 
       - name: Find zip artifacts
         id: find_zips
