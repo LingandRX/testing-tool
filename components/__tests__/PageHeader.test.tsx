@@ -47,9 +47,8 @@ describe('PageHeader 组件系统', () => {
 
     it('应默认使用蓝色作为 primary 色', () => {
       render(<PageHeader {...defaultProps} />);
-      const iconContainer = screen.getByTestId('test-icon').parentElement;
-      expect(iconContainer).toHaveStyle('background-color: #3b82f615');
-      expect(iconContainer).toHaveStyle('color: #3b82f6');
+      const iconContainer = screen.getByTestId('test-icon').parentElement?.parentElement;
+      expect(iconContainer).toHaveClass('text-blue-500');
     });
 
     it('应渲染 badge 组件', () => {
@@ -58,28 +57,28 @@ describe('PageHeader 组件系统', () => {
       expect(screen.getByTestId('test-badge')).toBeInTheDocument();
     });
 
-    it('应支持自定义 iconSx', () => {
-      render(<PageHeader {...defaultProps} iconSx={{ borderRadius: '8px' }} />);
-      const iconContainer = screen.getByTestId('test-icon').parentElement;
-      expect(iconContainer).toHaveStyle('border-radius: 8px');
+    it('应支持自定义 iconClassName', () => {
+      render(<PageHeader {...defaultProps} iconClassName="custom-icon-class" />);
+      const iconContainer = screen.getByTestId('test-icon').parentElement?.parentElement;
+      expect(iconContainer).toHaveClass('custom-icon-class');
     });
 
-    it('应支持自定义 titleSx', () => {
-      render(<PageHeader {...defaultProps} titleSx={{ fontSize: '1.2rem' }} />);
+    it('应支持自定义 titleClassName', () => {
+      render(<PageHeader {...defaultProps} titleClassName="custom-title-class" />);
       const title = screen.getByText('时间戳转换');
-      expect(title).toHaveStyle('font-size: 1.2rem');
+      expect(title).toHaveClass('custom-title-class');
     });
 
-    it('应支持自定义 subtitleSx', () => {
-      render(<PageHeader {...defaultProps} subtitleSx={{ color: 'red' }} />);
+    it('应支持自定义 subtitleClassName', () => {
+      render(<PageHeader {...defaultProps} subtitleClassName="custom-subtitle-class" />);
       const subtitle = screen.getByText('Unix 毫秒数转换与格式化');
-      expect(subtitle).toHaveStyle('color: rgb(255, 0, 0)');
+      expect(subtitle).toHaveClass('custom-subtitle-class');
     });
 
-    it('应支持自定义 sx', () => {
-      const { container } = render(<PageHeader {...defaultProps} sx={{ marginBottom: '2rem' }} />);
+    it('应支持自定义 className', () => {
+      const { container } = render(<PageHeader {...defaultProps} className="custom-page-header" />);
       const outerElement = container.firstChild;
-      expect(outerElement).toHaveStyle('margin-bottom: 2rem');
+      expect(outerElement).toHaveClass('custom-page-header');
     });
 
     it('无副标题时不渲染副标题区域', () => {
