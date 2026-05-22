@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import QrCodePreview from '@/components/QrCodePreview';
 
 describe('QrCodePreview 组件', () => {
@@ -30,7 +30,7 @@ describe('QrCodePreview 组件', () => {
           onCopy={mockOnCopy}
         />,
       );
-      const img = screen.getByAltText('QR Code');
+      const img = screen.getByAltText('QR Code Preview');
       expect(img).toBeInTheDocument();
       expect(img).toHaveAttribute('src', testDataUrl);
     });
