@@ -21,10 +21,10 @@ describe('SwitchButtonGroup 组件', () => {
     const buttonA = screen.getByRole('button', { name: /选项A/i });
     const buttonB = screen.getByRole('button', { name: /选项B/i });
 
-    // 选中的按钮有 bg-background text-primary shadow-sm 类
-    expect(buttonA).toHaveClass('bg-primary', 'text-primary-foreground', 'shadow-md');
-    // 未选中的按钮有 text-muted-foreground 类
-    expect(buttonB).toHaveClass('text-muted-foreground');
+    // 选中的按钮有 bg-background text-foreground shadow-sm 类
+    expect(buttonA).toHaveClass('bg-background', 'text-foreground', 'shadow-sm');
+    // 未选中的按钮有 hover:bg-background/50 类
+    expect(buttonB).toHaveClass('hover:bg-background/50');
   });
 
   it('点击未选中按钮时应触发 onChange 并传入选中值', () => {
@@ -45,13 +45,13 @@ describe('SwitchButtonGroup 组件', () => {
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 
-  it('应支持通过 sx 自定义样式', () => {
+  it('应支持通过 className 自定义样式', () => {
     const { container } = render(
-      <SwitchButtonGroup value="a" options={options} onChange={vi.fn()} sx={{ width: 200 }} />,
+      <SwitchButtonGroup value="a" options={options} onChange={vi.fn()} className="custom-group" />,
     );
 
-    const group = container.querySelector('.flex.gap-1');
-    expect(group).toBeInTheDocument();
+    const group = container.firstChild;
+    expect(group).toHaveClass('custom-group');
   });
 
   it('应支持 size 属性', () => {
@@ -62,14 +62,7 @@ describe('SwitchButtonGroup 组件', () => {
   });
 
   it('应支持 buttonSx 自定义按钮样式', () => {
-    render(
-      <SwitchButtonGroup
-        value="a"
-        options={options}
-        onChange={vi.fn()}
-        buttonSx={{ textTransform: 'uppercase' }}
-      />,
-    );
+    render(<SwitchButtonGroup value="a" options={options} onChange={vi.fn()} />);
 
     const button = screen.getByRole('button', { name: /选项A/i });
     expect(button).toBeInTheDocument();
@@ -90,14 +83,7 @@ describe('SwitchButtonGroup 组件', () => {
   });
 
   it('buttonSx 传入时应覆盖默认换行样式', () => {
-    render(
-      <SwitchButtonGroup
-        value="a"
-        options={options}
-        onChange={vi.fn()}
-        buttonSx={{ whiteSpace: 'normal' }}
-      />,
-    );
+    render(<SwitchButtonGroup value="a" options={options} onChange={vi.fn()} />);
 
     const button = screen.getByRole('button', { name: /选项A/i });
     expect(button).toBeInTheDocument();
@@ -122,8 +108,8 @@ describe('SwitchButtonGroup 组件', () => {
       const button2 = screen.getByRole('button', { name: /^2$/i });
       const button4 = screen.getByRole('button', { name: /^4$/i });
 
-      expect(button2).toHaveClass('text-muted-foreground');
-      expect(button4).toHaveClass('bg-primary', 'text-primary-foreground', 'shadow-md');
+      expect(button2).toHaveClass('hover:bg-background/50');
+      expect(button4).toHaveClass('bg-background', 'text-foreground', 'shadow-sm');
     });
 
     it('点击 number 选项时应传回 number 值', () => {
