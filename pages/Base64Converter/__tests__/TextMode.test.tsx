@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import TextMode from '../TextMode';
 
 // Mock CopyButton
@@ -8,9 +8,17 @@ vi.mock('@/components/CopyButton', () => ({
 }));
 
 describe('TextMode', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('应该渲染编码/解码切换按钮', () => {
     render(<TextMode />);
-    expect(screen.getAllByText('encode').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('encode')).toBeInTheDocument();
     expect(screen.getByText('decode')).toBeInTheDocument();
   });
 
@@ -24,13 +32,13 @@ describe('TextMode', () => {
     const input = screen.getByPlaceholderText('textInputPlaceholder');
     fireEvent.change(input, { target: { value: 'Hello' } });
 
-    const convertBtn = screen.getAllByText('encode')[1];
-    fireEvent.click(convertBtn);
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('base64Output')).toBeInTheDocument();
     });
-    // 输出内容在 CopyButton 的 data-testid 中
     expect(screen.getByTestId('copy-button')).toHaveTextContent('SGVsbG8=');
   });
 
@@ -43,8 +51,9 @@ describe('TextMode', () => {
     const input = screen.getByPlaceholderText('base64InputPlaceholder');
     fireEvent.change(input, { target: { value: 'SGVsbG8=' } });
 
-    const convertBtn = screen.getAllByText('decode')[1];
-    fireEvent.click(convertBtn);
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('textOutput')).toBeInTheDocument();
@@ -61,8 +70,9 @@ describe('TextMode', () => {
     const input = screen.getByPlaceholderText('base64InputPlaceholder');
     fireEvent.change(input, { target: { value: 'invalid!!!' } });
 
-    const convertBtn = screen.getAllByText('decode')[1];
-    fireEvent.click(convertBtn);
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('invalidBase64')).toBeInTheDocument();
@@ -75,16 +85,17 @@ describe('TextMode', () => {
     // 先编码
     const input = screen.getByPlaceholderText('textInputPlaceholder');
     fireEvent.change(input, { target: { value: 'Hello' } });
-    fireEvent.click(screen.getAllByText('encode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('copy-button')).toHaveTextContent('SGVsbG8=');
     });
 
     // 切换方向
-    await act(async () => {
-      fireEvent.click(screen.getByText('decode'));
-    });
+    fireEvent.click(screen.getByText('decode'));
 
     // 输出应该被清除
     await waitFor(() => {
@@ -97,7 +108,10 @@ describe('TextMode', () => {
 
     const input = screen.getByPlaceholderText('textInputPlaceholder');
     fireEvent.change(input, { target: { value: 'Hello' } });
-    fireEvent.click(screen.getAllByText('encode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('copy-button')).toHaveTextContent('SGVsbG8=');
@@ -109,20 +123,6 @@ describe('TextMode', () => {
       expect(screen.queryByTestId('copy-button')).not.toBeInTheDocument();
       expect(input).toHaveValue('');
     });
-  });
-
-  it('空输入时转换按钮应该禁用', () => {
-    render(<TextMode />);
-    const convertBtn = screen.getAllByText('encode')[1];
-    expect(convertBtn).toBeDisabled();
-  });
-
-  it('输入非空时转换按钮应该启用', () => {
-    render(<TextMode />);
-    const input = screen.getByPlaceholderText('textInputPlaceholder');
-    fireEvent.change(input, { target: { value: 'Hello' } });
-    const convertBtn = screen.getAllByText('encode')[1];
-    expect(convertBtn).not.toBeDisabled();
   });
 
   it('解码模式下粘贴图片 data URI 时应该显示切换图像模式的提示', () => {
@@ -172,8 +172,9 @@ describe('TextMode', () => {
     const input = screen.getByPlaceholderText('base64InputPlaceholder');
     fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
 
-    const convertBtn = screen.getAllByText('decode')[1];
-    fireEvent.click(convertBtn);
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('binaryDataDetected')).toBeInTheDocument();

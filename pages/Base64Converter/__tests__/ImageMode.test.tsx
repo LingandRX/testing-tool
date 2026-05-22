@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ImageMode from '../ImageMode';
 
 // Mock CopyButton
@@ -13,6 +13,11 @@ vi.mock('@/components/CopyButton', () => ({
 
 beforeEach(() => {
   localStorage.clear();
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 const waitForStorageReady = () => act(() => Promise.resolve());
@@ -119,7 +124,7 @@ describe('ImageMode', () => {
   it('应该渲染 encode/decode 切换按钮', async () => {
     render(<ImageMode />);
     await waitForStorageReady();
-    expect(screen.getAllByText('encode').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('encode')).toBeInTheDocument();
     expect(screen.getByText('decode')).toBeInTheDocument();
   });
 
@@ -130,7 +135,10 @@ describe('ImageMode', () => {
 
     const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
-    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('decodedImageOutput')).toBeInTheDocument();
@@ -147,7 +155,10 @@ describe('ImageMode', () => {
 
     const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
-    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
 
     expect(await screen.findByDisplayValue('decoded.png')).toBeInTheDocument();
   });
@@ -159,7 +170,10 @@ describe('ImageMode', () => {
 
     const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: '!!!not base64' } });
-    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('invalidBase64')).toBeInTheDocument();

@@ -1,23 +1,28 @@
-import { Trash2, Upload } from 'lucide-react';
+import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
 import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
 import DecodeResultPaper from '@/components/DecodeResultPaper';
 import { Button } from '@/components/ui/button';
-import { downloadBlob, formatFileSize, MAX_FILE_SIZE } from '@/utils/base64Converter';
+import { downloadBlob, formatFileSize } from '@/utils/base64Converter';
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConvertDirection } from '@/types/storage';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
-import { useBase64Converter } from './useBase64Converter'; // 💡 斩断重复代码
+import { useBase64Converter } from './useBase64Converter';
 import { cn } from '@/lib/utils';
 
 const isValidDirection = (val: unknown): val is Base64ConvertDirection =>
   val === 'encode' || val === 'decode';
 
-export default function FileMode() {
+interface Base64ConverterSectionProps {
+  mode: 'file' | 'image';
+}
+
+export default function Base64ConverterSection({ mode }: Base64ConverterSectionProps) {
   const { t } = useTranslation('base64Converter');
+
   const [direction, setDirection] = useStorageState(
-    'base64Converter/fileMode/direction',
+    `base64Converter/${mode}Mode/direction`,
     'encode',
     isValidDirection,
   );
@@ -38,7 +43,14 @@ export default function FileMode() {
     setCustomFileName,
     resetAll,
     safeFileSelect,
-  } = useBase64Converter({ mode: 'file' });
+    maxFileSizeStr,
+  } = useBase64Converter({ mode });
+
+  const handleDirectionChange = (next: Base64ConvertDirection) => {
+    if (!next || next === direction) return;
+    resetAll();
+    setDirection(next);
+  };
 
   const handleDownload = () => {
     if (decoded) downloadBlob(decoded.blob, decodedFileName);
@@ -53,12 +65,7 @@ export default function FileMode() {
             { value: 'encode', label: t('encode') },
             { value: 'decode', label: t('decode') },
           ]}
-          onChange={(next) => {
-            if (next && next !== direction) {
-              resetAll();
-              setDirection(next);
-            }
-          }}
+          onChange={handleDirectionChange}
           size="small"
         />
       </div>
@@ -90,6 +97,7 @@ export default function FileMode() {
             <input
               ref={fileInputRef}
               type="file"
+              accept={mode === 'image' ? 'image/*' : undefined}
               hidden
               onChange={(e) => {
                 const file = e.target.files?.[0];
@@ -99,8 +107,19 @@ export default function FileMode() {
             {isLoading ? (
               <div className="w-9 h-9 border-3 border-primary/20 border-t-primary rounded-full animate-spin" />
             ) : info ? (
-              <div className="flex flex-col items-center gap-1.5 text-center">
-                <Upload className="w-8 h-8 text-primary animate-bounce" />
+              <div className="flex flex-col items-center gap-1.5 text-center w-full animate-in fade-in duration-200">
+                {mode === 'image' && result && (
+                  <div className="relative p-1 border border-border bg-background rounded-lg shadow-sm mb-1 max-w-[180px] overflow-hidden">
+                    <img
+                      src={result.output}
+                      alt="preview"
+                      className="max-h-32 w-full object-contain rounded"
+                    />
+                  </div>
+                )}
+                <Upload
+                  className={cn('w-8 h-8 text-primary', mode === 'file' && 'animate-bounce')}
+                />
                 <span className="text-sm font-bold text-foreground/90 max-w-[280px] truncate">
                   {info.name}
                 </span>
@@ -113,22 +132,28 @@ export default function FileMode() {
               </div>
             ) : (
               <div className="flex flex-col items-center gap-1.5 text-center">
-                <Upload className="w-8 h-8 text-muted-foreground/60" />
+                {mode === 'image' ? (
+                  <ImageIcon className="w-8 h-8 text-muted-foreground/60" />
+                ) : (
+                  <Upload className="w-8 h-8 text-muted-foreground/60" />
+                )}
                 <span className="text-xs font-bold text-foreground/80">
-                  {t('clickOrDropToFile')}
+                  {mode === 'image' ? t('clickOrDropToImage') : t('clickOrDropToFile')}
                 </span>
                 <span className="text-[10px] font-medium text-muted-foreground/60">
-                  {t('maxFileSize', { max: `${MAX_FILE_SIZE / 1024 / 1024} MB` })}
+                  {t('maxFileSize', { max: maxFileSizeStr })}
                 </span>
+                {mode === 'image' && (
+                  <span className="text-[10px] font-medium text-muted-foreground/50">
+                    {t('supportedFormats')}
+                  </span>
+                )}
               </div>
             )}
           </div>
 
           {encodeError && (
-            <div
-              role="alert"
-              className="p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl text-xs font-semibold text-destructive"
-            >
+            <div className="p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl text-xs font-semibold text-destructive">
               {encodeError}
             </div>
           )}
@@ -205,13 +230,23 @@ export default function FileMode() {
           />
           {decoded && (
             <DecodeResultPaper
-              title={t('decodedFileOutput')}
+              title={mode === 'image' ? t('decodedImageOutput') : t('decodedFileOutput')}
               mimeType={decoded.mimeType}
               blobSize={decoded.blob.size}
               fileName={decodedFileName}
               onFileNameChange={setCustomFileName}
               onDownload={handleDownload}
-            />
+            >
+              {mode === 'image' && (
+                <div className="relative p-1.5 border border-border bg-background dark:bg-muted/10 rounded-xl max-w-[220px] mb-3 overflow-hidden shadow-sm">
+                  <img
+                    src={`data:${decoded.mimeType};base64,${decoded.rawBase64}`}
+                    alt="decoded preview"
+                    className="max-h-40 w-full rounded-lg object-contain bg-[linear-gradient(45deg,#ccc_25%,transparent_25%),linear-gradient(-45deg,#ccc_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#ccc_75%),linear-gradient(-45deg,transparent_75%,#ccc_75%)] bg-[size:10px_10px] bg-[position:0_0,0_5px,5px_-5px,-5px_0] dark:bg-none"
+                  />
+                </div>
+              )}
+            </DecodeResultPaper>
           )}
         </div>
       )}
