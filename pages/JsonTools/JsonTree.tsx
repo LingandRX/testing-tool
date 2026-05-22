@@ -121,17 +121,17 @@ const NodeRow = ({
           onClick={() => setOverride(expanded ? 'closed' : 'open')}
           className={`cursor-pointer pr-1 py-0.5 ${bg ?? ''} ${
             isActive ? 'ring-2 ring-blue-500 rounded' : ''
-          } flex items-center gap-1 whitespace-nowrap hover:${bg ? 'bg-opacity-80' : 'bg-gray-50'}`}
+          } flex items-center gap-1 whitespace-nowrap hover:${bg ? 'bg-opacity-80' : 'bg-muted'}`}
           style={{ paddingLeft: `${depth * 1.5}rem` }}
         >
-          <span className="w-3 text-gray-500 text-[11px]">{expanded ? '▾' : '▸'}</span>
+          <span className="w-3 text-muted-foreground text-[11px]">{expanded ? '▾' : '▸'}</span>
           {!isRoot && (
-            <span className="text-gray-900 font-bold">{isArrayKeyDisplay(node.key)}:</span>
+            <span className="text-foreground font-bold">{isArrayKeyDisplay(node.key)}:</span>
           )}
-          <span className="text-gray-500">{open}</span>
-          {!expanded && <span className="text-gray-400 italic">{summarize(value)}</span>}
+          <span className="text-muted-foreground">{open}</span>
+          {!expanded && <span className="text-muted-foreground italic">{summarize(value)}</span>}
           {!expanded && (
-            <span className="text-gray-500">
+            <span className="text-muted-foreground">
               {close}
               {isLastChild ? '' : ','}
             </span>
@@ -154,7 +154,7 @@ const NodeRow = ({
         )}
         {expanded && (
           <div
-            className="text-gray-500 whitespace-nowrap"
+            className="text-muted-foreground whitespace-nowrap"
             style={{ paddingLeft: `${depth * 1.5 + 1.0625}rem` }}
           >
             {close}
@@ -175,8 +175,8 @@ const NodeRow = ({
       style={{ paddingLeft: `${depth * 1.5}rem` }}
     >
       <span className="w-3" />
-      {!isRoot && <span className="text-gray-900 font-bold">{isArrayKeyDisplay(node.key)}:</span>}
-      <span className={valueColor ?? 'text-gray-900'}>
+      {!isRoot && <span className="text-foreground font-bold">{isArrayKeyDisplay(node.key)}:</span>}
+      <span className={valueColor ?? 'text-foreground'}>
         {formatPrimitive(value)}
         {isLastChild ? '' : ','}
       </span>
@@ -206,7 +206,7 @@ export default function JsonTree({
 }: JsonTreeProps) {
   const sideKey = useMemo(() => side, [side]);
   return (
-    <div className="p-3 rounded-lg bg-white border border-gray-200 font-mono text-sm overflow-x-auto min-h-[200px] max-h-[480px] overflow-y-auto">
+    <div className="p-3 rounded-lg bg-background border border-border font-mono text-sm overflow-x-auto min-h-[200px] max-h-[480px] overflow-y-auto">
       <NodeRow
         node={node}
         side={sideKey}

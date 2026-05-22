@@ -137,7 +137,7 @@ const severityConfig: Record<
   { icon: React.ElementType; bgClass: string; textClass: string }
 > = {
   success: { icon: CheckCircle, bgClass: 'bg-green-500', textClass: 'text-white' },
-  info: { icon: Info, bgClass: 'bg-blue-500', textClass: 'text-white' },
+  info: { icon: Info, bgClass: 'bg-primary/100', textClass: 'text-white' },
   warning: { icon: AlertTriangle, bgClass: 'bg-amber-500', textClass: 'text-white' },
   error: { icon: XCircle, bgClass: 'bg-red-500', textClass: 'text-white' },
 };

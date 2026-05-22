@@ -27,7 +27,7 @@ export default function CleaningResult({ result }: CleaningResultProps) {
         )}
         <span
           className={`text-sm font-semibold leading-relaxed ${
-            isSuccess ? 'text-green-700' : 'text-red-700'
+            isSuccess ? 'text-green-600' : 'text-red-700'
           }`}
         >
           {isSuccess

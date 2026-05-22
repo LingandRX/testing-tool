@@ -27,14 +27,14 @@ export default function DiffResult({ result, viewMode, activePath }: DiffResultP
   }
 
   return (
-    <div className="p-3 rounded-lg bg-white border border-gray-200 font-mono text-sm overflow-x-auto min-h-[200px] max-h-[480px] overflow-y-auto">
+    <div className="p-3 rounded-lg bg-background border border-border font-mono text-sm overflow-x-auto min-h-[200px] max-h-[480px] overflow-y-auto">
       <UnifiedView node={result.root} depth={0} activePath={activePath} />
     </div>
   );
 }
 
 const SectionLabel = ({ text }: { text: string }) => (
-  <span className="block mb-1.5 text-[11px] font-extrabold tracking-wider text-gray-500 uppercase">
+  <span className="block mb-1.5 text-[11px] font-extrabold tracking-wider text-muted-foreground uppercase">
     {text}
   </span>
 );
@@ -61,7 +61,7 @@ const colorForType = (type: DiffType): string => {
   if (type === 'added') return 'text-green-600';
   if (type === 'removed') return 'text-red-600';
   if (type === 'modified') return 'text-amber-600';
-  return 'text-gray-900';
+  return 'text-foreground';
 };
 
 const bgForType = (type: DiffType): string | undefined => {

@@ -334,7 +334,7 @@ describe('TextInputArea 组件', () => {
       );
 
       const btn = screen.getByText('主要');
-      expect(btn).toHaveClass('bg-blue-600', 'text-white');
+      expect(btn).toHaveClass('bg-primary', 'text-white');
     });
   });
 
@@ -346,7 +346,7 @@ describe('TextInputArea 组件', () => {
 
     it('不设置 title 时不渲染标题', () => {
       const { container } = render(<TextInputArea value="" onChange={() => {}} />);
-      expect(container.querySelector('.text-gray-500')).not.toBeInTheDocument();
+      expect(container.querySelector('.text-muted-foreground')).not.toBeInTheDocument();
     });
   });
 

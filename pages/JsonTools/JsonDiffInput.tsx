@@ -17,7 +17,7 @@ export default function JsonDiffInput({
 }: JsonDiffInputProps) {
   return (
     <div className="flex-1 min-w-0">
-      <span className="block mb-1.5 text-[11px] font-extrabold tracking-wider text-gray-500 uppercase">
+      <span className="block mb-1.5 text-[11px] font-extrabold tracking-wider text-muted-foreground uppercase">
         {label}
       </span>
       <TextInputArea

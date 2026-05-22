@@ -31,7 +31,7 @@ export default function StorageOptionsGrid({
   ];
 
   return (
-    <div className="mb-3 border rounded-lg bg-white shadow-sm overflow-hidden transition-all hover:shadow-md">
+    <div className="mb-3 border rounded-lg bg-background shadow-sm overflow-hidden transition-all hover:shadow-md">
       <div className="p-3">
         <div className="grid grid-cols-2 gap-3">
           {optionKeys.map(({ key, isCount }) => (
@@ -48,13 +48,15 @@ export default function StorageOptionsGrid({
         </div>
       </div>
       <div className="border-t" />
-      <div className="flex justify-between items-center px-5 py-2 transition-colors hover:bg-gray-50 rounded-b-lg">
-        <span className="text-xs font-bold text-gray-500">{t('storageCleaner:selectAll')}</span>
+      <div className="flex justify-between items-center px-5 py-2 transition-colors hover:bg-muted rounded-b-lg">
+        <span className="text-xs font-bold text-muted-foreground">
+          {t('storageCleaner:selectAll')}
+        </span>
         <input
           type="checkbox"
           checked={allSelected}
           onChange={(e) => onSelectAll(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+          className="h-4 w-4 rounded border-input text-amber-500 focus:ring-amber-500"
         />
       </div>
     </div>

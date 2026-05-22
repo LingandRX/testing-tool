@@ -66,7 +66,9 @@ export default function Index() {
                 borderColor: `${textStatisticsPageStyles.primaryColor}1a`,
               }}
             >
-              <span className="text-gray-500 whitespace-nowrap mb-0 md:mb-1">{item.label}</span>
+              <span className="text-muted-foreground whitespace-nowrap mb-0 md:mb-1">
+                {item.label}
+              </span>
               <span
                 className="break-all font-semibold"
                 style={{ color: textStatisticsPageStyles.primaryColor }}

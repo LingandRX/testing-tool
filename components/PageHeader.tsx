@@ -92,7 +92,7 @@ export default function PageHeader({
         </div>
         {/* 副标题 */}
         {subtitle && (
-          <span className="text-xs font-semibold text-gray-500" style={subtitleSx}>
+          <span className="text-xs font-semibold text-muted-foreground" style={subtitleSx}>
             {subtitle}
           </span>
         )}
