@@ -287,6 +287,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
                 <button
                   type="button"
                   onClick={handleCopy}
+                  aria-label={t('textInputArea.copyContent')}
                   className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <Copy className="h-4 w-4" />
@@ -296,6 +297,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
                 <button
                   type="button"
                   onClick={handleClear}
+                  aria-label={t('textInputArea.clear')}
                   className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <X className="h-4 w-4" />
