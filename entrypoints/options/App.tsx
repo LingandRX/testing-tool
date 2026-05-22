@@ -91,14 +91,14 @@ function SortableFeatureRow({
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-gray-50 ${
-        isLast ? '' : 'border-b border-gray-200'
+      className={`flex items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-muted ${
+        isLast ? '' : 'border-b border-border'
       }`}
     >
       <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
         {/* 拖拽手柄 */}
         <div
-          className="drag-handle text-gray-300 cursor-grab touch-none transition-colors duration-200 hover:text-gray-500 active:cursor-grabbing"
+          className="drag-handle text-muted-foreground cursor-grab touch-none transition-colors duration-200 hover:text-foreground active:cursor-grabbing"
           {...attributes}
           {...listeners}
           aria-label={`拖拽以调整 ${t(feature.labelKey)} 的位置`}
@@ -119,12 +119,12 @@ function SortableFeatureRow({
 
         {/* 文本信息 */}
         <div className="min-w-0 flex-1">
-          <div className="font-bold text-[0.95rem] leading-tight text-gray-900">
+          <div className="font-bold text-[0.95rem] leading-tight text-foreground">
             {t(feature.labelKey)}
           </div>
           {feature.descriptionKey && (
             <div
-              className="text-xs text-gray-500 font-medium mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap"
+              className="text-xs text-muted-foreground font-medium mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap"
               title={t(feature.descriptionKey)}
             >
               {t(feature.descriptionKey)}
@@ -140,12 +140,12 @@ function SortableFeatureRow({
         aria-checked={isChecked}
         disabled={isDisabled}
         onClick={() => onToggle(pageKey)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-          isChecked ? 'bg-blue-600' : 'bg-gray-200'
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+          isChecked ? 'bg-primary' : 'bg-muted'
         } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+          className={`inline-block h-4 w-4 transform rounded-full bg-background transition-transform duration-200 ${
             isChecked ? 'translate-x-6' : 'translate-x-1'
           }`}
         />
@@ -306,16 +306,16 @@ export default function App() {
   if (!isLoaded) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="app min-h-screen bg-gray-50 flex flex-col">
+    <div className="app min-h-screen bg-background flex flex-col">
       <PageErrorBoundary>
         {/* 顶部标题与导航栏 */}
-        <div className="w-full bg-white border-b border-gray-200 pt-8 sm:pt-12 pb-0 px-4 sm:px-8">
+        <div className="w-full bg-background border-b border-border pt-8 sm:pt-12 pb-0 px-4 sm:px-8">
           <div className="max-w-3xl mx-auto">
             <PageHeader
               icon={<Settings size={20} />}
@@ -333,8 +333,8 @@ export default function App() {
                     onClick={(e) => handleWindowTypeChange(e, type)}
                     className={`px-4 sm:px-6 py-2 text-[0.9rem] font-bold transition-colors duration-200 ${
                       windowType === type
-                        ? 'text-blue-600 border-b-2 border-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'text-primary border-b-2 border-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {type === 'popup' ? 'Popup 窗口' : type === 'sidepanel' ? '侧边栏' : '标签页'}
@@ -343,7 +343,7 @@ export default function App() {
               </div>
               <button
                 onClick={handleRestoreDefaults}
-                className="mb-1 ml-2 p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                className="mb-1 ml-2 p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors duration-200"
                 title="恢复当前模式默认"
               >
                 <RefreshCw size={16} />
@@ -355,7 +355,7 @@ export default function App() {
         {/* 主内容区域 */}
         <div className="flex-1 p-4 sm:p-8">
           <div className="max-w-3xl mx-auto">
-            <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm">
+            <div className="rounded-2xl border border-border overflow-hidden bg-card shadow-sm">
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}

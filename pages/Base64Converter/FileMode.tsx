@@ -179,10 +179,10 @@ export default function FileMode() {
             onClick={() => fileInputRef.current?.click()}
             className={`flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed rounded-xl p-8 cursor-pointer transition-all duration-200 ${
               isDragging
-                ? 'border-blue-500 bg-blue-50'
+                ? 'border-primary bg-primary/10'
                 : info
-                  ? 'border-blue-500 bg-blue-50/50'
-                  : 'border-gray-300 bg-gray-50 hover:border-blue-500 hover:bg-blue-50/50'
+                  ? 'border-primary bg-primary/5'
+                  : 'border-input bg-muted hover:border-primary hover:bg-primary/5'
             }`}
           >
             <input
@@ -195,23 +195,23 @@ export default function FileMode() {
               }}
             />
             {isLoading ? (
-              <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-primary/30 border-t-blue-600 rounded-full animate-spin" />
             ) : info ? (
               <div className="flex flex-col items-center gap-1">
-                <Upload className="w-10 h-10 text-blue-600" />
+                <Upload className="w-10 h-10 text-primary" />
                 <span className="text-sm font-bold">{info.name}</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">
                   {formatFileSize(info.size)} · {info.type}
                 </span>
-                <span className="text-xs text-gray-400">{t('clickOrDropToReplace')}</span>
+                <span className="text-xs text-muted-foreground">{t('clickOrDropToReplace')}</span>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-1">
-                <Upload className="w-10 h-10 text-gray-400" />
-                <span className="text-sm text-gray-500 font-semibold">
+                <Upload className="w-10 h-10 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground font-semibold">
                   {t('clickOrDropToFile')}
                 </span>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {t('maxFileSize', { max: `${MAX_FILE_SIZE / 1024 / 1024} MB` })}
                 </span>
               </div>
@@ -228,9 +228,9 @@ export default function FileMode() {
           )}
 
           {result && (
-            <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+            <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold text-gray-500">{t('base64Output')}</span>
+                <span className="text-xs font-bold text-muted-foreground">{t('base64Output')}</span>
                 <div className="flex gap-1">
                   <CopyButton text={result.rawBase64} tooltip={t('copyRaw')} />
                   <CopyButton text={result.output} tooltip={t('copyDataUri')} color="info" />
@@ -247,17 +247,17 @@ export default function FileMode() {
                 showCount
               />
               <div className="flex items-center gap-4 mt-2">
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {t('originalSize')}: {formatFileSize(result.originalBytes)}
                 </span>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {t('encodedSize')}: {formatFileSize(result.outputBytes)}
                 </span>
                 <div className="flex-1" />
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:bg-accent rounded-md transition-colors"
                 >
                   <Trash2 className="w-3 h-3" />
                   {t('clear')}
@@ -270,7 +270,7 @@ export default function FileMode() {
             <button
               type="button"
               onClick={handleClear}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:bg-accent rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
               {t('clear')}

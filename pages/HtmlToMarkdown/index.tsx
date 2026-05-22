@@ -65,14 +65,14 @@ export default function HtmlToMarkdownPage() {
             <button
               onClick={handleDownload}
               disabled={!result.markdown}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-background border border-input rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Download size={14} />
               {t('download')}
             </button>
             <button
               onClick={handleClear}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-background border border-input rounded-lg hover:bg-muted transition-colors"
             >
               <Trash2 size={14} />
               {t('clear')}
@@ -95,10 +95,10 @@ export default function HtmlToMarkdownPage() {
         >
           {/* HTML 输入区 */}
           {showInput && (
-            <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between px-4 py-2 bg-blue-50/50 border-b border-gray-200">
-                <span className="text-xs font-bold text-gray-500">{t('inputLabel')}</span>
-                <span className="text-xs text-gray-400">
+            <div className="border border-border rounded-xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 bg-primary/5 border-b border-border">
+                <span className="text-xs font-bold text-muted-foreground">{t('inputLabel')}</span>
+                <span className="text-xs text-muted-foreground">
                   {t('charCount', { count: html.length })}
                 </span>
               </div>
@@ -113,15 +113,15 @@ export default function HtmlToMarkdownPage() {
 
           {/* Markdown 输出区 */}
           {showOutput && (
-            <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between px-4 py-2 bg-blue-50/50 border-b border-gray-200">
-                <span className="text-xs font-bold text-gray-500">
+            <div className="border border-border rounded-xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 bg-primary/5 border-b border-border">
+                <span className="text-xs font-bold text-muted-foreground">
                   {(previewMode as string) === 'markdown'
                     ? t('markdownOutputLabel')
                     : t('previewLabel')}
                 </span>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {t('charCount', { count: result.markdownLength })}
                   </span>
                   <CopyButton text={result.markdown} size="small" />
@@ -132,11 +132,13 @@ export default function HtmlToMarkdownPage() {
                 <textarea
                   value={result.markdown}
                   readOnly
-                  className="flex-1 min-h-[400px] p-4 font-mono text-[0.85rem] leading-relaxed resize-none focus:outline-none bg-gray-50"
+                  className="flex-1 min-h-[400px] p-4 font-mono text-[0.85rem] leading-relaxed resize-none focus:outline-none bg-muted"
                 />
               ) : (
-                <div className="flex-1 p-4 min-h-[400px] overflow-auto bg-white font-mono text-[0.85rem] leading-relaxed whitespace-pre-wrap break-words">
-                  {result.markdown || <span className="text-gray-400">{t('emptyHint')}</span>}
+                <div className="flex-1 p-4 min-h-[400px] overflow-auto bg-background font-mono text-[0.85rem] leading-relaxed whitespace-pre-wrap break-words">
+                  {result.markdown || (
+                    <span className="text-muted-foreground">{t('emptyHint')}</span>
+                  )}
                 </div>
               )}
             </div>

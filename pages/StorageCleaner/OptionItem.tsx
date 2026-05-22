@@ -22,23 +22,23 @@ export default function OptionItem({
       className={`flex justify-between items-center py-2 px-3 rounded-lg transition-all duration-200 ${
         checked
           ? 'bg-amber-50 border border-amber-200'
-          : 'bg-transparent border border-transparent hover:bg-gray-50 hover:shadow-sm'
+          : 'bg-transparent border border-transparent hover:bg-muted hover:shadow-sm'
       }`}
     >
       <div className="flex-1 min-w-0 mr-3">
         <span
           className={`block text-xs leading-tight truncate transition-colors ${
-            checked ? 'text-amber-700 font-bold' : 'text-gray-900 font-bold'
+            checked ? 'text-amber-700 font-bold' : 'text-foreground font-bold'
           }`}
         >
           {t(labelKey)}
         </span>
         {size !== undefined && size > 0 ? (
-          <span className="block text-[10px] font-semibold text-gray-500 mt-0.5 opacity-80">
+          <span className="block text-[10px] font-semibold text-muted-foreground mt-0.5 opacity-80">
             {isCount ? `${size} ${t('storageCleaner:countUnit')}` : formatSize(size)}
           </span>
         ) : (
-          <span className="block text-[10px] font-medium text-gray-400 mt-0.5 italic">
+          <span className="block text-[10px] font-medium text-muted-foreground mt-0.5 italic">
             {t('storageCleaner:noData')}
           </span>
         )}
@@ -47,7 +47,7 @@ export default function OptionItem({
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+        className="h-4 w-4 rounded border-input text-amber-500 focus:ring-amber-500"
       />
     </div>
   );

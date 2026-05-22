@@ -185,10 +185,10 @@ export default function ImageMode() {
             onClick={() => imageInputRef.current?.click()}
             className={`flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed rounded-xl p-8 cursor-pointer transition-all duration-200 ${
               isDragging
-                ? 'border-blue-500 bg-blue-50'
+                ? 'border-primary bg-primary/10'
                 : info
-                  ? 'border-blue-500 bg-blue-50/50'
-                  : 'border-gray-300 bg-gray-50 hover:border-blue-500 hover:bg-blue-50/50'
+                  ? 'border-primary bg-primary/5'
+                  : 'border-input bg-muted hover:border-primary hover:bg-primary/5'
             }`}
           >
             <input
@@ -202,7 +202,7 @@ export default function ImageMode() {
               }}
             />
             {isLoading ? (
-              <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-primary/30 border-t-blue-600 rounded-full animate-spin" />
             ) : info ? (
               <div className="flex flex-col items-center gap-1">
                 {result && (
@@ -213,18 +213,18 @@ export default function ImageMode() {
                   />
                 )}
                 <span className="text-sm font-bold">{info.name}</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">
                   {formatFileSize(info.size)} · {info.type}
                 </span>
-                <span className="text-xs text-gray-400">{t('clickOrDropToReplace')}</span>
+                <span className="text-xs text-muted-foreground">{t('clickOrDropToReplace')}</span>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-1">
-                <Image className="w-10 h-10 text-gray-400" />
-                <span className="text-sm text-gray-500 font-semibold">
+                <Image className="w-10 h-10 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground font-semibold">
                   {t('clickOrDropToImage')}
                 </span>
-                <span className="text-xs text-gray-400">{t('supportedFormats')}</span>
+                <span className="text-xs text-muted-foreground">{t('supportedFormats')}</span>
               </div>
             )}
           </div>
@@ -239,24 +239,24 @@ export default function ImageMode() {
           )}
 
           {result && (
-            <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+            <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold text-gray-500">{t('base64Output')}</span>
+                <span className="text-xs font-bold text-muted-foreground">{t('base64Output')}</span>
                 <div className="flex gap-1">
                   <CopyButton text={result.rawBase64} tooltip={t('copyRaw')} />
                   <CopyButton text={result.output} tooltip={t('copyDataUri')} color="info" />
                 </div>
               </div>
-              <div className="font-mono text-xs break-all max-h-[200px] overflow-y-auto leading-relaxed text-blue-600 font-semibold">
+              <div className="font-mono text-xs break-all max-h-[200px] overflow-y-auto leading-relaxed text-primary font-semibold">
                 {result.output.length > 2000
                   ? `${result.output.substring(0, 2000)}...`
                   : result.output}
               </div>
               <div className="flex gap-4 mt-2">
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {t('originalSize')}: {formatFileSize(result.originalBytes)}
                 </span>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {t('encodedSize')}: {formatFileSize(result.outputBytes)}
                 </span>
               </div>
@@ -267,7 +267,7 @@ export default function ImageMode() {
             <button
               type="button"
               onClick={handleClear}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:bg-accent rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
               {t('clear')}

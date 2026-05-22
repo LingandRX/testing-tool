@@ -84,7 +84,7 @@ describe('PageHeader 组件系统', () => {
 
     it('无副标题时不渲染副标题区域', () => {
       const { container } = render(<PageHeader icon={defaultProps.icon} title="仅标题" />);
-      const subtitles = container.querySelectorAll('.text-gray-500');
+      const subtitles = container.querySelectorAll('.text-muted-foreground');
       expect(subtitles.length).toBe(0);
     });
   });

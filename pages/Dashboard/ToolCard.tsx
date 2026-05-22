@@ -33,7 +33,7 @@ export default function ToolCard({
 
   return (
     <div
-      className="group relative rounded-2xl border border-gray-200 h-full box-border transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1"
+      className="group relative rounded-2xl border border-border h-full box-border transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1"
       style={{
         borderColor: undefined,
         ['--hover-color' as string]: colorCode,
@@ -65,18 +65,18 @@ export default function ToolCard({
               <IconComponent size={20} />
             </div>
             <div>
-              <span className="font-bold text-sm leading-tight text-gray-900 flex items-center gap-1">
+              <span className="font-bold text-sm leading-tight text-foreground flex items-center gap-1">
                 {title}
               </span>
               {description && (
-                <span className="block text-xs text-gray-500 font-medium mt-1 overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px]">
+                <span className="block text-xs text-muted-foreground font-medium mt-1 overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px]">
                   {description}
                 </span>
               )}
             </div>
           </div>
           <ChevronRight
-            className="w-3 h-3 text-gray-300 mt-1 transition-all duration-300 ease-in-out group-hover:translate-x-1"
+            className="w-3 h-3 text-muted-foreground mt-1 transition-all duration-300 ease-in-out group-hover:translate-x-1"
             style={{ color: undefined }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = colorCode;
@@ -88,9 +88,7 @@ export default function ToolCard({
         </div>
 
         {snapshot != null && (
-          <div className="mt-auto pt-4 border-t border-dashed border-gray-200 w-full">
-            {snapshot}
-          </div>
+          <div className="mt-auto pt-4 border-t border-dashed border-border w-full">{snapshot}</div>
         )}
       </button>
     </div>

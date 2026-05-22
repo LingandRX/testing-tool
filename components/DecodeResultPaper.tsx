@@ -41,33 +41,33 @@ export default function DecodeResultPaper({
   const { t } = useTranslation('base64Converter');
 
   return (
-    <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+    <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
       {/* 标题 */}
-      <span className="block mb-2 text-xs font-bold text-gray-500">{title}</span>
+      <span className="block mb-2 text-xs font-bold text-muted-foreground">{title}</span>
 
       {/* 可选预览内容（ImageMode 的图片） */}
       {children}
 
       {/* 文件信息 */}
       <div className="flex gap-4 mb-3">
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-muted-foreground">
           {t('inferredMimeType')}: {mimeType}
         </span>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-muted-foreground">
           {t('decodedSize')}: {formatFileSize(blobSize)}
         </span>
       </div>
 
       {/* 文件名输入 */}
       <div className="mb-3">
-        <label className="block text-xs font-medium text-gray-500 mb-1">
+        <label className="block text-xs font-medium text-muted-foreground mb-1">
           {t('decodedFileName')}
         </label>
         <input
           type="text"
           value={fileName}
           onChange={(e) => onFileNameChange(e.target.value)}
-          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
 

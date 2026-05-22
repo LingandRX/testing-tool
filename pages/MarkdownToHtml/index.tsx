@@ -168,21 +168,21 @@ export default function MarkdownToHtmlPage() {
           <div className="flex gap-2">
             <button
               onClick={handleClear}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-background border border-input rounded-lg hover:bg-muted transition-colors"
             >
               <Trash2 size={14} />
               {t('clear')}
             </button>
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-background border border-input rounded-lg hover:bg-muted transition-colors"
             >
               <Printer size={14} />
               {t('print')}
             </button>
             <button
               onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-background border border-input rounded-lg hover:bg-muted transition-colors"
             >
               <Download size={14} />
               {t('download')}
@@ -205,10 +205,10 @@ export default function MarkdownToHtmlPage() {
         >
           {/* Markdown 输入区 */}
           {showInput && (
-            <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between px-4 py-2 bg-blue-50/50 border-b border-gray-200">
-                <span className="text-xs font-bold text-gray-500">{t('inputLabel')}</span>
-                <span className="text-xs text-gray-400">
+            <div className="border border-border rounded-xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 bg-primary/5 border-b border-border">
+                <span className="text-xs font-bold text-muted-foreground">{t('inputLabel')}</span>
+                <span className="text-xs text-muted-foreground">
                   {t('charCount', { count: markdown.length })}
                 </span>
               </div>
@@ -223,13 +223,13 @@ export default function MarkdownToHtmlPage() {
 
           {/* 预览/输出区 */}
           {showPreview && (
-            <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between px-4 py-2 bg-blue-50/50 border-b border-gray-200">
-                <span className="text-xs font-bold text-gray-500">
+            <div className="border border-border rounded-xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 bg-primary/5 border-b border-border">
+                <span className="text-xs font-bold text-muted-foreground">
                   {(previewMode as string) === 'html' ? t('htmlOutputLabel') : t('previewLabel')}
                 </span>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {t('charCount', { count: result.htmlLength })}
                   </span>
                   <CopyButton text={result.html} size="small" />
@@ -240,10 +240,10 @@ export default function MarkdownToHtmlPage() {
                 <textarea
                   value={result.html}
                   readOnly
-                  className="flex-1 min-h-[400px] p-4 font-mono text-[0.8rem] leading-relaxed resize-none focus:outline-none bg-gray-50"
+                  className="flex-1 min-h-[400px] p-4 font-mono text-[0.8rem] leading-relaxed resize-none focus:outline-none bg-muted"
                 />
               ) : (
-                <div className="flex-1 p-4 min-h-[400px] overflow-auto bg-white">
+                <div className="flex-1 p-4 min-h-[400px] overflow-auto bg-background">
                   <iframe
                     ref={iframeRef}
                     title="markdown-preview"

@@ -152,9 +152,9 @@ function ActionButton({
     typeof action.disabled === 'function' ? action.disabled(value) : action.disabled || !value;
 
   const typeClasses: Record<string, string> = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    danger: 'text-red-600 hover:bg-red-50',
-    default: 'text-gray-500 hover:bg-gray-50',
+    primary: 'bg-primary text-white hover:bg-primary/90',
+    danger: 'text-red-600 hover:bg-red-500/10',
+    default: 'text-muted-foreground hover:bg-muted',
   };
 
   const sizeClasses = {
@@ -333,7 +333,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
       {hasTopBar && (
         <div className="flex items-center justify-between mb-2 px-1">
           <div className="flex items-center gap-3">
-            {title && <span className="text-sm font-semibold text-gray-500">{title}</span>}
+            {title && <span className="text-sm font-semibold text-muted-foreground">{title}</span>}
             {topExtra}
           </div>
 
@@ -349,7 +349,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
               />
             ))}
             {showCount && (
-              <span className="text-xs text-gray-400 tabular-nums ml-1">
+              <span className="text-xs text-muted-foreground tabular-nums ml-1">
                 {value.length}
                 {maxLength ? ` / ${maxLength}` : ''}
               </span>
@@ -374,10 +374,10 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
             maxHeight: autoResize ? `${maxRows * 1.5}rem` : undefined,
           }}
           className={`w-full rounded-lg border ${
-            displayError ? 'border-red-300' : 'border-gray-200'
-          } bg-white px-3 py-3 font-mono text-sm leading-relaxed transition-all resize-y ${
+            displayError ? 'border-red-300' : 'border-border'
+          } bg-background px-3 py-3 font-mono text-sm leading-relaxed transition-all resize-y ${
             showClear || allowCopy || bottomActions.length > 0 ? 'pb-10' : ''
-          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white hover:bg-gray-50 ${
+          } focus:outline-none focus:ring-2 focus:ring-primary focus:bg-background hover:bg-muted ${
             displayError ? 'focus:ring-red-500' : ''
           }`}
         />
@@ -403,7 +403,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
                 type="button"
                 onClick={handleCopy}
                 title={t('textInputArea.copyContent')}
-                className="p-1 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                className="p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
               >
                 <Copy className="h-4 w-4" />
               </button>
@@ -413,7 +413,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
                 type="button"
                 onClick={handleClear}
                 title={t('textInputArea.clear')}
-                className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                className="p-1 rounded-md text-muted-foreground hover:text-red-600 hover:bg-red-500/10 transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>

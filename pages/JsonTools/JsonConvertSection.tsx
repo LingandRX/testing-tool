@@ -120,17 +120,17 @@ export default function JsonConvertSection({
 
       {/* 转换结果 */}
       {result && result.output ? (
-        <div className="relative rounded-lg bg-white border border-gray-200 overflow-hidden">
+        <div className="relative rounded-lg bg-background border border-border overflow-hidden">
           {/* 结果头部 */}
-          <div className="flex justify-between items-center px-4 py-2 border-b border-gray-200 bg-gray-50">
+          <div className="flex justify-between items-center px-4 py-2 border-b border-border bg-muted">
             <div className="flex gap-4 items-center">
-              <span className="text-[11px] font-extrabold text-gray-500">
+              <span className="text-[11px] font-extrabold text-muted-foreground">
                 {t(`jsonFormat:${pk}OutputLabel`)}
               </span>
-              <span className="text-[10px] text-gray-400">
+              <span className="text-[10px] text-muted-foreground">
                 {t('jsonFormat:originalSize')}: {formatByteSize(result.originalBytes)}
               </span>
-              <span className="text-[10px] text-gray-400">
+              <span className="text-[10px] text-muted-foreground">
                 {t('jsonFormat:formattedSize')}: {formatByteSize(result.outputBytes)}
               </span>
             </div>
@@ -143,8 +143,10 @@ export default function JsonConvertSection({
           </div>
         </div>
       ) : (
-        <div className="p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-center">
-          <p className="text-sm font-semibold text-gray-500">{t(`jsonFormat:${pk}EmptyHint`)}</p>
+        <div className="p-4 rounded-lg bg-muted border border-dashed border-input text-center">
+          <p className="text-sm font-semibold text-muted-foreground">
+            {t(`jsonFormat:${pk}EmptyHint`)}
+          </p>
         </div>
       )}
     </div>

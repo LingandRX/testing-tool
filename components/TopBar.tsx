@@ -156,27 +156,27 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
   const isDashboard = currentPage === 'dashboard';
 
   return (
-    <div className="flex justify-between items-center px-3 sm:px-4 py-3 border-b border-gray-200 bg-white relative z-[1100]">
+    <div className="flex justify-between items-center px-3 sm:px-4 py-3 border-b border-border bg-background relative z-[1100]">
       <div className="w-8 sm:w-10">
         {!isDashboard && (
           <button
             type="button"
             onClick={goBack}
             aria-label={t('common:buttons.back')}
-            className="p-1.5 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-md bg-muted hover:bg-accent transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
 
-      <span className="hidden md:block text-xs font-extrabold tracking-wider uppercase text-gray-500 ml-2">
+      <span className="hidden md:block text-xs font-extrabold tracking-wider uppercase text-muted-foreground ml-2">
         {t('common:appName')}
       </span>
 
       <div className="flex-1 mx-2 sm:mx-4 relative max-w-[400px]">
         <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
             <Search className="h-4 w-4" />
           </div>
           <input
@@ -188,7 +188,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
             onFocus={() => setShowResults(true)}
             onKeyDown={handleKeyDown}
             aria-label={t('common:buttons.search')}
-            className="w-full pl-9 pr-8 py-1.5 text-sm rounded-lg border border-transparent bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+            className="w-full pl-9 pr-8 py-1.5 text-sm rounded-lg border border-transparent bg-muted focus:bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
           />
           {searchQuery && (
             <button
@@ -198,7 +198,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                 setSelectedIndex(-1);
               }}
               aria-label={t('common:buttons.clearSearch')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-gray-400 hover:text-gray-600"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-muted-foreground hover:text-foreground"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -206,7 +206,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         </div>
 
         {showResults && (searchQuery.trim() || displayedHistory.length > 0) && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-[300px] overflow-auto z-[1200]">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-popover rounded-lg shadow-lg border border-border max-h-[300px] overflow-auto z-[1200]">
             <ul role="listbox" className="py-1">
               {searchQuery.trim() ? (
                 searchResults.length > 0 ? (
@@ -217,17 +217,17 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                       aria-selected={selectedIndex === index}
                       onClick={() => handleSelectFeature(feature)}
                       className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors ${
-                        selectedIndex === index ? 'bg-blue-50' : 'hover:bg-gray-50'
+                        selectedIndex === index ? 'bg-primary/10' : 'hover:bg-muted'
                       }`}
                     >
-                      <div className="w-8 h-8 flex items-center justify-center text-gray-500">
+                      <div className="w-8 h-8 flex items-center justify-center text-muted-foreground">
                         {feature.icon && <feature.icon className="h-5 w-5" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
+                        <p className="text-sm font-semibold text-foreground truncate">
                           {t(feature.labelKey)}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-muted-foreground truncate">
                           {t(feature.descriptionKey)}
                         </p>
                       </div>
@@ -235,13 +235,13 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                   ))
                 ) : (
                   <li className="px-4 py-6 text-center">
-                    <p className="text-sm text-gray-500">{t('common:buttons.noResults')}</p>
+                    <p className="text-sm text-muted-foreground">{t('common:buttons.noResults')}</p>
                   </li>
                 )
               ) : (
                 <>
                   <li className="px-4 py-2">
-                    <span className="text-xs font-bold text-gray-400">
+                    <span className="text-xs font-bold text-muted-foreground">
                       {t('common:buttons.recentSearch')}
                     </span>
                   </li>
@@ -255,13 +255,13 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                         setSelectedIndex(-1);
                       }}
                       className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors ${
-                        selectedIndex === index ? 'bg-blue-50' : 'hover:bg-gray-50'
+                        selectedIndex === index ? 'bg-primary/10' : 'hover:bg-muted'
                       }`}
                     >
-                      <div className="w-8 h-8 flex items-center justify-center text-gray-400">
+                      <div className="w-8 h-8 flex items-center justify-center text-muted-foreground">
                         <History className="h-4 w-4" />
                       </div>
-                      <span className="text-sm text-gray-700">{item}</span>
+                      <span className="text-sm text-foreground">{item}</span>
                     </li>
                   ))}
                 </>
@@ -277,7 +277,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           onClick={toggleLanguage}
           aria-label={t('common:buttons.toggleLanguage')}
           title={t('common:buttons.toggleLanguage')}
-          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
         >
           <Globe className="h-4 w-4" />
         </button>
@@ -286,7 +286,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           onClick={cycleThemeMode}
           aria-label={t('common:buttons.toggleTheme')}
           title={t(`common:buttons.themeMode.${mode}`)}
-          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
         >
           <ThemeIcon className="h-4 w-4" />
         </button>
@@ -295,7 +295,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           onClick={handleOpenInTab}
           aria-label={t('common:buttons.openInTab')}
           title={t('common:buttons.openInTab')}
-          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
         >
           <ExternalLink className="h-4 w-4" />
         </button>
@@ -304,7 +304,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           onClick={onOpenOptions}
           aria-label={t('common:buttons.settings')}
           title={t('common:buttons.settings')}
-          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
         >
           <Settings className="h-4 w-4" />
         </button>

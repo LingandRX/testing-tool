@@ -13,7 +13,7 @@ export default function ErrorDisplay({ error }: ErrorDisplayProps) {
         <div className="flex flex-col items-center justify-center rounded-lg p-6 shadow-lg border border-red-200 bg-red-50">
           <AlertCircle className="h-9 w-9 text-red-500 mb-3" />
           <p className="text-sm font-bold leading-relaxed mb-4 text-red-600">{error}</p>
-          <p className="text-xs font-medium leading-relaxed text-gray-500">
+          <p className="text-xs font-medium leading-relaxed text-muted-foreground">
             {t('storageCleaner:errorStandardOnly')}
           </p>
         </div>

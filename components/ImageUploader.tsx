@@ -118,7 +118,7 @@ const ImageUploader = ({
           ? 'border-green-600 bg-green-50'
           : selectedFile
             ? 'border-green-600 bg-green-50/50'
-            : 'border-gray-300 bg-gray-50 hover:border-green-600 hover:bg-green-50/50'
+            : 'border-input bg-muted hover:border-green-600 hover:bg-green-500/10/50'
       }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -153,14 +153,21 @@ const ImageUploader = ({
                 <X className="w-3 h-3" />
               </button>
             </div>
-            <span className="block text-sm text-gray-500 mt-2">{selectedFile.name}</span>
-            <span className="block text-xs text-gray-400">{t('qrCode:clickToChange')}</span>
+            <span className="block text-sm text-muted-foreground mt-2">{selectedFile.name}</span>
+            <span className="block text-xs text-muted-foreground">{t('qrCode:clickToChange')}</span>
           </div>
         ) : (
           <>
-            <Image data-testid="ImageIcon" className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <span className="block text-sm text-gray-500 mb-1">{t('qrCode:clickToUpload')}</span>
-            <span className="block text-xs text-gray-400">{t('qrCode:supportFormats')}</span>
+            <Image
+              data-testid="ImageIcon"
+              className="w-12 h-12 text-muted-foreground mx-auto mb-2"
+            />
+            <span className="block text-sm text-muted-foreground mb-1">
+              {t('qrCode:clickToUpload')}
+            </span>
+            <span className="block text-xs text-muted-foreground">
+              {t('qrCode:supportFormats')}
+            </span>
           </>
         )}
       </label>

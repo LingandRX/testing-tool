@@ -32,7 +32,7 @@ const Section = ({ title, content, color }: SectionProps) => {
           <CopyButton text={JSON.stringify(content)} size="small" />
         </div>
       </div>
-      <pre className="m-0 p-3 bg-white/60 rounded-lg text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border border-black/5">
+      <pre className="m-0 p-3 bg-background/60 rounded-lg text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border border-black/5">
         {content ? stringifyJson(content) : t('jwt:invalidFormat')}
       </pre>
     </div>
@@ -91,14 +91,14 @@ export default function Index() {
                 content={result.payload}
                 color="#d63aff" // JWT.io Payload Color
               />
-              <div className="p-4 rounded-xl border border-blue-200 bg-blue-50">
+              <div className="p-4 rounded-xl border border-primary/30 bg-primary/10">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-bold tracking-wide text-blue-600">
+                  <span className="text-sm font-bold tracking-wide text-primary">
                     {t('jwt:signatureTitle')}
                   </span>
                   <CopyButton text={JSON.stringify(result.raw.signature)} size="small" />
                 </div>
-                <span className="block text-sm font-mono break-all text-gray-500 bg-white/60 p-3 rounded-lg border border-black/5">
+                <span className="block text-sm font-mono break-all text-muted-foreground bg-background/60 p-3 rounded-lg border border-black/5">
                   {result.signature || t('jwt:noSignature')}
                 </span>
               </div>

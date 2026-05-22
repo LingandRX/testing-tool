@@ -28,7 +28,7 @@ export default function SwitchButtonGroup<T extends string | number = string>({
 
   return (
     <div
-      className="w-full mb-4 rounded-xl border border-gray-200 bg-gray-50 p-1.5 flex gap-1"
+      className="w-full mb-4 rounded-xl border border-border bg-muted p-1.5 flex gap-1"
       style={sx}
     >
       {options.map((option) => (
@@ -40,8 +40,8 @@ export default function SwitchButtonGroup<T extends string | number = string>({
             sizeClasses[size]
           } ${
             value === option.value
-              ? 'bg-white text-blue-600 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+              ? 'bg-background text-primary shadow-sm'
+              : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
           }`}
           style={buttonSx}
         >

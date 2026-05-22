@@ -219,8 +219,10 @@ export default function Index() {
                   <DiffResult result={diffResult} viewMode={viewMode} activePath={activePath} />
                 </>
               ) : (
-                <div className="p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-center">
-                  <p className="text-sm font-semibold text-gray-500">{t('jsonDiff:emptyHint')}</p>
+                <div className="p-4 rounded-lg bg-muted border border-dashed border-input text-center">
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    {t('jsonDiff:emptyHint')}
+                  </p>
                 </div>
               )}
             </>

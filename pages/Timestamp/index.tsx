@@ -41,7 +41,7 @@ export default function Index() {
         {/* 桌面端 md+ 左右分栏；移动端单栏堆叠 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
           {/* 左栏：转换工作台 */}
-          <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-sm">
+          <div className="p-5 rounded-xl bg-background border border-border shadow-sm">
             {/* 模式切换 */}
             <SwitchButtonGroup
               value={mode}
@@ -63,8 +63,8 @@ export default function Index() {
                 value={mode === 'ts2dt' ? tsInput : dtInput}
                 onChange={(e) => setInput(e.target.value)}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
-                  error ? 'border-red-500' : 'border-gray-300'
-                } bg-white text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
+                  error ? 'border-red-500' : 'border-input'
+                } bg-background text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
               />
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 
@@ -84,7 +84,7 @@ export default function Index() {
                 <select
                   value={zone}
                   onChange={(e) => setZone(e.target.value as typeof zone)}
-                  className="flex-1 min-w-0 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="flex-1 min-w-0 px-4 py-2.5 rounded-lg border border-input bg-background text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 >
                   {ZONES.map((z) => (
                     <option key={z} value={z} className="text-sm font-semibold">
@@ -98,14 +98,14 @@ export default function Index() {
             {/* 立即转换 */}
             <button
               onClick={convert}
-              className="block mx-auto mt-4 mb-1 max-w-[240px] w-full py-2.5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
+              className="block mx-auto mt-4 mb-1 max-w-[240px] w-full py-2.5 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
             >
               {t('timestamp:convertButton')}
             </button>
           </div>
 
           {/* 右栏：结果展示卡片 */}
-          <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-sm h-full flex flex-col">
+          <div className="p-5 rounded-xl bg-background border border-border shadow-sm h-full flex flex-col">
             <ResultView result={result} mode={mode} unit={unit} zone={zone} showEmptyPlaceholder />
           </div>
         </div>

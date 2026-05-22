@@ -37,7 +37,7 @@ const ResultView = React.memo(
     if (!result) {
       if (!showEmptyPlaceholder) return null;
       return (
-        <div className="flex-1 flex items-center justify-center text-gray-400 text-sm font-semibold py-12 text-center">
+        <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm font-semibold py-12 text-center">
           {t('timestamp:resultEmpty')}
         </div>
       );
@@ -45,12 +45,12 @@ const ResultView = React.memo(
 
     return (
       <div className="animate-in fade-in duration-300">
-        <span className="block text-gray-500 mb-3 text-xs font-bold">
+        <span className="block text-muted-foreground mb-3 text-xs font-bold">
           {t('timestamp:resultLabel')}
         </span>
 
-        <div className="bg-blue-50 p-5 rounded-xl relative mb-4 border border-blue-200 flex justify-between items-center">
-          <span className="font-mono font-bold text-blue-700 break-all pr-4 text-xl tracking-tight leading-tight">
+        <div className="bg-primary/10 p-5 rounded-xl relative mb-4 border border-primary/30 flex justify-between items-center">
+          <span className="font-mono font-bold text-primary break-all pr-4 text-xl tracking-tight leading-tight">
             {result}
           </span>
           <CopyButton
@@ -61,18 +61,18 @@ const ResultView = React.memo(
           />
         </div>
 
-        <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex flex-col gap-3">
+        <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 flex flex-col gap-3">
           {[
             { label: t('timestamp:relativeTime'), value: extraInfo?.relative },
             { label: t('timestamp:iso8601'), value: extraInfo?.iso },
             { label: t('timestamp:utcTime'), value: extraInfo?.utc },
           ].map((item) => (
             <div key={item.label} className="flex justify-between items-center">
-              <span className="text-gray-400 font-bold text-xs pr-2 whitespace-nowrap">
+              <span className="text-muted-foreground font-bold text-xs pr-2 whitespace-nowrap">
                 {item.label}
               </span>
               <div className="flex items-center gap-2 min-w-0">
-                <span className="font-mono text-blue-700 font-semibold text-xs break-all text-right">
+                <span className="font-mono text-primary font-semibold text-xs break-all text-right">
                   {item.value}
                 </span>
                 {item.value && (

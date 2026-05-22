@@ -73,7 +73,7 @@ export default function JsonFormatSection() {
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
         <div className="flex gap-3 items-center">
           {/* 缩进选择 */}
-          <span className="text-[11px] font-extrabold text-gray-500">
+          <span className="text-[11px] font-extrabold text-muted-foreground">
             {t('jsonFormat:indentSize')}
           </span>
           <SwitchButtonGroup
@@ -90,7 +90,7 @@ export default function JsonFormatSection() {
               type="checkbox"
               checked={sortKeys}
               onChange={(e) => setSortKeys(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+              className="h-4 w-4 rounded border-input text-blue-500 focus:ring-primary"
             />
             <span className="text-xs font-bold">{t('jsonFormat:sortKeys')}</span>
           </label>
@@ -119,8 +119,8 @@ export default function JsonFormatSection() {
           onChange={(e) => setInput(e.target.value)}
           rows={6}
           className={`w-full rounded-lg border ${
-            error ? 'border-red-300' : 'border-gray-200'
-          } p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y`}
+            error ? 'border-red-300' : 'border-border'
+          } p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-y`}
         />
         {error && (
           <p className="mx-3 mt-1 text-xs font-semibold text-red-500">
@@ -131,17 +131,17 @@ export default function JsonFormatSection() {
 
       {/* 格式化结果 */}
       {result && result.formatted ? (
-        <div className="relative rounded-lg bg-white border border-gray-200 overflow-hidden">
+        <div className="relative rounded-lg bg-background border border-border overflow-hidden">
           {/* 结果头部 */}
-          <div className="flex justify-between items-center px-4 py-2 border-b border-gray-200 bg-gray-50">
+          <div className="flex justify-between items-center px-4 py-2 border-b border-border bg-muted">
             <div className="flex gap-4 items-center">
-              <span className="text-[11px] font-extrabold text-gray-500">
+              <span className="text-[11px] font-extrabold text-muted-foreground">
                 {t('jsonFormat:outputLabel')}
               </span>
-              <span className="text-[10px] text-gray-400">
+              <span className="text-[10px] text-muted-foreground">
                 {t('jsonFormat:originalSize')}: {formatByteSize(result.originalBytes)}
               </span>
-              <span className="text-[10px] text-gray-400">
+              <span className="text-[10px] text-muted-foreground">
                 {t('jsonFormat:formattedSize')}: {formatByteSize(result.formattedBytes)}
               </span>
             </div>
@@ -154,8 +154,8 @@ export default function JsonFormatSection() {
           </div>
         </div>
       ) : (
-        <div className="p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-center">
-          <p className="text-sm font-semibold text-gray-500">{t('jsonFormat:emptyHint')}</p>
+        <div className="p-4 rounded-lg bg-muted border border-dashed border-input text-center">
+          <p className="text-sm font-semibold text-muted-foreground">{t('jsonFormat:emptyHint')}</p>
         </div>
       )}
     </div>
