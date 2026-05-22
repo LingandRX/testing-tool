@@ -220,7 +220,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
 
   return (
     <div className={cn('w-full flex flex-col gap-1.5', className)}>
-      {/* 顶部工具栏 */}
       {hasTopBar && (
         <div className="flex items-center justify-between px-0.5">
           <div className="flex items-center gap-2">
@@ -247,10 +246,9 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
         </div>
       )}
 
-      {/* 核心卡片容器：完美适配 shadcn 风格的多行包裹框 */}
       <div
         className={cn(
-          'rounded-md border border-input bg-background shadow-sm transition-all focus-within:ring-1 focus-within:ring-ring focus-within:border-input',
+          'rounded-md border border-input bg-background shadow-sm transition-all focus-within:ring-1 focus-within:ring-ring focus-within:border-input overflow-hidden',
           displayError &&
             'border-destructive focus-within:ring-destructive focus-within:border-destructive',
         )}
@@ -264,14 +262,14 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
           autoFocus={autoFocus}
           readOnly={readOnly}
           placeholder={placeholder}
-          className="w-full bg-transparent px-3 py-2.5 font-mono text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none resize-none border-0 block"
+          className="w-full bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none resize-none border-0 block"
           {...restProps}
         />
 
-        {/* 底部隔离式功能区：杜绝重叠和塌陷 */}
         {hasBottomBar && (
-          <div className="flex items-center justify-between px-2 py-1.5 bg-muted/20 border-t border-border/60">
-            <div className="flex items-center gap-1.5">
+          <div className="flex h-10 items-center justify-between px-4 bg-muted/30 border-t border-border/50">
+            {/* 左侧自定义动作 */}
+            <div className="flex items-center gap-1.5 min-w-0">
               {bottomActions.map((action) => (
                 <ActionButton
                   key={action.key}
@@ -283,14 +281,13 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
               ))}
             </div>
 
-            <div className="flex items-center gap-1 ml-auto">
+            {/* 右侧系统按钮组 */}
+            <div className="flex items-center gap-1.5 ml-auto shrink-0">
               {allowCopy && value && (
                 <button
                   type="button"
                   onClick={handleCopy}
-                  aria-label={t('textInputArea.copyContent')}
-                  title={t('textInputArea.copyContent')}
-                  className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
@@ -299,9 +296,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
                 <button
                   type="button"
                   onClick={handleClear}
-                  aria-label={t('textInputArea.clear')}
-                  title={t('textInputArea.clear')}
-                  className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -311,7 +306,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
         )}
       </div>
 
-      {/* 错误提示区域 */}
+      {/* 错误提示 */}
       {displayError && (
         <p className="text-xs font-medium text-destructive px-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
           {displayError}
