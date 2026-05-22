@@ -74,7 +74,7 @@ export default function ToolCard({
               {title}
             </h4>
             {description && (
-              <p className="text-[11px] font-medium text-muted-foreground/90 mt-0.5 leading-normal break-words">
+              <p className="text-[11px] font-medium text-muted-foreground/90 mt-0.5 leading-normal w-full truncate">
                 {description}
               </p>
             )}
