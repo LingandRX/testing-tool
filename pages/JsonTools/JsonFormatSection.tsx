@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import {
   formatJson,
@@ -10,149 +9,159 @@ import {
 import { formatByteSize } from '@/utils/textStatistics';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
+import TextInputArea from '@/components/TextInputArea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
-/** 缩进大小选项 */
-const INDENT_OPTIONS = [2, 4, 6, 8] as const;
-
-/**
- * JSON 格式化工具区域组件
- *
- * 提供输入区域、格式化选项（缩进大小、键名排序）和格式化结果展示，
- * 支持一键复制格式化后的 JSON。
- */
 export default function JsonFormatSection() {
   const { t } = useLazyTranslation('jsonFormat');
 
   const [input, setInput] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [debouncedInput, setDebouncedInput] = useState('');
   const [indentSize, setIndentSize] = useState<number>(2);
   const [sortKeys, setSortKeys] = useState(false);
-  const [result, setResult] = useState<JsonFormatResult | null>(null);
 
-  // 防抖校验输入
+  // 1. 高频打字防抖落盘：防止大体积 JSON 在高频输入时发生卡顿
   useEffect(() => {
     const handle = setTimeout(() => {
-      setError(validateJson(input));
-    }, 300);
+      setDebouncedInput(input);
+    }, 250);
     return () => clearTimeout(handle);
   }, [input]);
 
-  const canFormat = useMemo(() => {
-    return input.trim() !== '' && !error;
-  }, [input, error]);
+  // 💡 2. 贯彻方案 A（衍生变量超进化）：
+  // 彻底删除原有的 setError 状态和相关的 useEffect。
+  // 语法错误由防抖文本在内存中同步推导，彻底斩断二次级联渲染链条，ESLint 警告瞬间消亡！
+  const error = useMemo(() => {
+    return validateJson(debouncedInput);
+  }, [debouncedInput]);
 
-  const handleFormat = () => {
-    const validationError = validateJson(input);
-    if (validationError) {
-      setError(validationError);
-      setResult(null);
-      return;
-    }
+  // 3. 实时流式格式化管线
+  const formattedPipeline = useMemo(() => {
+    const trimmed = debouncedInput.trim();
+    if (!trimmed || error) return null;
 
     try {
       const options: JsonFormatOptions = { indentSize, sortKeys };
-      const formatResult = formatJson(input, options);
-      setResult(formatResult);
+      return formatJson(debouncedInput, options);
     } catch (e) {
-      setError(e instanceof SyntaxError ? e.message : String(e));
-      setResult(null);
+      return {
+        isRuntimeError: true,
+        errorMessage: e instanceof SyntaxError ? e.message : String(e),
+      };
     }
-  };
+  }, [debouncedInput, error, indentSize, sortKeys]);
 
-  const handleClear = () => {
-    setInput('');
-    setError(null);
-    setResult(null);
-  };
+  const runtimeError =
+    formattedPipeline && 'isRuntimeError' in formattedPipeline
+      ? formattedPipeline.errorMessage
+      : null;
+  const result =
+    formattedPipeline && !('isRuntimeError' in formattedPipeline)
+      ? (formattedPipeline as JsonFormatResult)
+      : null;
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* 工具栏 */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
-        <div className="flex gap-3 items-center">
-          {/* 缩进选择 */}
-          <span className="text-[11px] font-extrabold text-muted-foreground">
-            {t('jsonFormat:indentSize')}
-          </span>
-          <SwitchButtonGroup
-            value={indentSize}
-            onChange={(v) => setIndentSize(v)}
-            options={INDENT_OPTIONS.map((size) => ({ value: size, label: String(size) }))}
-            size="small"
-          />
-
-          {/* 键名排序开关 */}
-          <label className="flex items-center gap-2 ml-2">
-            <input
-              type="checkbox"
-              checked={sortKeys}
-              onChange={(e) => setSortKeys(e.target.checked)}
-              className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+    <div className="w-full flex flex-col gap-4 animate-in fade-in duration-300">
+      {/* 工具控制栏 */}
+      <div className="flex h-10 items-center justify-between px-1.5 bg-secondary/40 rounded-xl border border-border/60">
+        <div className="flex gap-4 items-center w-full">
+          {/* 缩进配置区 */}
+          <div className="flex gap-2 items-center shrink-0 select-none">
+            <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
+              {t('jsonFormat:indentSize')}
+            </span>
+            <SwitchButtonGroup
+              value={indentSize}
+              onChange={(v) => setIndentSize(Number(v))}
+              options={[2, 4, 6, 8].map((size) => ({ value: size, label: String(size) }))}
+              size="small"
             />
-            <span className="text-xs font-bold">{t('jsonFormat:sortKeys')}</span>
-          </label>
-        </div>
-
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleClear} className="rounded-lg">
-            {t('jsonFormat:clearButton')}
-          </Button>
-          <Button
-            variant="default"
-            disabled={!canFormat}
-            onClick={handleFormat}
-            className="rounded-lg font-bold px-4"
-          >
-            {t('jsonFormat:formatButton')}
-          </Button>
-        </div>
-      </div>
-
-      {/* 输入区 */}
-      <div>
-        <textarea
-          placeholder={t('jsonFormat:inputPlaceholder')}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          rows={6}
-          className={`w-full rounded-lg border ${
-            error ? 'border-red-300' : 'border-border'
-          } p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-y`}
-        />
-        {error && (
-          <p className="mx-3 mt-1 text-xs font-semibold text-red-500">
-            {t('jsonFormat:invalidJson')}
-          </p>
-        )}
-      </div>
-
-      {/* 格式化结果 */}
-      {result && result.formatted ? (
-        <div className="relative rounded-lg bg-background border border-border overflow-hidden">
-          {/* 结果头部 */}
-          <div className="flex justify-between items-center px-4 py-2 border-b border-border bg-muted">
-            <div className="flex gap-4 items-center">
-              <span className="text-[11px] font-extrabold text-muted-foreground">
-                {t('jsonFormat:outputLabel')}
-              </span>
-              <span className="text-[10px] text-muted-foreground">
-                {t('jsonFormat:originalSize')}: {formatByteSize(result.originalBytes)}
-              </span>
-              <span className="text-[10px] text-muted-foreground">
-                {t('jsonFormat:formattedSize')}: {formatByteSize(result.formattedBytes)}
-              </span>
-            </div>
-            <CopyButton text={result.formatted} />
           </div>
 
-          {/* 格式化内容 */}
-          <div className="p-4 font-mono text-sm whitespace-pre-wrap break-all max-h-[400px] overflow-y-auto leading-relaxed">
+          <div className="h-4 w-px bg-border/60" />
+
+          {/* 键名排序区 */}
+          <div
+            onClick={() => setSortKeys(!sortKeys)}
+            className="flex items-center gap-2 cursor-pointer select-none group py-1"
+          >
+            <Checkbox
+              id="sort-keys-checkbox"
+              checked={sortKeys}
+              onClick={(e) => e.stopPropagation()}
+              onCheckedChange={(checked) => setSortKeys(checked === true)}
+              className="h-3.5 w-3.5 rounded border-input data-[state=checked]:bg-primary shadow-sm"
+            />
+            <Label
+              htmlFor="sort-keys-checkbox"
+              className="text-xs font-bold text-foreground/80 cursor-pointer tracking-tight group-hover:text-foreground transition-colors"
+            >
+              {t('jsonFormat:sortKeys')}
+            </Label>
+          </div>
+        </div>
+      </div>
+
+      {/* 满血版输入终端 */}
+      <TextInputArea
+        placeholder={t('jsonFormat:inputPlaceholder')}
+        value={input}
+        onChange={setInput}
+        externalError={error || runtimeError || undefined}
+        showClear={true}
+        allowCopy={true}
+        minRows={8}
+        maxRows={15}
+        onClear={() => setInput('')}
+      />
+
+      {/* 格式化结果流面板展示 */}
+      {result && result.formatted ? (
+        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden animate-in slide-in-from-bottom-2 duration-300">
+          {/* 结果栏头部 */}
+          <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
+            <div className="flex gap-4 items-center">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
+                {t('jsonFormat:outputLabel')}
+              </span>
+
+              <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
+                <span>
+                  {t('jsonFormat:originalSize')}:{' '}
+                  <span className="font-semibold text-foreground/80">
+                    {formatByteSize(result.originalBytes)}
+                  </span>
+                </span>
+                <span className="text-border/60">|</span>
+                <span>
+                  {t('jsonFormat:formattedSize')}:{' '}
+                  <span className="font-semibold text-foreground/80">
+                    {formatByteSize(result.formattedBytes)}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <CopyButton
+              text={result.formatted}
+              className="h-6 w-6 rounded-md border text-muted-foreground"
+            />
+          </div>
+
+          {/* 核心格式化数据面板：
+            💡 修复点：移除了互相打架的 select-all 类名，仅保留纯正的代码高亮可选样式 select-text
+          */}
+          <div className="p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all max-h-[420px] overflow-y-auto leading-relaxed select-text">
             {result.formatted}
           </div>
         </div>
       ) : (
-        <div className="p-4 rounded-lg bg-muted border border-dashed border-input text-center">
-          <p className="text-sm font-semibold text-muted-foreground">{t('jsonFormat:emptyHint')}</p>
+        /* 空状态指示引导区 */
+        <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
+          <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
+            {error ? '请修正上方 JSON 语法错误以开启实时流式格式化' : t('jsonFormat:emptyHint')}
+          </p>
         </div>
       )}
     </div>
