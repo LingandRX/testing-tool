@@ -90,6 +90,9 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
 
+      - name: Generate WXT types
+        run: npx wxt prepare
+
       - name: Run TypeScript type check
         run: npm run typecheck
 
@@ -112,6 +115,9 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Generate WXT types
+        run: npx wxt prepare
 
       - name: Run tests
         run: npm run test
@@ -144,6 +150,9 @@ jobs:
           key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
 
       # 💡 动态代理编译指令：完美匹配 WXT / 各类多端打包器的标准构建命令
+      - name: Generate WXT types
+        run: npx wxt prepare
+
       - name: Build Extension (${{ matrix.browser }})
         run: |
           if npm run | grep -q "build:${{ matrix.browser }}"; then
