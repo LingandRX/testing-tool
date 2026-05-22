@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import StorageCleanerConfirm from '@/pages/StorageCleaner/StorageCleanerConfirm';
 import { useStorageCleaner } from './useStorageCleaner';
-import DomainHeader from './DomainHeader';
 import StorageOptionsGrid from './StorageOptionsGrid';
 import AutoRefreshToggle from './AutoRefreshToggle';
 import ErrorDisplay from './ErrorDisplay';
@@ -13,7 +12,6 @@ export default function Index() {
   const { showMessage } = useSnackbar();
   const { t } = useLazyTranslation('storageCleaner');
   const {
-    domain,
     error,
     isInitializing,
     options,
@@ -23,7 +21,6 @@ export default function Index() {
     result,
     showConfirm,
     setShowConfirm,
-    totalSize,
     allSelected,
     someSelected,
     handleAutoRefreshChange,
@@ -49,8 +46,6 @@ export default function Index() {
   return (
     <div>
       <div className="p-2">
-        <DomainHeader domain={domain} totalSize={totalSize} />
-
         <StorageOptionsGrid
           options={options}
           sizes={sizes}
