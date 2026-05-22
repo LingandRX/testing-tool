@@ -40,8 +40,8 @@ export default function SwitchButtonGroup<T extends string | number = string>({
             sizeClasses[size]
           } ${
             value === option.value
-              ? 'bg-background text-primary shadow-sm'
-              : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+              ? 'bg-primary text-primary-foreground shadow-md'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
           style={buttonSx}
         >
