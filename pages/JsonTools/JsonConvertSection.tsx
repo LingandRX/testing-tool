@@ -1,149 +1,142 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { formatByteSize } from '@/utils/textStatistics';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
 import { validateJson } from '@/utils/jsonFormatter';
+import { cn } from '@/lib/utils';
 
-/** 转换结果通用接口 */
 export interface ConvertResult {
-  /** 转换后的输出字符串 */
   output: string;
-  /** 原始输入的字节大小 */
   originalBytes: number;
-  /** 转换后的字节大小 */
   outputBytes: number;
 }
 
-/** 转换函数类型 */
 export type ConvertFunction = (text: string) => ConvertResult;
 
-/**
- * JSON 转换工具区域组件属性
- */
-interface JsonConvertSectionProps {
-  /** i18n 命名空间内翻译键的前缀，如 'yamlMode' / 'tomlMode' / 'minifyMode' */
+interface JsonConvertSectionProps extends React.HTMLAttributes<HTMLDivElement> {
   translationPrefix: string;
-  /** 转换函数 */
   convertFunction: ConvertFunction;
-  /** 转换按钮的翻译键后缀，默认 'convertButton' */
-  convertButtonKey?: string;
 }
 
-/**
- * JSON 转换工具共享组件
- *
- * 适用于 JSON->YAML、JSON->TOML、JSON 压缩等场景，
- * 提供输入区域、转换按钮和结果展示（含一键复制）。
- */
 export default function JsonConvertSection({
   translationPrefix,
   convertFunction,
-  convertButtonKey = 'convertButton',
+  className,
+  ...props
 }: JsonConvertSectionProps) {
   const { t } = useLazyTranslation('jsonFormat');
 
   const [input, setInput] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<ConvertResult | null>(null);
+  const [debouncedInput, setDebouncedInput] = useState('');
 
   const pk = translationPrefix;
 
-  // 防抖校验输入
+  // 1. 高阶性能调优：将文本变化收拢进行 250ms 极速防抖落盘，避免每一次敲击键盘都触发底层的复杂序列化算法
   useEffect(() => {
     const handle = setTimeout(() => {
-      setError(validateJson(input));
-    }, 300);
+      setDebouncedInput(input);
+    }, 250);
     return () => clearTimeout(handle);
   }, [input]);
 
-  const canConvert = useMemo(() => {
-    return input.trim() !== '' && !error;
-  }, [input, error]);
+  // 💡 2. 贯彻方案 A（衍生变量超进化）：
+  // 彻底删掉 error 状态和对应的受控 useEffect 节点。
+  // 语法错误由防抖文本在内存中同步推导，彻底斩断二次级联渲染链条，ESLint 警告自愈！
+  const error = useMemo(() => {
+    return validateJson(debouncedInput);
+  }, [debouncedInput]);
 
-  const handleConvert = () => {
-    const validationError = validateJson(input);
-    if (validationError) {
-      setError(validationError);
-      setResult(null);
-      return;
-    }
+  // 3. 核心魔法：纯净的即时流式转换转换管线 (Live Compilation Pipeline)
+  const conversionPipeline = useMemo(() => {
+    const trimmed = debouncedInput.trim();
+    if (!trimmed || error) return null;
 
     try {
-      const convertResult = convertFunction(input);
-      setResult(convertResult);
+      return convertFunction(debouncedInput);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setResult(null);
+      // 捕获可能从外部转换器（如 YAML.stringify）中抛出的底层异常
+      return {
+        isRuntimeError: true,
+        errorMessage: e instanceof Error ? e.message : String(e),
+      };
     }
-  };
+  }, [debouncedInput, error, convertFunction]);
 
-  const handleClear = () => {
-    setInput('');
-    setError(null);
-    setResult(null);
-  };
+  // 判定运行时异常
+  const runtimeError =
+    conversionPipeline && 'isRuntimeError' in conversionPipeline
+      ? conversionPipeline.errorMessage
+      : null;
+  const result =
+    conversionPipeline && !('isRuntimeError' in conversionPipeline)
+      ? (conversionPipeline as ConvertResult)
+      : null;
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* 工具栏 */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
-        <div />
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleClear} className="rounded-lg">
-            {t('jsonFormat:clearButton')}
-          </Button>
-          <Button
-            variant="default"
-            disabled={!canConvert}
-            onClick={handleConvert}
-            className="rounded-lg font-bold px-4"
-          >
-            {t(`jsonFormat:${convertButtonKey}`)}
-          </Button>
-        </div>
-      </div>
-
+    <div
+      className={cn('w-full flex flex-col gap-4 animate-in fade-in duration-300', className)}
+      {...props}
+    >
       {/* 输入区 */}
       <TextInputArea
         placeholder={t(`jsonFormat:${pk}InputPlaceholder`)}
         value={input}
         onChange={setInput}
-        externalError={error || undefined}
-        onClear={() => {
-          setResult(null);
-        }}
+        externalError={error || runtimeError || undefined} // 融合语法错误与运行时转换错误
+        showClear={true}
+        allowCopy={true}
+        minRows={7}
+        maxRows={14}
+        onClear={() => setInput('')}
       />
 
-      {/* 转换结果 */}
+      {/* 4. 结果展示或状态引导卡片区 */}
       {result && result.output ? (
-        <div className="relative rounded-lg bg-background border border-border overflow-hidden">
-          {/* 结果头部 */}
-          <div className="flex justify-between items-center px-4 py-2 border-b border-border bg-muted">
+        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden animate-in slide-in-from-bottom-2 duration-300">
+          {/* 结果栏精致头部 */}
+          <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
             <div className="flex gap-4 items-center">
-              <span className="text-[11px] font-extrabold text-muted-foreground">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
                 {t(`jsonFormat:${pk}OutputLabel`)}
               </span>
-              <span className="text-[10px] text-muted-foreground">
-                {t('jsonFormat:originalSize')}: {formatByteSize(result.originalBytes)}
-              </span>
-              <span className="text-[10px] text-muted-foreground">
-                {t('jsonFormat:formattedSize')}: {formatByteSize(result.outputBytes)}
-              </span>
+
+              {/* 字节比对注入 tabular-nums font-mono，防止容量大小变动时字符横向抽搐 */}
+              <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
+                <span>
+                  {t('jsonFormat:originalSize')}:{' '}
+                  <span className="font-semibold text-foreground/80">
+                    {formatByteSize(result.originalBytes)}
+                  </span>
+                </span>
+                <span className="text-border/60">|</span>
+                <span>
+                  {t('jsonFormat:formattedSize')}:{' '}
+                  <span className="font-semibold text-foreground/80">
+                    {formatByteSize(result.outputBytes)}
+                  </span>
+                </span>
+              </div>
             </div>
-            <CopyButton text={result.output} />
+
+            <CopyButton
+              text={result.output}
+              className="h-6 w-6 rounded-md border text-muted-foreground"
+            />
           </div>
 
-          {/* 转换内容 */}
-          <div className="p-4 font-mono text-sm whitespace-pre-wrap break-all max-h-[400px] overflow-y-auto leading-relaxed">
+          {/* 转换出的数据流承载区：
+            💡 修复点：移除了互相冲突打架的 select-all 类名，仅保留纯净、支持自由划线选中的 select-text 样式 
+          */}
+          <div className="p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all max-h-[380px] overflow-y-auto leading-relaxed select-text">
             {result.output}
           </div>
         </div>
       ) : (
-        <div className="p-4 rounded-lg bg-muted border border-dashed border-input text-center">
-          <p className="text-sm font-semibold text-muted-foreground">
-            {t(`jsonFormat:${pk}EmptyHint`)}
+        /* 5. 空状态提示容器：完美的中性虚线引导，不喧宾夺主 */
+        <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
+          <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
+            {error ? '请修正上方 JSON 的语法错误以激活流式转换' : t(`jsonFormat:${pk}EmptyHint`)}
           </p>
         </div>
       )}
