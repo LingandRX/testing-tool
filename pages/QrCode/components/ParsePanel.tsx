@@ -4,6 +4,8 @@ import ImageUploader from '@/components/ImageUploader';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 export default function ParsePanel() {
   const { t } = useLazyTranslation('qrCode');
@@ -56,8 +58,12 @@ export default function ParsePanel() {
   }, [handlePaste]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
+    /* 💡 统一大视觉轴：
+       - 追加 p-0.5 微隔离，配合 gap-6 建立与生成面板（GeneratePanel）绝对像素对齐的网格天平。
+    */
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full items-stretch select-none p-0.5 animate-in fade-in duration-300">
+      {/* 左翼：图片接收/拖拽/剪贴板上传终端 */}
+      <div className="flex flex-col h-full">
         <ImageUploader
           selectedFile={parserState.selectedFile}
           onFileChange={handleFileChange}
@@ -68,16 +74,34 @@ export default function ParsePanel() {
           onDraggingChange={(dragging) => setParserState((prev) => ({ ...prev, dragging }))}
         />
       </div>
-      <div>
-        <TextInputArea
-          title={t('qrCode:resultLabel')}
-          value={parserState.decodedResult}
-          readOnly
-          showClear={false}
-          allowCopy
-          placeholder=""
-          externalError={parserState.parseError}
-        />
+
+      {/* 右翼：高阶解析出码只读终端 */}
+      <div
+        className={cn(
+          'border border-border rounded-xl bg-card text-card-foreground shadow-sm flex flex-col p-4 transition-all duration-200',
+          // 💡 视觉对称增强：加入相同的聚焦变量环联动，使双翼权重达成完美绝对平衡
+          'focus-within:ring-1 focus-within:ring-ring focus-within:border-ring',
+        )}
+      >
+        <div className="flex flex-col space-y-2.5 h-full">
+          {/* 💡 修复点：物理剔除 TextInputArea 上的违规 title，改用符合 Vercel 美学的极致大写极细原子标签 */}
+          <Label className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider pl-0.5">
+            {t('qrCode:resultLabel')}
+          </Label>
+
+          <div className="flex-1 min-h-0">
+            <TextInputArea
+              value={parserState.decodedResult}
+              readOnly={true}
+              showClear={false}
+              allowCopy={true}
+              placeholder=""
+              minRows={6}
+              maxRows={12}
+              externalError={parserState.parseError || undefined}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
