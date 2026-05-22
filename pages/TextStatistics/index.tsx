@@ -3,15 +3,10 @@ import { FileText } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import TextInputArea from '@/components/TextInputArea';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
-import { textStatisticsPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { useContextMenuData } from '@/utils/useContextMenuData';
+import { cn } from '@/lib/utils';
 
-/**
- * 文本统计页面组件
- *
- * 提供实时的文本分析功能，包括字符数、单词数、行数和字节大小。
- */
 export default function Index() {
   const { t } = useLazyTranslation('textStatistics');
   const [text, setText] = useState('');
@@ -22,8 +17,7 @@ export default function Index() {
 
   useContextMenuData({ featureKey: 'textStatistics', onData: handleContextMenuData });
 
-  // 实时计算统计信息，使用 useMemo 优化性能
-  // 对于 10,000 字符以上的文本，Intl.Segmenter 也能保持良好的性能
+  // 实时计算统计信息，由 useMemo 拦截非必要计算
   const stats = useMemo(() => getTextStats(text), [text]);
 
   const statItems = [
@@ -34,49 +28,45 @@ export default function Index() {
   ];
 
   return (
-    <div>
-      <div className="p-2">
-        {/* 头部区域 */}
-        <PageHeader
-          title={t('textStatistics:pageTitle')}
-          subtitle={t('textStatistics:pageSubtitle')}
-          icon={<FileText />}
-          iconColor={textStatisticsPageStyles.primaryColor}
-        />
+    <div className="p-4 w-full space-y-4 animate-in fade-in duration-300">
+      {/* 头部区域 */}
+      <PageHeader
+        title={t('textStatistics:pageTitle')}
+        subtitle={t('textStatistics:pageSubtitle')}
+        icon={<FileText />}
+        iconColor="text-purple-500"
+      />
 
-        {/* 文本输入区域 */}
-        <TextInputArea
-          value={text}
-          onChange={setText}
-          placeholder={t('textStatistics:placeholder')}
-          minRows={8}
-          maxRows={15}
-          showClear={false}
-        />
+      {/* 文本输入区域 */}
+      <TextInputArea
+        value={text}
+        onChange={setText}
+        placeholder={t('textStatistics:placeholder')}
+        minRows={10}
+        maxRows={18}
+        showClear={true}
+        allowCopy={true}
+      />
 
-        {/* 统计结果展示区域 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-          {statItems.map((item) => (
-            <div
-              key={item.label}
-              className="p-2 text-center rounded-2xl border transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] min-h-[64px] md:min-h-[90px] flex flex-row md:flex-col items-center justify-between md:justify-center px-3 md:px-2 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(156,39,176,0.15)] hover:border-purple-600"
-              style={{
-                backgroundColor: `${textStatisticsPageStyles.primaryColor}0a`,
-                borderColor: `${textStatisticsPageStyles.primaryColor}1a`,
-              }}
-            >
-              <span className="text-muted-foreground whitespace-nowrap mb-0 md:mb-1">
-                {item.label}
-              </span>
-              <span
-                className="break-all font-semibold"
-                style={{ color: textStatisticsPageStyles.primaryColor }}
-              >
-                {item.value}
-              </span>
-            </div>
-          ))}
-        </div>
+      {/* 统计结果展示区域 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {statItems.map((item) => (
+          <div
+            key={item.label}
+            className={cn(
+              'flex flex-col justify-center items-center p-4 text-center rounded-xl border border-border bg-card shadow-sm text-card-foreground',
+              'transition-all duration-200 ease-out',
+              'hover:-translate-y-0.5 hover:shadow-md hover:border-primary/50 focus-within:ring-1 focus-within:ring-ring',
+            )}
+          >
+            <span className="text-xs font-medium text-muted-foreground tracking-wider mb-1 select-none">
+              {item.label}
+            </span>
+            <span className="font-mono text-lg md:text-2xl font-extrabold text-primary break-all tracking-tight leading-none tabular-nums select-all">
+              {item.value}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );
