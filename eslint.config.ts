@@ -60,6 +60,12 @@ export default tseslint.config(
       'react-hooks': reactHooks,
     },
 
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+
     // 💡 修复点 2：高精对齐 React 19 / JSX Runtime 的全量生产质检规则大闸
     rules: {
       // 激活 react-hooks 官方推荐规则
@@ -67,6 +73,8 @@ export default tseslint.config(
       // 激活 react 官方精选规则（排除旧版 React 必须手动 import 的历史包袱）
       ...reactPlugin.configs.recommended.rules,
       ...reactPlugin.configs['jsx-runtime'].rules,
+
+      'react/prop-types': 'off',
 
       // 清洗原生未消费变量冲突，统一交由 TS 高阶哨兵接管
       'no-unused-vars': 'off',
