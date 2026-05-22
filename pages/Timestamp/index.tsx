@@ -98,7 +98,7 @@ export default function Index() {
             {/* 立即转换 */}
             <button
               onClick={convert}
-              className="block mx-auto mt-4 mb-1 max-w-[240px] w-full py-2.5 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
+              className="block mx-auto mt-4 mb-1 max-w-[240px] w-full py-2.5 text-sm font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
             >
               {t('timestamp:convertButton')}
             </button>

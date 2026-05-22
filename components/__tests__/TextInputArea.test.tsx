@@ -334,7 +334,7 @@ describe('TextInputArea 组件', () => {
       );
 
       const btn = screen.getByText('主要');
-      expect(btn).toHaveClass('bg-primary', 'text-white');
+      expect(btn).toHaveClass('bg-primary', 'text-primary-foreground');
     });
   });
 

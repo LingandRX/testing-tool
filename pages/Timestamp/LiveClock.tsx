@@ -47,7 +47,7 @@ const LiveClock = React.memo(({ unit, onUseNow }: LiveClockProps) => {
       <button
         onClick={handleUseNow}
         title={t('timestamp:useNowTooltip')}
-        className="p-1.5 rounded-md bg-background text-primary shadow-sm hover:bg-blue-700 hover:text-white transition-colors"
+        className="p-1.5 rounded-md bg-background text-primary shadow-sm hover:bg-primary hover:text-primary-foreground transition-colors"
       >
         <Clock className="w-4 h-4" />
       </button>
