@@ -1,58 +1,60 @@
 import { defineConfig } from 'wxt';
 import type { Plugin } from 'vite';
-import postcssConfig from './postcss.config.js';
 
-/**
- * 仅在 HTML 多入口构建（popup / options / sidepanel）中启用 manualChunks 拆分 vendor。
- * WXT 对 background / content-script 使用 lib 模式（IIFE），该模式不支持 manualChunks。
- */
 function manualChunksForHtmlOnly(): Plugin {
   return {
     name: 'manual-chunks-html-only',
     outputOptions(rawOptions) {
-      // lib 模式（IIFE）不支持 manualChunks，仅对 ES/CJS 格式启用
       if (rawOptions.format === 'iife' || rawOptions.format === 'umd') {
         return;
       }
-      rawOptions.manualChunks = (id: string) => {
-        if (!id.includes('node_modules')) return;
 
-        // React 核心
-        if (id.includes('/react-dom/') || (id.includes('/react/') && !id.includes('/react-dom/'))) {
-          return 'vendor-react';
-        }
-        // 国际化
-        if (
-          id.includes('i18next') ||
-          id.includes('react-i18next') ||
-          id.includes('intl-messageformat')
-        ) {
-          return 'vendor-i18n';
-        }
-        // QR 相关
-        if (id.includes('qr-scanner') || id.includes('qrious')) {
-          return 'vendor-qr';
-        }
-        // 拖拽
-        if (id.includes('@dnd-kit')) {
-          return 'vendor-dnd';
-        }
-        // Markdown
-        if (id.includes('marked')) {
-          return 'vendor-markdown';
-        }
+      return {
+        ...rawOptions,
+        manualChunks(id: string): string | void {
+          if (!id.includes('node_modules')) {
+            return undefined;
+          }
+
+          if (
+            id.includes('/react-dom/') ||
+            (id.includes('/react/') && !id.includes('/react-dom/'))
+          ) {
+            return 'vendor-react';
+          }
+          if (
+            id.includes('i18next') ||
+            id.includes('react-i18next') ||
+            id.includes('intl-messageformat')
+          ) {
+            return 'vendor-i18n';
+          }
+          // 二维码活态感知依赖分流
+          if (id.includes('qr-scanner') || id.includes('qrious')) {
+            return 'vendor-qr';
+          }
+          // 拖拽排序高级组件分流
+          if (id.includes('@dnd-kit')) {
+            return 'vendor-dnd';
+          }
+          // Markdown 高性能转换引擎分流
+          if (id.includes('marked')) {
+            return 'vendor-markdown';
+          }
+
+          return undefined;
+        },
       };
     },
   };
 }
 
-// See https://wxt.dev/api/config.html
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    name: 'Testing Tools',
-    version: '1.0',
-    description: '测试工具',
+    name: '__MSG_extName__',
+    description: '__MSG_extDescription__',
+    version_name: undefined,
     permissions: [
       'storage',
       'unlimitedStorage',
@@ -66,7 +68,7 @@ export default defineConfig({
     ],
     host_permissions: ['<all_urls>'],
     action: {
-      default_title: 'Testing Tools',
+      default_title: '__MSG_extName__',
     },
     side_panel: {
       default_path: 'entrypoints/sidepanel/index.html',
@@ -83,10 +85,7 @@ export default defineConfig({
       terserOptions: {
         format: { ascii_only: true, comments: false },
       },
-      chunkSizeWarningLimit: 600,
-    },
-    css: {
-      postcss: postcssConfig,
+      chunkSizeWarningLimit: 800,
     },
   }),
 });
