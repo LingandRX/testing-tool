@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import TextInputArea from '@/components/TextInputArea';
 import ImageUploader from '@/components/ImageUploader';
 import { useSnackbar } from '@/components/GlobalSnackbar';
@@ -77,7 +77,6 @@ export default function ParsePanel() {
           allowCopy
           placeholder=""
           externalError={parserState.parseError}
-          showMessage={showMessage}
         />
       </div>
     </div>

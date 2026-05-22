@@ -1,12 +1,10 @@
 import TextInputArea from '@/components/TextInputArea';
 import QrCodePreview from '@/components/QrCodePreview';
-import { useSnackbar } from '@/components/GlobalSnackbar';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 
 export default function GeneratePanel() {
   const { t } = useLazyTranslation('qrCode');
-  const { showMessage } = useSnackbar();
   const { generatorState, setTextToEncode, downloadQrCode, copyQrCode } = useQrCodeContext();
 
   return (
@@ -21,7 +19,6 @@ export default function GeneratePanel() {
           showClear
           allowCopy
           externalError={generatorState.inputError}
-          showMessage={showMessage}
         />
       </div>
       <div>
