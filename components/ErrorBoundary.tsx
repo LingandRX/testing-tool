@@ -1,8 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import { Box, Button, Container, Paper, Typography } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   children: ReactNode;
@@ -43,63 +41,30 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <Container sx={{ mt: 8 }}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 4,
-              textAlign: 'center',
-              borderRadius: 4,
-              border: '1px solid',
-              borderColor: 'error.light',
-              bgcolor: 'rgba(211, 47, 47, 0.04)',
-            }}
-          >
-            <ErrorOutlineIcon color="error" sx={{ fontSize: 64, mb: 2 }} />
-            <Typography variant="h5" fontWeight={800} gutterBottom color="error.main">
-              糟糕，出了点问题
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        <div className="mt-16 mx-auto max-w-md">
+          <div className="p-6 text-center rounded-xl border border-red-200 bg-red-50">
+            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-extrabold text-red-600 mb-2">糟糕，出了点问题</h2>
+            <p className="text-sm text-muted-foreground mb-6">
               应用遇到了一些意外错误。您可以尝试刷新页面或重置应用。
-            </Typography>
+            </p>
             {this.state.error && (
-              <Box
-                sx={{
-                  mb: 3,
-                  p: 2,
-                  bgcolor: (theme: Theme) =>
-                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.100',
-                  borderRadius: 2,
-                  textAlign: 'left',
-                  maxHeight: '200px',
-                  overflow: 'auto',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  component="pre"
-                  sx={{
-                    fontFamily: 'monospace',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-all',
-                    color: 'error.dark',
-                  }}
-                >
+              <div className="mb-6 p-4 bg-muted rounded-lg text-left max-h-[200px] overflow-auto">
+                <pre className="font-mono text-xs whitespace-pre-wrap break-all text-red-700">
                   {this.state.error.toString()}
-                </Typography>
-              </Box>
+                </pre>
+              </div>
             )}
             <Button
-              variant="contained"
-              color="error"
-              startIcon={<RefreshIcon />}
+              variant="default"
               onClick={this.handleReset}
-              sx={{ borderRadius: 2, fontWeight: 700 }}
+              className="rounded-lg font-bold bg-red-600 hover:bg-red-700 text-white"
             >
+              <RefreshCw className="mr-2 h-4 w-4" />
               刷新应用
             </Button>
-          </Paper>
-        </Container>
+          </div>
+        </div>
       );
     }
 

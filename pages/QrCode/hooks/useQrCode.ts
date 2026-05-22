@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import QRious from 'qrious';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
@@ -6,24 +6,24 @@ import { useContextMenuData } from '@/utils/useContextMenuData';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { useDebounce } from '@/utils/useDebounce';
 import type { QrCodeContextValue } from '../contexts/QrCodeContext';
-import type { QrCodeMode, QrCodeGeneratorState, QrCodeParserState } from '../types';
+import type { QrCodeGeneratorState, QrCodeMode, QrCodeParserState } from '../types';
 
 export function useQrCode(): QrCodeContextValue {
   const { t } = useLazyTranslation('qrCode');
   const { showMessage } = useSnackbar();
 
-  // 当前模式
+  // 核心路由视图模式
   const [mode, setMode] = useState<QrCodeMode>('generate');
 
-  // 二维码生成器状态
-  const [generatorState, setGeneratorState] = useState<QrCodeGeneratorState>({
+  // 1. 生成器状态流（大幅瘦身：剔除 generating 状态）
+  const [generatorState, setGeneratorState] = useState<
+    Omit<QrCodeGeneratorState, 'generating' | 'qrCodeDataUrl'>
+  >({
     textToEncode: '',
-    qrCodeDataUrl: '',
-    generating: false,
     inputError: '',
   });
 
-  // 二维码解析器状态
+  // 2. 解析器状态流
   const [parserState, setParserState] = useState<QrCodeParserState>({
     decodedResult: '',
     parsing: false,
@@ -33,75 +33,65 @@ export function useQrCode(): QrCodeContextValue {
     dragging: false,
   });
 
-  // 生成二维码
-  const generateQrCode = useCallback(
-    async (text: string) => {
-      if (!text) {
-        setGeneratorState((prev) => ({ ...prev, qrCodeDataUrl: '' }));
-        return;
-      }
-
-      try {
-        setGeneratorState((prev) => ({ ...prev, generating: true, inputError: '' }));
-
-        let url = text;
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          url = 'https://' + url;
-        }
-
-        const qr = new QRious({
-          value: url,
-          size: 250,
-          level: 'H',
-          foreground: '#000000',
-          background: '#FFFFFF',
-        });
-
-        setGeneratorState((prev) => ({ ...prev, qrCodeDataUrl: qr.toDataURL() }));
-      } catch (error) {
-        console.error('生成二维码失败:', error);
-        setGeneratorState((prev) => ({
-          ...prev,
-          inputError: t('qrCode:generateError'),
-        }));
-        showMessage(t('qrCode:generateError'), { severity: 'error', autoHideDuration: 3000 });
-      } finally {
-        setGeneratorState((prev) => ({ ...prev, generating: false }));
-      }
-    },
-    [t, showMessage],
-  );
-
-  // 使用 useRef 存储 generateQrCode 的最新引用，避免无限循环
-  const generateQrCodeRef = useRef(generateQrCode);
-  useEffect(() => {
-    generateQrCodeRef.current = generateQrCode;
-  });
-
-  // 防抖处理输入文本（200ms）
+  // 3. 高频打字极速防抖
   const debouncedTextToEncode = useDebounce(generatorState.textToEncode, 200);
 
-  // 当防抖后的文本变化时，自动生成二维码
-  useEffect(() => {
-    if (debouncedTextToEncode && mode === 'generate') {
-      generateQrCodeRef.current(debouncedTextToEncode);
+  // 💡 4. 贯彻方案 A（无副作用超导管线）：
+  // 彻底删除原有的 generateQrCodeRef、3个 useEffect、1个 useRef 以及相关的复杂状态机。
+  // 二维码画布纯粹作为防抖文本的派生变量同步算出，0重绘死循环风险，体验平滑如镜！
+  const qrCodeDataUrl = useMemo(() => {
+    const text = debouncedTextToEncode.trim();
+    if (!text) return '';
+
+    try {
+      let url = text;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+
+      // 💡 暗黑模式自适应大闸：实时嗅探系统 DOM 阶度
+      const isDark = document.documentElement.classList.contains('dark');
+
+      const qr = new QRious({
+        value: url,
+        size: 260,
+        level: 'H',
+        // 暗黑模式下使用透明底、月白前景色；白天模式下使用标准现代黑白配
+        foreground: isDark ? '#f3f4f6' : '#0f172a',
+        background: isDark ? 'transparent' : '#ffffff',
+      });
+
+      return qr.toDataURL();
+    } catch (error) {
+      console.error('QR code generation sync task failed:', error);
+      return '';
     }
-  }, [debouncedTextToEncode, mode]);
+  }, [debouncedTextToEncode]);
+
+  // 融合派生数据至完整状态体，满足外部组件强类型契合
+  const fullGeneratorState = useMemo<QrCodeGeneratorState>(
+    () => ({
+      ...generatorState,
+      qrCodeDataUrl,
+      generating: false,
+    }),
+    [generatorState, qrCodeDataUrl],
+  );
 
   // 设置输入文本
   const setTextToEncode = useCallback((text: string) => {
-    setGeneratorState((prev) => ({ ...prev, textToEncode: text }));
+    setGeneratorState((prev) => ({ ...prev, textToEncode: text, inputError: '' }));
   }, []);
 
-  // 处理右键菜单数据
+  // 处理右键菜单数据上下文
   const handleContextMenuData = useCallback((payload: string) => {
     setMode('generate');
-    setGeneratorState((prev) => ({ ...prev, textToEncode: payload }));
+    setGeneratorState((prev) => ({ ...prev, textToEncode: payload, inputError: '' }));
   }, []);
 
   useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
 
-  // 解析二维码
+  // 反向活态解析二维码算法
   const parseQrCode = useCallback(
     async (file: File) => {
       try {
@@ -131,21 +121,21 @@ export function useQrCode(): QrCodeContextValue {
 
   // 下载二维码
   const downloadQrCode = useCallback(() => {
-    if (!generatorState.qrCodeDataUrl) return;
+    if (!qrCodeDataUrl) return;
 
     const link = document.createElement('a');
-    link.href = generatorState.qrCodeDataUrl;
+    link.href = qrCodeDataUrl;
     link.download = 'qrcode.png';
     link.click();
     showMessage(t('qrCode:qrCodeDownloadSuccess'), { severity: 'success', autoHideDuration: 1000 });
-  }, [generatorState.qrCodeDataUrl, showMessage, t]);
+  }, [qrCodeDataUrl, showMessage, t]);
 
-  // 复制二维码
+  // 复制二维码至剪贴板
   const copyQrCode = useCallback(async () => {
-    if (!generatorState.qrCodeDataUrl) return;
+    if (!qrCodeDataUrl) return;
 
     try {
-      const response = await fetch(generatorState.qrCodeDataUrl);
+      const response = await fetch(qrCodeDataUrl);
       const blob = await response.blob();
 
       await navigator.clipboard.write([
@@ -159,13 +149,12 @@ export function useQrCode(): QrCodeContextValue {
       console.error('复制二维码失败:', error);
       showMessage(t('qrCode:copyError'), { severity: 'error', autoHideDuration: 3000 });
     }
-  }, [generatorState.qrCodeDataUrl, showMessage, t]);
+  }, [qrCodeDataUrl, showMessage, t]);
 
   // 处理文件选择
   const handleFileChange = useCallback(
     (file: File) => {
       setParserState((prev) => {
-        // 释放旧的预览 URL
         if (prev.previewUrl) {
           URL.revokeObjectURL(prev.previewUrl);
         }
@@ -177,37 +166,41 @@ export function useQrCode(): QrCodeContextValue {
           parseError: '',
         };
       });
-      // 自动解析
-      parseQrCode(file);
+
+      // 触发解析安全的后台 Promise
+      parseQrCode(file).catch((err) => {
+        console.error('Parser standalone task thread exploded:', err);
+      });
     },
     [parseQrCode],
   );
 
-  // 清除文件
+  // 清除解析受控文件
   const handleClearFile = useCallback(() => {
-    if (parserState.previewUrl) {
-      URL.revokeObjectURL(parserState.previewUrl);
-    }
-    setParserState((prev) => ({
-      ...prev,
-      selectedFile: null,
-      previewUrl: '',
-      decodedResult: '',
-      parseError: '',
-    }));
-  }, [parserState.previewUrl]);
+    setParserState((prev) => {
+      if (prev.previewUrl) {
+        URL.revokeObjectURL(prev.previewUrl);
+      }
+      return {
+        ...prev,
+        selectedFile: null,
+        previewUrl: '',
+        decodedResult: '',
+        parseError: '',
+      };
+    });
+  }, []);
 
   return {
     mode,
     setMode,
-    generatorState,
+    generatorState: fullGeneratorState,
     setTextToEncode,
-    generateQrCode,
+    parseQrCode,
     downloadQrCode,
     copyQrCode,
     parserState,
     setParserState,
-    parseQrCode,
     handleFileChange,
     handleClearFile,
   };

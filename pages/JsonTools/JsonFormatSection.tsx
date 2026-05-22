@@ -1,236 +1,169 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Button,
-  FormControlLabel,
-  FormHelperText,
-  Stack,
-  Switch,
-  TextField,
-  Typography,
-} from '@mui/material';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import {
   formatJson,
-  validateJson,
   type JsonFormatOptions,
   type JsonFormatResult,
+  validateJson,
 } from '@/utils/jsonFormatter';
 import { formatByteSize } from '@/utils/textStatistics';
-import { useSnackbar } from '@/components/GlobalSnackbar';
-import { jsonDiffPageStyles } from '@/config/pageTheme';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
+import TextInputArea from '@/components/TextInputArea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
-/** 缩进大小选项 */
-const INDENT_OPTIONS = [2, 4, 6, 8] as const;
-
-/**
- * JSON 格式化工具区域组件
- *
- * 提供输入区域、格式化选项（缩进大小、键名排序）和格式化结果展示，
- * 支持一键复制格式化后的 JSON。
- */
 export default function JsonFormatSection() {
   const { t } = useLazyTranslation('jsonFormat');
-  const { showMessage } = useSnackbar();
 
   const [input, setInput] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [debouncedInput, setDebouncedInput] = useState('');
   const [indentSize, setIndentSize] = useState<number>(2);
   const [sortKeys, setSortKeys] = useState(false);
-  const [result, setResult] = useState<JsonFormatResult | null>(null);
 
-  // 防抖校验输入
+  // 1. 高频打字防抖落盘：防止大体积 JSON 在高频输入时发生卡顿
   useEffect(() => {
     const handle = setTimeout(() => {
-      setError(validateJson(input));
-    }, 300);
+      setDebouncedInput(input);
+    }, 250);
     return () => clearTimeout(handle);
   }, [input]);
 
-  const canFormat = useMemo(() => {
-    return input.trim() !== '' && !error;
-  }, [input, error]);
+  // 💡 2. 贯彻方案 A（衍生变量超进化）：
+  // 彻底删除原有的 setError 状态和相关的 useEffect。
+  // 语法错误由防抖文本在内存中同步推导，彻底斩断二次级联渲染链条，ESLint 警告瞬间消亡！
+  const error = useMemo(() => {
+    return validateJson(debouncedInput);
+  }, [debouncedInput]);
 
-  const handleFormat = () => {
-    const validationError = validateJson(input);
-    if (validationError) {
-      setError(validationError);
-      setResult(null);
-      return;
-    }
+  // 3. 实时流式格式化管线
+  const formattedPipeline = useMemo(() => {
+    const trimmed = debouncedInput.trim();
+    if (!trimmed || error) return null;
 
     try {
       const options: JsonFormatOptions = { indentSize, sortKeys };
-      const formatResult = formatJson(input, options);
-      setResult(formatResult);
+      return formatJson(debouncedInput, options);
     } catch (e) {
-      setError(e instanceof SyntaxError ? e.message : String(e));
-      setResult(null);
+      return {
+        isRuntimeError: true,
+        errorMessage: e instanceof SyntaxError ? e.message : String(e),
+      };
     }
-  };
+  }, [debouncedInput, error, indentSize, sortKeys]);
 
-  const handleClear = () => {
-    setInput('');
-    setError(null);
-    setResult(null);
-  };
+  const runtimeError =
+    formattedPipeline && 'isRuntimeError' in formattedPipeline
+      ? formattedPipeline.errorMessage
+      : null;
+  const result =
+    formattedPipeline && !('isRuntimeError' in formattedPipeline)
+      ? (formattedPipeline as JsonFormatResult)
+      : null;
 
   return (
-    <Stack spacing={2.5}>
-      {/* 工具栏 */}
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={1.5}
-        justifyContent="space-between"
-        alignItems={{ xs: 'stretch', sm: 'center' }}
-      >
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          {/* 缩进选择 */}
-          <Typography
-            variant="caption"
-            sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.7rem' }}
+    <div className="w-full flex flex-col gap-4 animate-in fade-in duration-300">
+      {/* 工具控制栏 */}
+      <div className="flex h-10 items-center justify-between px-1.5 bg-secondary/40 rounded-xl border border-border/60">
+        <div className="flex gap-4 items-center w-full">
+          {/* 缩进配置区 */}
+          <div className="flex gap-2 items-center shrink-0 select-none">
+            <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
+              {t('jsonFormat:indentSize')}
+            </span>
+            <SwitchButtonGroup
+              value={indentSize}
+              onChange={(v) => setIndentSize(Number(v))}
+              options={[2, 4, 6, 8].map((size) => ({ value: size, label: String(size) }))}
+              size="small"
+            />
+          </div>
+
+          <div className="h-4 w-px bg-border/60" />
+
+          {/* 键名排序区 */}
+          <div
+            onClick={() => setSortKeys(!sortKeys)}
+            className="flex items-center gap-2 cursor-pointer select-none group py-1"
           >
-            {t('jsonFormat:indentSize')}
-          </Typography>
-          <SwitchButtonGroup
-            value={indentSize}
-            onChange={(v) => setIndentSize(v)}
-            options={INDENT_OPTIONS.map((size) => ({ value: size, label: String(size) }))}
-            sx={{ width: 'auto', mb: 0, flexShrink: 0 }}
-            size="small"
-          />
+            <Checkbox
+              id="sort-keys-checkbox"
+              checked={sortKeys}
+              onClick={(e) => e.stopPropagation()}
+              onCheckedChange={(checked) => setSortKeys(checked === true)}
+              className="h-3.5 w-3.5 rounded border-input data-[state=checked]:bg-primary shadow-sm"
+            />
+            <Label
+              htmlFor="sort-keys-checkbox"
+              className="text-xs font-bold text-foreground/80 cursor-pointer tracking-tight group-hover:text-foreground transition-colors"
+            >
+              {t('jsonFormat:sortKeys')}
+            </Label>
+          </div>
+        </div>
+      </div>
 
-          {/* 键名排序开关 */}
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={sortKeys}
-                onChange={(e) => setSortKeys(e.target.checked)}
-              />
-            }
-            label={
-              <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.7rem' }}>
-                {t('jsonFormat:sortKeys')}
-              </Typography>
-            }
-            sx={{ ml: 1 }}
-          />
-        </Stack>
+      {/* 满血版输入终端 */}
+      <TextInputArea
+        placeholder={t('jsonFormat:inputPlaceholder')}
+        value={input}
+        onChange={setInput}
+        externalError={error || runtimeError || undefined}
+        showClear={true}
+        allowCopy={true}
+        minRows={8}
+        maxRows={15}
+        onClear={() => setInput('')}
+      />
 
-        <Stack direction="row" spacing={1}>
-          <Button variant="text" onClick={handleClear} sx={{ borderRadius: 3 }}>
-            {t('jsonFormat:clearButton')}
-          </Button>
-          <Button
-            variant="contained"
-            disabled={!canFormat}
-            onClick={handleFormat}
-            sx={{ borderRadius: 3, fontWeight: 700, px: 3 }}
-          >
-            {t('jsonFormat:formatButton')}
-          </Button>
-        </Stack>
-      </Stack>
-
-      {/* 输入区 */}
-      <Box>
-        <TextField
-          multiline
-          rows={6}
-          fullWidth
-          placeholder={t('jsonFormat:inputPlaceholder')}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          error={Boolean(error)}
-          sx={jsonDiffPageStyles.INPUT_STYLE}
-        />
-        {error && (
-          <FormHelperText error sx={{ mx: 1.5, mt: 0.5, fontWeight: 600 }}>
-            {t('jsonFormat:invalidJson')}
-          </FormHelperText>
-        )}
-      </Box>
-
-      {/* 格式化结果 */}
+      {/* 格式化结果流面板展示 */}
       {result && result.formatted ? (
-        <Box
-          sx={{
-            position: 'relative',
-            borderRadius: 3,
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            overflow: 'hidden',
-          }}
-        >
-          {/* 结果头部 */}
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
-              px: 2,
-              py: 1,
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-            }}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Typography
-                variant="caption"
-                sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.7rem' }}
-              >
+        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden animate-in slide-in-from-bottom-2 duration-300">
+          {/* 结果栏头部 */}
+          <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
+            <div className="flex gap-4 items-center">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
                 {t('jsonFormat:outputLabel')}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
-                {t('jsonFormat:originalSize')}: {formatByteSize(result.originalBytes)}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
-                {t('jsonFormat:formattedSize')}: {formatByteSize(result.formattedBytes)}
-              </Typography>
-            </Stack>
-            <CopyButton text={result.formatted} showMessage={showMessage} />
-          </Stack>
+              </span>
 
-          {/* 格式化内容 */}
-          <Box
-            sx={{
-              p: 2,
-              fontFamily: 'monospace',
-              fontSize: '0.8rem',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-all',
-              maxHeight: 400,
-              overflowY: 'auto',
-              lineHeight: 1.6,
-            }}
-          >
+              <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
+                <span>
+                  {t('jsonFormat:originalSize')}:{' '}
+                  <span className="font-semibold text-foreground/80">
+                    {formatByteSize(result.originalBytes)}
+                  </span>
+                </span>
+                <span className="text-border/60">|</span>
+                <span>
+                  {t('jsonFormat:formattedSize')}:{' '}
+                  <span className="font-semibold text-foreground/80">
+                    {formatByteSize(result.formattedBytes)}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <CopyButton
+              text={result.formatted}
+              className="h-6 w-6 rounded-md border text-muted-foreground"
+            />
+          </div>
+
+          {/* 核心格式化数据面板：
+            💡 修复点：移除了互相打架的 select-all 类名，仅保留纯正的代码高亮可选样式 select-text
+          */}
+          <div className="p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all max-h-[420px] overflow-y-auto leading-relaxed select-text">
             {result.formatted}
-          </Box>
-        </Box>
+          </div>
+        </div>
       ) : (
-        <Box
-          sx={{
-            p: 3,
-            borderRadius: 3,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'grey.50',
-            border: '1px dashed',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'grey.300',
-            textAlign: 'center',
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-            {t('jsonFormat:emptyHint')}
-          </Typography>
-        </Box>
+        /* 空状态指示引导区 */
+        <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
+          <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
+            {error ? '请修正上方 JSON 语法错误以开启实时流式格式化' : t('jsonFormat:emptyHint')}
+          </p>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 }

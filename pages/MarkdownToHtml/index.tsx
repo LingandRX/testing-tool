@@ -1,111 +1,85 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Alert,
-  alpha,
-  Box,
-  Button,
-  Container,
-  Stack,
-  TextField,
-  Typography,
-  Paper,
-} from '@mui/material';
-import CodeIcon from '@mui/icons-material/Code';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import PrintIcon from '@mui/icons-material/Print';
-import DownloadIcon from '@mui/icons-material/Download';
+import { Code, Download, Printer, Trash2 } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
+import { Button } from '@/components/ui/button';
 import { useStorageState } from '@/utils/useStorageState';
 import type { MarkdownToHtmlPreviewMode } from '@/types/storage';
 import {
-  markdownToHtml,
-  wrapHtmlDocument,
   downloadHtmlFile,
+  markdownToHtml,
   printHtml,
   SAMPLE_MARKDOWN,
+  wrapHtmlDocument,
 } from '@/utils/markdownToHtml';
+import { cn } from '@/lib/utils';
 
 const isValidPreviewMode = (val: unknown): val is MarkdownToHtmlPreviewMode =>
   typeof val === 'string' && ['split', 'preview', 'html'].includes(val);
 
+// 💡 规范回归：保持最纯净的通用选择器集合，内部变量全部交由全局 :root 驱动
 const PREVIEW_STYLES = `
   .markdown-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
-    color: inherit;
+    color: var(--md-foreground);
+    background-color: transparent;
+    font-size: 14px;
   }
-  .markdown-body h1, .markdown-body h2, .markdown-body h3,
-  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
-    margin-top: 20px;
-    margin-bottom: 12px;
+  .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+    margin-top: 24px;
+    margin-bottom: 16px;
     font-weight: 600;
     line-height: 1.25;
+    color: var(--md-foreground);
   }
-  .markdown-body h1 { font-size: 1.8em; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 0.3em; }
-  .markdown-body h2 { font-size: 1.5em; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 0.3em; }
-  .markdown-body h3 { font-size: 1.25em; }
-  .markdown-body p { margin-top: 0; margin-bottom: 12px; }
-  .markdown-body a { color: #1976d2; text-decoration: none; }
+  .markdown-body h1 { border-bottom: 1px solid var(--md-border); padding-bottom: 0.3em; font-size: 1.6em; }
+  .markdown-body h2 { border-bottom: 1px solid var(--md-border); padding-bottom: 0.3em; font-size: 1.35em; }
+  .markdown-body p { margin-top: 0; margin-bottom: 16px; }
+  .markdown-body a { color: #3b82f6; text-decoration: none; }
   .markdown-body a:hover { text-decoration: underline; }
   .markdown-body code {
-    background-color: rgba(128,128,128,0.1);
-    border-radius: 3px;
+    background-color: var(--md-code-bg);
+    border-radius: 4px;
     font-size: 85%;
     padding: 0.2em 0.4em;
-    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-family: Menlo, Consolas, monospace;
   }
   .markdown-body pre {
-    background-color: rgba(128,128,128,0.08);
-    border-radius: 6px;
+    background-color: var(--md-pre-bg);
+    border-radius: 8px;
     font-size: 85%;
     line-height: 1.45;
     overflow: auto;
-    padding: 14px;
-    margin: 0 0 12px;
+    padding: 16px;
+    margin: 0 0 16px;
+    border: 1px solid var(--md-border);
   }
   .markdown-body pre code {
     background-color: transparent;
     border: 0;
-    display: inline;
-    line-height: inherit;
-    margin: 0;
     padding: 0;
-    word-wrap: normal;
   }
   .markdown-body blockquote {
-    border-left: 0.25em solid rgba(128,128,128,0.3);
-    color: rgba(128,128,128,0.7);
-    margin: 0 0 12px;
+    border-left: 0.25em solid var(--md-quote-line);
+    color: var(--md-muted);
+    margin: 0 0 16px;
     padding: 0 1em;
   }
-  .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 12px; padding-left: 2em; }
-  .markdown-body li + li { margin-top: 0.25em; }
-  .markdown-body img { max-width: 100%; box-sizing: content-box; }
   .markdown-body table {
     border-collapse: collapse;
-    border-spacing: 0;
-    display: block;
-    overflow: auto;
     width: 100%;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    font-size: 13px;
   }
   .markdown-body table th, .markdown-body table td {
-    border: 1px solid rgba(128,128,128,0.25);
+    border: 1px solid var(--md-border);
     padding: 6px 13px;
   }
-  .markdown-body table tr:nth-child(2n) { background-color: rgba(128,128,128,0.05); }
-  .markdown-body table th { font-weight: 600; background-color: rgba(128,128,128,0.05); }
-  .markdown-body hr {
-    background-color: rgba(128,128,128,0.2);
-    border: 0;
-    height: 0.25em;
-    margin: 20px 0;
-    padding: 0;
-  }
-  .markdown-body input[type="checkbox"] { margin-right: 0.5em; }
+  .markdown-body table tr:nth-child(2n) { background-color: var(--md-code-bg); }
+  .markdown-body table th { font-weight: 600; background-color: var(--md-code-bg); }
 `;
 
 export default function MarkdownToHtmlPage() {
@@ -121,23 +95,62 @@ export default function MarkdownToHtmlPage() {
   const result = useMemo(() => markdownToHtml(markdown), [markdown]);
   const error = result.hasError ? (result.error ?? null) : null;
 
-  // 更新 iframe 预览内容
+  // 💡 自适应大总管：以极高严谨度拼装明暗大闸，用标准换行切断粘连风险
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe || !iframe.contentDocument) return;
+    if (!iframe) return;
 
-    const doc = iframe.contentDocument;
-    doc.open();
-    doc.write(`<!DOCTYPE html>
-<html>
+    const isDarkMode = document.documentElement.classList.contains('dark');
+
+    const themeVariables = isDarkMode
+      ? `:root { 
+          --md-bg: #090d16;
+          --md-foreground: #e6edf3; 
+          --md-border: rgba(255,255,255,0.15); 
+          --md-code-bg: rgba(255,255,255,0.12); 
+          --md-pre-bg: rgba(255,255,255,0.04); 
+          --md-muted: #8b949e;
+          --md-quote-line: rgba(255,255,255,0.25);
+        }`
+      : `:root { 
+          --md-bg: #ffffff;
+          --md-foreground: #1f2328; 
+          --md-border: rgba(128,128,128,0.2); 
+          --md-code-bg: rgba(128,128,128,0.08); 
+          --md-pre-bg: rgba(128,128,128,0.03); 
+          --md-muted: #4b5563;
+          --md-quote-line: rgba(128,128,128,0.3);
+        }`;
+
+    // 💡 3. 核心大清洗：将全局基础树（html, body）与派生样式完全独立硬编码，杜绝任何语法踩踏
+    const baseGlobalStyles = `
+      html, body { 
+        margin: 0; 
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--md-bg);
+        color: var(--md-foreground);
+      }
+      body {
+        padding: 16px;
+        box-sizing: border-box;
+      }
+    `;
+
+    iframe.srcdoc = `<!DOCTYPE html>
+<html lang="zh" style="background-color: ${isDarkMode ? '#090d16' : '#ffffff'};">
 <head>
 <meta charset="UTF-8">
-<style>${PREVIEW_STYLES}</style>
+<style>
+  ${themeVariables}
+  ${PREVIEW_STYLES}
+  ${baseGlobalStyles}
+</style>
 </head>
 <body class="markdown-body">${result.html}</body>
-</html>`);
-    doc.close();
-  }, [result.html]);
+</html>`;
+  }, [result.html, previewMode]);
 
   const handleModeChange = useCallback(
     (newMode: MarkdownToHtmlPreviewMode) => {
@@ -163,18 +176,17 @@ export default function MarkdownToHtmlPage() {
   const showPreview = previewMode !== 'html';
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      <PageHeader title={t('pageTitle')} subtitle={t('pageSubtitle')} icon={<CodeIcon />} />
+    <div className="p-4 w-full flex flex-col space-y-4 select-none animate-in fade-in duration-300">
+      <PageHeader
+        title={t('pageTitle')}
+        subtitle={t('pageSubtitle')}
+        icon={<Code className="h-4 w-4" />}
+        className="pb-1"
+      />
 
-      <Stack spacing={2}>
-        {/* 工具栏 */}
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          flexWrap="wrap"
-          gap={1.5}
-        >
+      <div className="flex flex-col space-y-4">
+        {/* 工具集成控制中枢 */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center bg-secondary/40 rounded-xl border border-border/60 px-1.5 py-1.5 sm:h-12">
           <SwitchButtonGroup
             value={previewMode}
             options={[
@@ -184,202 +196,116 @@ export default function MarkdownToHtmlPage() {
             ]}
             onChange={handleModeChange}
             size="small"
+            className="w-full sm:w-auto"
           />
 
-          <Stack direction="row" spacing={1}>
+          <div className="flex gap-2 shrink-0">
             <Button
-              variant="outlined"
-              size="small"
-              startIcon={<DeleteOutlineIcon />}
+              variant="outline"
+              size="sm"
               onClick={handleClear}
-              sx={{ borderRadius: 2 }}
+              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm active:scale-95 text-destructive hover:text-destructive hover:bg-destructive/5 dark:hover:bg-destructive/10 border-input/60 transition-all"
             >
+              <Trash2 className="h-3.5 w-3.5" />
               {t('clear')}
             </Button>
             <Button
-              variant="outlined"
-              size="small"
-              startIcon={<PrintIcon />}
+              variant="outline"
+              size="sm"
               onClick={handlePrint}
-              sx={{ borderRadius: 2 }}
+              disabled={!result.html}
+              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm active:scale-95 transition-all"
             >
+              <Printer className="h-3.5 w-3.5" />
               {t('print')}
             </Button>
             <Button
-              variant="outlined"
-              size="small"
-              startIcon={<DownloadIcon />}
+              variant="outline"
+              size="sm"
               onClick={handleDownload}
-              sx={{ borderRadius: 2 }}
+              disabled={!result.html}
+              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm active:scale-95 transition-all"
             >
+              <Download className="h-3.5 w-3.5" />
               {t('download')}
             </Button>
-          </Stack>
-        </Stack>
+          </div>
+        </div>
 
-        {/* 错误提示 */}
+        {/* 错误拦截提示框 */}
         {error && (
-          <Alert severity="error" sx={{ borderRadius: 2 }}>
+          <div
+            role="alert"
+            className="p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-xs font-semibold tracking-wide animate-in shake duration-300"
+          >
             {error}
-          </Alert>
+          </div>
         )}
 
-        {/* 主内容区 */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: showInput && showPreview ? '1fr 1fr' : '1fr',
-            },
-            gap: 2,
-            minHeight: 500,
-          }}
+        {/* 主框架多栏联动排版轴 */}
+        <div
+          className={cn(
+            'grid gap-4 min-h-[480px] w-full',
+            showInput && showPreview ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1',
+          )}
         >
-          {/* Markdown 输入区 */}
+          {/* Markdown 输入翼终端 */}
           {showInput && (
-            <Paper
-              elevation={0}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 3,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+            <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col transition-all duration-200 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring animate-in fade-in">
+              <div className="flex h-9 items-center justify-between px-4 bg-muted/50 border-b border-border select-none">
+                <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
                   {t('inputLabel')}
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground/60 tabular-nums">
                   {t('charCount', { count: markdown.length })}
-                </Typography>
-              </Box>
-              <TextField
-                multiline
-                fullWidth
+                </span>
+              </div>
+              <textarea
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
                 placeholder={t('inputPlaceholder')}
-                sx={{
-                  flex: 1,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 0,
-                    fontFamily: 'monospace',
-                    fontSize: '0.85rem',
-                    lineHeight: 1.6,
-                    alignItems: 'flex-start',
-                    '& fieldset': { border: 'none' },
-                  },
-                  '& .MuiInputBase-input': {
-                    py: 2,
-                    px: 2,
-                    minHeight: 400,
-                  },
-                }}
+                className="flex-1 min-h-[390px] p-4 bg-transparent font-mono text-xs leading-relaxed resize-none focus:outline-none text-foreground/90 select-text"
               />
-            </Paper>
+            </div>
           )}
 
-          {/* 预览/输出区 */}
+          {/* 实时 HTML/Iframe 预览翼终端 */}
           {showPreview && (
-            <Paper
-              elevation={0}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 3,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+            <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col animate-in fade-in">
+              <div className="flex h-9 items-center justify-between px-4 bg-muted/50 border-b border-border select-none">
+                <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
                   {(previewMode as string) === 'html' ? t('htmlOutputLabel') : t('previewLabel')}
-                </Typography>
-                <Stack direction="row" spacing={0.5} alignItems="center">
-                  <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono text-muted-foreground/60 tabular-nums">
                     {t('charCount', { count: result.htmlLength })}
-                  </Typography>
-                  <CopyButton text={result.html} size="small" />
-                </Stack>
-              </Box>
+                  </span>
+                  <CopyButton
+                    text={result.html}
+                    className="h-6 w-6 rounded-md border text-muted-foreground"
+                  />
+                </div>
+              </div>
 
               {(previewMode as string) === 'html' ? (
-                <TextField
-                  multiline
-                  fullWidth
+                <textarea
                   value={result.html}
-                  InputProps={{ readOnly: true }}
-                  sx={{
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 0,
-                      fontFamily: 'monospace',
-                      fontSize: '0.8rem',
-                      lineHeight: 1.5,
-                      alignItems: 'flex-start',
-                      '& fieldset': { border: 'none' },
-                    },
-                    '& .MuiInputBase-input': {
-                      py: 2,
-                      px: 2,
-                      minHeight: 400,
-                    },
-                  }}
+                  readOnly
+                  className="flex-1 min-h-[390px] p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none bg-muted/30 dark:bg-muted/10 text-foreground/80 select-text"
                 />
               ) : (
-                <Box
-                  sx={{
-                    flex: 1,
-                    p: 2,
-                    minHeight: 400,
-                    overflow: 'auto',
-                    bgcolor: 'background.paper',
-                  }}
-                >
+                <div className="flex-1 min-h-[390px] overflow-hidden bg-transparent">
                   <iframe
                     ref={iframeRef}
                     title="markdown-preview"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      minHeight: 380,
-                      border: 'none',
-                      background: 'transparent',
-                    }}
+                    className="w-full h-full min-h-[360px] border-none bg-transparent"
                   />
-                </Box>
+                </div>
               )}
-            </Paper>
+            </div>
           )}
-        </Box>
-      </Stack>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }

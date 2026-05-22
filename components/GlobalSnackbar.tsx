@@ -38,12 +38,14 @@
 import {
   JSX,
   useState,
+  useRef,
   createContext,
   useContext,
+  useEffect,
   type ReactNode,
   type SyntheticEvent,
 } from 'react';
-import { Snackbar, Alert, type SxProps, type Theme, alpha, Portal } from '@mui/material';
+import { CheckCircle, Info, AlertTriangle, XCircle } from 'lucide-react';
 
 /**
  * Snackbar 消息严重程度类型
@@ -80,9 +82,9 @@ export interface GlobalSnackbarProps {
   /** 是否隐藏 Alert 图标，默认 false */
   hideIcon?: boolean;
   /** 自定义样式，透传给外层 Snackbar 组件 */
-  sx?: SxProps<Theme>;
+  sx?: React.CSSProperties;
   /** 自定义样式，透传给内层 Alert 组件（仅 showAlert=true 时生效） */
-  alertSx?: SxProps<Theme>;
+  alertSx?: React.CSSProperties;
 }
 
 /**
@@ -130,11 +132,20 @@ const defaultProps: Required<
   hideIcon: false,
 };
 
+const severityConfig: Record<
+  SnackbarSeverity,
+  { icon: React.ElementType; bgClass: string; textClass: string }
+> = {
+  success: { icon: CheckCircle, bgClass: 'bg-green-500', textClass: 'text-white' },
+  info: { icon: Info, bgClass: 'bg-primary/100', textClass: 'text-white' },
+  warning: { icon: AlertTriangle, bgClass: 'bg-amber-500', textClass: 'text-white' },
+  error: { icon: XCircle, bgClass: 'bg-red-500', textClass: 'text-white' },
+};
+
 /**
  * GlobalSnackbar 组件
  *
  * 全局消息提示的展示组件，支持受控和非受控两种使用模式。
- * 使用 MUI Snackbar 和 Alert 组件实现消息提示功能。
  *
  * @param {GlobalSnackbarProps} props - 组件属性
  * @returns {JSX.Element}
@@ -145,55 +156,42 @@ export function GlobalSnackbar({
   onClose,
   severity = defaultProps.severity,
   autoHideDuration = defaultProps.autoHideDuration,
-  anchorOrigin = defaultProps.anchorOrigin,
   showAlert = defaultProps.showAlert,
   hideIcon = defaultProps.hideIcon,
-}: GlobalSnackbarProps): JSX.Element {
+}: GlobalSnackbarProps): JSX.Element | null {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (open && autoHideDuration > 0) {
+      timerRef.current = setTimeout(() => {
+        onClose();
+      }, autoHideDuration);
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+      };
+    }
+    return undefined;
+  }, [open, autoHideDuration, onClose]);
+
+  if (!open) return null;
+
+  const config = severityConfig[severity];
+  const IconComponent = config.icon;
+
   return (
-    <Portal>
-      <Snackbar
-        open={open}
-        autoHideDuration={autoHideDuration}
-        onClose={onClose}
-        anchorOrigin={anchorOrigin}
-        disableWindowBlurListener
-        sx={{
-          zIndex: 999999,
-          bottom: { xs: '24px', sm: '24px' },
-          left: '50%',
-          transform: 'translateX(-50%)',
-          minWidth: '140px',
-        }}
-      >
-        {showAlert ? (
-          <Alert
-            severity={severity}
-            variant="filled"
-            icon={hideIcon ? false : undefined}
-            sx={{
-              borderRadius: '50px',
-              px: 2.5,
-              py: 0.2,
-              minWidth: '140px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '0.75rem',
-              backgroundImage: 'none',
-              boxShadow: (theme: Theme) =>
-                `0 12px 32px ${alpha(theme.palette[severity].main, 0.35)}`,
-              '& .MuiAlert-icon': { mr: 0.5, fontSize: '1.1rem' },
-              '& .MuiAlert-message': { padding: '6px 0' },
-            }}
-          >
-            {message}
-          </Alert>
-        ) : (
-          <div>{message}</div>
-        )}
-      </Snackbar>
-    </Portal>
+    <div className="fixed z-[999999] bottom-6 left-1/2 -translate-x-1/2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      {showAlert ? (
+        <div
+          className={`flex items-center gap-2 px-5 py-1.5 rounded-full shadow-lg ${config.bgClass} ${config.textClass}`}
+          style={{ minWidth: '140px' }}
+        >
+          {!hideIcon && <IconComponent className="h-4 w-4 flex-shrink-0" />}
+          <span className="text-xs font-bold">{message}</span>
+        </div>
+      ) : (
+        <div className="px-4 py-2 rounded-lg bg-gray-800 text-white text-sm">{message}</div>
+      )}
+    </div>
   );
 }
 
