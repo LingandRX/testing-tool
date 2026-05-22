@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { formatByteSize } from '@/utils/textStatistics';
-import { useSnackbar } from '@/components/GlobalSnackbar';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
 import { validateJson } from '@/utils/jsonFormatter';
@@ -44,7 +43,6 @@ export default function JsonConvertSection({
   convertButtonKey = 'convertButton',
 }: JsonConvertSectionProps) {
   const { t } = useLazyTranslation('jsonFormat');
-  const { showMessage } = useSnackbar();
 
   const [input, setInput] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -134,7 +132,7 @@ export default function JsonConvertSection({
                 {t('jsonFormat:formattedSize')}: {formatByteSize(result.outputBytes)}
               </span>
             </div>
-            <CopyButton text={result.output} showMessage={showMessage} />
+            <CopyButton text={result.output} />
           </div>
 
           {/* 转换内容 */}
