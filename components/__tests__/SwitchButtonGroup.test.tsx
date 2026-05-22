@@ -22,7 +22,7 @@ describe('SwitchButtonGroup 组件', () => {
     const buttonB = screen.getByRole('button', { name: /选项B/i });
 
     // 选中的按钮有 bg-background text-primary shadow-sm 类
-    expect(buttonA).toHaveClass('bg-background', 'text-primary', 'shadow-sm');
+    expect(buttonA).toHaveClass('bg-primary', 'text-primary-foreground', 'shadow-md');
     // 未选中的按钮有 text-muted-foreground 类
     expect(buttonB).toHaveClass('text-muted-foreground');
   });
@@ -123,7 +123,7 @@ describe('SwitchButtonGroup 组件', () => {
       const button4 = screen.getByRole('button', { name: /^4$/i });
 
       expect(button2).toHaveClass('text-muted-foreground');
-      expect(button4).toHaveClass('bg-background', 'text-primary', 'shadow-sm');
+      expect(button4).toHaveClass('bg-primary', 'text-primary-foreground', 'shadow-md');
     });
 
     it('点击 number 选项时应传回 number 值', () => {
