@@ -90,7 +90,7 @@ export default function JsonFormatSection() {
               type="checkbox"
               checked={sortKeys}
               onChange={(e) => setSortKeys(e.target.checked)}
-              className="h-4 w-4 rounded border-input text-blue-500 focus:ring-primary"
+              className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
             />
             <span className="text-xs font-bold">{t('jsonFormat:sortKeys')}</span>
           </label>

@@ -17,13 +17,13 @@ function DashboardCardSkeleton() {
     <div className="rounded-xl border border-border p-5 h-[100px]">
       <div className="flex justify-between items-start">
         <div className="flex gap-3 items-center">
-          <div className="w-10 h-10 rounded-lg bg-gray-200 animate-pulse" />
+          <div className="w-10 h-10 rounded-lg bg-muted animate-pulse" />
           <div>
-            <div className="w-24 h-5 bg-gray-200 rounded animate-pulse" />
-            <div className="w-32 h-3.5 bg-gray-200 rounded animate-pulse mt-1.5" />
+            <div className="w-24 h-5 bg-muted rounded animate-pulse" />
+            <div className="w-32 h-3.5 bg-muted rounded animate-pulse mt-1.5" />
           </div>
         </div>
-        <div className="w-3 h-3 rounded-full bg-gray-200 animate-pulse" />
+        <div className="w-3 h-3 rounded-full bg-muted animate-pulse" />
       </div>
     </div>
   );
@@ -36,21 +36,21 @@ function ToolPageSkeleton() {
   return (
     <div className="p-5">
       {/* 标题区域 */}
-      <div className="w-44 h-7 bg-gray-200 rounded animate-pulse mb-4" />
+      <div className="w-44 h-7 bg-muted rounded animate-pulse mb-4" />
 
       {/* 输入区域 */}
-      <div className="w-full h-[120px] bg-gray-200 rounded-xl animate-pulse mb-4" />
+      <div className="w-full h-[120px] bg-muted rounded-xl animate-pulse mb-4" />
 
       {/* 控制栏 */}
       <div className="flex gap-2 mb-4">
-        <div className="w-24 h-9 bg-gray-200 rounded-lg animate-pulse" />
-        <div className="w-20 h-9 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="w-24 h-9 bg-muted rounded-lg animate-pulse" />
+        <div className="w-20 h-9 bg-muted rounded-lg animate-pulse" />
         <div className="flex-1" />
-        <div className="w-22 h-9 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="w-22 h-9 bg-muted rounded-lg animate-pulse" />
       </div>
 
       {/* 结果区域 */}
-      <div className="w-full h-[160px] bg-gray-200 rounded-xl animate-pulse" />
+      <div className="w-full h-[160px] bg-muted rounded-xl animate-pulse" />
     </div>
   );
 }

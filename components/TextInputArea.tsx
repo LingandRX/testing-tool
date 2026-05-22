@@ -152,7 +152,7 @@ function ActionButton({
     typeof action.disabled === 'function' ? action.disabled(value) : action.disabled || !value;
 
   const typeClasses: Record<string, string> = {
-    primary: 'bg-primary text-white hover:bg-primary/90',
+    primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
     danger: 'text-red-600 hover:bg-red-500/10',
     default: 'text-muted-foreground hover:bg-muted',
   };

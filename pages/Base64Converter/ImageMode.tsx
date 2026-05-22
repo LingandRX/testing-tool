@@ -202,7 +202,7 @@ export default function ImageMode() {
               }}
             />
             {isLoading ? (
-              <div className="w-10 h-10 border-4 border-primary/30 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
             ) : info ? (
               <div className="flex flex-col items-center gap-1">
                 {result && (
