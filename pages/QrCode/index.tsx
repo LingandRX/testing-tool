@@ -1,5 +1,4 @@
-import { Box, Container, useMediaQuery, useTheme } from '@mui/material';
-import QrCodeIcon from '@mui/icons-material/QrCode';
+import { QrCode as QrCodeIcon } from 'lucide-react'; // 💡 别名规整，防止与页面组件发生重名误判
 import PageHeader from '@/components/PageHeader';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { qrCodePageStyles } from '@/config/pageTheme';
@@ -12,11 +11,9 @@ import type { QrCodeMode } from './types';
 
 export default function Index() {
   const { t } = useLazyTranslation('qrCode');
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const qrCode = useQrCode();
 
-  // 模式选项
+  // 模式选项驱动骨架
   const modeOptions = [
     { value: 'generate' as QrCodeMode, label: t('qrCode:urlToQr') },
     { value: 'parse' as QrCodeMode, label: t('qrCode:qrToUrl') },
@@ -24,29 +21,46 @@ export default function Index() {
 
   return (
     <QrCodeContext.Provider value={qrCode}>
-      <Box>
-        <Container
-          maxWidth={isDesktop ? 'lg' : false}
-          sx={{ py: 2, maxWidth: isDesktop ? undefined : 400 }}
-        >
-          <PageHeader
-            title={t('qrCode:pageTitle')}
-            subtitle={t('qrCode:pageSubtitle')}
-            icon={<QrCodeIcon />}
-            iconColor={qrCodePageStyles.primaryColor}
-            sx={{ mb: 2.5 }}
-          />
+      {/* 💡 统一视觉规范大超进化：
+         - 彻底剥离破坏流式宽度的 max-w-[400px] 枷锁，开启标准的 w-full 全自适应包裹。
+         - 替换为标准的 p-4 呼吸内边距配合 flex flex-col space-y-4，接管系统级重排！
+      */}
+      <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none animate-in fade-in duration-300">
+        {/* 标题控制栏：追加微调 py-0.5，防范文字边缘截断 */}
+        <PageHeader
+          title={t('qrCode:pageTitle')}
+          subtitle={t('qrCode:pageSubtitle')}
+          icon={<QrCodeIcon className="h-4 w-4" />} // 💡 规范对齐：强制锁死 Icon 宽高，抹杀闪烁
+          iconColor={qrCodePageStyles.primaryColor}
+          className="pb-1"
+        />
 
+        {/* 流式中央控制切流卡：注入 sm 断点防御，防范单栏状态下发生变形 */}
+        <div className="w-full sm:w-fit pt-0.5">
           <SwitchButtonGroup
             value={qrCode.mode}
             options={modeOptions}
             onChange={qrCode.setMode}
-            sx={{ mb: 3 }}
+            size="small"
           />
+        </div>
 
-          {qrCode.mode === 'generate' ? <GeneratePanel /> : <ParsePanel />}
-        </Container>
-      </Box>
+        {/* 💡 面板渲染沙箱：
+            - 在切流渲染时，利用独立的 mt-2 增加纵深边界线。
+            - 配合内部自带的双翼 Flex 聚焦大边框，形成坚固如铁的架构闭环！
+        */}
+        <div className="w-full pt-1.5">
+          {qrCode.mode === 'generate' ? (
+            <div className="animate-in fade-in duration-200">
+              <GeneratePanel />
+            </div>
+          ) : (
+            <div className="animate-in fade-in duration-200">
+              <ParsePanel />
+            </div>
+          )}
+        </div>
+      </div>
     </QrCodeContext.Provider>
   );
 }

@@ -1,18 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
-import { alpha, Box, Container, Grid, Paper, Typography } from '@mui/material';
+import { FileText } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import TextInputArea from '@/components/TextInputArea';
-import DescriptionIcon from '@mui/icons-material/Description';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
-import { textStatisticsPageStyles } from '@/config/pageTheme';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { useContextMenuData } from '@/utils/useContextMenuData';
+import { cn } from '@/lib/utils';
 
-/**
- * 文本统计页面组件
- *
- * 提供实时的文本分析功能，包括字符数、单词数、行数和字节大小。
- */
 export default function Index() {
   const { t } = useLazyTranslation('textStatistics');
   const [text, setText] = useState('');
@@ -23,8 +17,7 @@ export default function Index() {
 
   useContextMenuData({ featureKey: 'textStatistics', onData: handleContextMenuData });
 
-  // 实时计算统计信息，使用 useMemo 优化性能
-  // 对于 10,000 字符以上的文本，Intl.Segmenter 也能保持良好的性能
+  // 实时计算统计信息，由 useMemo 拦截非必要计算
   const stats = useMemo(() => getTextStats(text), [text]);
 
   const statItems = [
@@ -35,80 +28,46 @@ export default function Index() {
   ];
 
   return (
-    <Box>
-      <Container sx={{ p: 2 }}>
-        {/* 头部区域 */}
-        <PageHeader
-          title={t('textStatistics:pageTitle')}
-          subtitle={t('textStatistics:pageSubtitle')}
-          icon={<DescriptionIcon />}
-          iconColor={textStatisticsPageStyles.primaryColor}
-        />
+    <div className="p-4 w-full space-y-4 animate-in fade-in duration-300">
+      {/* 头部区域 */}
+      <PageHeader
+        title={t('textStatistics:pageTitle')}
+        subtitle={t('textStatistics:pageSubtitle')}
+        icon={<FileText />}
+        iconColor="text-purple-500"
+      />
 
-        {/* 文本输入区域 */}
-        <TextInputArea
-          value={text}
-          onChange={setText}
-          placeholder={t('textStatistics:placeholder')}
-          minRows={8}
-          maxRows={15}
-          showClear={false}
-          sx={{ mb: 3 }}
-        />
+      {/* 文本输入区域 */}
+      <TextInputArea
+        value={text}
+        onChange={setText}
+        placeholder={t('textStatistics:placeholder')}
+        minRows={10}
+        maxRows={18}
+        showClear={true}
+        allowCopy={true}
+      />
 
-        {/* 统计结果展示区域 */}
-        <Grid container spacing={2}>
-          {statItems.map((item) => (
-            <Grid size={{ xs: 12, md: 3 }} key={item.label}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  textAlign: 'center',
-                  borderRadius: 4,
-                  bgcolor: textStatisticsPageStyles.cardBg,
-                  border: '1px solid',
-                  borderColor: textStatisticsPageStyles.cardBorder,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', // 平滑的切换动画
-                  minHeight: { xs: '64px', md: '90px' },
-                  display: 'flex',
-                  flexDirection: { xs: 'row', md: 'column' }, // 小屏幕横向排列提高空间利用率
-                  alignItems: 'center',
-                  justifyContent: { xs: 'space-between', md: 'center' },
-                  px: { xs: 3, md: 2 },
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: () =>
-                      `0 4px 12px ${alpha(textStatisticsPageStyles.primaryColor, 0.15)}`,
-                    borderColor: textStatisticsPageStyles.primaryColor,
-                  },
-                  lineHeight: 1.6,
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
-                }}
-              >
-                <Typography
-                  color="text.secondary"
-                  sx={{
-                    mb: { xs: 0, md: 0.5 },
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {item.label}
-                </Typography>
-                <Typography
-                  sx={{
-                    color: textStatisticsPageStyles.primaryColor, // 高亮显示核心数值
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  {item.value}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </Box>
+      {/* 统计结果展示区域 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {statItems.map((item) => (
+          <div
+            key={item.label}
+            className={cn(
+              'flex flex-col justify-center items-center p-4 text-center rounded-xl border border-border bg-card shadow-sm text-card-foreground',
+              'transition-all duration-200 ease-out',
+              'hover:-translate-y-0.5 hover:shadow-md hover:border-primary/50 focus-within:ring-1 focus-within:ring-ring',
+            )}
+          >
+            <span className="text-xs font-medium text-muted-foreground tracking-wider mb-1 select-none">
+              {item.label}
+            </span>
+            <span className="font-mono text-lg md:text-2xl font-extrabold text-primary break-all tracking-tight leading-none tabular-nums select-all">
+              {item.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,15 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import QrCodePage from '../index';
+
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('lucide-react')>();
+  return {
+    ...actual,
+    // 增量伪造需要高精嗅探的 QrCode 核心定位图标
+    QrCode: () => <div data-testid="mock-lucide-qrcode">Icon</div>,
+  };
+});
 
 // Mock useLazyTranslation
 vi.mock('@/utils/useLazyTranslation', () => ({
@@ -11,7 +20,14 @@ vi.mock('@/utils/useLazyTranslation', () => ({
   }),
 }));
 
-// Mock getEntryPointType
+// Mock useSnackbar
+vi.mock('@/components/GlobalSnackbar', () => ({
+  useSnackbar: () => ({
+    showMessage: vi.fn(),
+  }),
+}));
+
+// Mock getEntryPointType（保留原厂其他特征配置，仅模拟入口路由环境）
 vi.mock('@/config/features', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/config/features')>();
   return {
@@ -20,7 +36,7 @@ vi.mock('@/config/features', async (importOriginal) => {
   };
 });
 
-// Mock 子组件
+// Mock 高频变化的子组件，收拢断言边界
 vi.mock('@/components/QrCodePreview', () => ({
   default: () => <div data-testid="qr-code-preview">QrCodePreview</div>,
 }));
@@ -29,21 +45,18 @@ vi.mock('@/components/ImageUploader', () => ({
   default: () => <div data-testid="image-uploader">ImageUploader</div>,
 }));
 
-// Mock QRious
+// Mock QRious 动态图像离屏生成引擎
 vi.mock('qrious', () => ({
   default: vi.fn().mockImplementation(() => ({
     toDataURL: () => 'data:image/png;base64,mock',
   })),
 }));
 
-// Mock useSnackbar
-vi.mock('@/components/GlobalSnackbar', () => ({
-  useSnackbar: () => ({
-    showMessage: vi.fn(),
-  }),
-}));
-
 describe('QrCodePage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('应该默认渲染生成模式', () => {
     render(<QrCodePage />);
     expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
@@ -78,14 +91,14 @@ describe('QrCodePage', () => {
     expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
   });
 
-  it('应该渲染输入区域', () => {
+  it('应该渲染输入区域的系统标签（对齐新版 Label 机制）', () => {
     render(<QrCodePage />);
     expect(screen.getByText('qrCode:urlInputLabel')).toBeInTheDocument();
   });
 
-  it('应该渲染双栏布局容器', () => {
+  it('应该渲染双翼响应式卡片网格布局', () => {
     const { container } = render(<QrCodePage />);
-    const gridContainer = container.querySelector('.MuiGrid-container');
+    const gridContainer = container.querySelector('.grid');
     expect(gridContainer).toBeInTheDocument();
   });
 });

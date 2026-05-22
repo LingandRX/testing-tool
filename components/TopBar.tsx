@@ -1,113 +1,95 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Box,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-  InputBase,
-  Paper,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ClickAwayListener,
-} from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import SearchIcon from '@mui/icons-material/Search';
-import HistoryIcon from '@mui/icons-material/History';
-import CloseIcon from '@mui/icons-material/Close';
-import LanguageIcon from '@mui/icons-material/Language';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
+  ArrowLeft,
+  ExternalLink,
+  Globe,
+  History,
+  Monitor,
+  Moon,
+  Search,
+  Settings,
+  Sun,
+  X,
+} from 'lucide-react';
 import { useRouter } from '@/providers/RouterProvider';
 import { useThemeMode } from '@/providers/ThemeModeProvider';
-import { FEATURES, FeatureConfig } from '@/config/features';
+import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
-import { openExtensionPage } from '@/utils/chromeTabs';
 import { useTranslation } from 'react-i18next';
-import { alpha } from '@mui/material/styles';
-import { SUPPORTED_LANGUAGES, normalizeLanguage } from '@/i18n';
+import { normalizeLanguage, SUPPORTED_LANGUAGES } from '@/i18n';
+import { cn } from '@/lib/utils'; // 1. 引入 shadcn 核心工具函数
 
-const topBarStyles = {
-  SEARCH_MAX_WIDTH: 400,
-  DROPDOWN_MAX_HEIGHT: 300,
-  Z_INDEX: 1100,
-  DROPDOWN_Z_INDEX: 1200,
-  SEARCH_HISTORY_LIMIT: 10,
-  SEARCH_HISTORY_DISPLAY: 5,
-};
+// 常量配置抽取（无需写在全局变量或 styles 对象里）
+const SEARCH_HISTORY_LIMIT = 10;
+const SEARCH_HISTORY_DISPLAY = 5;
 
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
   const { mode, setMode } = useThemeMode();
   const { t, i18n } = useTranslation(['common', 'features']);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // 加载搜索历史
-  useEffect(() => {
-    storageUtil
-      .get('app/searchHistory', [])
-      .then((history) => {
-        setSearchHistory(history || []);
-      })
-      .catch((error) => {
-        console.error('加载搜索历史失败:', error);
-      });
-  }, []);
-
-  // 模糊搜索逻辑
-  const searchResults = useMemo(() => {
-    if (!searchQuery.trim()) return [];
-    const query = searchQuery.toLowerCase();
-    return FEATURES.filter((f) => {
-      if (f.key === 'dashboard') return false;
-      const label = t(f.labelKey).toLowerCase();
-      const desc = t(f.descriptionKey).toLowerCase();
-      return label.includes(query) || desc.includes(query);
-    });
-  }, [searchQuery, t]);
-
-  const displayedHistory = useMemo(() => {
-    if (searchQuery.trim()) return [];
-    return searchHistory.slice(0, topBarStyles.SEARCH_HISTORY_DISPLAY);
-  }, [searchHistory, searchQuery]);
 
   const handleOpenInTab = async () => {
     await openExtensionPage('popup.html', { mode: 'tab' });
     window.close();
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setShowResults(true);
-    setSelectedIndex(-1);
-  };
+  // 2. 健壮的 Click Outside 逻辑：点击空白处收起搜索框
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
+  // 从 Chrome Storage 异步初始化历史记录
+  useEffect(() => {
+    storageUtil
+      .get('app/searchHistory', [])
+      .then((history) => {
+        if (history) setSearchHistory(history);
+      })
+      .catch((err) => console.error('加载搜索历史失败:', err));
+  }, []);
+
+  // 3. 模糊搜索匹配（移除了无意义的 dashboard 干扰项）
+  const searchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return [];
+    return FEATURES.filter((f) => {
+      if (f.key === 'dashboard') return false;
+      return (
+        t(f.labelKey).toLowerCase().includes(query) ||
+        t(f.descriptionKey).toLowerCase().includes(query)
+      );
+    });
+  }, [searchQuery, t]);
+
+  const displayedHistory = useMemo(() => {
+    if (searchQuery.trim()) return [];
+    return searchHistory.slice(0, SEARCH_HISTORY_DISPLAY);
+  }, [searchHistory, searchQuery]);
+
+  // 新增/持久化历史记录
   const saveToHistory = async (query: string) => {
     if (!query.trim()) return;
-    setSearchHistory((prev) => {
-      const newHistory = [query, ...prev.filter((h) => h !== query)].slice(
-        0,
-        topBarStyles.SEARCH_HISTORY_LIMIT,
-      );
-      return newHistory;
-    });
+    const nextHistory = [query, ...searchHistory.filter((h) => h !== query)].slice(
+      0,
+      SEARCH_HISTORY_LIMIT,
+    );
+    setSearchHistory(nextHistory);
+    await storageUtil.set('app/searchHistory', nextHistory).catch((err) => console.error(err));
   };
-
-  // 副作用：搜索历史变化后持久化到 storage
-  useEffect(() => {
-    storageUtil.set('app/searchHistory', searchHistory).catch((error) => {
-      console.error('保存搜索历史失败:', error);
-    });
-  }, [searchHistory]);
 
   const handleSelectFeature = (feature: FeatureConfig) => {
     navigateTo(feature.key);
@@ -119,20 +101,19 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
   const toggleLanguage = async () => {
     const currentLng = normalizeLanguage(i18n.language);
     const currentIndex = SUPPORTED_LANGUAGES.indexOf(currentLng);
-    const nextIndex = (currentIndex + 1) % SUPPORTED_LANGUAGES.length;
-    const newLng = SUPPORTED_LANGUAGES[nextIndex];
-    await i18n.changeLanguage(newLng);
-    await storageUtil.set('app/language', newLng);
+    const nextLng = SUPPORTED_LANGUAGES[(currentIndex + 1) % SUPPORTED_LANGUAGES.length];
+    await i18n.changeLanguage(nextLng);
+    await storageUtil.set('app/language', nextLng);
   };
 
   const cycleThemeMode = () => {
-    const next = { light: 'dark', dark: 'system', system: 'light' } as const;
-    setMode(next[mode]);
+    const nextMap = { light: 'dark', dark: 'system', system: 'light' } as const;
+    setMode(nextMap[mode]);
   };
 
-  const ThemeIcon =
-    mode === 'light' ? LightModeIcon : mode === 'dark' ? DarkModeIcon : SettingsBrightnessIcon;
+  const ThemeIcon = mode === 'light' ? Sun : mode === 'dark' ? Moon : Monitor;
 
+  // 4. 健壮的键盘导航交互
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const totalItems = searchQuery.trim() ? searchResults.length : displayedHistory.length;
 
@@ -143,6 +124,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
       e.preventDefault();
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (e.key === 'Enter') {
+      e.preventDefault();
       if (selectedIndex >= 0) {
         if (searchQuery.trim()) {
           handleSelectFeature(searchResults[selectedIndex]);
@@ -150,13 +132,10 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           const selectedQuery = displayedHistory[selectedIndex];
           setSearchQuery(selectedQuery);
           setSelectedIndex(-1);
-          // 触发搜索：如果匹配到功能则跳转，否则保持搜索词展示结果
-          const matchedFeature = FEATURES.find(
+          const matched = FEATURES.find(
             (f) => f.key !== 'dashboard' && t(f.labelKey) === selectedQuery,
           );
-          if (matchedFeature) {
-            handleSelectFeature(matchedFeature);
-          }
+          if (matched) handleSelectFeature(matched);
         }
       } else if (searchQuery.trim() && searchResults.length > 0) {
         handleSelectFeature(searchResults[0]);
@@ -170,224 +149,162 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
   const isDashboard = currentPage === 'dashboard';
 
   return (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      sx={{
-        px: { xs: 1, sm: 2 },
-        py: 1.5,
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
-        zIndex: topBarStyles.Z_INDEX,
-        position: 'relative',
-      }}
-    >
-      <Box sx={{ width: { xs: 32, sm: 40 } }}>
+    <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4 relative z-50">
+      {/* 左侧：返回按钮区 */}
+      <div className="flex w-10 items-center justify-start">
         {!isDashboard && (
-          <IconButton
-            size="small"
+          <button
+            type="button"
             onClick={goBack}
             aria-label={t('common:buttons.back')}
-            sx={{
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.50',
-              '&:hover': {
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'grey.200',
-              },
-            }}
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
           >
-            <ArrowBackIosNewIcon sx={{ fontSize: 14 }} />
-          </IconButton>
+            <ArrowLeft className="h-4 w-4" />
+          </button>
         )}
-      </Box>
+      </div>
 
-      <Typography
-        variant="subtitle2"
-        sx={{
-          fontWeight: 800,
-          letterSpacing: '0.5px',
-          textTransform: 'uppercase',
-          fontSize: '0.75rem',
-          color: 'text.secondary',
-          ml: 1,
-          display: { xs: 'none', md: 'block' },
-        }}
-      >
-        {t('common:appName')}
-      </Typography>
-
-      <Box sx={{ flex: 1, mx: { xs: 1, sm: 2 }, position: 'relative', maxWidth: 400 }}>
-        <ClickAwayListener onClickAway={() => setShowResults(false)}>
-          <Box>
-            <InputBase
-              ref={inputRef}
-              placeholder={t('common:buttons.search')}
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={() => setShowResults(true)}
-              onKeyDown={handleKeyDown}
-              inputProps={{ 'aria-label': t('common:buttons.search') }}
-              startAdornment={<SearchIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />}
-              endAdornment={
-                searchQuery && (
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSelectedIndex(-1);
-                    }}
-                    aria-label={t('common:buttons.clearSearch')}
-                  >
-                    <CloseIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                )
-              }
-              sx={{
-                width: '100%',
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.50',
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 2,
-                fontSize: '0.875rem',
-                border: '1px solid',
-                borderColor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                transition: 'all 0.2s',
-                '&:hover': {
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'grey.100',
-                },
-                '&.Mui-focused': {
-                  bgcolor: 'background.paper',
-                  borderColor: 'primary.main',
-                  boxShadow: (theme) => `0 0 0 2px ${alpha(theme.palette.primary.main, 0.15)}`,
-                },
+      {/* 中间：搜索容器 */}
+      <div ref={containerRef} className="flex-1 mx-4 max-w-md relative">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder={t('common:buttons.search')}
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowResults(true);
+              setSelectedIndex(-1);
+            }}
+            onFocus={() => setShowResults(true)}
+            onKeyDown={handleKeyDown}
+            aria-label={t('common:buttons.search')}
+            className="w-full h-9 pl-9 pr-8 text-sm rounded-md border border-input bg-muted/50 transition-all placeholder:text-muted-foreground focus:bg-background focus:outline-none focus:ring-1 focus:ring-ring focus:border-input"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedIndex(-1);
               }}
-            />
+              aria-label={t('common:buttons.clearSearch')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
 
-            {showResults && (searchQuery.trim() || displayedHistory.length > 0) && (
-              <Paper
-                elevation={8}
-                sx={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  right: 0,
-                  mt: 1,
-                  maxHeight: topBarStyles.DROPDOWN_MAX_HEIGHT,
-                  overflow: 'auto',
-                  borderRadius: 2,
-                  zIndex: topBarStyles.DROPDOWN_Z_INDEX,
-                }}
-              >
-                <List disablePadding role="listbox">
-                  {searchQuery.trim() ? (
-                    searchResults.length > 0 ? (
-                      searchResults.map((feature, index) => (
-                        <ListItemButton
-                          key={feature.key}
-                          selected={selectedIndex === index}
-                          onClick={() => handleSelectFeature(feature)}
-                          role="option"
-                          aria-selected={selectedIndex === index}
-                          sx={{ py: 1 }}
-                        >
-                          <ListItemIcon sx={{ minWidth: 40 }}>
-                            {feature.icon && <feature.icon sx={{ fontSize: 20 }} />}
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={t(feature.labelKey)}
-                            secondary={t(feature.descriptionKey)}
-                            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
-                            secondaryTypographyProps={{ variant: 'caption', noWrap: true }}
-                          />
-                        </ListItemButton>
-                      ))
-                    ) : (
-                      <Box sx={{ py: 3, textAlign: 'center' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {t('common:buttons.noResults')}
-                        </Typography>
-                      </Box>
-                    )
-                  ) : (
-                    <>
-                      <Box sx={{ px: 2, py: 1 }}>
-                        <Typography variant="caption" fontWeight={700} color="text.disabled">
-                          {t('common:buttons.recentSearch')}
-                        </Typography>
-                      </Box>
-                      {displayedHistory.map((item, index) => (
-                        <ListItemButton
-                          key={item}
-                          selected={selectedIndex === index}
-                          onClick={() => {
-                            setSearchQuery(item);
-                            setSelectedIndex(-1);
-                          }}
-                          role="option"
-                          aria-selected={selectedIndex === index}
-                        >
-                          <ListItemIcon sx={{ minWidth: 40 }}>
-                            <HistoryIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={item}
-                            primaryTypographyProps={{ variant: 'body2' }}
-                          />
-                        </ListItemButton>
-                      ))}
-                    </>
-                  )}
-                </List>
-              </Paper>
-            )}
-          </Box>
-        </ClickAwayListener>
-      </Box>
+        {/* 动态联想结果卡片 */}
+        {showResults && (searchQuery.trim() || displayedHistory.length > 0) && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-popover text-popover-foreground rounded-md shadow-md border border-border max-h-80 overflow-y-auto z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+            <ul role="listbox" className="p-1">
+              {searchQuery.trim() ? (
+                searchResults.length > 0 ? (
+                  searchResults.map((feature, index) => (
+                    <li
+                      key={feature.key}
+                      role="option"
+                      aria-selected={selectedIndex === index}
+                      onClick={() => handleSelectFeature(feature)}
+                      className={cn(
+                        'flex items-center gap-3 px-2.5 py-2 rounded-sm cursor-pointer text-sm transition-colors',
+                        selectedIndex === index
+                          ? 'bg-accent text-accent-foreground'
+                          : 'hover:bg-muted/60',
+                      )}
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-muted text-muted-foreground">
+                        {feature.icon && <feature.icon className="h-4 w-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground truncate">
+                          {t(feature.labelKey)}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {t(feature.descriptionKey)}
+                        </p>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-6 text-center text-sm text-muted-foreground">
+                    {t('common:buttons.noResults')}
+                  </li>
+                )
+              ) : (
+                <>
+                  <div className="px-2.5 py-1.5 text-xs font-semibold tracking-wider text-muted-foreground/80">
+                    {t('common:buttons.recentSearch')}
+                  </div>
+                  {displayedHistory.map((item, index) => (
+                    <li
+                      key={item}
+                      role="option"
+                      aria-selected={selectedIndex === index}
+                      onClick={() => {
+                        setSearchQuery(item);
+                        setSelectedIndex(-1);
+                      }}
+                      className={cn(
+                        'flex items-center gap-3 px-2.5 py-2 rounded-sm cursor-pointer text-sm transition-colors',
+                        selectedIndex === index
+                          ? 'bg-accent text-accent-foreground'
+                          : 'hover:bg-muted/60',
+                      )}
+                    >
+                      <History className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="truncate">{item}</span>
+                    </li>
+                  ))}
+                </>
+              )}
+            </ul>
+          </div>
+        )}
+      </div>
 
-      <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end', flexShrink: 0 }}>
-        <Tooltip title={t('common:buttons.toggleLanguage')}>
-          <IconButton
-            size="small"
-            onClick={toggleLanguage}
-            aria-label={t('common:buttons.toggleLanguage')}
-          >
-            <LanguageIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t(`common:buttons.themeMode.${mode}`)}>
-          <IconButton
-            size="small"
-            onClick={cycleThemeMode}
-            aria-label={t('common:buttons.toggleTheme')}
-          >
-            <ThemeIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('common:buttons.openInTab')}>
-          <IconButton
-            size="small"
-            onClick={handleOpenInTab}
-            aria-label={t('common:buttons.openInTab')}
-          >
-            <OpenInNewIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('common:buttons.settings')}>
-          <IconButton
-            size="small"
-            onClick={onOpenOptions}
-            aria-label={t('common:buttons.settings')}
-          >
-            <SettingsIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-    </Stack>
+      {/* 右侧：操作区 */}
+      <div className="flex items-center gap-1 shrink-0">
+        <IconButton onClick={toggleLanguage} title={t('common:buttons.toggleLanguage')}>
+          <Globe className="h-4 w-4" />
+        </IconButton>
+        <IconButton onClick={cycleThemeMode} title={t(`common:buttons.themeMode.${mode}`)}>
+          <ThemeIcon className="h-4 w-4" />
+        </IconButton>
+        <IconButton onClick={handleOpenInTab} title={t('common:buttons.openInTab')}>
+          <ExternalLink className="h-4 w-4" />
+        </IconButton>
+        <IconButton onClick={onOpenOptions} title={t('common:buttons.settings')}>
+          <Settings className="h-4 w-4" />
+        </IconButton>
+      </div>
+    </header>
+  );
+}
+
+// 5. 提炼出高度复用的原子按钮，大幅精简 Tailwind 冗余，符合 shadcn 的灵巧风格
+function IconButton({
+  children,
+  onClick,
+  title,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  title: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+    >
+      {children}
+    </button>
   );
 }

@@ -195,15 +195,16 @@ export function downloadHtmlFile(content: string, filename: string = 'export.htm
  * @param title - 打印窗口标题
  */
 export function printHtml(html: string, title: string = 'Markdown Preview'): void {
-  const printWindow = window.open('', '_blank', 'width=800,height=600');
+  const doc = wrapHtmlDocument(html, title);
+  const blob = new Blob([doc], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  const printWindow = window.open(url, '_blank', 'width=800,height=600');
   if (!printWindow) {
+    URL.revokeObjectURL(url);
     console.error('无法打开打印窗口，请检查浏览器弹窗拦截设置');
     return;
   }
-
-  const doc = wrapHtmlDocument(html, title);
-  printWindow.document.write(doc);
-  printWindow.document.close();
 
   // 等待样式加载完成后打印
   let printed = false;
@@ -220,6 +221,11 @@ export function printHtml(html: string, title: string = 'Markdown Preview'): voi
       printWindow.print();
     }
   }, 500);
+
+  // 打印完成后释放 Blob URL（浏览器标签页关闭后也会自动回收）
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 60000);
 }
 
 /**

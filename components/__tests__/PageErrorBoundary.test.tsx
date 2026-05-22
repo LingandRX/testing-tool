@@ -34,7 +34,7 @@ describe('PageErrorBoundary', () => {
       </PageErrorBoundary>,
     );
 
-    expect(screen.getByText('该页面加载失败')).toBeInTheDocument();
+    expect(screen.getByText('该功能运行异常')).toBeInTheDocument();
     expect(screen.getByText(/测试错误/)).toBeInTheDocument();
   });
 
@@ -45,7 +45,7 @@ describe('PageErrorBoundary', () => {
       </PageErrorBoundary>,
     );
 
-    expect(screen.getByText('该页面加载失败')).toBeInTheDocument();
+    expect(screen.getByText('该功能运行异常')).toBeInTheDocument();
 
     // 将子组件替换为正常组件，然后点击重试
     rerender(
@@ -54,14 +54,14 @@ describe('PageErrorBoundary', () => {
       </PageErrorBoundary>,
     );
 
-    const retryButton = screen.getByRole('button', { name: /重试/ });
+    const retryButton = screen.getByRole('button', { name: /重新尝试/ });
     retryButton.click();
 
     await waitFor(() => {
       expect(screen.getByTestId('normal-content')).toHaveTextContent('恢复后的内容');
     });
 
-    expect(screen.queryByText('该页面加载失败')).not.toBeInTheDocument();
+    expect(screen.queryByText('该功能运行异常')).not.toBeInTheDocument();
   });
 
   it('resetKey 变化时自动重置错误状态', async () => {
@@ -71,7 +71,7 @@ describe('PageErrorBoundary', () => {
       </PageErrorBoundary>,
     );
 
-    expect(screen.getByText('该页面加载失败')).toBeInTheDocument();
+    expect(screen.getByText('该功能运行异常')).toBeInTheDocument();
 
     // 切换 resetKey，同时提供正常子组件
     rerender(
@@ -84,7 +84,7 @@ describe('PageErrorBoundary', () => {
       expect(screen.getByTestId('normal-content')).toHaveTextContent('页面 B 内容');
     });
 
-    expect(screen.queryByText('该页面加载失败')).not.toBeInTheDocument();
+    expect(screen.queryByText('该功能运行异常')).not.toBeInTheDocument();
   });
 
   it('resetKey 不变时保持错误状态', () => {
@@ -94,7 +94,7 @@ describe('PageErrorBoundary', () => {
       </PageErrorBoundary>,
     );
 
-    expect(screen.getByText('该页面加载失败')).toBeInTheDocument();
+    expect(screen.getByText('该功能运行异常')).toBeInTheDocument();
 
     // 仅 children 变化，resetKey 不变，错误应保持
     rerender(
@@ -103,7 +103,7 @@ describe('PageErrorBoundary', () => {
       </PageErrorBoundary>,
     );
 
-    expect(screen.getByText('该页面加载失败')).toBeInTheDocument();
+    expect(screen.getByText('该功能运行异常')).toBeInTheDocument();
   });
 
   it('错误 UI 包含重试按钮', () => {
@@ -113,7 +113,7 @@ describe('PageErrorBoundary', () => {
       </PageErrorBoundary>,
     );
 
-    const retryButton = screen.getByRole('button', { name: /重试/ });
+    const retryButton = screen.getByRole('button', { name: /重新尝试/ });
     expect(retryButton).toBeInTheDocument();
   });
 

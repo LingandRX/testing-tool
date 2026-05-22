@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import FileMode from '../FileMode';
 
 // Mock CopyButton
@@ -13,6 +13,11 @@ vi.mock('@/components/CopyButton', () => ({
 
 beforeEach(() => {
   localStorage.clear();
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 // useStorageState's async loadState may overwrite user toggle if we click before the
@@ -124,7 +129,7 @@ describe('FileMode', () => {
 
   it('应该渲染 encode/decode 切换按钮', () => {
     render(<FileMode />);
-    expect(screen.getAllByText('encode').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('encode')).toBeInTheDocument();
     expect(screen.getByText('decode')).toBeInTheDocument();
   });
 
@@ -143,7 +148,9 @@ describe('FileMode', () => {
     const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'JVBERi0K' } });
 
-    fireEvent.click(screen.getAllByText('decode')[1]);
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('decodedFileOutput')).toBeInTheDocument();
@@ -159,7 +166,10 @@ describe('FileMode', () => {
 
     const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'JVBERi0K' } });
-    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
 
     const filenameInput = (await screen.findByDisplayValue('decoded.pdf')) as HTMLInputElement;
     fireEvent.change(filenameInput, { target: { value: 'my-report.pdf' } });
@@ -173,7 +183,10 @@ describe('FileMode', () => {
 
     const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'JVBERi0K' } });
-    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
 
     expect(await screen.findByText('download')).toBeInTheDocument();
   });
@@ -185,7 +198,10 @@ describe('FileMode', () => {
 
     const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: '!!!not base64' } });
-    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('invalidBase64')).toBeInTheDocument();
@@ -199,13 +215,16 @@ describe('FileMode', () => {
 
     const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'JVBERi0K' } });
-    fireEvent.click(screen.getAllByText('decode')[1]);
+
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('decodedFileOutput')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getAllByText('encode')[0]);
+    fireEvent.click(screen.getByText('encode'));
 
     await waitFor(() => {
       expect(screen.queryByText('decodedFileOutput')).not.toBeInTheDocument();

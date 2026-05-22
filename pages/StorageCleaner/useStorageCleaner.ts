@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
-import type { SnackbarOptions } from '@/components/GlobalSnackbar';
 import type {
   CleaningResult,
   StorageCleanerOptions,
@@ -11,14 +10,15 @@ import {
   getCacheStorageSize,
   getCookieSize,
   getCurrentTab,
-  getOriginStorageEstimate,
   getLocalStorageSize,
+  getOriginStorageEstimate,
   getServiceWorkerCount,
   getSessionStorageSize,
   isRestrictedUrl,
 } from '@/utils/storageCleaner';
 import { MessageAction, sendMessage } from '@/utils/messages';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { toast } from 'sonner'; // 1. 直接引用 shadcn 推荐的 Sonner 单例通知，踢出回调依赖
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
   localStorage: true,
@@ -35,7 +35,6 @@ const DEFAULT_PREFERENCES: StorageCleanerPreferences = {
 };
 
 export interface UseStorageCleanerReturn {
-  // State
   domain: string;
   error: string;
   isInitializing: boolean;
@@ -46,26 +45,17 @@ export interface UseStorageCleanerReturn {
   result: CleaningResult | null;
   showConfirm: boolean;
   setShowConfirm: (show: boolean) => void;
-
-  // Computed
   totalSize: number;
   allSelected: boolean;
   someSelected: boolean;
 
-  // Handlers
-  handleAutoRefreshChange: (checked: boolean) => Promise<void>;
-  handleOptionChange: (key: keyof StorageCleanerOptions) => Promise<void>;
-  handleSelectAll: (checked: boolean) => Promise<void>;
+  handleAutoRefreshChange: (checked: boolean) => void;
+  handleOptionChange: (key: keyof StorageCleanerOptions) => void;
+  handleSelectAll: (checked: boolean) => void;
   handleClean: () => Promise<void>;
 }
 
-export interface UseStorageCleanerOptions {
-  showMessage: (message: string, options?: SnackbarOptions) => void;
-}
-
-export function useStorageCleaner({
-  showMessage,
-}: UseStorageCleanerOptions): UseStorageCleanerReturn {
+export function useStorageCleaner(): UseStorageCleanerReturn {
   const { t } = useLazyTranslation(['storageCleaner', 'common']);
   const [domain, setDomain] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -79,6 +69,7 @@ export function useStorageCleaner({
 
   const requestIdRef = useRef<number>(0);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const storageTimerRef = useRef<NodeJS.Timeout | null>(null);
   const loadingRef = useRef(loading);
 
   useEffect(() => {
@@ -88,9 +79,11 @@ export function useStorageCleaner({
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      if (storageTimerRef.current) clearTimeout(storageTimerRef.current);
     };
   }, []);
 
+  // 核心数据拉取链条
   const loadInfo = useCallback(async () => {
     const currentRequestId = ++requestIdRef.current;
     try {
@@ -149,16 +142,14 @@ export function useStorageCleaner({
   });
 
   const debouncedLoadInfo = useCallback(() => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     debounceTimerRef.current = setTimeout(() => {
       loadInfoRef.current().catch(console.error);
     }, 300);
   }, []);
 
+  // 监听浏览器标签行为
   useEffect(() => {
-    // 首次加载不防抖
     loadInfoRef.current().catch(console.error);
 
     const handleTabChange = () => debouncedLoadInfo();
@@ -176,90 +167,91 @@ export function useStorageCleaner({
       chrome.tabs.onActivated.removeListener(handleTabChange);
       chrome.tabs.onUpdated.removeListener(handleTabUpdated);
       chrome.windows.onFocusChanged.removeListener(handleTabChange);
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
     };
   }, [debouncedLoadInfo]);
 
-  const handleAutoRefreshChange = useCallback(
-    async (checked: boolean) => {
-      setAutoRefresh(checked);
-      await storageUtil.set('storageCleaner/preferences', {
-        autoRefresh: checked,
-        selectedTypes: options,
-      });
-    },
-    [options],
-  );
+  // 2. 超进化：防抖写盘管道 (Chrome Storage Debounce Pipeline)
+  // 用户疯狂点击勾选时，React 状态保持丝滑的 0 延迟同步，只有停下点击 500ms 后，才会真正发起一次 Chrome 存盘，配额永远安全。
+  useEffect(() => {
+    // 过滤掉首次初始化时的无意义写盘
+    if (isInitializing) return;
 
-  const handleOptionChange = useCallback(
-    async (key: keyof StorageCleanerOptions) => {
-      const newOptions = { ...options, [key]: !options[key] };
-      setOptions(newOptions);
-      await storageUtil.set('storageCleaner/preferences', {
-        autoRefresh,
-        selectedTypes: newOptions,
-      });
-    },
-    [options, autoRefresh],
-  );
+    if (storageTimerRef.current) clearTimeout(storageTimerRef.current);
+    storageTimerRef.current = setTimeout(async () => {
+      await storageUtil
+        .set('storageCleaner/preferences', {
+          autoRefresh,
+          selectedTypes: options,
+        })
+        .catch(console.error);
+    }, 500);
+  }, [options, autoRefresh, isInitializing]);
 
-  const handleSelectAll = useCallback(
-    async (checked: boolean) => {
-      const newOptions = {
-        localStorage: checked,
-        sessionStorage: checked,
-        indexedDB: checked,
-        cookies: checked,
-        cacheStorage: checked,
-        serviceWorkers: checked,
-      };
-      setOptions(newOptions);
-      await storageUtil.set('storageCleaner/preferences', {
-        autoRefresh,
-        selectedTypes: newOptions,
-      });
-    },
-    [autoRefresh],
-  );
+  // 3. 极速状态分发：同步函数化（去掉了原有的 async 声明，只负责触发状态）
+  const handleAutoRefreshChange = useCallback((checked: boolean) => {
+    setAutoRefresh(checked);
+  }, []);
 
+  const handleOptionChange = useCallback((key: keyof StorageCleanerOptions) => {
+    setOptions((prev) => ({ ...prev, [key]: !prev[key] }));
+  }, []);
+
+  const handleSelectAll = useCallback((checked: boolean) => {
+    setOptions({
+      localStorage: checked,
+      sessionStorage: checked,
+      indexedDB: checked,
+      cookies: checked,
+      cacheStorage: checked,
+      serviceWorkers: checked,
+    });
+  }, []);
+
+  // 清理动作核心
   const handleClean = useCallback(async () => {
-    if (loadingRef.current) {
-      return;
-    }
+    if (loadingRef.current) return;
+
     const tab = await getCurrentTab();
     if (!tab || !tab.id || !tab.url) {
-      showMessage(t('storageCleaner:errorNoTab'), { severity: 'warning' });
+      toast.warning(t('storageCleaner:errorNoTab'));
       return;
     }
+
     setLoading(true);
     try {
       const cleaningResult = await clearStorage(tab.id, tab.url, options);
       setResult(cleaningResult);
 
       if (autoRefresh && cleaningResult.success) {
-        showMessage(t('storageCleaner:cleanSuccessReload'), { severity: 'success' });
+        toast.success(t('storageCleaner:cleanSuccessReload'));
         await sendMessage(MessageAction.RELOAD_TAB, { tabId: tab.id, delay: 1000 });
       } else {
         await loadInfo();
       }
     } catch (err) {
-      showMessage(`${t('storageCleaner:cleanError')}: ${String(err)}`, { severity: 'error' });
+      toast.error(`${t('storageCleaner:cleanError')}: ${String(err)}`);
     } finally {
       setLoading(false);
       setShowConfirm(false);
     }
-  }, [options, autoRefresh, showMessage, loadInfo, t]);
+  }, [options, autoRefresh, loadInfo, t]);
 
-  const totalSize =
-    (sizes.cookies || 0) +
-    (sizes.localStorage || 0) +
-    (sizes.sessionStorage || 0) +
-    (sizes.indexedDB || 0);
+  // 4. 精准的流式衍生计算收拢：完全切断垃圾内存常态分配
+  const totalSize = useMemo(() => {
+    return (
+      (sizes.cookies || 0) +
+      (sizes.localStorage || 0) +
+      (sizes.sessionStorage || 0) +
+      (sizes.indexedDB || 0)
+    );
+  }, [sizes]);
 
-  const allSelected = Object.values(options).every(Boolean);
-  const someSelected = Object.values(options).some(Boolean) && !allSelected;
+  const selectionMetrics = useMemo(() => {
+    const vals = Object.values(options);
+    const all = vals.every(Boolean);
+    const some = vals.some(Boolean) && !all;
+    return { all, some };
+  }, [options]);
 
   return {
     domain,
@@ -273,8 +265,8 @@ export function useStorageCleaner({
     showConfirm,
     setShowConfirm,
     totalSize,
-    allSelected,
-    someSelected,
+    allSelected: selectionMetrics.all,
+    someSelected: selectionMetrics.some,
     handleAutoRefreshChange,
     handleOptionChange,
     handleSelectAll,

@@ -1,8 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import { Box, Button, Paper, Typography } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   children: ReactNode;
@@ -16,7 +14,7 @@ interface State {
 
 /**
  * 页面级错误边界组件：捕获子组件树中的 JavaScript 错误
- * 与全局 ErrorBoundary 的区别：使用轻量内嵌卡片 UI，提供重试按钮
+ * 完美适配 shadcn/ui 语义化主题与暗黑模式
  */
 export class PageErrorBoundary extends Component<Props, State> {
   state: State = {
@@ -45,75 +43,48 @@ export class PageErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            p: 3,
-            minHeight: 200,
-          }}
-        >
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              textAlign: 'center',
-              borderRadius: 4,
-              border: '1px solid',
-              borderColor: 'error.light',
-              bgcolor: 'rgba(211, 47, 47, 0.04)',
-              maxWidth: 400,
-              width: '100%',
-            }}
-          >
-            <ErrorOutlineIcon color="error" sx={{ fontSize: 48, mb: 1.5 }} />
-            <Typography variant="h6" fontWeight={700} gutterBottom color="error.main">
-              该页面加载失败
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              页面在加载或渲染时遇到错误，您可以重试或切换到其他工具。
-            </Typography>
+        <div className="flex flex-col items-center justify-center flex-1 p-6 min-h-[300px] animate-in fade-in zoom-in-95 duration-200">
+          {/*
+            1. 适配暗黑模式的容器设计：
+            不再使用 border-red-200 / bg-red-50，改用标准的 border-destructive/20 和 bg-destructive/5，
+            并在黑夜模式下会自动转为深红底色，绝不刺眼。
+          */}
+          <div className="p-6 text-center rounded-xl border border-destructive/20 bg-destructive/5 max-w-md w-full shadow-sm">
+            {/* 2. 状态符号改用标准的 text-destructive 语义色 */}
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive mx-auto mb-4">
+              <AlertCircle className="h-6 w-6" />
+            </div>
+
+            <h3 className="text-base font-semibold text-foreground mb-1.5">该功能运行异常</h3>
+            <p className="text-xs text-muted-foreground mb-5">
+              该页面在加载或渲染时遇到了内部脚本错误。您可以尝试重试，或者通过导航菜单切换到其他工具。
+            </p>
+
+            {/* 3. 错误日志展示：使用与 shadcn 贴合的深色代码块包裹 */}
             {this.state.error && (
-              <Box
-                sx={{
-                  mb: 2,
-                  p: 1.5,
-                  bgcolor: (theme: Theme) =>
-                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'grey.100',
-                  borderRadius: 2,
-                  textAlign: 'left',
-                  maxHeight: '160px',
-                  overflow: 'auto',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  component="pre"
-                  sx={{
-                    fontFamily: 'monospace',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-all',
-                    color: 'error.dark',
-                  }}
-                >
-                  {this.state.error.toString()}
-                </Typography>
-              </Box>
+              <div className="mb-5 p-3 rounded-lg bg-zinc-950 dark:bg-zinc-900 text-left max-h-40 overflow-y-auto border border-border/40">
+                <pre className="font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-all text-zinc-200 selection:bg-zinc-700">
+                  {this.state.error.stack || this.state.error.toString()}
+                </pre>
+              </div>
             )}
+
+            {/*
+              4. 严谨调用 shadcn 原子 Button：
+              去掉全部手动指定的红底白字类名，直接启用 variant="destructive"。
+              它会自动处理 hover 颜色变化、暗黑模式切换以及无障碍高亮边框。
+            */}
             <Button
-              variant="contained"
-              color="error"
-              startIcon={<RefreshIcon />}
+              variant="destructive"
+              size="sm"
               onClick={this.handleRetry}
-              sx={{ borderRadius: 2, fontWeight: 700 }}
+              className="font-medium shadow-sm"
             >
-              重试
+              <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+              重新尝试
             </Button>
-          </Paper>
-        </Box>
+          </div>
+        </div>
       );
     }
 
