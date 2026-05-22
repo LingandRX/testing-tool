@@ -46,13 +46,30 @@
 - **生成器**: 将当前 URL 或自定义文本快速转换为二维码，支持下载.
 - **解析器**: 支持通过上传图片或粘贴图片来解析二维码内容.
 
+### 🔄 JSON 工具
+
+- **差异比较**: 对比两段 JSON 数据，高亮展示差异.
+- **格式化**: 支持 JSON 美化、压缩、转 YAML / TOML.
+
+### 🧰 Base64 转换器
+
+- **文本编解码**: 支持文本内容的 Base64 编码与解码.
+- **文件转换**: 支持文件与 Base64 字符串互转.
+- **图像预览**: 支持图片 Base64 编码与实时预览.
+
+### 📝 Markdown ↔ HTML 转换
+
+- **Markdown 转 HTML**: 实时预览 Markdown 渲染结果，支持导出 HTML 源码.
+- **HTML 转 Markdown**: 将 HTML 内容转换为 Markdown 格式.
+
 ## 技术栈
 
 - **框架**: [WXT (Web Extension Toolkit)](https://wxt.dev/)
 - **前端**: React 19 + TypeScript
-- **UI 组件**: Material UI (MUI) @7.x
-- **样式**: Emotion (Styled Components)
+- **UI 组件**: Radix UI (无头组件库)
+- **样式**: Tailwind CSS + class-variance-authority
 - **日期处理**: dayjs (集成 UTC 和 Timezone 插件)
+- **国际化**: i18next + react-i18next
 - **通信**: @webext-core/messaging
 - **存储**: Chrome Storage API (类型安全封装)
 - **解析引擎**: qr-scanner (二维码解析), qrious (二维码生成)
@@ -72,10 +89,13 @@
 │   ├── background.ts    # 后台 Service Worker
 │   └── content.ts       # 网页注入脚本
 ├── pages/               # 各功能模块的页面组件
-├── providers/           # 全局状态提供者 (Router, Snackbar 等)
-├── types/               # TypeScript 类型声明
+├── providers/           # 全局状态提供者 (Router, Theme 等)
+├── hooks/               # 自定义 React Hooks
 ├── utils/               # 工具函数与服务抽象
-├── public/              # 静态资源 (图标、 manifest 资源等)
+├── types/               # TypeScript 类型声明
+├── lib/                 # 通用工具函数
+├── i18n/                # 国际化资源
+├── public/              # 静态资源 (图标、manifest 资源等)
 ├── wxt.config.ts        # WXT 框架核心配置
 └── package.json         # 项目元数据与依赖管理
 ```
@@ -89,15 +109,20 @@
 
 ### 常用命令
 
-| 命令                    | 说明                             |
-| ----------------------- | -------------------------------- |
-| `npm run dev`           | 启动 Chrome 开发模式（支持 HMR） |
-| `npm run dev:firefox`   | 启动 Firefox 开发模式            |
-| `npm run build`         | 构建 Chrome 生产版本             |
-| `npm run compile`       | 执行 TypeScript 类型检查         |
-| `npm run lint`          | 执行 ESLint 代码规范检查         |
-| `npm run test`          | 运行单元测试                     |
-| `npm run test:coverage` | 生成测试覆盖率报告               |
+| 命令                    | 说明                              |
+| ----------------------- | --------------------------------- |
+| `npm run dev`           | 启动 Chrome 开发模式（支持 HMR）  |
+| `npm run dev:firefox`   | 启动 Firefox 开发模式             |
+| `npm run build`         | 构建 Chrome 生产版本              |
+| `npm run build:firefox` | 构建 Firefox 生产版本             |
+| `npm run zip`           | 打包 Chrome 扩展 (.output/\*.zip) |
+| `npm run zip:firefox`   | 打包 Firefox 扩展                 |
+| `npm run typecheck`     | 执行 TypeScript 类型检查          |
+| `npm run lint`          | 执行 ESLint 代码规范检查          |
+| `npm run test`          | 运行单元测试                      |
+| `npm run test:coverage` | 生成测试覆盖率报告                |
+
+运行单个测试: `npx vitest run path/to/file.test.ts`
 
 ### 自动化流程
 
