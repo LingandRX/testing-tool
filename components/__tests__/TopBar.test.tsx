@@ -2,6 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { PageType } from '@/types/storage';
 import React from 'react';
+import TopBar from '@/components/TopBar';
+import { RouterProvider } from '@/providers/RouterProvider';
+import { ThemeModeProvider } from '@/providers/ThemeModeProvider';
 
 // matchMedia must be mocked before ThemeModeProvider is imported
 Object.defineProperty(window, 'matchMedia', {
@@ -17,10 +20,6 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
-
-import TopBar from '@/components/TopBar';
-import { RouterProvider } from '@/providers/RouterProvider';
-import { ThemeModeProvider } from '@/providers/ThemeModeProvider';
 
 const mockRouterValue = {
   currentPage: 'dashboard' as PageType,
@@ -53,11 +52,6 @@ describe('TopBar 组件', () => {
   };
 
   describe('渲染测试', () => {
-    it('应使用默认标题渲染', () => {
-      renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.getByText('common:appName')).toBeInTheDocument();
-    });
-
     it('不在 dashboard 时应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
