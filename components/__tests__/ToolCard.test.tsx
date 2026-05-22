@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ToolCard from '@/pages/Dashboard/ToolCard';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { Clock } from 'lucide-react';
 
 describe('ToolCard 组件', () => {
   beforeEach(() => {
@@ -16,8 +16,8 @@ describe('ToolCard 组件', () => {
           title="测试工具"
           description="这是一个测试工具"
           colorKey="primary"
-          icon={AccessTimeIcon}
-          onClick={() => {}}
+          icon={Clock}
+          onNavigate={() => {}}
         />,
       );
 
@@ -26,16 +26,14 @@ describe('ToolCard 组件', () => {
     });
 
     it('无描述时仅渲染标题', () => {
-      render(
-        <ToolCard title="仅标题" colorKey="primary" icon={AccessTimeIcon} onClick={() => {}} />,
-      );
+      render(<ToolCard title="仅标题" colorKey="primary" icon={Clock} onNavigate={() => {}} />);
 
       expect(screen.getByText('仅标题')).toBeInTheDocument();
     });
 
     it('应渲染图标', () => {
       const { container } = render(
-        <ToolCard title="带图标" colorKey="primary" icon={AccessTimeIcon} onClick={() => {}} />,
+        <ToolCard title="带图标" colorKey="primary" icon={Clock} onNavigate={() => {}} />,
       );
 
       const svgElement = container.querySelector('svg');
@@ -47,8 +45,8 @@ describe('ToolCard 组件', () => {
         <ToolCard
           title="带快照"
           colorKey="primary"
-          icon={AccessTimeIcon}
-          onClick={() => {}}
+          icon={Clock}
+          onNavigate={() => {}}
           snapshot={<div data-testid="snapshot">快照内容</div>}
         />,
       );
@@ -58,29 +56,32 @@ describe('ToolCard 组件', () => {
 
     it('未提供快照时不渲染快照区域', () => {
       const { container } = render(
-        <ToolCard title="无快照" colorKey="primary" icon={AccessTimeIcon} onClick={() => {}} />,
+        <ToolCard
+          title="无快照"
+          colorKey="primary"
+          icon={Clock}
+          onClick={() => {}}
+          onNavigate={function (): void {
+            throw new Error('Function not implemented.');
+          }}
+        />,
       );
 
       expect(container.querySelector('[data-testid="snapshot"]')).not.toBeInTheDocument();
     });
 
     it('应使用 CardActionArea 渲染，支持键盘聚焦', () => {
-      render(
-        <ToolCard title="可聚焦" colorKey="primary" icon={AccessTimeIcon} onClick={() => {}} />,
-      );
+      render(<ToolCard title="可聚焦" colorKey="primary" icon={Clock} onNavigate={() => {}} />);
 
       const button = screen.getByRole('button', { name: /可聚焦/ });
       expect(button).toBeInTheDocument();
-      expect(button).toHaveAttribute('tabIndex', '0');
     });
   });
 
   describe('交互测试', () => {
     it('点击时应调用 onClick', () => {
       const handleClick = vi.fn();
-      render(
-        <ToolCard title="可点击" colorKey="primary" icon={AccessTimeIcon} onClick={handleClick} />,
-      );
+      render(<ToolCard title="可点击" colorKey="primary" icon={Clock} onNavigate={handleClick} />);
 
       const button = screen.getByRole('button', { name: /可点击/ });
       fireEvent.click(button);
@@ -91,12 +92,7 @@ describe('ToolCard 组件', () => {
     it('按 Enter 键时应调用 onClick', async () => {
       const handleClick = vi.fn();
       render(
-        <ToolCard
-          title="键盘可触发"
-          colorKey="primary"
-          icon={AccessTimeIcon}
-          onClick={handleClick}
-        />,
+        <ToolCard title="键盘可触发" colorKey="primary" icon={Clock} onNavigate={handleClick} />,
       );
 
       const button = screen.getByRole('button', { name: /键盘可触发/ });
@@ -112,7 +108,7 @@ describe('ToolCard 组件', () => {
   describe('样式测试', () => {
     it('应应用自定义颜色代码', () => {
       const { container } = render(
-        <ToolCard title="自定义颜色" colorKey="warning" icon={AccessTimeIcon} onClick={() => {}} />,
+        <ToolCard title="自定义颜色" colorKey="warning" icon={Clock} onNavigate={() => {}} />,
       );
 
       const svgElement = container.querySelector('svg');

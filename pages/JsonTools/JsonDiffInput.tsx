@@ -1,12 +1,16 @@
-import { Box, Typography } from '@mui/material';
+import React from 'react';
 import TextInputArea from '@/components/TextInputArea';
+import { cn } from '@/lib/utils';
 
-interface JsonDiffInputProps {
+// 💡 核心修复：使用 Omit<..., 'onChange'> 强行挖掉原生的 onChange 签名
+// 这样我们自定义的 (value: string) => void 就能独占鳌头，彻底消灭 TS2430 接口冲突！
+export interface JsonDiffInputProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   label: string;
   placeholder: string;
   value: string;
   onChange: (value: string) => void;
   error?: string | null;
+  minRows?: number;
 }
 
 export default function JsonDiffInput({
@@ -15,35 +19,26 @@ export default function JsonDiffInput({
   value,
   onChange,
   error,
+  minRows = 10,
+  className,
+  ...props
 }: JsonDiffInputProps) {
   return (
-    <Box sx={{ flex: 1, minWidth: 0 }}>
-      <Typography
-        variant="caption"
-        sx={{
-          display: 'block',
-          mb: 0.6,
-          fontWeight: 800,
-          fontSize: '0.7rem',
-          letterSpacing: 0.4,
-          color: 'text.secondary',
-          textTransform: 'uppercase',
-        }}
-      >
+    <div className={cn('flex-1 min-w-0 flex flex-col', className)} {...props}>
+      <span className="block mb-2 text-[10px] font-bold tracking-wide text-muted-foreground/80 uppercase select-none px-0.5">
         {label}
-      </Typography>
+      </span>
+
       <TextInputArea
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        minRows={8}
-        autoResize={false}
+        minRows={minRows}
+        maxRows={16}
         externalError={error ?? undefined}
         showClear={true}
+        allowCopy={true}
       />
-    </Box>
+    </div>
   );
 }
-
-export { JsonDiffInput };
-export type { JsonDiffInputProps };

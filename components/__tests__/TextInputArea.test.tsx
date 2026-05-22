@@ -107,33 +107,28 @@ describe('TextInputArea 组件', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('复制时调用 showMessage', async () => {
+    it('复制时调用 clipboard writeText', async () => {
       const user = userEvent.setup();
-      const showMessage = vi.fn();
       const writeTextSpy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
-      render(
-        <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
-      );
+      render(<TextInputArea value="测试" onChange={() => {}} allowCopy />);
 
       await user.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
       expect(writeTextSpy).toHaveBeenCalledWith('测试');
-      expect(showMessage).toHaveBeenCalledWith('messages.copySuccess', { severity: 'success' });
     });
 
-    it('复制失败时调用 showMessage 错误提示', async () => {
+    it('复制失败时调用 clipboard writeText 并捕获错误', async () => {
       const user = userEvent.setup();
-      const showMessage = vi.fn();
-      vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('失败'));
+      const writeTextSpy = vi
+        .spyOn(navigator.clipboard, 'writeText')
+        .mockRejectedValue(new Error('失败'));
 
-      render(
-        <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
-      );
+      render(<TextInputArea value="测试" onChange={() => {}} allowCopy />);
 
       await user.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
-      expect(showMessage).toHaveBeenCalledWith('messages.copyError', { severity: 'error' });
+      expect(writeTextSpy).toHaveBeenCalledWith('测试');
     });
   });
 
@@ -334,7 +329,7 @@ describe('TextInputArea 组件', () => {
       );
 
       const btn = screen.getByText('主要');
-      expect(btn).toHaveClass('MuiButton-contained');
+      expect(btn).toHaveClass('bg-primary', 'text-primary-foreground');
     });
   });
 
@@ -346,7 +341,7 @@ describe('TextInputArea 组件', () => {
 
     it('不设置 title 时不渲染标题', () => {
       const { container } = render(<TextInputArea value="" onChange={() => {}} />);
-      expect(container.querySelector('.MuiTypography-body2')).not.toBeInTheDocument();
+      expect(container.querySelector('.text-muted-foreground')).not.toBeInTheDocument();
     });
   });
 
@@ -370,18 +365,15 @@ describe('TextInputArea 组件', () => {
     });
   });
 
-  describe('showMessage prop', () => {
-    it('复制成功时调用 showMessage', async () => {
+  describe('复制功能', () => {
+    it('复制成功时调用 clipboard writeText', async () => {
       const user = userEvent.setup();
-      const showMessage = vi.fn();
-      vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+      const writeTextSpy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
-      render(
-        <TextInputArea value="测试" onChange={() => {}} allowCopy showMessage={showMessage} />,
-      );
+      render(<TextInputArea value="测试" onChange={() => {}} allowCopy />);
       await user.click(screen.getByRole('button', { name: 'textInputArea.copyContent' }));
 
-      expect(showMessage).toHaveBeenCalledWith('messages.copySuccess', { severity: 'success' });
+      expect(writeTextSpy).toHaveBeenCalledWith('测试');
     });
   });
 
@@ -472,7 +464,7 @@ describe('TextInputArea 组件', () => {
   describe('autoResize', () => {
     it('autoResize=true 时设置 minRows/maxRows', () => {
       const { container } = render(
-        <TextInputArea value="" onChange={() => {}} autoResize minRows={3} maxRows={8} />,
+        <TextInputArea value="" onChange={() => {}} minRows={3} maxRows={8} />,
       );
 
       const textarea = container.querySelector('textarea');
@@ -480,9 +472,7 @@ describe('TextInputArea 组件', () => {
     });
 
     it('autoResize=false 时设置固定 rows', () => {
-      const { container } = render(
-        <TextInputArea value="" onChange={() => {}} autoResize={false} minRows={5} />,
-      );
+      const { container } = render(<TextInputArea value="" onChange={() => {}} minRows={5} />);
 
       const textarea = container.querySelector('textarea');
       expect(textarea).toBeInTheDocument();
@@ -496,20 +486,6 @@ describe('TextInputArea 组件', () => {
       );
 
       expect(container.firstChild).toHaveClass('custom-class');
-    });
-
-    it('应透传 style', () => {
-      const { container } = render(
-        <TextInputArea value="" onChange={() => {}} style={{ marginTop: 10 }} />,
-      );
-
-      expect(container.firstChild).toHaveStyle({ marginTop: '10px' });
-    });
-
-    it('应透传 sx 样式', () => {
-      const { container } = render(<TextInputArea value="" onChange={() => {}} sx={{ mb: 3 }} />);
-
-      expect(container.firstChild).toHaveStyle({ marginBottom: '24px' });
     });
   });
 });

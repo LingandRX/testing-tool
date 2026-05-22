@@ -1,12 +1,11 @@
-import { Box, Collapse, useTheme } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { surfaceTint } from '@/config/pageTheme';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react'; // 用正统的矢量箭头平替原生的字符 '▾' '▸'
 import type { DiffNode, DiffType } from './types';
+import { cn } from '@/lib/utils';
 
 export type TreeSide = 'left' | 'right';
 
-interface JsonTreeProps {
+export interface JsonTreeProps extends React.HTMLAttributes<HTMLDivElement> {
   node: DiffNode;
   side: TreeSide;
   defaultExpandDepth?: number;
@@ -29,10 +28,6 @@ const formatPrimitive = (v: unknown): string => {
   return JSON.stringify(v);
 };
 
-/**
- * 决定当前节点在指定一侧是否需要渲染。
- * 例如：'added' 节点只在 right 侧出现，'removed' 节点只在 left 侧出现。
- */
 const shouldRenderOnSide = (type: DiffType, side: TreeSide): boolean => {
   if (type === 'added') return side === 'right';
   if (type === 'removed') return side === 'left';
@@ -43,230 +38,231 @@ const getValueForSide = (node: DiffNode, side: TreeSide): unknown => {
   return side === 'left' ? node.oldValue : node.newValue;
 };
 
-const getRowBg = (type: DiffType, side: TreeSide, theme: Theme): string | undefined => {
-  if (!shouldRenderOnSide(type, side)) return undefined;
-  if (type === 'added') return surfaceTint(theme, theme.palette.success.main, 0.15);
-  if (type === 'removed') return surfaceTint(theme, theme.palette.error.main, 0.15);
-  if (type === 'modified') return surfaceTint(theme, theme.palette.warning.main, 0.15);
-  return undefined;
-};
-
-const getValueColor = (type: DiffType, side: TreeSide): string | undefined => {
-  if (!shouldRenderOnSide(type, side)) return undefined;
-  if (type === 'added') return 'success.main';
-  if (type === 'removed') return 'error.main';
-  if (type === 'modified') return 'warning.main';
-  return undefined;
+// 1. 核心状态色彩映射调色盘：完美自适应双色模式
+const typeThemeMap = {
+  added: {
+    text: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-emerald-500/5 dark:bg-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/15',
+  },
+  removed: {
+    text: 'text-destructive',
+    bg: 'bg-destructive/5 dark:bg-destructive/10 hover:bg-destructive/10 dark:hover:bg-destructive/15',
+  },
+  modified: {
+    text: 'text-amber-600 dark:text-amber-400',
+    bg: 'bg-amber-500/5 dark:bg-amber-500/10 hover:bg-amber-500/10 dark:hover:bg-amber-500/15',
+  },
+  unchanged: {
+    text: 'text-foreground/80',
+    bg: 'hover:bg-muted/60',
+  },
 };
 
 const isContainerValue = (v: unknown): boolean => {
   return (typeof v === 'object' && v !== null) || Array.isArray(v);
 };
 
-const NodeRow = ({
-  node,
-  side,
-  depth,
-  defaultExpandDepth,
-  activePath,
-  isLastChild,
-}: NodeRowProps) => {
-  // 'auto' = follow defaults + activePath; otherwise user explicitly toggled
-  const [override, setOverride] = useState<'auto' | 'open' | 'closed'>('auto');
-  const rowRef = useRef<HTMLDivElement | null>(null);
-  const theme = useTheme();
+/**
+ * 💡 性能调优大闸：将 NodeRow 抽离为顶层独立组件并裹上 React.memo。
+ * 配合精准的 Props Diff，使得某一行的展开闭合绝对不会连累到其他平级和上级节点。
+ */
+const NodeRow = React.memo(
+  ({ node, side, depth, defaultExpandDepth, activePath, isLastChild }: NodeRowProps) => {
+    const [override, setOverride] = useState<'auto' | 'open' | 'closed'>('auto');
+    const rowRef = useRef<HTMLDivElement | null>(null);
 
-  const onActivePath = Boolean(
-    activePath &&
-    (activePath === node.path ||
-      activePath.startsWith(`${node.path}.`) ||
-      activePath.startsWith(`${node.path}[`)),
-  );
+    const onActivePath = useMemo(() => {
+      return Boolean(
+        activePath &&
+        (activePath === node.path ||
+          activePath.startsWith(`${node.path}.`) ||
+          activePath.startsWith(`${node.path}[`)),
+      );
+    }, [activePath, node.path]);
 
-  const expanded =
-    override === 'open'
-      ? true
-      : override === 'closed'
-        ? false
-        : onActivePath || depth < defaultExpandDepth;
+    const expanded =
+      override === 'open'
+        ? true
+        : override === 'closed'
+          ? false
+          : onActivePath || depth < defaultExpandDepth;
 
-  // 当激活路径定位到本节点时滚动到视图中心（仅 DOM 副作用，不更新 state）
-  useEffect(() => {
-    if (activePath === node.path) {
-      rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }, [activePath, node.path]);
+    // 当激活路径精准定位到本行时，平滑滚动至容器中心
+    useEffect(() => {
+      if (activePath === node.path) {
+        rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, [activePath, node.path]);
 
-  if (!shouldRenderOnSide(node.type, side)) {
-    // 渲染占位空行以保持左右两侧高度一致
-    return <Box sx={{ pl: depth * 1.5, color: 'transparent', userSelect: 'none' }}>·</Box>;
-  }
-
-  const value = getValueForSide(node, side);
-  const isContainer = isContainerValue(value) && Array.isArray(node.children);
-  const isArray = Array.isArray(value);
-  const bg = getRowBg(node.type, side, theme);
-  const valueColor = getValueColor(node.type, side);
-  const isActive = activePath === node.path;
-
-  // 根节点渲染
-  const isRoot = depth === 0;
-
-  if (isContainer && node.children) {
-    const open = isArray ? '[' : '{';
-    const close = isArray ? ']' : '}';
-    return (
-      <Box ref={rowRef}>
-        <Box
-          onClick={() => setOverride(expanded ? 'closed' : 'open')}
-          sx={{
-            cursor: 'pointer',
-            pl: depth * 1.5,
-            pr: 1,
-            py: 0.2,
-            bgcolor: bg,
-            outline: isActive ? '2px solid' : 'none',
-            outlineColor: 'primary.main',
-            borderRadius: 0.5,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            whiteSpace: 'nowrap',
-            '&:hover': { bgcolor: bg ?? 'action.hover' },
-          }}
+    // 占位空行分支：必须加 h-[22px] 锁定绝对等高，防止两侧文本高度塌陷发生高低错位
+    if (!shouldRenderOnSide(node.type, side)) {
+      return (
+        <div
+          className="text-transparent select-none opacity-0 h-[22px] leading-relaxed"
+          style={{ paddingLeft: `${depth * 1.15}rem` }}
         >
-          <Box component="span" sx={{ width: 12, color: 'text.secondary', fontSize: '0.7rem' }}>
-            {expanded ? '▾' : '▸'}
-          </Box>
-          {!isRoot && (
-            <Box component="span" sx={{ color: 'text.primary', fontWeight: 700 }}>
-              {isArrayKeyDisplay(node.key)}:
-            </Box>
+          ·
+        </div>
+      );
+    }
+
+    const value = getValueForSide(node, side);
+    const isContainer = isContainerValue(value) && Array.isArray(node.children);
+    const isArray = Array.isArray(value);
+    const theme = typeThemeMap[node.type] || typeThemeMap.unchanged;
+    const isActive = activePath === node.path;
+    const isRoot = depth === 0;
+
+    // 缩进样式封装：
+    // 💡 视觉魔法：通过在左侧追加 before 细线，在每一层级下自动垂下一条优雅的 IDE 级“缩进指引线”
+    const indentStyle = {
+      paddingLeft: `${Math.max(0.25, depth * 1.15)}rem`,
+    };
+
+    const indentClass = cn(
+      'relative',
+      depth > 0 &&
+        'before:absolute before:left-[4px] before:top-0 before:bottom-0 before:w-[1px] before:bg-border/40',
+    );
+
+    if (isContainer && node.children) {
+      const open = isArray ? '[' : '{';
+      const close = isArray ? ']' : '}';
+
+      return (
+        <div ref={rowRef} className="w-full flex flex-col">
+          {/* 大容器开端行 */}
+          <div
+            onClick={() => setOverride(expanded ? 'closed' : 'open')}
+            className={cn(
+              'group flex items-center gap-1 py-0.5 pr-2 text-xs font-mono select-none cursor-pointer rounded-sm transition-colors w-full h-[22px] leading-relaxed',
+              theme.bg,
+              isActive &&
+                'bg-primary/10 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-500 rounded-none ring-0',
+            )}
+            style={indentStyle}
+          >
+            {/* 折叠小箭头：升级为精巧的 Lucide SVG 矢量微动效 */}
+            <span className="w-3.5 h-3.5 flex items-center justify-center text-muted-foreground/80 shrink-0">
+              {expanded ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
+            </span>
+
+            {!isRoot && (
+              <span className="text-foreground/90 font-bold tracking-tight">{node.key}:</span>
+            )}
+
+            <span className="text-muted-foreground/80 font-semibold">{open}</span>
+
+            {!expanded && (
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-muted/80 text-muted-foreground font-sans font-medium mx-1 select-none">
+                {summarize(value)}
+              </span>
+            )}
+
+            {!expanded && (
+              <span className="text-muted-foreground/80 font-semibold">
+                {close}
+                {isLastChild ? '' : ','}
+              </span>
+            )}
+          </div>
+
+          {/* 容器子节点递归区 */}
+          {expanded && (
+            <div className={indentClass}>
+              {node.children.map((child, idx) => (
+                <NodeRow
+                  key={child.path}
+                  node={child}
+                  side={side}
+                  depth={depth + 1}
+                  defaultExpandDepth={defaultExpandDepth}
+                  activePath={activePath}
+                  isLastChild={idx === node.children!.length - 1}
+                />
+              ))}
+            </div>
           )}
-          <Box component="span" sx={{ color: 'text.secondary' }}>
-            {open}
-          </Box>
-          {!expanded && (
-            <Box component="span" sx={{ color: 'text.disabled', fontStyle: 'italic' }}>
-              {summarize(value)}
-            </Box>
-          )}
-          {!expanded && (
-            <Box component="span" sx={{ color: 'text.secondary' }}>
+
+          {/* 大容器收尾行 */}
+          {expanded && (
+            <div
+              className="text-muted-foreground/80 font-mono text-xs py-0.5 h-[22px] leading-relaxed"
+              style={{ paddingLeft: `${depth * 1.15 + 0.88}rem` }}
+            >
               {close}
               {isLastChild ? '' : ','}
-            </Box>
+            </div>
           )}
-        </Box>
-        <Collapse in={expanded} unmountOnExit>
-          <Box>
-            {node.children.map((child, idx) => (
-              <NodeRow
-                key={child.path}
-                node={child}
-                side={side}
-                depth={depth + 1}
-                defaultExpandDepth={defaultExpandDepth}
-                activePath={activePath}
-                isLastChild={idx === node.children!.length - 1}
-              />
-            ))}
-          </Box>
-          <Box
-            sx={{
-              pl: depth * 1.5,
-              color: 'text.secondary',
-              whiteSpace: 'nowrap',
-              ml: '17px',
-            }}
-          >
-            {close}
-            {isLastChild ? '' : ','}
-          </Box>
-        </Collapse>
-      </Box>
+        </div>
+      );
+    }
+
+    // 叶子数据行分支
+    return (
+      <div
+        ref={rowRef}
+        className={cn(
+          'flex items-center gap-1 py-0.5 pr-2 font-mono text-xs w-full h-[22px] leading-relaxed rounded-sm transition-colors',
+          theme.bg,
+          isActive &&
+            'bg-primary/10 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-500 rounded-none ring-0',
+        )}
+        style={indentStyle}
+      >
+        <span className="w-3.5 shrink-0" /> {/* 与上方的折叠键轴线严格对齐 */}
+        {!isRoot && (
+          <span className="text-foreground/90 font-bold tracking-tight">{node.key}:</span>
+        )}
+        <span className={cn('font-medium tracking-tight truncate flex-1', theme.text)}>
+          {formatPrimitive(value)}
+          <span className="text-foreground/60 font-sans">{isLastChild ? '' : ','}</span>
+        </span>
+      </div>
     );
-  }
+  },
+);
 
-  // 叶子节点
-  return (
-    <Box
-      ref={rowRef}
-      sx={{
-        pl: depth * 1.5,
-        pr: 1,
-        py: 0.2,
-        bgcolor: bg,
-        outline: isActive ? '2px solid' : 'none',
-        outlineColor: 'primary.main',
-        borderRadius: 0.5,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0.5,
-        whiteSpace: 'nowrap',
-      }}
-    >
-      <Box component="span" sx={{ width: 12 }} />
-      {!isRoot && (
-        <Box component="span" sx={{ color: 'text.primary', fontWeight: 700 }}>
-          {isArrayKeyDisplay(node.key)}:
-        </Box>
-      )}
-      <Box component="span" sx={{ color: valueColor ?? 'text.primary' }}>
-        {formatPrimitive(value)}
-        {isLastChild ? '' : ','}
-      </Box>
-    </Box>
-  );
-};
-
-const isArrayKeyDisplay = (key: string): string => {
-  // 数组索引在父级渲染中已加方括号；这里仅显示对象键名
-  return key;
-};
-
-const summarize = (v: unknown): string => {
-  if (Array.isArray(v)) return ` ${v.length} ${v.length === 1 ? 'item' : 'items'} `;
-  if (v && typeof v === 'object') {
-    const n = Object.keys(v).length;
-    return ` ${n} ${n === 1 ? 'key' : 'keys'} `;
-  }
-  return '';
-};
+NodeRow.displayName = 'NodeRow';
 
 export default function JsonTree({
   node,
   side,
   defaultExpandDepth = 2,
   activePath,
+  className,
+  ...props
 }: JsonTreeProps) {
-  const sideKey = useMemo(() => side, [side]);
   return (
-    <Box
-      sx={{
-        p: 1.5,
-        borderRadius: 3,
-        bgcolor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider',
-        fontFamily: 'monospace',
-        fontSize: '0.8rem',
-        overflowX: 'auto',
-        minHeight: 200,
-        maxHeight: 480,
-        overflowY: 'auto',
-      }}
+    /* 最外层承载器：统一收拢至标准的 bg-card 与等宽 tabular-nums 控制轴 */
+    <div
+      className={cn(
+        'rounded-xl border border-border bg-card text-card-foreground font-mono text-xs shadow-sm overflow-x-auto min-h-[200px] max-h-[520px] overflow-y-auto p-2.5 tabular-nums select-text',
+        className,
+      )}
+      {...props}
     >
       <NodeRow
         node={node}
-        side={sideKey}
+        side={side}
         depth={0}
         defaultExpandDepth={defaultExpandDepth}
         activePath={activePath}
         isLastChild
       />
-    </Box>
+    </div>
   );
 }
 
-export type { JsonTreeProps };
+const summarize = (v: unknown): string => {
+  if (Array.isArray(v)) return `${v.length} ${v.length === 1 ? 'item' : 'items'}`;
+  if (v && typeof v === 'object') {
+    const n = Object.keys(v).length;
+    return `${n} ${n === 1 ? 'key' : 'keys'}`;
+  }
+  return '';
+};

@@ -1,18 +1,29 @@
+import type { ContextMenuClickedPayload } from '@/utils/messages';
 import { MessageAction, onMessage } from '@/utils/messages';
 import { getTextStats } from '@/utils/textStatistics';
-import { showTimestampResult, showTextStatsResult, hidePopover } from './uiPopover';
-import type { ContextMenuClickedPayload } from '@/utils/messages';
+import { hidePopover, showTextStatsResult, showTimestampResult } from './uiPopover';
+
+// 💡 1. 国际化超进化：对接 chrome.i18n 插件标准 API，如果环境不支持则安全降级，拒绝硬编码中文
+function getI18nText(key: string, fallback: string): string {
+  if (typeof chrome !== 'undefined' && chrome.i18n) {
+    return chrome.i18n.getMessage(key) || fallback;
+  }
+  return fallback;
+}
 
 function convertTimestamp(input: string): string {
+  const invalidText = getI18nText('invalidTimestamp', 'Invalid Timestamp');
   const num = Number(input.trim());
+
   if (isNaN(num)) {
-    return '无效时间戳';
+    return invalidText;
   }
 
+  // 1e12 判定毫秒级/秒级时间戳兼容
   const d = num > 1e12 ? new Date(num) : new Date(num * 1000);
 
   if (isNaN(d.getTime())) {
-    return '无效时间戳';
+    return invalidText;
   }
 
   const year = d.getFullYear();
@@ -28,16 +39,28 @@ function convertTimestamp(input: string): string {
 let lastClickX = 0;
 let lastClickY = 0;
 
+// 💡 使用 capture: true 确保在任何极其复杂的单页应用（SPA）中都能精准捕获右键坐标
 document.addEventListener(
   'contextmenu',
   (e) => {
     lastClickX = e.clientX;
     lastClickY = e.clientY;
   },
-  true,
+  { capture: true, passive: true }, // 优化滚动与捕获性能
 );
 
 export function initContextMenuHandler(): void {
+  // 💡 2. 全局自净化大闸（Global Auto-Purge Grid）：
+  // 当用户在网页上进行左键点击、滚动视视口、或调整大小时，
+  // 证明心流已经移开，自发隐退所有浮动的 Popover 弹窗，体验顺滑得丝丝入扣！
+  const dismissPopover = (): void => {
+    hidePopover();
+  };
+
+  document.addEventListener('click', dismissPopover, { passive: true });
+  document.addEventListener('scroll', dismissPopover, { passive: true });
+  window.addEventListener('resize', dismissPopover, { passive: true });
+
   onMessage(MessageAction.CONTEXT_MENU_CLICKED, (message) => {
     const { featureKey, payload } = message.data as ContextMenuClickedPayload;
 

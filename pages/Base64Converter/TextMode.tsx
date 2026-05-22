@@ -1,12 +1,11 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Alert, alpha, Button, Paper, Stack, Typography } from '@mui/material';
-import TextInputArea, { type ToolbarAction } from '@/components/TextInputArea';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import TextInputArea from '@/components/TextInputArea';
 import { useTranslation } from 'react-i18next';
 import CopyButton from '@/components/CopyButton';
-import { textToBase64, base64ToText } from '@/utils/base64Converter';
+import { base64ToText, textToBase64 } from '@/utils/base64Converter';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { useContextMenuData } from '@/utils/useContextMenuData';
+import { Button } from '@/components/ui/button';
 
 const IMAGE_DATA_URI_PATTERN = /^\s*data:image\//i;
 
@@ -22,31 +21,56 @@ interface TextModeProps {
 
 export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   const { t } = useTranslation('base64Converter');
+
+  // 1. 纯净的核心源状态机：只保留输入源和转换方向
   const [input, setInput] = useState('');
-  const [output, setOutput] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [debouncedInput, setDebouncedInput] = useState('');
   const [direction, setDirection] = useState<'encode' | 'decode'>('encode');
 
-  const handleContextMenuData = useCallback(
-    (payload: string) => {
-      setInput(payload);
-      setDirection('decode');
-      setError(null);
-      try {
-        const decoded = base64ToText(payload);
-        setOutput(decoded);
-      } catch (e) {
-        const message = e instanceof Error ? e.message : '';
-        const i18nKey = ERROR_MESSAGE_TO_I18N[message];
-        setError(i18nKey ? t(i18nKey) : message || t('conversionFailed'));
-      }
-    },
-    [t],
-  );
+  // 2. 文本高频敲击防抖大闸：斩断频繁进行文本转 Base64 带来的 CPU 计算过热
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDebouncedInput(input);
+    }, 200);
+    return () => clearTimeout(handle);
+  }, [input]);
+
+  // 3. 右键联动数据上下文：优雅原地合并受控状态
+  const handleContextMenuData = useCallback((payload: string) => {
+    setInput(payload);
+    setDebouncedInput(payload);
+    setDirection('decode');
+  }, []);
 
   useContextMenuData({ featureKey: 'base64Converter', onData: handleContextMenuData });
 
-  const actionLabel = direction === 'encode' ? t('encode') : t('decode');
+  // 💡 4. 贯彻方案 A（彻底消灭 setOutput / setError）：
+  // 让所有的转化逻辑、类型安全校验在 useMemo 内存管道中单次渲染一气呵成！
+  const conversionPipeline = useMemo(() => {
+    const trimmed = debouncedInput.trim();
+    if (!trimmed) return { output: '', error: null };
+
+    try {
+      if (direction === 'encode') {
+        const result = textToBase64(debouncedInput);
+        return { output: result.output, error: null };
+      } else {
+        const decoded = base64ToText(trimmed);
+        return { output: decoded, error: null };
+      }
+    } catch (e) {
+      const message = e instanceof Error ? e.message : '';
+      const i18nKey = ERROR_MESSAGE_TO_I18N[message];
+      return {
+        output: '',
+        error: i18nKey ? t(i18nKey) : message || t('conversionFailed'),
+      };
+    }
+  }, [debouncedInput, direction, t]);
+
+  const output = conversionPipeline.output;
+  const error = conversionPipeline.error;
+
   const placeholder =
     direction === 'encode' ? t('textInputPlaceholder') : t('base64InputPlaceholder');
   const outputLabel = direction === 'encode' ? t('base64Output') : t('textOutput');
@@ -56,108 +80,88 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
     [direction, input],
   );
 
-  const handleDirectionChange = useCallback(
-    (value: 'encode' | 'decode') => {
-      if (value === direction) return;
-      setDirection(value);
-      setOutput('');
-      setError(null);
-    },
-    [direction],
-  );
+  const handleDirectionChange = (value: 'encode' | 'decode') => {
+    if (value === direction) return;
+    setDirection(value);
+    setInput('');
+    setDebouncedInput('');
+  };
 
-  const actions: ToolbarAction[] = useMemo(
-    () => [
-      {
-        key: 'convert',
-        label: actionLabel,
-        icon: <SwapHorizIcon />,
-        type: 'primary',
-        position: 'bottom',
-        disabled: (value: string) => !value.trim(),
-        onClick: (value: string) => {
-          setError(null);
-          try {
-            if (direction === 'encode') {
-              const result = textToBase64(value);
-              setOutput(result.output);
-            } else {
-              const decoded = base64ToText(value);
-              setOutput(decoded);
-            }
-          } catch (e) {
-            const message = e instanceof Error ? e.message : '';
-            const i18nKey = ERROR_MESSAGE_TO_I18N[message];
-            setError(i18nKey ? t(i18nKey) : message || t('conversionFailed'));
-          }
-        },
-      },
-    ],
-    [direction, t, actionLabel],
-  );
+  const handleClear = () => {
+    setInput('');
+    setDebouncedInput('');
+  };
 
   return (
-    <>
-      <SwitchButtonGroup
-        value={direction}
-        options={[
-          { value: 'encode', label: t('encode') },
-          { value: 'decode', label: t('decode') },
-        ]}
-        onChange={handleDirectionChange}
-        size="small"
-      />
+    <div className="w-full flex flex-col space-y-4 animate-in fade-in duration-300">
+      {/* 受控方向切流中枢 */}
+      <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
+        <SwitchButtonGroup
+          value={direction}
+          options={[
+            { value: 'encode', label: t('encode') },
+            { value: 'decode', label: t('decode') },
+          ]}
+          onChange={handleDirectionChange}
+          size="small"
+        />
+      </div>
 
+      {/* 高性能受控文本输入端 */}
       <TextInputArea
         placeholder={placeholder}
         value={input}
-        onChange={(v) => {
-          setInput(v);
-          setError(null);
-        }}
-        actions={actions}
-        externalError={error || undefined}
-        onClear={() => setOutput('')}
+        onChange={setInput}
+        externalError={error || undefined} // 💡 流式异常大闸动态注入
+        showClear={true}
+        allowCopy={true}
+        minRows={5}
+        maxRows={10}
+        onClear={handleClear}
       />
 
+      {/* 图片 URI 类型劫持警告引导区：
+        - 💡 修复点：彻底废除原生亮色硬编码 hover:bg-blue-100 类名，
+        - 完美向全站 shadcn 暗黑生态看齐，采用标准的 bg-primary/10 混合变体。
+      */}
       {showImageHint && (
-        <Alert
-          severity="info"
-          action={
-            <Button color="info" size="small" onClick={onSwitchToImageMode}>
-              {t('switchToImageMode')}
-            </Button>
-          }
-        >
-          {t('imageDataUriHint')}
-        </Alert>
+        <div className="flex items-center justify-between p-3.5 rounded-xl bg-primary/10 border border-primary/20 animate-in slide-in-from-top-1 duration-200">
+          <span className="text-xs font-semibold text-primary tracking-tight">
+            {t('imageDataUriHint')}
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onSwitchToImageMode}
+            className="h-7 rounded-md text-xs font-bold text-primary hover:text-primary hover:bg-primary/20 dark:hover:bg-primary/10 transition-colors px-2.5"
+          >
+            {t('switchToImageMode')}
+          </Button>
+        </div>
       )}
 
+      {/* 5. 编码/解码核心数据承载流卡片 */}
       {output && (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 2,
-            borderRadius: 3,
-            bgcolor: (theme) => alpha(theme.palette.info.main, 0.04),
-            border: '1px solid',
-            borderColor: (theme) => alpha(theme.palette.info.main, 0.15),
-          }}
-        >
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-            <Typography variant="caption" fontWeight={700} color="text.secondary">
+        <div className="p-4 rounded-2xl bg-card border border-border shadow-sm flex flex-col space-y-3 animate-in slide-in-from-bottom-2 duration-300">
+          <div className="flex justify-between items-center select-none">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
               {outputLabel}
-            </Typography>
-            <CopyButton text={output} />
-          </Stack>
+            </span>
+            <CopyButton
+              text={output}
+              className="h-6 px-2 rounded-md border text-[10px] font-bold"
+            />
+          </div>
+
           <TextInputArea
             readOnly
             value={output.length > 2000 ? `${output.substring(0, 2000)}...` : output}
             showClear={false}
-            showCount
+            minRows={4}
           />
-        </Paper>
+        </div>
       )}
-    </>
+    </div>
   );
 }
