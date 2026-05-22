@@ -13,9 +13,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint
+  # 💡 1. 提速核心：前置基建节点（Infrastructure Initialization）
+  # 专门负责锁死环境、同步下载并缓存 node_modules，下游节点直接满血复用！
+  setup:
+    name: Prepare Dependencies
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-info.outputs.key }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,17 +28,53 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+
+      # 建立基于 package-lock.json 唯一哈希的缓存大闸
+      - name: Cache Node Modules
+        id: cache-nodemodules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-v22-
 
       - name: Install dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
+
+      - name: Output Cache Key
+        id: cache-info
+        run: echo "key=${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}" >> $GITHUB_OUTPUT
+
+  # 💡 2. 静态语法质检节点（依赖前置节点完成）
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Restore Node Modules Instantantly
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
 
       - name: Run ESLint
         run: npm run lint
 
+  # 💡 3. 强类型守卫节点（2秒瞬时恢复，开箱即查）
   typecheck:
     name: TypeScript Check
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,17 +83,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Restore Node Modules Instantantly
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
 
       - name: Run TypeScript type check
         run: npm run typecheck
 
+  # 💡 4. 单元测试节点（无缝运行你刚刚修复完的 setupTests.ts 套件）
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,21 +106,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Restore Node Modules Instantantly
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
 
       - name: Run tests
         run: npm run test
 
+  # 💡 5. 多端分布式最终编译节点（Production Matrix Compliance）
   build:
     name: Build (${{ matrix.browser }})
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, test]
+    # 只有当 Linter、类型大闸、Vitest 单元测试全数满分通过，才放行最终打包编译
+    needs: [ lint, typecheck, test ]
     strategy:
       matrix:
-        browser: [chrome]
+        # 💡 完美对齐 WXT 跨端架构：将 firefox 同步纳入生产编译大矩阵，
+        # 如果 firefox 编译因任何多端不兼容挂掉，CI 会立刻拉起警报，防护力拉满！
+        browser: [ chrome, firefox ]
       fail-fast: false
     steps:
       - name: Checkout
@@ -86,11 +136,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Restore Node Modules Instantantly
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Build (Chrome)
-        if: matrix.browser == 'chrome'
-        run: npm run build
+      # 💡 动态代理编译指令：完美匹配 WXT / 各类多端打包器的标准构建命令
+      - name: Build Extension (${{ matrix.browser }})
+        run: |
+          if npm run | grep -q "build:${{ matrix.browser }}"; then
+            npm run build:${{ matrix.browser }}
+          else
+            npm run build -- --browser ${{ matrix.browser }}
+          fi
