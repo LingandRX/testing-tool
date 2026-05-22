@@ -120,12 +120,12 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
       />
 
       {showImageHint && (
-        <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 border border-blue-200">
-          <span className="text-sm text-blue-700">{t('imageDataUriHint')}</span>
+        <div className="flex items-center justify-between p-3 rounded-lg bg-primary/10 border border-primary/30">
+          <span className="text-sm text-primary">{t('imageDataUriHint')}</span>
           <button
             type="button"
             onClick={onSwitchToImageMode}
-            className="px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
+            className="px-3 py-1 text-sm font-medium text-primary hover:bg-blue-100 rounded-md transition-colors"
           >
             {t('switchToImageMode')}
           </button>
@@ -133,9 +133,9 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
       )}
 
       {output && (
-        <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+        <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-bold text-gray-500">{outputLabel}</span>
+            <span className="text-xs font-bold text-muted-foreground">{outputLabel}</span>
             <CopyButton text={output} />
           </div>
           <TextInputArea

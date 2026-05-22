@@ -47,11 +47,11 @@ export class PageErrorBoundary extends Component<Props, State> {
           <div className="p-6 text-center rounded-xl border border-red-200 bg-red-50 max-w-md w-full">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-3" />
             <h3 className="text-lg font-bold text-red-600 mb-2">该页面加载失败</h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               页面在加载或渲染时遇到错误，您可以重试或切换到其他工具。
             </p>
             {this.state.error && (
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg text-left max-h-[160px] overflow-auto">
+              <div className="mb-4 p-3 bg-muted rounded-lg text-left max-h-[160px] overflow-auto">
                 <pre className="font-mono text-xs whitespace-pre-wrap break-all text-red-700">
                   {this.state.error.toString()}
                 </pre>

@@ -45,11 +45,11 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="p-6 text-center rounded-xl border border-red-200 bg-red-50">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-extrabold text-red-600 mb-2">糟糕，出了点问题</h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               应用遇到了一些意外错误。您可以尝试刷新页面或重置应用。
             </p>
             {this.state.error && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg text-left max-h-[200px] overflow-auto">
+              <div className="mb-6 p-4 bg-muted rounded-lg text-left max-h-[200px] overflow-auto">
                 <pre className="font-mono text-xs whitespace-pre-wrap break-all text-red-700">
                   {this.state.error.toString()}
                 </pre>

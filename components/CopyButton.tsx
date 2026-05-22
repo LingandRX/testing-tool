@@ -73,15 +73,15 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   const iconSize = size === 'small' ? 14 : size === 'medium' ? 16 : 18;
 
   const colorClasses: Record<string, string> = {
-    primary: 'text-blue-600 hover:bg-blue-50',
-    secondary: 'text-gray-600 hover:bg-gray-50',
-    success: 'text-green-600 hover:bg-green-50',
-    error: 'text-red-600 hover:bg-red-50',
-    info: 'text-blue-600 hover:bg-blue-50',
+    primary: 'text-primary hover:bg-primary/10',
+    secondary: 'text-foreground hover:bg-muted',
+    success: 'text-green-600 hover:bg-green-500/10',
+    error: 'text-red-600 hover:bg-red-500/10',
+    info: 'text-primary hover:bg-primary/10',
     warning: 'text-amber-600 hover:bg-amber-50',
   };
 
-  const colorClass = colorClasses[color] || `text-[${color}] hover:bg-gray-50`;
+  const colorClass = colorClasses[color] || `text-[${color}] hover:bg-muted`;
 
   return (
     <button
@@ -91,7 +91,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       style={style}
       className={`${sizeClasses[size]} rounded-md flex items-center justify-center transition-all ${
         copied ? 'text-green-600 bg-green-50' : colorClass
-      } bg-white shadow-sm hover:shadow-md`}
+      } bg-background shadow-sm hover:shadow-md`}
     >
       {copied ? (
         <Check style={{ width: iconSize, height: iconSize }} />

@@ -14,7 +14,7 @@ interface PageSkeletonProps {
  */
 function DashboardCardSkeleton() {
   return (
-    <div className="rounded-xl border border-gray-200 p-5 h-[100px]">
+    <div className="rounded-xl border border-border p-5 h-[100px]">
       <div className="flex justify-between items-start">
         <div className="flex gap-3 items-center">
           <div className="w-10 h-10 rounded-lg bg-gray-200 animate-pulse" />

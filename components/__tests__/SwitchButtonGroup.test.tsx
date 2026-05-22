@@ -21,10 +21,10 @@ describe('SwitchButtonGroup 组件', () => {
     const buttonA = screen.getByRole('button', { name: /选项A/i });
     const buttonB = screen.getByRole('button', { name: /选项B/i });
 
-    // 选中的按钮有 bg-white text-blue-600 shadow-sm 类
-    expect(buttonA).toHaveClass('bg-white', 'text-blue-600', 'shadow-sm');
-    // 未选中的按钮有 text-gray-500 类
-    expect(buttonB).toHaveClass('text-gray-500');
+    // 选中的按钮有 bg-background text-primary shadow-sm 类
+    expect(buttonA).toHaveClass('bg-background', 'text-primary', 'shadow-sm');
+    // 未选中的按钮有 text-muted-foreground 类
+    expect(buttonB).toHaveClass('text-muted-foreground');
   });
 
   it('点击未选中按钮时应触发 onChange 并传入选中值', () => {
@@ -122,8 +122,8 @@ describe('SwitchButtonGroup 组件', () => {
       const button2 = screen.getByRole('button', { name: /^2$/i });
       const button4 = screen.getByRole('button', { name: /^4$/i });
 
-      expect(button2).toHaveClass('text-gray-500');
-      expect(button4).toHaveClass('bg-white', 'text-blue-600', 'shadow-sm');
+      expect(button2).toHaveClass('text-muted-foreground');
+      expect(button4).toHaveClass('bg-background', 'text-primary', 'shadow-sm');
     });
 
     it('点击 number 选项时应传回 number 值', () => {

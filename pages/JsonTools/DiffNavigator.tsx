@@ -14,14 +14,14 @@ export default function DiffNavigator({ total, currentIndex, onPrev, onNext }: D
 
   if (total === 0) {
     return (
-      <div className="flex items-center justify-center gap-3 p-2.5 rounded-lg bg-blue-50 border border-blue-200">
-        <span className="text-sm font-bold text-gray-500">{t('jsonDiff:noDiffs')}</span>
+      <div className="flex items-center justify-center gap-3 p-2.5 rounded-lg bg-primary/10 border border-primary/30">
+        <span className="text-sm font-bold text-muted-foreground">{t('jsonDiff:noDiffs')}</span>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center gap-3 p-2.5 rounded-lg bg-blue-50 border border-blue-200">
+    <div className="flex items-center justify-center gap-3 p-2.5 rounded-lg bg-primary/10 border border-primary/30">
       <button
         type="button"
         aria-label={t('jsonDiff:previousDiff')}
