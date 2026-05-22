@@ -13,13 +13,9 @@ export default function DashboardPage() {
   const visibleSet = useMemo(() => new Set<string>(visiblePages), [visiblePages]);
 
   return (
-    /* 💡 核心修复点：
-      - 彻底移除限制死高度的 auto-rows-fr，换用弹性自适应的 auto-rows-auto。
-      - 将 gap-2 / p-2 扩展为标准的 gap-3.5 / p-3.5，彻底消灭挤压颤噪。
-    */
     <div
       className={cn(
-        'grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(290px,1fr))] auto-rows-auto gap-3.5 p-3.5 w-full h-full',
+        'grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(290px,1fr))] auto-rows-auto gap-3.5 p-3.5 w-full h-auto',
         'animate-in fade-in duration-300 select-none',
       )}
     >
