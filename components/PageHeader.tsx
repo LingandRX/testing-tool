@@ -1,13 +1,15 @@
 import { ReactNode, useMemo } from 'react';
 import { getEntryPointType } from '@/config/features';
+import { cn } from '@/lib/utils'; // shadcn 核心类名合并工具
 
-/**
- * PageHeader 组件属性接口
- */
-export interface PageHeaderProps {
+export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   /** 要显示的图标组件 */
   icon: ReactNode;
-  /** 图标的颜色，默认使用主题 primary.main 色 */
+  /**
+   * 图标的颜色，支持：
+   * 1. Tailwind 颜色类名 (如 'text-blue-500', 'text-primary') -> 推荐
+   * 2. 原生颜色值 (如 '#3b82f6')
+   */
   iconColor?: string;
   /** 主标题文本 */
   title: string;
@@ -15,86 +17,86 @@ export interface PageHeaderProps {
   subtitle?: string;
   /** 在标题右侧显示的徽章/标签组件（可选） */
   badge?: ReactNode;
-  /** 图标容器的自定义样式 */
-  iconSx?: React.CSSProperties;
-  /** 标题文本的自定义样式 */
-  titleSx?: React.CSSProperties;
-  /** 副标题文本的自定义样式 */
-  subtitleSx?: React.CSSProperties;
-  /** 整个组件的自定义样式 */
-  sx?: React.CSSProperties;
+  /** 覆盖图标容器的类名 */
+  iconClassName?: string;
+  /** 覆盖主标题的类名 */
+  titleClassName?: string;
+  /** 覆盖副标题的类名 */
+  subtitleClassName?: string;
 }
 
-/**
- * PageHeader - 通用页面标题栏组件
- *
- * 用于显示带图标的页面标题，支持自定义颜色、副标题、徽章等功能
- *
- * @example
- * ```tsx
- * <PageHeader
- *   icon={<AccessTimeIcon />}
- *   iconColor="#1976d2"
- *   title="时间戳转换"
- *   subtitle="Unix 毫秒数转换与格式化"
- * />
- * ```
- *
- * @example
- * ```tsx
- * <PageHeader
- *   icon={<StorageIcon />}
- *   iconColor={storageCleanerPageStyles.warningColor}
- *   title="存储清理"
- *   subtitle={domain}
- *   badge={<Badge>已占用 {size}</Badge>}
- * />
- * ```
- */
 export default function PageHeader({
   icon,
-  iconColor = '#3b82f6',
+  iconColor = 'text-blue-500', // 默认改用类名，若需保持 Hex 可写 "#3b82f6"
   title,
   subtitle,
   badge,
-  iconSx,
-  titleSx,
-  subtitleSx,
-  sx,
+  iconClassName,
+  titleClassName,
+  subtitleClassName,
+  className,
+  ...props
 }: PageHeaderProps) {
   const entryPointType = useMemo(() => getEntryPointType(), []);
 
+  // 扩展环境判断：如果是 popup 形式则不渲染头部
   if (entryPointType === 'popup') {
     return null;
   }
 
+  // 判断传入的是否是 Hex/RGB 等原生颜色值
+  const isRawColor =
+    iconColor.startsWith('#') || iconColor.startsWith('rgb') || iconColor.startsWith('hsl');
+
   return (
-    <div className="flex items-center gap-3 mb-6" style={sx}>
+    <div className={cn('flex items-center gap-3 mb-6', className)} {...props}>
       {/* 图标容器 */}
       <div
-        className="p-2 rounded-lg flex items-center"
-        style={{
-          backgroundColor: `${iconColor}15`,
-          color: iconColor,
-          ...iconSx,
-        }}
+        className={cn(
+          'p-2 rounded-lg flex items-center justify-center shrink-0',
+          // 如果不是原生颜色，直接当作 Tailwind 类名注入
+          !isRawColor && iconColor,
+          iconClassName,
+        )}
+        style={
+          isRawColor
+            ? {
+                color: iconColor,
+                // 使用 CSS inline 变量或 color-mix 安全处理透明度，不再暴力拼接 "15"
+                backgroundColor: `color-mix(in srgb, ${iconColor} 8%, transparent)`,
+              }
+            : undefined
+        }
       >
-        {icon}
+        {/* 确保图标大小可控，通过子元素选择器约束 SVG 宽高 */}
+        <div className="[&>svg]:h-5 [&>svg]:w-5">{icon}</div>
       </div>
+
       {/* 标题区域 */}
-      <div className="flex-1">
+      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
         {/* 标题行（含徽章） */}
-        <div className="flex justify-between items-center">
-          <span className="text-base font-extrabold tracking-tight leading-tight" style={titleSx}>
+        <div className="flex justify-between items-center gap-2">
+          <h1
+            className={cn(
+              'text-base font-extrabold tracking-tight leading-tight text-foreground truncate',
+              titleClassName,
+            )}
+          >
             {title}
-          </span>
-          {badge}
+          </h1>
+          {badge && <div className="shrink-0">{badge}</div>}
         </div>
-        {/* 副标题 */}
+
+        {/* 副标题 - 使用 p 标签（block）保证换行 */}
         {subtitle && (
-          <span className="text-xs font-semibold text-muted-foreground" style={subtitleSx}>
+          <p
+            className={cn(
+              'text-xs font-semibold text-muted-foreground truncate',
+              subtitleClassName,
+            )}
+          >
             {subtitle}
-          </span>
+          </p>
         )}
       </div>
     </div>
