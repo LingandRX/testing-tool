@@ -25,7 +25,6 @@ export default function JsonDiffInput({
         onChange={onChange}
         placeholder={placeholder}
         minRows={8}
-        autoResize={false}
         externalError={error ?? undefined}
         showClear={true}
       />

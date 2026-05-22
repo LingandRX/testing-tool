@@ -3,12 +3,11 @@ import { Button } from '@/components/ui/button';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import {
   formatJson,
-  validateJson,
   type JsonFormatOptions,
   type JsonFormatResult,
+  validateJson,
 } from '@/utils/jsonFormatter';
 import { formatByteSize } from '@/utils/textStatistics';
-import { useSnackbar } from '@/components/GlobalSnackbar';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
@@ -23,7 +22,6 @@ const INDENT_OPTIONS = [2, 4, 6, 8] as const;
  */
 export default function JsonFormatSection() {
   const { t } = useLazyTranslation('jsonFormat');
-  const { showMessage } = useSnackbar();
 
   const [input, setInput] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +78,6 @@ export default function JsonFormatSection() {
             value={indentSize}
             onChange={(v) => setIndentSize(v)}
             options={INDENT_OPTIONS.map((size) => ({ value: size, label: String(size) }))}
-            sx={{ width: 'auto', marginBottom: 0, flexShrink: 0 }}
             size="small"
           />
 
@@ -145,7 +142,7 @@ export default function JsonFormatSection() {
                 {t('jsonFormat:formattedSize')}: {formatByteSize(result.formattedBytes)}
               </span>
             </div>
-            <CopyButton text={result.formatted} showMessage={showMessage} />
+            <CopyButton text={result.formatted} />
           </div>
 
           {/* 格式化内容 */}

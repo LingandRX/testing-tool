@@ -1,13 +1,13 @@
 import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
-import { Settings, RefreshCw, GripVertical } from 'lucide-react';
+import { GripVertical, RefreshCw, Settings } from 'lucide-react';
 import {
-  DndContext,
   closestCenter,
-  PointerSensor,
+  DndContext,
+  type DragEndEvent,
   KeyboardSensor,
+  PointerSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -19,6 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import type { PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
+import type { PaletteColorKey } from '@/config/features';
 import {
   getAllFeatureKeys,
   getDefaultPageOrder,
@@ -29,7 +30,6 @@ import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
 import PageHeader from '@/components/PageHeader';
 import { useTranslation } from 'react-i18next';
-import type { PaletteColorKey } from '@/config/features';
 
 const PALETTE_COLORS: Record<PaletteColorKey, string> = {
   primary: '#1976d2',
@@ -322,7 +322,6 @@ export default function App() {
               iconColor="#1976d2"
               title="应用设置"
               subtitle="针对不同窗口类型独立配置 Dashboard 中显示的功能及其排序"
-              sx={{ marginBottom: '1rem' }}
             />
             {/* Tab 与恢复按钮同行 */}
             <div className="flex items-end justify-between border-b-0">

@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Key } from 'lucide-react';
-import { useSnackbar } from '@/components/GlobalSnackbar';
 import PageHeader from '@/components/PageHeader';
-import { stringifyJson, parseJwt } from '@/utils/jwt';
+import { parseJwt, stringifyJson } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
@@ -40,7 +39,6 @@ const Section = ({ title, content, color }: SectionProps) => {
 };
 
 export default function Index() {
-  const { showMessage } = useSnackbar();
   const { t } = useLazyTranslation('jwt');
   const [jwtInput, setJwtInput] = useState('');
 
@@ -75,7 +73,6 @@ export default function Index() {
             }}
             allowCopy={true}
             showClear={true}
-            showMessage={showMessage}
             externalError={result?.error}
           />
 
