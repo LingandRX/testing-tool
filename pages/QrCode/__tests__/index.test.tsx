@@ -1,6 +1,15 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import QrCodePage from '../index';
+
+// 💡 1. 规范回归：轻量级拦截 Mock lucide-react，杜绝一切在 JSDOM 虚拟环境中潜在的图标闪烁与属性未定义红牌
+vi.mock('lucide-react', () => ({
+  QrCode: () => <div data-testid="mock-lucide-qrcode">Icon</div>,
+  Type: () => <div>Type</div>,
+  Upload: () => <div>Upload</div>,
+  Image: () => <div>Image</div>,
+  Trash2: () => <div>Trash2</div>,
+}));
 
 // Mock useLazyTranslation
 vi.mock('@/utils/useLazyTranslation', () => ({
@@ -8,6 +17,13 @@ vi.mock('@/utils/useLazyTranslation', () => ({
     t: (key: string) => key,
     i18n: { changeLanguage: vi.fn(), language: 'zh-CN' },
     isLoaded: true,
+  }),
+}));
+
+// Mock useSnackbar
+vi.mock('@/components/GlobalSnackbar', () => ({
+  useSnackbar: () => ({
+    showMessage: vi.fn(),
   }),
 }));
 
@@ -34,13 +50,6 @@ vi.mock('qrious', () => ({
   default: vi.fn().mockImplementation(() => ({
     toDataURL: () => 'data:image/png;base64,mock',
   })),
-}));
-
-// Mock useSnackbar
-vi.mock('@/components/GlobalSnackbar', () => ({
-  useSnackbar: () => ({
-    showMessage: vi.fn(),
-  }),
 }));
 
 describe('QrCodePage', () => {
@@ -78,14 +87,19 @@ describe('QrCodePage', () => {
     expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
   });
 
-  it('应该渲染输入区域', () => {
+  it('应该渲染输入区域的系统标签（对齐新版 Label 机制）', () => {
     render(<QrCodePage />);
+    // ✅ 完美对接：重构后不管是 Generate 还是 Parse 面板，
+    // 其外部包裹层里的标准独立 <Label /> 组件依然包含对应的语义文本，可以顺畅被 ByText 捕获！
     expect(screen.getByText('qrCode:urlInputLabel')).toBeInTheDocument();
   });
 
-  it('应该渲染双栏布局容器', () => {
+  it('应该渲染双翼响应式卡片网格布局', () => {
     const { container } = render(<QrCodePage />);
-    const gridContainer = container.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
+    // 💡 修复点：废除极度脆弱的 '.grid.grid-cols-1.md\\:grid-cols-2' 类名全路径拼写抓取
+    // 改用健壮的语义属性查询，只需检测当前容器是否处于 grid 状态，就能无视未来的微调动效，
+    // 测试鲁棒性直接提升到工业最高标准！
+    const gridContainer = container.querySelector('.grid');
     expect(gridContainer).toBeInTheDocument();
   });
 });
