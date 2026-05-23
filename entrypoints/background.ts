@@ -5,12 +5,12 @@ import { createAllContextMenus, parseContextMenuClick } from '@/utils/contextMen
 import { saveContextMenuData } from '@/utils/useContextMenuData';
 
 export default defineBackground(() => {
-  // 1. 扩展初次安装或更新时，注册右键上下文大闸
+  // 1. 扩展初次安装或更新时，注册右键上下文菜单
   browser.runtime.onInstalled.addListener(() => {
     createAllContextMenus();
   });
 
-  // 2. 右键点击中央中枢路由
+  // 2. 右键点击路由
   browser.contextMenus.onClicked.addListener(async (info, _tab) => {
     const result = parseContextMenuClick(info.menuItemId as string, info);
 
@@ -24,12 +24,10 @@ export default defineBackground(() => {
     const { featureKey, payload } = result.data;
 
     try {
-      // 检查侧边栏（Side Panel）的挂载激活状态
       const sidePanelState = await browser.storage.local.get('sidePanelOpen');
       const isSidePanelOpen = sidePanelState.sidePanelOpen === true;
 
       if (isSidePanelOpen) {
-        // 如果侧边栏正开着，利用高性能管道直发
         await sendMessage(MessageAction.CONTEXT_MENU_CLICKED, { featureKey, payload });
         return;
       }
@@ -37,18 +35,13 @@ export default defineBackground(() => {
       console.debug('[Context Menu] Side panel pipeline is not available:', err);
     }
 
-    // 💡 核心自愈机制：保存数据到共享沙箱 Storage，Popup 打开后（无论是自动还是手动）都会读取
     await saveContextMenuData({ featureKey, payload });
 
-    // 打开 popup 弹窗
     try {
       await browser.action.openPopup();
     } catch (err) {
-      // 💡 修复点：自动打开 Popup 失败时，绝对不能将 pendingData 撕毁！
-      // 保持数据留在 storage 内部，由于 Service Worker 的持久化，用户之后不管什么时候手动点开图标，
-      // 数据依旧完好如初，完美契合了你的设计注释！
       console.warn(
-        '[Context Menu] 自动打开 popup 失败，请手动点击扩展图标，暂存数据已安全保留在内存中:',
+        '[Context Menu] 自动打开 popup 失败，请手动点击扩展图标，暂存数据已安全保留:',
         err,
       );
     }
@@ -65,7 +58,7 @@ export default defineBackground(() => {
     }
   });
 
-  // 💡 3. 异步刷新请求监听
+  // 3. 异步刷新请求监听（统一使用 alarms API，避免 MV3 Service Worker 被销毁导致任务丢失）
   onMessage(MessageAction.RELOAD_TAB, async (message) => {
     const { tabId, delay = 0 } = message.data;
 
@@ -75,28 +68,33 @@ export default defineBackground(() => {
       });
     };
 
-    // 如果小于 1000ms（短抖动缓冲），可以使用极轻量级 setTimeout 防御
-    // 如果是秒级以上的延时，为防止 Service Worker 闲置被内核销毁，应当使用 Alarms 沙箱驱动
-    if (delay > 0 && delay < 1000) {
-      setTimeout(executeReload, delay);
-    } else if (delay >= 1000) {
-      const alarmName = `reload-tab-${tabId}-${Date.now()}`;
-
-      // 创建一个临时的一次性 Alarm 闹钟
-      await browser.alarms.create(alarmName, { when: Date.now() + delay });
-
-      // 动态注册一个一次性的生命周期续航守卫
-      const alarmListener = (alarm: { name: string }) => {
-        if (alarm.name === alarmName) {
-          executeReload();
-          browser.alarms.onAlarm.removeListener(alarmListener);
-        }
-      };
-      browser.alarms.onAlarm.addListener(alarmListener);
-    } else {
+    if (delay <= 0) {
       executeReload();
+      return { success: true };
     }
 
-    return { success: true, message: '刷新请求已通过常驻 Service Worker 安全隔离区' };
+    const alarmName = `reload-tab-${tabId}-${Date.now()}`;
+
+    // 创建一次性 Alarm，由浏览器内核保障触发（不受 Service Worker 生命周期影响）
+    await browser.alarms.create(alarmName, { when: Date.now() + delay });
+
+    // 兜底清理：若 alarm 因异常未触发，delay 后 5 秒强制移除监听器并清理 alarm
+    const cleanupTimeout = setTimeout(() => {
+      browser.alarms.onAlarm.removeListener(alarmListener);
+      browser.alarms.clear(alarmName).catch(() => {});
+    }, delay + 5000);
+
+    const alarmListener = (alarm: { name: string }) => {
+      if (alarm.name !== alarmName) return;
+
+      clearTimeout(cleanupTimeout);
+      executeReload();
+      browser.alarms.onAlarm.removeListener(alarmListener);
+      browser.alarms.clear(alarmName).catch(() => {});
+    };
+
+    browser.alarms.onAlarm.addListener(alarmListener);
+
+    return { success: true };
   });
 });
