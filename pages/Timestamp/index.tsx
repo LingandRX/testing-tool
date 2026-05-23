@@ -1,7 +1,7 @@
 import { Clock } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
-import { ZONES } from '@/config/pageTheme';
+import { ZONES } from './constants';
 import LiveClock from './LiveClock';
 import ResultView from './ResultView';
 import { useTimestampConverter } from './useTimestampConverter';
