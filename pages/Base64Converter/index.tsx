@@ -1,7 +1,4 @@
-import { Image as ImageIcon, Type, Upload } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
-import PageHeader from '@/components/PageHeader';
-
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConverterPageMode } from '@/types/storage';
 import TextMode from './TextMode';
@@ -22,22 +19,8 @@ export default function Index() {
     isValidPageMode,
   );
 
-  const modeIcon: Record<PageMode, React.ReactNode> = {
-    text: <Type className="h-4 w-4" />,
-    file: <Upload className="h-4 w-4" />,
-    image: <ImageIcon className="h-4 w-4" />,
-  };
-
   return (
     <div className="p-4 w-full flex flex-col space-y-4 min-h-[520px] select-none animate-in fade-in duration-300">
-      <PageHeader
-        title={t('base64Converter:pageTitle')}
-        subtitle={t('base64Converter:pageSubtitle')}
-        icon={modeIcon[pageMode]}
-        iconColor="text-indigo-800"
-        className="pb-1"
-      />
-
       <SwitchButtonGroup
         value={pageMode}
         options={[

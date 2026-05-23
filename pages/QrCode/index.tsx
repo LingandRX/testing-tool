@@ -1,5 +1,3 @@
-import { QrCode as QrCodeIcon } from 'lucide-react'; // 💡 别名规整，防止与页面组件发生重名误判
-import PageHeader from '@/components/PageHeader';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
@@ -26,15 +24,6 @@ export default function Index() {
          - 替换为标准的 p-4 呼吸内边距配合 flex flex-col space-y-4，接管系统级重排！
       */}
       <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none animate-in fade-in duration-300">
-        {/* 标题控制栏：追加微调 py-0.5，防范文字边缘截断 */}
-        <PageHeader
-          title={t('qrCode:pageTitle')}
-          subtitle={t('qrCode:pageSubtitle')}
-          icon={<QrCodeIcon className="h-4 w-4" />} // 💡 规范对齐：强制锁死 Icon 宽高，抹杀闪烁
-          iconColor="text-green-700"
-          className="pb-1"
-        />
-
         {/* 流式中央控制切流卡：注入 sm 断点防御，防范单栏状态下发生变形 */}
         <div className="w-full sm:w-fit pt-0.5">
           <SwitchButtonGroup

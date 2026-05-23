@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Code, Download, Printer, Trash2 } from 'lucide-react';
+import { Download, Printer, Trash2 } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
-import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { Button } from '@/components/ui/button';
@@ -177,13 +176,6 @@ export default function MarkdownToHtmlPage() {
 
   return (
     <div className="p-4 w-full flex flex-col space-y-4 select-none animate-in fade-in duration-300">
-      <PageHeader
-        title={t('pageTitle')}
-        subtitle={t('pageSubtitle')}
-        icon={<Code className="h-4 w-4" />}
-        className="pb-1"
-      />
-
       <div className="flex flex-col space-y-4">
         {/* 工具集成控制中枢 */}
         <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center bg-secondary/40 rounded-xl border border-border/60 px-1.5 py-1.5 sm:h-12">

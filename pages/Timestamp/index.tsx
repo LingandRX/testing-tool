@@ -1,5 +1,3 @@
-import { Clock } from 'lucide-react';
-import PageHeader from '@/components/PageHeader';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { ZONES } from './constants';
 import LiveClock from './LiveClock';
@@ -39,13 +37,6 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-4">
-        {/* Header */}
-        <PageHeader
-          title={t('timestamp:pageTitle')}
-          subtitle={t('timestamp:pageSubtitle')}
-          icon={<Clock />}
-        />
-
         {/* 动态参考信息时钟条 */}
         <LiveClock unit={unit} onUseNow={handleUseNow} />
 
