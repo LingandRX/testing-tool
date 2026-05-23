@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Key } from 'lucide-react';
-import PageHeader from '@/components/PageHeader';
 import { parseJwt, stringifyJson } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
@@ -73,12 +71,6 @@ export default function Index() {
 
   return (
     <div className="p-4 w-full flex flex-col space-y-4 animate-in fade-in duration-300 select-none">
-      <PageHeader
-        title={t('jwt:pageTitle')}
-        subtitle={t('jwt:pageSubtitle')}
-        icon={<Key className="h-4 w-4" />} // 💡 规范锁死 Icon 宽高，抹杀闪烁
-      />
-
       <div className="flex flex-col gap-4">
         {/* 输入终端 */}
         <TextInputArea
