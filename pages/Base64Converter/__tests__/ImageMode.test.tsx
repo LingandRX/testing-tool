@@ -26,8 +26,8 @@ describe('ImageMode', () => {
   it('应该渲染图像上传区域', async () => {
     render(<ImageMode />);
     await waitForStorageReady();
-    expect(screen.getByText('clickOrDropToImage')).toBeInTheDocument();
-    expect(screen.getByText('supportedFormats')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:clickOrDropToImage')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:supportedFormats')).toBeInTheDocument();
   });
 
   it('应该接受有效的图像文件', async () => {
@@ -40,7 +40,7 @@ describe('ImageMode', () => {
 
     await waitFor(() => {
       expect(screen.getByText('test.png')).toBeInTheDocument();
-      expect(screen.getByText('base64Output')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:base64Output')).toBeInTheDocument();
     });
   });
 
@@ -53,7 +53,7 @@ describe('ImageMode', () => {
     fireEvent.change(hiddenInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('unsupportedImageType');
+      expect(screen.getByRole('alert')).toHaveTextContent('base64Converter:unsupportedImageType');
     });
   });
 
@@ -68,7 +68,7 @@ describe('ImageMode', () => {
     fireEvent.change(hiddenInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('fileSizeExceeded');
+      expect(screen.getByRole('alert')).toHaveTextContent('base64Converter:fileSizeExceeded');
     });
   });
 
@@ -98,11 +98,11 @@ describe('ImageMode', () => {
       expect(screen.getByText('test.png')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('clear'));
+    fireEvent.click(screen.getByText('base64Converter:clear'));
 
     await waitFor(() => {
       expect(screen.queryByText('test.png')).not.toBeInTheDocument();
-      expect(screen.getByText('clickOrDropToImage')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:clickOrDropToImage')).toBeInTheDocument();
     });
   });
 
@@ -124,16 +124,16 @@ describe('ImageMode', () => {
   it('应该渲染 encode/decode 切换按钮', async () => {
     render(<ImageMode />);
     await waitForStorageReady();
-    expect(screen.getByText('encode')).toBeInTheDocument();
-    expect(screen.getByText('decode')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:encode')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:decode')).toBeInTheDocument();
   });
 
   it('解码 PNG Base64 后应该显示图像预览', async () => {
     render(<ImageMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    const input = await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
 
     act(() => {
@@ -141,7 +141,7 @@ describe('ImageMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('decodedImageOutput')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:decodedImageOutput')).toBeInTheDocument();
       const img = screen.getByAltText('decoded preview');
       expect(img).toBeInTheDocument();
       expect(img.tagName.toLowerCase()).toBe('img');
@@ -151,9 +151,9 @@ describe('ImageMode', () => {
   it('解码后默认文件名应该为 decoded.png', async () => {
     render(<ImageMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    const input = await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
 
     act(() => {
@@ -166,9 +166,9 @@ describe('ImageMode', () => {
   it('解码非法 Base64 应该显示 invalidBase64 错误', async () => {
     render(<ImageMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    const input = await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: '!!!not base64' } });
 
     act(() => {
@@ -176,7 +176,7 @@ describe('ImageMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('invalidBase64')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:invalidBase64')).toBeInTheDocument();
     });
   });
 });
