@@ -30,7 +30,7 @@ const DEFAULT_OPTIONS: StorageCleanerOptions = {
 };
 
 const DEFAULT_PREFERENCES: StorageCleanerPreferences = {
-  autoRefresh: true,
+  reloadAfterClean: true,
   selectedTypes: DEFAULT_OPTIONS,
 };
 
@@ -40,7 +40,7 @@ export interface UseStorageCleanerReturn {
   isInitializing: boolean;
   options: StorageCleanerOptions;
   sizes: Record<string, number>;
-  autoRefresh: boolean;
+  reloadAfterClean: boolean;
   loading: boolean;
   result: CleaningResult | null;
   showConfirm: boolean;
@@ -49,7 +49,7 @@ export interface UseStorageCleanerReturn {
   allSelected: boolean;
   someSelected: boolean;
 
-  handleAutoRefreshChange: (checked: boolean) => void;
+  handleReloadAfterCleanChange: (checked: boolean) => void;
   handleOptionChange: (key: keyof StorageCleanerOptions) => void;
   handleSelectAll: (checked: boolean) => void;
   handleClean: () => Promise<void>;
@@ -62,7 +62,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
   const [options, setOptions] = useState<StorageCleanerOptions>(DEFAULT_OPTIONS);
   const [sizes, setSizes] = useState<Record<string, number>>({});
-  const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
+  const [reloadAfterClean, setReloadAfterClean] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -117,7 +117,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       if (currentRequestId !== requestIdRef.current) return;
 
       if (savedPrefs) {
-        setAutoRefresh(savedPrefs.autoRefresh ?? DEFAULT_PREFERENCES.autoRefresh);
+        setReloadAfterClean(savedPrefs.reloadAfterClean ?? DEFAULT_PREFERENCES.reloadAfterClean);
         setOptions(savedPrefs.selectedTypes ?? DEFAULT_PREFERENCES.selectedTypes);
       }
 
@@ -170,26 +170,22 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     };
   }, [debouncedLoadInfo]);
 
-  // 2. 超进化：防抖写盘管道 (Chrome Storage Debounce Pipeline)
-  // 用户疯狂点击勾选时，React 状态保持丝滑的 0 延迟同步，只有停下点击 500ms 后，才会真正发起一次 Chrome 存盘，配额永远安全。
   useEffect(() => {
-    // 过滤掉首次初始化时的无意义写盘
     if (isInitializing) return;
 
     if (storageTimerRef.current) clearTimeout(storageTimerRef.current);
     storageTimerRef.current = setTimeout(async () => {
       await storageUtil
         .set('storageCleaner/preferences', {
-          autoRefresh,
+          reloadAfterClean,
           selectedTypes: options,
         })
         .catch(console.error);
     }, 500);
-  }, [options, autoRefresh, isInitializing]);
+  }, [options, reloadAfterClean, isInitializing]);
 
-  // 3. 极速状态分发：同步函数化（去掉了原有的 async 声明，只负责触发状态）
-  const handleAutoRefreshChange = useCallback((checked: boolean) => {
-    setAutoRefresh(checked);
+  const handleReloadAfterCleanChange = useCallback((checked: boolean) => {
+    setReloadAfterClean(checked);
   }, []);
 
   const handleOptionChange = useCallback((key: keyof StorageCleanerOptions) => {
@@ -207,7 +203,6 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     });
   }, []);
 
-  // 清理动作核心
   const handleClean = useCallback(async () => {
     if (loadingRef.current) return;
 
@@ -222,7 +217,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       const cleaningResult = await clearStorage(tab.id, tab.url, options);
       setResult(cleaningResult);
 
-      if (autoRefresh && cleaningResult.success) {
+      if (reloadAfterClean && cleaningResult.success) {
         toast.success(t('storageCleaner:cleanSuccessReload'));
         await sendMessage(MessageAction.RELOAD_TAB, { tabId: tab.id, delay: 1000 });
       } else {
@@ -234,9 +229,8 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       setLoading(false);
       setShowConfirm(false);
     }
-  }, [options, autoRefresh, loadInfo, t]);
+  }, [options, reloadAfterClean, loadInfo, t]);
 
-  // 4. 精准的流式衍生计算收拢：完全切断垃圾内存常态分配
   const totalSize = useMemo(() => {
     return (
       (sizes.cookies || 0) +
@@ -259,7 +253,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     isInitializing,
     options,
     sizes,
-    autoRefresh,
+    reloadAfterClean,
     loading,
     result,
     showConfirm,
@@ -267,7 +261,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     totalSize,
     allSelected: selectionMetrics.all,
     someSelected: selectionMetrics.some,
-    handleAutoRefreshChange,
+    handleReloadAfterCleanChange,
     handleOptionChange,
     handleSelectAll,
     handleClean,

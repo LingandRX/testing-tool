@@ -99,7 +99,7 @@ describe('chromeStorage', () => {
 
     it('应该成功设置复杂对象值', async () => {
       const preferences = {
-        autoRefresh: false,
+        reloadAfterClean: false,
         selectedTypes: {
           localStorage: true,
           sessionStorage: true,
