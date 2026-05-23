@@ -5,6 +5,8 @@
   "currentDomain": "当前域名",
   "statusLocked": "未解锁",
   "statusUnlocked": "已解锁",
+  "unsupported": "不支持",
+  "unsupportedDesc": "当前页面为浏览器内部页面或扩展页面，无法解锁右键功能。请切换到普通网页后重试。",
   "unlockDesc": "点击下方按钮，为当前网站临时解锁右键菜单。刷新页面后需要重新解锁。",
   "unlockBtn": "解锁当前网站右键",
   "alreadyUnlocked": "右键已解锁"
