@@ -96,23 +96,28 @@ jobs:
           npm run zip
           npm run zip:firefox
 
-      # 🔍 关键调试步骤：确认 zip 文件位置
+      # 🔍 调试：确认 zip 文件位置
       - name: Verify output files
         run: |
-          echo "=== .output/ ==="
-          ls -la .output/ 2>/dev/null || echo "Not found"
+          echo "=== .output/ contents ==="
+          ls -la .output/ || echo "Not found"
           echo "=== All zip files ==="
-          find . -name "*.zip" -type f 2>/dev/null || echo "No zip files"
+          find . -name "*.zip" -type f
+
+      # 💡 关键修复：将 zip 文件复制到固定目录，避免 glob 问题
+      - name: Prepare release artifacts
+        run: |
+          mkdir -p release-archives
+          cp .output/*.zip release-archives/ 2>/dev/null || true
+          echo "Files in release-archives:"
+          ls -la release-archives/
 
       - name: Upload Extension Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: extension-zips
-          path: |
-            .output/*.zip
-            dist/*.zip
-            *.zip
-          if-no-files-found: error   # ← 如果没有文件，直接报错
+          path: release-archives/
+          if-no-files-found: error
           retention-days: 7
 
   # ── Phase 4: 发布 ───────────────────────
