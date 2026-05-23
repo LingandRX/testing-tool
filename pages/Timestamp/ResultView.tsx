@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import dayjs from '@/utils/dayjs';
 import CopyButton from '@/components/CopyButton';
-import type { UnitType } from '@/config/pageTheme';
-import { DATE_FORMAT } from '@/config/pageTheme'; // 彻底移除了非语义的 timestampPageStyles 依赖
+import type { UnitType } from './constants';
+import { DATE_FORMAT } from './constants';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { cn } from '@/lib/utils'; // shadcn 核心类名合并工具
 
