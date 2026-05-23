@@ -10,7 +10,7 @@
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatFileSize } from '@/utils/base64Converter';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 interface DecodeResultPaperProps {
   /** 标题文案，由调用方传入 i18n key 对应的值（如 decodedFileOutput / decodedImageOutput） */
@@ -38,7 +38,7 @@ export default function DecodeResultPaper({
   onDownload,
   children,
 }: DecodeResultPaperProps) {
-  const { t } = useTranslation('base64Converter');
+  const { t } = useLazyTranslation('base64Converter');
 
   return (
     <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
