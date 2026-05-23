@@ -71,8 +71,11 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-release-v22-${{ hashFiles('**/package-lock.json') }}
+      - name: Generate WXT types
+        run: npx wxt prepare
+
       - name: Run TypeScript type check
-        run: npm run compile
+        run: npm run typecheck
 
   test:
     name: Unit Tests
@@ -90,6 +93,10 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-release-v22-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Generate WXT types
+        run: npx wxt prepare
+
       - name: Run tests
         run: npm run test
 
