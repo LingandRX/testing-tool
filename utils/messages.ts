@@ -4,6 +4,9 @@ export enum MessageAction {
   RELOAD_TAB = 'reloadTab',
   SIDE_PANEL_STATE_CHANGED = 'sidePanelStateChanged',
   CONTEXT_MENU_CLICKED = 'contextMenuClicked',
+  RESTORE_RIGHT_CLICK = 'restoreRightClick',
+  QUERY_RIGHT_CLICK_STATUS = 'queryRightClickStatus',
+  INJECT_MAIN_WORLD_SCRIPT = 'injectMainWorldScript',
 }
 
 export interface MessageResponse {
@@ -21,6 +24,11 @@ export interface ProtocolMap {
   [MessageAction.RELOAD_TAB](data: { tabId: number; delay?: number }): MessageResponse;
   [MessageAction.SIDE_PANEL_STATE_CHANGED](data: { isOpen: boolean }): void;
   [MessageAction.CONTEXT_MENU_CLICKED](data: ContextMenuClickedPayload): void;
+  [MessageAction.RESTORE_RIGHT_CLICK](data: undefined): MessageResponse & { restored: boolean };
+  [MessageAction.QUERY_RIGHT_CLICK_STATUS](
+    data: undefined,
+  ): MessageResponse & { restored: boolean };
+  [MessageAction.INJECT_MAIN_WORLD_SCRIPT](data: undefined): MessageResponse;
 }
 
 export const { sendMessage, onMessage } = defineExtensionMessaging<ProtocolMap>();

@@ -37,5 +37,9 @@
   "htmlToMarkdown": {
     "title": "HTML to Markdown",
     "description": "Real-time HTML conversion and Markdown preview"
+  },
+  "rightClickRestorer": {
+    "title": "Right Click Restorer",
+    "description": "Detect and restore disabled browser right-click menus"
   }
 }
