@@ -25,15 +25,17 @@ export default function RightClickRestorerPage() {
       <div className="w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden transition-all">
         <div className="p-4">
           <Label className="text-sm font-medium">{t('rightClickRestorer:currentDomain')}</Label>
-          <div className="mt-2 flex items-center justify-between">
-            <code className="text-sm bg-muted px-2 py-1 rounded">{domain || '—'}</code>
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <code className="text-sm bg-muted px-2 py-1 rounded truncate min-w-0 flex-1">
+              {domain || '—'}
+            </code>
             {isUnlocked ? (
-              <Badge variant="default" className="gap-1 bg-green-600 hover:bg-green-700">
+              <Badge variant="default" className="gap-1 bg-green-600 hover:bg-green-700 shrink-0">
                 <ShieldCheck className="h-3 w-3" />
                 {t('rightClickRestorer:statusUnlocked')}
               </Badge>
             ) : (
-              <Badge variant="secondary" className="gap-1">
+              <Badge variant="secondary" className="gap-1 shrink-0">
                 <Shield className="h-3 w-3" />
                 {t('rightClickRestorer:statusLocked')}
               </Badge>
