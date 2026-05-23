@@ -1,7 +1,7 @@
 import { Image as ImageIcon, Type, Upload } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import PageHeader from '@/components/PageHeader';
-import { base64ConverterPageStyles } from '@/config/pageTheme';
+
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConverterPageMode } from '@/types/storage';
 import TextMode from './TextMode';
@@ -34,7 +34,7 @@ export default function Index() {
         title={t('base64Converter:pageTitle')}
         subtitle={t('base64Converter:pageSubtitle')}
         icon={modeIcon[pageMode]}
-        iconColor={base64ConverterPageStyles.primaryColor}
+        iconColor="text-indigo-800"
         className="pb-1"
       />
 
