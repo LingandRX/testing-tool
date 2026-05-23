@@ -157,7 +157,7 @@ export interface FieldTypePreferences {
  */
 export interface StorageCleanerPreferences {
   /** 是否在清理后自动刷新页面 */
-  autoRefresh: boolean;
+  reloadAfterClean: boolean;
   /** 默认勾选的清理类型 */
   selectedTypes: StorageCleanerOptions;
 }
