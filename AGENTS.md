@@ -31,9 +31,6 @@ Pre-commit hook (`.husky/pre-commit` 调用 `lint-staged`):
 
 提交前确保 `lint` 和 `typecheck` 通过。
 
-> **注意**: Release 工作流 (`.github/workflows/release.yml`) 存在脚本名错误，typecheck 步骤使用了不存在的
-> `npm run compile`，正确命令应为 `npm run typecheck`。
-
 ## WXT 生成文件
 
 - `.wxt/` 目录由 `postinstall` 自动执行 `wxt prepare` 生成，包含 TypeScript 类型声明和扩展的 tsconfig。
