@@ -1,7 +1,7 @@
 import { QrCode as QrCodeIcon } from 'lucide-react'; // 💡 别名规整，防止与页面组件发生重名误判
 import PageHeader from '@/components/PageHeader';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
-import { qrCodePageStyles } from '@/config/pageTheme';
+
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { QrCodeContext } from './contexts/QrCodeContext';
 import { useQrCode } from './hooks/useQrCode';
@@ -31,7 +31,7 @@ export default function Index() {
           title={t('qrCode:pageTitle')}
           subtitle={t('qrCode:pageSubtitle')}
           icon={<QrCodeIcon className="h-4 w-4" />} // 💡 规范对齐：强制锁死 Icon 宽高，抹杀闪烁
-          iconColor={qrCodePageStyles.primaryColor}
+          iconColor="text-green-700"
           className="pb-1"
         />
 
