@@ -58,7 +58,96 @@ export default defineBackground(() => {
     }
   });
 
-  // 3. 异步刷新请求监听（统一使用 alarms API，避免 MV3 Service Worker 被销毁导致任务丢失）
+  // 3. 注入主环境脚本（content script 无权访问 chrome.tabs/scripting，委托 background 执行）
+  onMessage(MessageAction.INJECT_MAIN_WORLD_SCRIPT, async (message) => {
+    const sender = message.sender as chrome.runtime.MessageSender | undefined;
+    const tabId = sender?.tab?.id;
+
+    if (!tabId) {
+      console.warn('[RightClickRestorer] Injection request missing tabId');
+      return { success: false, message: 'Missing tabId' };
+    }
+
+    try {
+      await browser.scripting.executeScript({
+        target: { tabId },
+        func: () => {
+          'use strict';
+          const w = window as unknown as Record<string, unknown>;
+          if (w.__testingToolsRightClickPatched) return;
+          w.__testingToolsRightClickPatched = true;
+
+          const PROTECTED = ['contextmenu', 'copy', 'paste', 'cut', 'selectstart'];
+
+          /* 1. 屏蔽 MouseEvent.prototype.preventDefault（含 mousedown 右键） */
+          const _origPreventDefault = MouseEvent.prototype.preventDefault;
+          Object.defineProperty(MouseEvent.prototype, 'preventDefault', {
+            value: function (this: MouseEvent) {
+              const t = this.type;
+              if (PROTECTED.includes(t) || (t === 'mousedown' && this.button === 2)) {
+                return;
+              }
+              return _origPreventDefault.call(this);
+            },
+            writable: true,
+            configurable: true,
+          });
+
+          /* 2. 屏蔽 Event.prototype.stopPropagation / stopImmediatePropagation */
+          const _origStopPropagation = Event.prototype.stopPropagation;
+          Object.defineProperty(Event.prototype, 'stopPropagation', {
+            value: function (this: Event) {
+              if (PROTECTED.includes(this.type)) return;
+              return _origStopPropagation.call(this);
+            },
+            writable: true,
+            configurable: true,
+          });
+
+          const _origStopImmediatePropagation = Event.prototype.stopImmediatePropagation;
+          Object.defineProperty(Event.prototype, 'stopImmediatePropagation', {
+            value: function (this: Event) {
+              if (PROTECTED.includes(this.type)) return;
+              return _origStopImmediatePropagation.call(this);
+            },
+            writable: true,
+            configurable: true,
+          });
+
+          /* 3. 拦截 document.oncontextmenu（处理 return false 方式） */
+          let _docOnContextMenu: unknown = null;
+          Object.defineProperty(document, 'oncontextmenu', {
+            get() {
+              return _docOnContextMenu;
+            },
+            set(fn: unknown) {
+              if (typeof fn === 'function') {
+                _docOnContextMenu = function (this: GlobalEventHandlers, e: MouseEvent) {
+                  const r = (fn as (this: GlobalEventHandlers, ev: MouseEvent) => unknown).call(
+                    this,
+                    e,
+                  );
+                  return r === false ? true : r;
+                };
+              } else {
+                _docOnContextMenu = fn;
+              }
+            },
+            configurable: true,
+          });
+        },
+        world: 'MAIN',
+      });
+
+      return { success: true };
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      console.error('[RightClickRestorer] executeScript failed:', errorMsg);
+      return { success: false, message: errorMsg };
+    }
+  });
+
+  // 4. 异步刷新请求监听（统一使用 alarms API，避免 MV3 Service Worker 被销毁导致任务丢失）
   onMessage(MessageAction.RELOAD_TAB, async (message) => {
     const { tabId, delay = 0 } = message.data;
 
