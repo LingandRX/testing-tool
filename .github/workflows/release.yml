@@ -126,13 +126,29 @@ jobs:
 
       # 💡 核心自愈补丁：显式将 .output 下打包出的真实生产绝对路径文件，
       # 稳固地上存至 GitHub 的常驻产物箱中进行安全物理隔离，防范后期发布网络崩溃导致产物蒸发！
-      - name: Upload Extension Artifacts
+      - name: Upload Chrome Extension
         uses: actions/upload-artifact@v4
         with:
-          name: extension-zips
-          path: |
-            .output/*.zip
+          name: chrome-extension
+          path: .output/testing-tools-*.zip
           retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload Firefox Extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension
+          path: .output/testing-tools-*-firefox.zip
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload Source Code
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-code
+          path: .output/testing-tools-*-sources.zip
+          retention-days: 7
+          if-no-files-found: error
 
   # ── Phase 4: 独立中央签发发布（Atomic Release Publisher） ───────────────────
   release:
@@ -144,10 +160,22 @@ jobs:
         uses: actions/checkout@v4
 
       # 💡 独立下载打包完好的绝对产物包
-      - name: Download Extension Artifacts
+      - name: Download Chrome Extension
         uses: actions/download-artifact@v4
         with:
-          name: extension-zips
+          name: chrome-extension
+          path: release-artifacts
+
+      - name: Download Firefox Extension
+        uses: actions/download-artifact@v4
+        with:
+          name: firefox-extension
+          path: release-artifacts
+
+      - name: Download Source Code
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
           path: release-artifacts
 
       - name: Extract version from tag
