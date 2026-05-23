@@ -3,7 +3,6 @@ import { MessageAction, onMessage } from '@/utils/messages';
 import { getTextStats } from '@/utils/textStatistics';
 import { hidePopover, showTextStatsResult, showTimestampResult } from './uiPopover';
 
-// 💡 1. 国际化超进化：对接 chrome.i18n 插件标准 API，如果环境不支持则安全降级，拒绝硬编码中文
 function getI18nText(key: string, fallback: string): string {
   if (typeof chrome !== 'undefined' && chrome.i18n) {
     return chrome.i18n.getMessage(key) || fallback;
@@ -39,20 +38,16 @@ function convertTimestamp(input: string): string {
 let lastClickX = 0;
 let lastClickY = 0;
 
-// 💡 使用 capture: true 确保在任何极其复杂的单页应用（SPA）中都能精准捕获右键坐标
 document.addEventListener(
   'contextmenu',
   (e) => {
     lastClickX = e.clientX;
     lastClickY = e.clientY;
   },
-  { capture: true, passive: true }, // 优化滚动与捕获性能
+  { capture: true, passive: true },
 );
 
 export function initContextMenuHandler(): void {
-  // 💡 2. 全局自净化大闸（Global Auto-Purge Grid）：
-  // 当用户在网页上进行左键点击、滚动视视口、或调整大小时，
-  // 证明心流已经移开，自发隐退所有浮动的 Popover 弹窗，体验顺滑得丝丝入扣！
   const dismissPopover = (): void => {
     hidePopover();
   };

@@ -1,17 +1,44 @@
+/**
+ * 自动刷新开关组件
+ *
+ * 用于 StorageCleaner 页面，控制是否自动刷新存储数据列表。
+ * 以卡片形式展示，左侧为标签文本，右侧为 shadcn/ui Switch 开关。
+ *
+ * @example
+ * ```tsx
+ * <AutoRefreshToggle
+ *   reloadAfterClean={reloadAfterClean}
+ *   onChange={(checked) => setReloadAfterClean(checked)}
+ * />
+ * ```
+ */
+
 import React from 'react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import { cn } from '@/lib/utils';
-// 引入官方的 Switch 原子组件
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
-interface AutoRefreshToggleProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  autoRefresh: boolean;
+export interface AutoRefreshToggleProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'onChange'
+> {
+  /** 开关的当前状态（受控） */
+  reloadAfterClean: boolean;
+  /** 状态变化时的回调函数 */
   onChange: (checked: boolean) => void;
 }
 
+/**
+ * 自动刷新开关
+ *
+ * @param reloadAfterClean - 当前开关状态
+ * @param onChange - 状态变化回调，接收新的布尔值
+ * @param className - 额外的 CSS 类名，用于覆盖或扩展样式
+ * @param props - 透传给外层 div 的其他 HTML 属性
+ */
 export default function AutoRefreshToggle({
-  autoRefresh,
+  reloadAfterClean,
   onChange,
   className,
   ...props
@@ -21,15 +48,12 @@ export default function AutoRefreshToggle({
   return (
     <div
       className={cn(
-        // 外层包裹维持优雅的 shadcn 风格中性卡片，去除硬编码 mb-3 扩展灵活性
         'w-full p-4 rounded-xl border border-border bg-card text-card-foreground shadow-sm transition-all focus-within:ring-1 focus-within:ring-ring flex justify-between items-center',
         className,
       )}
       {...props}
     >
-      {/* 3. 使用标准的 shadcn/ui Label 组件：
-        绑定 htmlFor 建立安全的表单无障碍桥梁，使得用户点击文字也能触发开关联动
-      */}
+      {/* Label 与 Switch 通过 htmlFor + id 关联，支持点击文字触发开关 */}
       <Label
         htmlFor="auto-refresh-switch"
         className="text-sm font-bold text-foreground cursor-pointer select-none tracking-tight"
@@ -37,16 +61,7 @@ export default function AutoRefreshToggle({
         {t('storageCleaner:autoRefresh')}
       </Label>
 
-      {/* 4. 超进化：彻底废除 200 个字符的原生 checkbox 拼接！
-        完美调用 shadcn 的 Switch 组件。它会自动应用全站统一的主色（Primary）、
-        带阻尼的滑块硬件加速动效、以及教科书级别的 WAI-ARIA 无障碍键盘焦点提示。
-      */}
-      <Switch
-        id="auto-refresh-switch"
-        checked={autoRefresh}
-        onCheckedChange={onChange}
-        className="data-[state=checked]:bg-primary" // 如果依然需要特定的琥珀色可写 data-[state=checked]:bg-amber-500
-      />
+      <Switch id="auto-refresh-switch" checked={reloadAfterClean} onCheckedChange={onChange} />
     </div>
   );
 }

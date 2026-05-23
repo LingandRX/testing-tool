@@ -1,6 +1,6 @@
 import { Image as ImageIcon, Trash2 } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import CopyButton from '@/components/CopyButton';
 import DecodeResultPaper from '@/components/DecodeResultPaper';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ const isValidDirection = (val: unknown): val is Base64ConvertDirection =>
   val === 'encode' || val === 'decode';
 
 export default function ImageMode() {
-  const { t } = useTranslation('base64Converter');
+  const { t } = useLazyTranslation('base64Converter');
   const [direction, setDirection] = useStorageState(
     'base64Converter/imageMode/direction',
     'encode',

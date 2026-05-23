@@ -73,11 +73,4 @@ describe('Base64ConverterPage', () => {
     });
     expect(screen.queryByTestId('text-mode')).not.toBeInTheDocument();
   });
-
-  it('应该渲染页面标题', async () => {
-    render(<Base64ConverterPage />);
-    await waitForStorageInit();
-    expect(screen.getByText('base64Converter:pageTitle')).toBeInTheDocument();
-    expect(screen.getByText('base64Converter:pageSubtitle')).toBeInTheDocument();
-  });
 });

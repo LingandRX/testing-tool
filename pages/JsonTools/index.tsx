@@ -1,7 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowRightLeft, Braces, GitCompareArrows, Minimize2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
-import PageHeader from '@/components/PageHeader';
 import JsonDiffInput from './JsonDiffInput';
 import DiffResult from './DiffResult';
 import DiffNavigator from './DiffNavigator';
@@ -99,22 +97,6 @@ export default function Index() {
 
   const activePath = diffResult && total > 0 ? diffResult.diffPaths[currentDiffIndex] : undefined;
 
-  const modeTitles: Record<PageMode, { title: string; subtitle: string }> = {
-    diff: { title: 'jsonDiff:pageTitle', subtitle: 'jsonDiff:pageSubtitle' },
-    format: { title: 'jsonFormat:formatTitle', subtitle: 'jsonFormat:formatSubtitle' },
-    yaml: { title: 'jsonFormat:yamlTitle', subtitle: 'jsonFormat:yamlSubtitle' },
-    toml: { title: 'jsonFormat:tomlTitle', subtitle: 'jsonFormat:tomlSubtitle' },
-    minify: { title: 'jsonFormat:minifyTitle', subtitle: 'jsonFormat:minifySubtitle' },
-  };
-
-  const modeIcon: Record<PageMode, React.ReactNode> = {
-    diff: <GitCompareArrows className="h-4 w-4" />,
-    format: <Braces className="h-4 w-4" />,
-    yaml: <ArrowRightLeft className="h-4 w-4" />,
-    toml: <ArrowRightLeft className="h-4 w-4" />,
-    minify: <Minimize2 className="h-4 w-4" />,
-  };
-
   const yamlConvert: ConvertFunction = useCallback((text: string) => {
     const r = jsonToYaml(text);
     return { output: r.output, originalBytes: r.originalBytes, outputBytes: r.outputBytes };
@@ -132,14 +114,6 @@ export default function Index() {
 
   return (
     <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none animate-in fade-in duration-300">
-      <PageHeader
-        title={t(modeTitles[pageMode].title)}
-        subtitle={t(modeTitles[pageMode].subtitle)}
-        icon={modeIcon[pageMode]}
-        iconColor="#3b82f6"
-        className="pb-1"
-      />
-
       <SwitchButtonGroup
         value={pageMode}
         onChange={(v: PageMode) => setPageMode(v)}

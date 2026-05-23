@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Code, Download, Trash2 } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
-import PageHeader from '@/components/PageHeader';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { Button } from '@/components/ui/button'; // 💡 1. 全面回归规范：引入原生的 shadcn 原子 Button
@@ -51,12 +50,6 @@ export default function HtmlToMarkdownPage() {
       - 统一收拢为我们先前在 Dashboard 页、JSON 工具箱制定的 p-4 space-y-4 标准极客桌面规格。
     */
     <div className="p-4 w-full flex flex-col space-y-4 select-none animate-in fade-in duration-300">
-      <PageHeader
-        title={t('pageTitle')}
-        subtitle={t('pageSubtitle')}
-        icon={<Code className="h-4 w-4" />}
-      />
-
       <div className="flex flex-col gap-4">
         {/* 工具栏集成区 */}
         <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center bg-secondary/40 rounded-xl border border-border/60 px-1.5 py-1.5 sm:h-12">

@@ -65,6 +65,7 @@ export default defineConfig({
       'cookies',
       'sidePanel',
       'contextMenus',
+      'alarms',
     ],
     host_permissions: ['<all_urls>'],
     action: {

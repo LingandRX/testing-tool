@@ -40,7 +40,7 @@ describe('DecodeResultPaper 组件', () => {
 
     it('应渲染下载按钮', () => {
       render(<DecodeResultPaper {...defaultProps} />);
-      expect(screen.getByRole('button', { name: 'download' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'base64Converter:download' })).toBeInTheDocument();
     });
 
     it('应渲染 children 内容', () => {
@@ -64,7 +64,7 @@ describe('DecodeResultPaper 组件', () => {
 
     it('点击下载按钮时应调用 onDownload', () => {
       render(<DecodeResultPaper {...defaultProps} />);
-      fireEvent.click(screen.getByRole('button', { name: 'download' }));
+      fireEvent.click(screen.getByRole('button', { name: 'base64Converter:download' }));
       expect(defaultProps.onDownload).toHaveBeenCalledTimes(1);
     });
   });
@@ -72,12 +72,12 @@ describe('DecodeResultPaper 组件', () => {
   describe('按钮状态', () => {
     it('文件名为空时下载按钮应禁用', () => {
       render(<DecodeResultPaper {...{ ...defaultProps, fileName: '' }} />);
-      expect(screen.getByRole('button', { name: 'download' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'base64Converter:download' })).toBeDisabled();
     });
 
     it('文件名不为空时下载按钮应启用', () => {
       render(<DecodeResultPaper {...defaultProps} />);
-      expect(screen.getByRole('button', { name: 'download' })).toBeEnabled();
+      expect(screen.getByRole('button', { name: 'base64Converter:download' })).toBeEnabled();
     });
   });
 });

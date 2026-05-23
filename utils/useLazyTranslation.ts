@@ -18,6 +18,7 @@ const localeModules: Record<
     base64Converter: () => import('@/i18n/locales/zh/base64Converter.json'),
     markdownToHtml: () => import('@/i18n/locales/zh/markdownToHtml.json'),
     htmlToMarkdown: () => import('@/i18n/locales/zh/htmlToMarkdown.json'),
+    rightClickRestorer: () => import('@/i18n/locales/zh/rightClickRestorer.json'),
   },
   en: {
     timestamp: () => import('@/i18n/locales/en/timestamp.json'),
@@ -30,6 +31,7 @@ const localeModules: Record<
     base64Converter: () => import('@/i18n/locales/en/base64Converter.json'),
     markdownToHtml: () => import('@/i18n/locales/en/markdownToHtml.json'),
     htmlToMarkdown: () => import('@/i18n/locales/en/htmlToMarkdown.json'),
+    rightClickRestorer: () => import('@/i18n/locales/en/rightClickRestorer.json'),
   },
 };
 

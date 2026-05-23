@@ -11,7 +11,8 @@ export type PageType =
   | 'jsonDiff' // JSON 差异比较工具
   | 'base64Converter' // Base64 转换器工具
   | 'markdownToHtml' // Markdown 转 HTML 工具
-  | 'htmlToMarkdown'; // HTML 转 Markdown 工具
+  | 'htmlToMarkdown' // HTML 转 Markdown 工具
+  | 'rightClickRestorer'; // 右键菜单恢复工具
 
 /**
  * JSON 工具页面子模式类型定义
@@ -157,7 +158,7 @@ export interface FieldTypePreferences {
  */
 export interface StorageCleanerPreferences {
   /** 是否在清理后自动刷新页面 */
-  autoRefresh: boolean;
+  reloadAfterClean: boolean;
   /** 默认勾选的清理类型 */
   selectedTypes: StorageCleanerOptions;
 }

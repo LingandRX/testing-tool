@@ -41,18 +41,41 @@
 - **安全检查**: 自动去除 `Bearer` 前缀，处理异常输入并提供友好提示.
 - **签名查看**: 展示 JWT 签名部分，辅助验证令牌完整性.
 
+### 🖱️ 右键恢复工具
+
+- **当前页面检测**: 自动识别当前活动标签页的域名.
+- **一键恢复**: 解除网站对右键菜单的限制，恢复复制、粘贴等基础操作.
+- **状态可视化**: 通过 Badge 组件直观展示当前页面的锁定/解锁状态.
+
 ### 🖼️ 二维码工具
 
 - **生成器**: 将当前 URL 或自定义文本快速转换为二维码，支持下载.
 - **解析器**: 支持通过上传图片或粘贴图片来解析二维码内容.
 
+### 🔄 JSON 工具
+
+- **差异比较**: 对比两段 JSON 数据，高亮展示差异.
+- **格式化**: 支持 JSON 美化、压缩、转 YAML / TOML.
+
+### 🧰 Base64 转换器
+
+- **文本编解码**: 支持文本内容的 Base64 编码与解码.
+- **文件转换**: 支持文件与 Base64 字符串互转.
+- **图像预览**: 支持图片 Base64 编码与实时预览.
+
+### 📝 Markdown ↔ HTML 转换
+
+- **Markdown 转 HTML**: 实时预览 Markdown 渲染结果，支持导出 HTML 源码.
+- **HTML 转 Markdown**: 将 HTML 内容转换为 Markdown 格式.
+
 ## 技术栈
 
 - **框架**: [WXT (Web Extension Toolkit)](https://wxt.dev/)
 - **前端**: React 19 + TypeScript
-- **UI 组件**: Material UI (MUI) @7.x
-- **样式**: Emotion (Styled Components)
+- **UI 组件**: shadcn/ui (基于 Radix UI 的无头组件库)
+- **样式**: Tailwind CSS + class-variance-authority + cn() 工具函数
 - **日期处理**: dayjs (集成 UTC 和 Timezone 插件)
+- **国际化**: i18next + react-i18next
 - **通信**: @webext-core/messaging
 - **存储**: Chrome Storage API (类型安全封装)
 - **解析引擎**: qr-scanner (二维码解析), qrious (二维码生成)
@@ -62,9 +85,8 @@
 
 ```text
 ├── components/           # 可复用 React 组件
-├── config/              # 应用配置（路由、功能元数据、主题）
-│   ├── features.tsx     # 功能定义与路由映射
-│   └── pageTheme.ts     # 各功能页面的视觉风格配置
+├── config/              # 应用配置
+│   └── features.tsx     # 功能定义与路由映射
 ├── entrypoints/         # 扩展程序入口点
 │   ├── popup/           # 点击图标弹出的主界面
 │   ├── options/         # 扩展程序设置页面
@@ -72,10 +94,13 @@
 │   ├── background.ts    # 后台 Service Worker
 │   └── content.ts       # 网页注入脚本
 ├── pages/               # 各功能模块的页面组件
-├── providers/           # 全局状态提供者 (Router, Snackbar 等)
-├── types/               # TypeScript 类型声明
+├── providers/           # 全局状态提供者 (Router, Theme 等)
+├── hooks/               # 自定义 React Hooks
 ├── utils/               # 工具函数与服务抽象
-├── public/              # 静态资源 (图标、 manifest 资源等)
+├── types/               # TypeScript 类型声明
+├── lib/                 # 通用工具函数 (cn, utils 等)
+├── i18n/                # 国际化资源
+├── public/              # 静态资源 (图标、manifest 资源等)
 ├── wxt.config.ts        # WXT 框架核心配置
 └── package.json         # 项目元数据与依赖管理
 ```
@@ -89,15 +114,20 @@
 
 ### 常用命令
 
-| 命令                    | 说明                             |
-| ----------------------- | -------------------------------- |
-| `npm run dev`           | 启动 Chrome 开发模式（支持 HMR） |
-| `npm run dev:firefox`   | 启动 Firefox 开发模式            |
-| `npm run build`         | 构建 Chrome 生产版本             |
-| `npm run compile`       | 执行 TypeScript 类型检查         |
-| `npm run lint`          | 执行 ESLint 代码规范检查         |
-| `npm run test`          | 运行单元测试                     |
-| `npm run test:coverage` | 生成测试覆盖率报告               |
+| 命令                    | 说明                              |
+| ----------------------- | --------------------------------- |
+| `npm run dev`           | 启动 Chrome 开发模式（支持 HMR）  |
+| `npm run dev:firefox`   | 启动 Firefox 开发模式             |
+| `npm run build`         | 构建 Chrome 生产版本              |
+| `npm run build:firefox` | 构建 Firefox 生产版本             |
+| `npm run zip`           | 打包 Chrome 扩展 (.output/\*.zip) |
+| `npm run zip:firefox`   | 打包 Firefox 扩展                 |
+| `npm run typecheck`     | 执行 TypeScript 类型检查          |
+| `npm run lint`          | 执行 ESLint 代码规范检查          |
+| `npm run test`          | 运行单元测试                      |
+| `npm run test:coverage` | 生成测试覆盖率报告                |
+
+运行单个测试: `npx vitest run path/to/file.test.ts`
 
 ### 自动化流程
 
@@ -110,12 +140,14 @@
 
 本扩展根据功能需要申请了以下权限：
 
-- `storage`: 存储用户设置和工具配置.
+- `storage` & `unlimitedStorage`: 存储用户设置、工具配置及大量数据.
 - `activeTab` & `tabs`: 获取当前页面 URL 及其元数据.
-- `scripting`: 在网页中执行清理脚本.
+- `scripting`: 在网页中执行清理和右键恢复脚本.
 - `cookies`: 管理和清理网站 Cookie.
 - `sidePanel`: 支持在浏览器侧边栏中运行.
 - `clipboardWrite`: 提供一键复制功能.
+- `contextMenus`: 注册右键菜单，支持快捷操作.
+- `alarms`: 管理后台定时任务（如清理后自动刷新）.
 
 ## 浏览器支持
 
