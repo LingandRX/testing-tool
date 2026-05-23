@@ -11,6 +11,7 @@ import {
   ArrowLeftRight,
   Code,
   File,
+  MousePointerClick,
 } from 'lucide-react';
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
@@ -26,6 +27,7 @@ const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
 const Base64ConverterPage = lazy(() => import('@/pages/Base64Converter'));
 const MarkdownToHtmlPage = lazy(() => import('@/pages/MarkdownToHtml'));
 const HtmlToMarkdownPage = lazy(() => import('@/pages/HtmlToMarkdown'));
+const RightClickRestorerPage = lazy(() => import('@/pages/RightClickRestorer'));
 
 export interface FeatureConfig {
   key: PageType;
@@ -168,6 +170,19 @@ export const FEATURES: FeatureConfig[] = [
       popup: HtmlToMarkdownPage,
       sidepanel: HtmlToMarkdownPage,
       tab: HtmlToMarkdownPage,
+    },
+  },
+  {
+    key: 'rightClickRestorer',
+    labelKey: 'features:rightClickRestorer.title',
+    descriptionKey: 'features:rightClickRestorer.description',
+    themeColorKey: 'success',
+    icon: MousePointerClick,
+    defaultVisible: true,
+    components: {
+      popup: RightClickRestorerPage,
+      sidepanel: RightClickRestorerPage,
+      tab: RightClickRestorerPage,
     },
   },
 ];

@@ -1,5 +1,5 @@
 import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
-import { GripVertical, RefreshCw, Settings } from 'lucide-react';
+import { GripVertical, RefreshCw } from 'lucide-react';
 import {
   closestCenter,
   DndContext,
@@ -28,7 +28,6 @@ import {
 } from '@/config/features';
 import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
-import PageHeader from '@/components/PageHeader';
 import { useTranslation } from 'react-i18next';
 
 const PALETTE_COLORS: Record<PaletteColorKey, string> = {
@@ -317,12 +316,6 @@ export default function App() {
         {/* 顶部标题与导航栏 */}
         <div className="w-full bg-background border-b border-border pt-8 sm:pt-12 pb-0 px-4 sm:px-8">
           <div className="max-w-3xl mx-auto">
-            <PageHeader
-              icon={<Settings size={20} />}
-              iconColor="#1976d2"
-              title="应用设置"
-              subtitle="针对不同窗口类型独立配置 Dashboard 中显示的功能及其排序"
-            />
             {/* Tab 与恢复按钮同行 */}
             <div className="flex items-end justify-between border-b-0">
               <div className="flex-1 flex">

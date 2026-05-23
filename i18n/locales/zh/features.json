@@ -37,5 +37,9 @@
   "htmlToMarkdown": {
     "title": "HTML 转 Markdown",
     "description": "实时 HTML 转换与 Markdown 预览"
+  },
+  "rightClickRestorer": {
+    "title": "右键恢复",
+    "description": "检测并恢复被网站禁用的浏览器右键菜单"
   }
 }

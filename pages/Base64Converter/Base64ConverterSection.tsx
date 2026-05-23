@@ -1,6 +1,6 @@
 import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import CopyButton from '@/components/CopyButton';
 import DecodeResultPaper from '@/components/DecodeResultPaper';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ interface Base64ConverterSectionProps {
 }
 
 export default function Base64ConverterSection({ mode }: Base64ConverterSectionProps) {
-  const { t } = useTranslation('base64Converter');
+  const { t } = useLazyTranslation('base64Converter');
 
   const [direction, setDirection] = useStorageState(
     `base64Converter/${mode}Mode/direction`,

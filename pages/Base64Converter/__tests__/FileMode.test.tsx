@@ -28,8 +28,8 @@ describe('FileMode', () => {
   it('应该渲染文件上传区域', async () => {
     render(<FileMode />);
     await waitForStorageReady();
-    expect(screen.getByText('clickOrDropToFile')).toBeInTheDocument();
-    expect(screen.getByText('maxFileSize')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:clickOrDropToFile')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:maxFileSize')).toBeInTheDocument();
   });
 
   it('应该处理有效的文件选择', async () => {
@@ -44,7 +44,7 @@ describe('FileMode', () => {
 
     await waitFor(() => {
       expect(screen.getByText('test.txt')).toBeInTheDocument();
-      expect(screen.getByText('base64Output')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:base64Output')).toBeInTheDocument();
     });
   });
 
@@ -60,7 +60,7 @@ describe('FileMode', () => {
     fireEvent.change(hiddenInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('fileSizeExceeded');
+      expect(screen.getByRole('alert')).toHaveTextContent('base64Converter:fileSizeExceeded');
     });
   });
 
@@ -76,11 +76,11 @@ describe('FileMode', () => {
       expect(screen.getByText('test.txt')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('clear'));
+    fireEvent.click(screen.getByText('base64Converter:clear'));
 
     await waitFor(() => {
       expect(screen.queryByText('test.txt')).not.toBeInTheDocument();
-      expect(screen.getByText('clickOrDropToFile')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:clickOrDropToFile')).toBeInTheDocument();
     });
   });
 
@@ -108,8 +108,8 @@ describe('FileMode', () => {
     fireEvent.change(hiddenInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByText(/originalSize/)).toBeInTheDocument();
-      expect(screen.getByText(/encodedSize/)).toBeInTheDocument();
+      expect(screen.getByText(/base64Converter:originalSize/)).toBeInTheDocument();
+      expect(screen.getByText(/base64Converter:encodedSize/)).toBeInTheDocument();
     });
   });
 
@@ -129,23 +129,25 @@ describe('FileMode', () => {
 
   it('应该渲染 encode/decode 切换按钮', () => {
     render(<FileMode />);
-    expect(screen.getByText('encode')).toBeInTheDocument();
-    expect(screen.getByText('decode')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:encode')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:decode')).toBeInTheDocument();
   });
 
   it('切到 decode 应该显示 Base64 输入框', async () => {
     render(<FileMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
-    expect(await screen.findByPlaceholderText('decodeBase64Placeholder')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('base64Converter:decode'));
+    expect(
+      await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder'),
+    ).toBeInTheDocument();
   });
 
   it('解码 PDF Base64 后应该显示 application/pdf 与默认文件名 decoded.pdf', async () => {
     render(<FileMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    const input = await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'JVBERi0K' } });
 
     act(() => {
@@ -153,7 +155,7 @@ describe('FileMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('decodedFileOutput')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:decodedFileOutput')).toBeInTheDocument();
       expect(screen.getByText(/application\/pdf/)).toBeInTheDocument();
       expect(screen.getByDisplayValue('decoded.pdf')).toBeInTheDocument();
     });
@@ -162,9 +164,9 @@ describe('FileMode', () => {
   it('解码后的文件名应该可编辑', async () => {
     render(<FileMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    const input = await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'JVBERi0K' } });
 
     act(() => {
@@ -179,24 +181,24 @@ describe('FileMode', () => {
   it('解码后应该显示下载按钮', async () => {
     render(<FileMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    const input = await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'JVBERi0K' } });
 
     act(() => {
       vi.advanceTimersByTime(250);
     });
 
-    expect(await screen.findByText('download')).toBeInTheDocument();
+    expect(await screen.findByText('base64Converter:download')).toBeInTheDocument();
   });
 
   it('解码非法 Base64 应该显示 invalidBase64 错误', async () => {
     render(<FileMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    const input = await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: '!!!not base64' } });
 
     act(() => {
@@ -204,16 +206,16 @@ describe('FileMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('invalidBase64')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:invalidBase64')).toBeInTheDocument();
     });
   });
 
   it('切换方向时应该清空解码状态', async () => {
     render(<FileMode />);
     await waitForStorageReady();
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = await screen.findByPlaceholderText('decodeBase64Placeholder');
+    const input = await screen.findByPlaceholderText('base64Converter:decodeBase64Placeholder');
     fireEvent.change(input, { target: { value: 'JVBERi0K' } });
 
     act(() => {
@@ -221,10 +223,10 @@ describe('FileMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('decodedFileOutput')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:decodedFileOutput')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('encode'));
+    fireEvent.click(screen.getByText('base64Converter:encode'));
 
     await waitFor(() => {
       expect(screen.queryByText('decodedFileOutput')).not.toBeInTheDocument();

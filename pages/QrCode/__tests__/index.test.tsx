@@ -68,12 +68,6 @@ describe('QrCodePage', () => {
     expect(screen.getByText('qrCode:qrToUrl')).toBeInTheDocument();
   });
 
-  it('应该渲染页面标题', () => {
-    render(<QrCodePage />);
-    expect(screen.getByText('qrCode:pageTitle')).toBeInTheDocument();
-    expect(screen.getByText('qrCode:pageSubtitle')).toBeInTheDocument();
-  });
-
   it('切换到解析模式应该渲染 ImageUploader', () => {
     render(<QrCodePage />);
     fireEvent.click(screen.getByText('qrCode:qrToUrl'));

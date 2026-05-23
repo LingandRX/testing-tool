@@ -18,18 +18,18 @@ describe('TextMode', () => {
 
   it('应该渲染编码/解码切换按钮', () => {
     render(<TextMode />);
-    expect(screen.getByText('encode')).toBeInTheDocument();
-    expect(screen.getByText('decode')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:encode')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:decode')).toBeInTheDocument();
   });
 
   it('应该渲染输入框和转换按钮', () => {
     render(<TextMode />);
-    expect(screen.getByPlaceholderText('textInputPlaceholder')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('base64Converter:textInputPlaceholder')).toBeInTheDocument();
   });
 
   it('应该将文本编码为 Base64', async () => {
     render(<TextMode />);
-    const input = screen.getByPlaceholderText('textInputPlaceholder');
+    const input = screen.getByPlaceholderText('base64Converter:textInputPlaceholder');
     fireEvent.change(input, { target: { value: 'Hello' } });
 
     act(() => {
@@ -37,7 +37,7 @@ describe('TextMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('base64Output')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:base64Output')).toBeInTheDocument();
     });
     expect(screen.getByTestId('copy-button')).toHaveTextContent('SGVsbG8=');
   });
@@ -46,9 +46,9 @@ describe('TextMode', () => {
     render(<TextMode />);
 
     // 切换到解码模式
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    const input = screen.getByPlaceholderText('base64Converter:base64InputPlaceholder');
     fireEvent.change(input, { target: { value: 'SGVsbG8=' } });
 
     act(() => {
@@ -56,7 +56,7 @@ describe('TextMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('textOutput')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:textOutput')).toBeInTheDocument();
     });
     expect(screen.getByTestId('copy-button')).toHaveTextContent('Hello');
   });
@@ -65,9 +65,9 @@ describe('TextMode', () => {
     render(<TextMode />);
 
     // 切换到解码模式
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    const input = screen.getByPlaceholderText('base64Converter:base64InputPlaceholder');
     fireEvent.change(input, { target: { value: 'invalid!!!' } });
 
     act(() => {
@@ -75,7 +75,7 @@ describe('TextMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('invalidBase64')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:invalidBase64')).toBeInTheDocument();
     });
   });
 
@@ -83,7 +83,7 @@ describe('TextMode', () => {
     render(<TextMode />);
 
     // 先编码
-    const input = screen.getByPlaceholderText('textInputPlaceholder');
+    const input = screen.getByPlaceholderText('base64Converter:textInputPlaceholder');
     fireEvent.change(input, { target: { value: 'Hello' } });
 
     act(() => {
@@ -95,7 +95,7 @@ describe('TextMode', () => {
     });
 
     // 切换方向
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
     // 输出应该被清除
     await waitFor(() => {
@@ -106,7 +106,7 @@ describe('TextMode', () => {
   it('点击清除按钮应该清空所有内容', async () => {
     render(<TextMode />);
 
-    const input = screen.getByPlaceholderText('textInputPlaceholder');
+    const input = screen.getByPlaceholderText('base64Converter:textInputPlaceholder');
     fireEvent.change(input, { target: { value: 'Hello' } });
 
     act(() => {
@@ -128,48 +128,48 @@ describe('TextMode', () => {
   it('解码模式下粘贴图片 data URI 时应该显示切换图像模式的提示', () => {
     render(<TextMode />);
 
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    const input = screen.getByPlaceholderText('base64Converter:base64InputPlaceholder');
     fireEvent.change(input, {
       target: { value: 'data:image/png;base64,iVBORw0KGgo=' },
     });
 
-    expect(screen.getByText('imageDataUriHint')).toBeInTheDocument();
-    expect(screen.getByText('switchToImageMode')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:imageDataUriHint')).toBeInTheDocument();
+    expect(screen.getByText('base64Converter:switchToImageMode')).toBeInTheDocument();
   });
 
   it('粘贴非图片 data URI 时不应该显示图像模式提示', () => {
     render(<TextMode />);
 
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    const input = screen.getByPlaceholderText('base64Converter:base64InputPlaceholder');
     fireEvent.change(input, { target: { value: 'SGVsbG8=' } });
 
-    expect(screen.queryByText('imageDataUriHint')).not.toBeInTheDocument();
+    expect(screen.queryByText('base64Converter:imageDataUriHint')).not.toBeInTheDocument();
   });
 
   it('点击切换图像模式按钮应该调用 onSwitchToImageMode 回调', () => {
     const onSwitch = vi.fn();
     render(<TextMode onSwitchToImageMode={onSwitch} />);
 
-    fireEvent.click(screen.getByText('decode'));
-    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    fireEvent.click(screen.getByText('base64Converter:decode'));
+    const input = screen.getByPlaceholderText('base64Converter:base64InputPlaceholder');
     fireEvent.change(input, {
       target: { value: 'data:image/png;base64,iVBORw0KGgo=' },
     });
 
-    fireEvent.click(screen.getByText('switchToImageMode'));
+    fireEvent.click(screen.getByText('base64Converter:switchToImageMode'));
     expect(onSwitch).toHaveBeenCalledTimes(1);
   });
 
   it('解码模式下对二进制数据应该显示更清晰的错误', async () => {
     render(<TextMode />);
 
-    fireEvent.click(screen.getByText('decode'));
+    fireEvent.click(screen.getByText('base64Converter:decode'));
 
-    const input = screen.getByPlaceholderText('base64InputPlaceholder');
+    const input = screen.getByPlaceholderText('base64Converter:base64InputPlaceholder');
     fireEvent.change(input, { target: { value: 'iVBORw0KGgo=' } });
 
     act(() => {
@@ -177,7 +177,7 @@ describe('TextMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('binaryDataDetected')).toBeInTheDocument();
+      expect(screen.getByText('base64Converter:binaryDataDetected')).toBeInTheDocument();
     });
   });
 });
