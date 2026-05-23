@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import TextInputArea from '@/components/TextInputArea';
-import { useTranslation } from 'react-i18next';
+import { useLazyTranslation } from '@/utils/useLazyTranslation';
 import CopyButton from '@/components/CopyButton';
 import { base64ToText, textToBase64 } from '@/utils/base64Converter';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
@@ -20,7 +20,7 @@ interface TextModeProps {
 }
 
 export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
-  const { t } = useTranslation('base64Converter');
+  const { t } = useLazyTranslation('base64Converter');
 
   // 1. 纯净的核心源状态机：只保留输入源和转换方向
   const [input, setInput] = useState('');
