@@ -11,7 +11,8 @@ export type PageType =
   | 'jsonDiff' // JSON 差异比较工具
   | 'base64Converter' // Base64 转换器工具
   | 'markdownToHtml' // Markdown 转 HTML 工具
-  | 'htmlToMarkdown'; // HTML 转 Markdown 工具
+  | 'htmlToMarkdown' // HTML 转 Markdown 工具
+  | 'rightClickRestorer'; // 右键菜单恢复工具
 
 /**
  * JSON 工具页面子模式类型定义
