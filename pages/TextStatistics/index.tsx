@@ -1,6 +1,4 @@
 import { useCallback, useMemo, useState } from 'react';
-import { FileText } from 'lucide-react';
-import PageHeader from '@/components/PageHeader';
 import TextInputArea from '@/components/TextInputArea';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
@@ -29,14 +27,6 @@ export default function Index() {
 
   return (
     <div className="p-4 w-full space-y-4 animate-in fade-in duration-300">
-      {/* 头部区域 */}
-      <PageHeader
-        title={t('textStatistics:pageTitle')}
-        subtitle={t('textStatistics:pageSubtitle')}
-        icon={<FileText />}
-        iconColor="text-purple-500"
-      />
-
       {/* 文本输入区域 */}
       <TextInputArea
         value={text}
