@@ -27,7 +27,21 @@ describe('useRightClickRestorer', () => {
 
     expect(result.current.domain).toBe('example.com');
     expect(result.current.isUnlocked).toBe(false);
+    expect(result.current.isUnsupported).toBe(false);
     expect(sendMessageToContent).toHaveBeenCalledWith('queryRightClickStatus');
+  });
+
+  it('should mark internal pages as unsupported', async () => {
+    mockTabsQuery.mockResolvedValue([{ url: 'chrome://newtab/' }]);
+    chrome.tabs.query = mockTabsQuery;
+
+    const { result } = renderHook(() => useRightClickRestorer());
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.isUnsupported).toBe(true);
+    expect(result.current.isUnlocked).toBe(false);
+    expect(sendMessageToContent).not.toHaveBeenCalled();
   });
 
   it('should unlock right click', async () => {
@@ -44,6 +58,22 @@ describe('useRightClickRestorer', () => {
 
     expect(result.current.isUnlocked).toBe(true);
     expect(sendMessageToContent).toHaveBeenLastCalledWith('restoreRightClick');
+  });
+
+  it('should not unlock unsupported pages', async () => {
+    mockTabsQuery.mockResolvedValue([{ url: 'chrome://settings/' }]);
+    chrome.tabs.query = mockTabsQuery;
+
+    const { result } = renderHook(() => useRightClickRestorer());
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.unlock();
+    });
+
+    expect(result.current.isUnlocked).toBe(false);
+    expect(sendMessageToContent).not.toHaveBeenCalled();
   });
 
   it('should handle sendMessage failure gracefully', async () => {

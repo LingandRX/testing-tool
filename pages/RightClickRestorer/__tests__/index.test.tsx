@@ -9,6 +9,7 @@ vi.mock('../useRightClickRestorer', () => ({
     domain: 'example.com',
     isLoading: false,
     isUnlocked: false,
+    isUnsupported: false,
     unlock: mockUnlock,
   }),
 }));

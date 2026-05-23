@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Shield, ShieldCheck, MousePointerClick } from 'lucide-react';
+import { Shield, ShieldCheck, MousePointerClick, AlertTriangle } from 'lucide-react';
 import { useRightClickRestorer } from './useRightClickRestorer';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
 
 export default function RightClickRestorerPage() {
   const { t } = useLazyTranslation('rightClickRestorer');
-  const { domain, isLoading, isUnlocked, unlock } = useRightClickRestorer();
+  const { domain, isLoading, isUnlocked, isUnsupported, unlock } = useRightClickRestorer();
 
   if (isLoading) {
     return (
@@ -29,7 +29,12 @@ export default function RightClickRestorerPage() {
             <code className="text-sm bg-muted px-2 py-1 rounded truncate min-w-0 flex-1">
               {domain || '—'}
             </code>
-            {isUnlocked ? (
+            {isUnsupported ? (
+              <Badge variant="destructive" className="gap-1 shrink-0">
+                <AlertTriangle className="h-3 w-3" />
+                {t('rightClickRestorer:unsupported')}
+              </Badge>
+            ) : isUnlocked ? (
               <Badge variant="default" className="gap-1 bg-green-600 hover:bg-green-700 shrink-0">
                 <ShieldCheck className="h-3 w-3" />
                 {t('rightClickRestorer:statusUnlocked')}
@@ -47,18 +52,32 @@ export default function RightClickRestorerPage() {
       {/* Unlock Action */}
       <div className="w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden transition-all">
         <div className="p-4 space-y-3">
-          <p className="text-xs text-muted-foreground">{t('rightClickRestorer:unlockDesc')}</p>
-          <Button
-            className="w-full gap-2"
-            onClick={() => void unlock()}
-            disabled={isUnlocked}
-            variant={isUnlocked ? 'secondary' : 'default'}
-          >
-            <MousePointerClick className="h-4 w-4" />
-            {isUnlocked
-              ? t('rightClickRestorer:alreadyUnlocked')
-              : t('rightClickRestorer:unlockBtn')}
-          </Button>
+          {isUnsupported ? (
+            <>
+              <p className="text-xs text-muted-foreground">
+                {t('rightClickRestorer:unsupportedDesc')}
+              </p>
+              <Button className="w-full gap-2" disabled variant="secondary">
+                <AlertTriangle className="h-4 w-4" />
+                {t('rightClickRestorer:unsupported')}
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-muted-foreground">{t('rightClickRestorer:unlockDesc')}</p>
+              <Button
+                className="w-full gap-2"
+                onClick={() => void unlock()}
+                disabled={isUnlocked}
+                variant={isUnlocked ? 'secondary' : 'default'}
+              >
+                <MousePointerClick className="h-4 w-4" />
+                {isUnlocked
+                  ? t('rightClickRestorer:alreadyUnlocked')
+                  : t('rightClickRestorer:unlockBtn')}
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
