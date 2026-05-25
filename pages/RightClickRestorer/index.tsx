@@ -11,7 +11,7 @@ export default function RightClickRestorerPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full animate-in fade-in duration-200">
+      <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full">
         <span className="text-xs text-muted-foreground mt-2 font-medium tracking-wide">
           {t('rightClickRestorer:loading')}
         </span>
@@ -20,9 +20,9 @@ export default function RightClickRestorerPage() {
   }
 
   return (
-    <div className="p-4 w-full flex flex-col space-y-4 animate-in fade-in duration-300">
+    <div className="p-4 w-full flex flex-col space-y-4">
       {/* Current Domain */}
-      <div className="w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden transition-all">
+      <div className="w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
         <div className="p-4">
           <Label className="text-sm font-medium">{t('rightClickRestorer:currentDomain')}</Label>
           <div className="mt-2 flex items-center justify-between gap-2">
@@ -50,7 +50,7 @@ export default function RightClickRestorerPage() {
       </div>
 
       {/* Unlock Action */}
-      <div className="w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden transition-all">
+      <div className="w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
         <div className="p-4 space-y-3">
           {isUnsupported ? (
             <>
