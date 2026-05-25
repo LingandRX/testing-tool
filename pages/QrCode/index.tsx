@@ -23,7 +23,7 @@ export default function Index() {
          - 彻底剥离破坏流式宽度的 max-w-[400px] 枷锁，开启标准的 w-full 全自适应包裹。
          - 替换为标准的 p-4 呼吸内边距配合 flex flex-col space-y-4，接管系统级重排！
       */}
-      <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none animate-in fade-in duration-300">
+      <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none">
         {/* 流式中央控制切流卡：注入 sm 断点防御，防范单栏状态下发生变形 */}
         <div className="w-full sm:w-fit pt-0.5">
           <SwitchButtonGroup
@@ -40,11 +40,11 @@ export default function Index() {
         */}
         <div className="w-full pt-1.5">
           {qrCode.mode === 'generate' ? (
-            <div className="animate-in fade-in duration-200">
+            <div>
               <GeneratePanel />
             </div>
           ) : (
-            <div className="animate-in fade-in duration-200">
+            <div>
               <ParsePanel />
             </div>
           )}

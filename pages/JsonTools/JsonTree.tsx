@@ -135,7 +135,7 @@ const NodeRow = React.memo(
           <div
             onClick={() => setOverride(expanded ? 'closed' : 'open')}
             className={cn(
-              'group flex items-center gap-1 py-0.5 pr-2 text-xs font-mono select-none cursor-pointer rounded-sm transition-colors w-full h-[22px] leading-relaxed',
+              'group flex items-center gap-1 py-0.5 pr-2 text-xs font-mono select-none cursor-pointer rounded-sm w-full h-[22px] leading-relaxed',
               theme.bg,
               isActive &&
                 'bg-primary/10 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-500 rounded-none ring-0',
@@ -207,7 +207,7 @@ const NodeRow = React.memo(
       <div
         ref={rowRef}
         className={cn(
-          'flex items-center gap-1 py-0.5 pr-2 font-mono text-xs w-full h-[22px] leading-relaxed rounded-sm transition-colors',
+          'flex items-center gap-1 py-0.5 pr-2 font-mono text-xs w-full h-[22px] leading-relaxed rounded-sm',
           theme.bg,
           isActive &&
             'bg-primary/10 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-500 rounded-none ring-0',

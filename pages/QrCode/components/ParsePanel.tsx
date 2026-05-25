@@ -61,7 +61,7 @@ export default function ParsePanel() {
     /* 💡 统一大视觉轴：
        - 追加 p-0.5 微隔离，配合 gap-6 建立与生成面板（GeneratePanel）绝对像素对齐的网格天平。
     */
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full items-stretch select-none p-0.5 animate-in fade-in duration-300">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full items-stretch select-none p-0.5">
       {/* 左翼：图片接收/拖拽/剪贴板上传终端 */}
       <div className="flex flex-col h-full">
         <ImageUploader
@@ -78,7 +78,7 @@ export default function ParsePanel() {
       {/* 右翼：高阶解析出码只读终端 */}
       <div
         className={cn(
-          'border border-border rounded-xl bg-card text-card-foreground shadow-sm flex flex-col p-4 transition-all duration-200',
+          'border border-border rounded-xl bg-card text-card-foreground shadow-sm flex flex-col p-4',
           // 💡 视觉对称增强：加入相同的聚焦变量环联动，使双翼权重达成完美绝对平衡
           'focus-within:ring-1 focus-within:ring-ring focus-within:border-ring',
         )}
