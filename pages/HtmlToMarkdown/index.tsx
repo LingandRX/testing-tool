@@ -49,7 +49,7 @@ export default function HtmlToMarkdownPage() {
       - 彻底清除多余的 container max-w-7xl 这种网页大边距，
       - 统一收拢为我们先前在 Dashboard 页、JSON 工具箱制定的 p-4 space-y-4 标准极客桌面规格。
     */
-    <div className="p-4 w-full flex flex-col space-y-4 select-none animate-in fade-in duration-300">
+    <div className="p-4 w-full flex flex-col space-y-4 select-none">
       <div className="flex flex-col gap-4">
         {/* 工具栏集成区 */}
         <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center bg-secondary/40 rounded-xl border border-border/60 px-1.5 py-1.5 sm:h-12">
@@ -72,7 +72,7 @@ export default function HtmlToMarkdownPage() {
               size="sm"
               onClick={handleDownload}
               disabled={!result.markdown}
-              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm active:scale-95 transition-all"
+              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm"
             >
               <Download className="h-3.5 w-3.5" />
               {t('download')}
@@ -83,7 +83,7 @@ export default function HtmlToMarkdownPage() {
               variant="outline"
               size="sm"
               onClick={handleClear}
-              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm active:scale-95 text-destructive hover:text-destructive hover:bg-destructive/5 dark:hover:bg-destructive/10 border-input/60 transition-all"
+              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm text-destructive hover:text-destructive hover:bg-destructive/5 dark:hover:bg-destructive/10 border-input/60"
             >
               <Trash2 className="h-3.5 w-3.5" />
               {t('clear')}
@@ -95,7 +95,7 @@ export default function HtmlToMarkdownPage() {
           - 💡 核心修复点：将硬编码的 bg-red-50 实色，完美超进化为系统的全自适应透明色变体
         */}
         {error && (
-          <div className="p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-xs font-semibold tracking-wide animate-in shake duration-300">
+          <div className="p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-xs font-semibold tracking-wide">
             {error}
           </div>
         )}
@@ -114,7 +114,7 @@ export default function HtmlToMarkdownPage() {
               - 只要用户用鼠标点击了内部的 textarea，外层整块精巧的圆角大边框会一帧内亮起 primary 系统的深色呼吸发光环，
               - 这种“全外包裹层框聚焦”的体验极大模仿了本地原生 IDE 的硬核专业体验！
             */
-            <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col transition-all duration-200 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring">
+            <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col focus-within:ring-1 focus-within:ring-ring focus-within:border-ring">
               {/* 卡片头部：改用标准的灰色 bg-muted/50 */}
               <div className="flex h-9 items-center justify-between px-4 bg-muted/50 border-b border-border select-none">
                 <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">

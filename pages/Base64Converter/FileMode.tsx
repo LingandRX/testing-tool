@@ -45,7 +45,7 @@ export default function FileMode() {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-4 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col space-y-4">
       <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
         <SwitchButtonGroup
           value={direction}
@@ -79,7 +79,7 @@ export default function FileMode() {
             }}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              'flex flex-col items-center justify-center min-h-[190px] border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all duration-300',
+              'flex flex-col items-center justify-center min-h-[190px] border-2 border-dashed rounded-2xl p-8 cursor-pointer',
               isDragging
                 ? 'border-primary bg-primary/10'
                 : info
@@ -100,7 +100,7 @@ export default function FileMode() {
               <div className="w-9 h-9 border-3 border-primary/20 border-t-primary rounded-full animate-spin" />
             ) : info ? (
               <div className="flex flex-col items-center gap-1.5 text-center">
-                <Upload className="w-8 h-8 text-primary animate-bounce" />
+                <Upload className="w-8 h-8 text-primary" />
                 <span className="text-sm font-bold text-foreground/90 max-w-[280px] truncate">
                   {info.name}
                 </span>

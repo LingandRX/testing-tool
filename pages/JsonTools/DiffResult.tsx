@@ -197,7 +197,7 @@ const UnifiedRow = ({ depth, type, text, active, multiline }: UnifiedRowProps) =
   return (
     <div
       className={cn(
-        'flex items-start w-full font-mono py-0.5 select-text group transition-colors',
+        'flex items-start w-full font-mono py-0.5 select-text group',
         currentTheme.bg,
         currentTheme.text,
         // 4. 高亮定位条：不再使用生硬的蓝圆环，改为现代编辑器的“侧边左高亮带”设计，质感直接拉满

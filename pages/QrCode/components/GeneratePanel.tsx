@@ -10,11 +10,11 @@ export default function GeneratePanel() {
   const { generatorState, setTextToEncode, downloadQrCode, copyQrCode } = useQrCodeContext();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full items-stretch select-none p-0.5 animate-in fade-in duration-300">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full items-stretch select-none p-0.5">
       {/* 左翼：高性能受控输入翼终端 */}
       <div
         className={cn(
-          'border border-border rounded-xl bg-card text-card-foreground shadow-sm flex flex-col p-4 transition-all duration-200',
+          'border border-border rounded-xl bg-card text-card-foreground shadow-sm flex flex-col p-4',
           'focus-within:ring-1 focus-within:ring-ring focus-within:border-ring',
         )}
       >

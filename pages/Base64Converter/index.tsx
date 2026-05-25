@@ -20,7 +20,7 @@ export default function Index() {
   );
 
   return (
-    <div className="p-4 w-full flex flex-col space-y-4 min-h-[520px] select-none animate-in fade-in duration-300">
+    <div className="p-4 w-full flex flex-col space-y-4 min-h-[520px] select-none">
       <SwitchButtonGroup
         value={pageMode}
         options={[

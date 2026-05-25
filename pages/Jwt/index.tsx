@@ -17,9 +17,7 @@ interface SectionProps {
 const Section = ({ title, content, colorClass, bgClass, borderClass }: SectionProps) => {
   const { t } = useLazyTranslation('jwt');
   return (
-    <div
-      className={cn('p-4 rounded-xl border border-solid transition-colors', bgClass, borderClass)}
-    >
+    <div className={cn('p-4 rounded-xl border border-solid', bgClass, borderClass)}>
       <div className="flex justify-between items-center mb-2 select-none">
         <span className={cn('text-xs font-bold tracking-wider uppercase', colorClass)}>
           {title}
@@ -70,7 +68,7 @@ export default function Index() {
   }, [debouncedInput]);
 
   return (
-    <div className="p-4 w-full flex flex-col space-y-4 animate-in fade-in duration-300 select-none">
+    <div className="p-4 w-full flex flex-col space-y-4 select-none">
       <div className="flex flex-col gap-4">
         {/* 输入终端 */}
         <TextInputArea
@@ -90,7 +88,7 @@ export default function Index() {
 
         {/* 解码看板结果展现 */}
         {result && !result.error && (
-          <div className="flex flex-col gap-4 animate-in slide-in-from-bottom-2 duration-300">
+          <div className="flex flex-col gap-4">
             {/* Header 分区：完美致敬 JWT.io 的鲜艳色彩，同时实现黑夜暗化自适应 */}
             <Section
               title={t('jwt:headerTitle')}
@@ -110,7 +108,7 @@ export default function Index() {
             />
 
             {/* Signature 签名区：完全对齐标准的 shadcn 骨架阶度 */}
-            <div className="p-4 rounded-xl border border-border bg-secondary/40 shadow-sm transition-colors">
+            <div className="p-4 rounded-xl border border-border bg-secondary/40 shadow-sm">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold tracking-wider text-muted-foreground/90 uppercase">
                   {t('jwt:signatureTitle')}

@@ -113,7 +113,7 @@ export default function Index() {
   }, []);
 
   return (
-    <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none animate-in fade-in duration-300">
+    <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none">
       <SwitchButtonGroup
         value={pageMode}
         onChange={(v: PageMode) => setPageMode(v)}
@@ -129,7 +129,7 @@ export default function Index() {
       />
 
       {pageMode === 'diff' ? (
-        <div className="flex flex-col space-y-4 animate-in fade-in duration-200">
+        <div className="flex flex-col space-y-4">
           <div className="flex h-10 items-center justify-between px-1.5 bg-secondary/40 rounded-xl border border-border/60">
             <SwitchButtonGroup
               value={viewMode}
