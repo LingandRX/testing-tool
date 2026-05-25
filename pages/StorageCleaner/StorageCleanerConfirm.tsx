@@ -42,7 +42,6 @@ export function StorageCleanerConfirm({
       <DialogContent
         className={cn(
           'w-[90%] max-w-[340px] p-6 gap-0 rounded-2xl overflow-hidden shadow-xl border border-border bg-card text-card-foreground',
-          'animate-in fade-in-50 zoom-in-95 duration-200',
         )}
       >
         {/* 头部标题区域 */}
@@ -72,7 +71,7 @@ export function StorageCleanerConfirm({
           </div>
 
           {/* 风险警告横幅 */}
-          <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-destructive/5 border border-dashed border-destructive/20 w-full max-w-[240px] animate-pulse [animation-duration:3s]">
+          <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-destructive/5 border border-dashed border-destructive/20 w-full max-w-[240px]">
             <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" />
             <span className="text-[11px] font-bold text-destructive leading-none tracking-tight">
               {t('storageCleaner:irreversible')}

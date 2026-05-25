@@ -29,7 +29,7 @@ export default function OptionItem({
       // 3. 跨越级交互升级：将外部容器升级为一个高度敏感的可点击 Tab 热区
       onClick={onChange}
       className={cn(
-        'flex justify-between items-center py-2.5 px-3.5 rounded-xl border cursor-pointer select-none transition-all duration-200',
+        'flex justify-between items-center py-2.5 px-3.5 rounded-xl border cursor-pointer select-none',
         // 4. 彻底抛弃硬编码黄底：
         // - 选中时：使用 bg-primary/5 (系统主色超淡叠加) 配合标准 border-primary/30。
         // - 未选中时：保持透明 border-transparent，悬停呈现 bg-muted。
@@ -45,7 +45,7 @@ export default function OptionItem({
       <div className="flex-1 min-w-0 mr-4">
         <span
           className={cn(
-            'block text-xs font-semibold leading-tight truncate transition-colors',
+            'block text-xs font-semibold leading-tight truncate',
             checked ? 'text-foreground font-bold' : 'text-foreground/80',
           )}
         >
