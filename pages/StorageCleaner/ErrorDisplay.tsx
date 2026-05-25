@@ -13,7 +13,7 @@ export default function ErrorDisplay({ error, className, ...props }: ErrorDispla
     // 1. 精简层级：单层外壳直接搞定居中、响应式高度与外部类名扩展
     <div
       className={cn(
-        'flex flex-col items-center justify-center py-8 min-h-[240px] sm:min-h-[360px] p-4 text-center animate-in fade-in zoom-in-95 duration-200',
+        'flex flex-col items-center justify-center py-8 min-h-[240px] sm:min-h-[360px] p-4 text-center',
         className,
       )}
       {...props}
@@ -25,7 +25,7 @@ export default function ErrorDisplay({ error, className, ...props }: ErrorDispla
       */}
       <div className="w-full max-w-xs flex flex-col items-center justify-center rounded-xl p-5 border border-destructive/20 bg-destructive/5 shadow-sm">
         {/* 3. 图标与主要错误信息全面对接 text-destructive 语义色 */}
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10 text-destructive mb-3.5 shrink-0 animate-bounce [animation-duration:2s]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10 text-destructive mb-3.5 shrink-0">
           <AlertCircle className="h-5 w-5" />
         </div>
 
