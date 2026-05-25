@@ -46,7 +46,6 @@ export default function ToolCard({
       */
       className={cn(
         'group relative rounded-xl border border-border/70 bg-card text-card-foreground p-4 h-auto flex flex-col items-stretch justify-start gap-3 shadow-sm select-none box-border',
-        'transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
         'hover:bg-muted/30',
         'hover:border-[rgba(var(--tool-color),0.45)]',
         'hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)] dark:hover:shadow-[0_8px_30px_-10px_rgba(var(--tool-color),0.25)]',
@@ -60,7 +59,7 @@ export default function ToolCard({
           {/* 左侧圆形图标容器 */}
           <div
             className={cn(
-              'flex items-center justify-center w-10 h-10 rounded-xl shrink-0 transition-colors duration-300',
+              'flex items-center justify-center w-10 h-10 rounded-xl shrink-0',
               'bg-[rgba(var(--tool-color),0.08)] dark:bg-[rgba(var(--tool-color),0.12)]',
               'text-[rgb(var(--tool-color))]',
             )}
@@ -82,7 +81,7 @@ export default function ToolCard({
         </div>
 
         {/* 右侧指示小箭头 */}
-        <div className="text-muted-foreground/40 group-hover:text-[rgb(var(--tool-color))] p-1 shrink-0 transition-all duration-300 ease-in-out group-hover:translate-x-0.5">
+        <div className="text-muted-foreground/40 group-hover:text-[rgb(var(--tool-color))] p-1 shrink-0 group-hover:translate-x-0.5">
           <ChevronRight className="h-4 w-4" />
         </div>
 

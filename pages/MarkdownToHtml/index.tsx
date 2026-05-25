@@ -175,7 +175,7 @@ export default function MarkdownToHtmlPage() {
   const showPreview = previewMode !== 'html';
 
   return (
-    <div className="p-4 w-full flex flex-col space-y-4 select-none animate-in fade-in duration-300">
+    <div className="p-4 w-full flex flex-col space-y-4 select-none">
       <div className="flex flex-col space-y-4">
         {/* 工具集成控制中枢 */}
         <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center bg-secondary/40 rounded-xl border border-border/60 px-1.5 py-1.5 sm:h-12">
@@ -196,7 +196,7 @@ export default function MarkdownToHtmlPage() {
               variant="outline"
               size="sm"
               onClick={handleClear}
-              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm active:scale-95 text-destructive hover:text-destructive hover:bg-destructive/5 dark:hover:bg-destructive/10 border-input/60 transition-all"
+              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm text-destructive hover:text-destructive hover:bg-destructive/5 dark:hover:bg-destructive/10 border-input/60"
             >
               <Trash2 className="h-3.5 w-3.5" />
               {t('clear')}
@@ -206,7 +206,7 @@ export default function MarkdownToHtmlPage() {
               size="sm"
               onClick={handlePrint}
               disabled={!result.html}
-              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm active:scale-95 transition-all"
+              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm"
             >
               <Printer className="h-3.5 w-3.5" />
               {t('print')}
@@ -216,7 +216,7 @@ export default function MarkdownToHtmlPage() {
               size="sm"
               onClick={handleDownload}
               disabled={!result.html}
-              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm active:scale-95 transition-all"
+              className="h-8 rounded-md font-medium text-xs gap-1.5 shadow-sm"
             >
               <Download className="h-3.5 w-3.5" />
               {t('download')}
@@ -228,7 +228,7 @@ export default function MarkdownToHtmlPage() {
         {error && (
           <div
             role="alert"
-            className="p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-xs font-semibold tracking-wide animate-in shake duration-300"
+            className="p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-xs font-semibold tracking-wide"
           >
             {error}
           </div>
@@ -243,7 +243,7 @@ export default function MarkdownToHtmlPage() {
         >
           {/* Markdown 输入翼终端 */}
           {showInput && (
-            <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col transition-all duration-200 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring animate-in fade-in">
+            <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col focus-within:ring-1 focus-within:ring-ring focus-within:border-ring">
               <div className="flex h-9 items-center justify-between px-4 bg-muted/50 border-b border-border select-none">
                 <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
                   {t('inputLabel')}
@@ -263,7 +263,7 @@ export default function MarkdownToHtmlPage() {
 
           {/* 实时 HTML/Iframe 预览翼终端 */}
           {showPreview && (
-            <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col animate-in fade-in">
+            <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col">
               <div className="flex h-9 items-center justify-between px-4 bg-muted/50 border-b border-border select-none">
                 <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
                   {(previewMode as string) === 'html' ? t('htmlOutputLabel') : t('previewLabel')}

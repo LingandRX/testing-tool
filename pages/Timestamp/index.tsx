@@ -70,17 +70,13 @@ export default function Index() {
                   value={input}
                   onChange={(e: { target: { value: string } }) => setInput(e.target.value)}
                   className={cn(
-                    'font-mono font-semibold h-10 shadow-sm placeholder:text-muted-foreground/60 focus:bg-background transition-all',
+                    'font-mono font-semibold h-10 shadow-sm placeholder:text-muted-foreground/60 focus:bg-background',
                     error && 'border-destructive focus-visible:ring-destructive',
                   )}
                 />
 
                 {/* 错误自愈提示 */}
-                {error && (
-                  <p className="text-destructive text-xs font-medium px-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
-                    {error}
-                  </p>
-                )}
+                {error && <p className="text-destructive text-xs font-medium px-0.5">{error}</p>}
               </div>
 
               {/* 核心配置群：单位切换 + 时区选择紧凑横排 */}
