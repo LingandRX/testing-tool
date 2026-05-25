@@ -46,7 +46,7 @@ export default function StorageOptionsGrid({
   return (
     <div
       className={cn(
-        'w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden transition-all',
+        'w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden',
         className,
       )}
       {...props}
@@ -75,7 +75,7 @@ export default function StorageOptionsGrid({
       */}
       <div
         onClick={handleToggleAll}
-        className="border-t border-border flex justify-between items-center px-4 py-2.5 bg-muted/20 hover:bg-muted/50 transition-colors cursor-pointer select-none"
+        className="border-t border-border flex justify-between items-center px-4 py-2.5 bg-muted/20 hover:bg-muted/50 cursor-pointer select-none"
       >
         <Label className="text-xs font-bold text-muted-foreground/90 cursor-pointer">
           {t('storageCleaner:selectAll')}
