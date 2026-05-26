@@ -30,7 +30,7 @@ export default function DiffNavigator({
     return (
       <div
         className={cn(
-          'flex items-center justify-center gap-3 px-4 py-2 rounded-lg border border-border bg-muted/30 select-none animate-in fade-in duration-200',
+          'flex items-center justify-center gap-3 px-4 py-2 rounded-lg border border-border bg-muted/30 select-none',
           className,
         )}
         {...props}
@@ -60,9 +60,9 @@ export default function DiffNavigator({
         aria-label={t('jsonDiff:previousDiff')}
         onClick={onPrev}
         className={cn(
-          'p-1 rounded-md text-muted-foreground transition-all hover:bg-accent hover:text-foreground',
+          'p-1 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground',
           'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-          'disabled:pointer-events-none disabled:opacity-30 active:scale-95', // 4. 边界拦截：触顶时优雅淡化并锁死点击
+          'disabled:pointer-events-none disabled:opacity-30', // 4. 边界拦截：触顶时优雅淡化并锁死点击
         )}
       >
         <ChevronLeft className="h-4 w-4" />
@@ -81,9 +81,9 @@ export default function DiffNavigator({
         aria-label={t('jsonDiff:nextDiff')}
         onClick={onNext}
         className={cn(
-          'p-1 rounded-md text-muted-foreground transition-all hover:bg-accent hover:text-foreground',
+          'p-1 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground',
           'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-          'disabled:pointer-events-none disabled:opacity-30 active:scale-95', // 4. 边界拦截：触底时优雅淡化并锁死点击
+          'disabled:pointer-events-none disabled:opacity-30', // 4. 边界拦截：触底时优雅淡化并锁死点击
         )}
       >
         <ChevronRight className="h-4 w-4" />

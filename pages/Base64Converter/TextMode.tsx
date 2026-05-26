@@ -93,7 +93,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-4 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col space-y-4">
       {/* 受控方向切流中枢 */}
       <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
         <SwitchButtonGroup
@@ -125,7 +125,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
         - 完美向全站 shadcn 暗黑生态看齐，采用标准的 bg-primary/10 混合变体。
       */}
       {showImageHint && (
-        <div className="flex items-center justify-between p-3.5 rounded-xl bg-primary/10 border border-primary/20 animate-in slide-in-from-top-1 duration-200">
+        <div className="flex items-center justify-between p-3.5 rounded-xl bg-primary/10 border border-primary/20">
           <span className="text-xs font-semibold text-primary tracking-tight">
             {t('imageDataUriHint')}
           </span>
@@ -134,7 +134,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
             variant="ghost"
             size="sm"
             onClick={onSwitchToImageMode}
-            className="h-7 rounded-md text-xs font-bold text-primary hover:text-primary hover:bg-primary/20 dark:hover:bg-primary/10 transition-colors px-2.5"
+            className="h-7 rounded-md text-xs font-bold text-primary hover:text-primary hover:bg-primary/20 dark:hover:bg-primary/10 px-2.5"
           >
             {t('switchToImageMode')}
           </Button>
@@ -143,7 +143,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
 
       {/* 5. 编码/解码核心数据承载流卡片 */}
       {output && (
-        <div className="p-4 rounded-2xl bg-card border border-border shadow-sm flex flex-col space-y-3 animate-in slide-in-from-bottom-2 duration-300">
+        <div className="p-4 rounded-2xl bg-card border border-border shadow-sm flex flex-col space-y-3">
           <div className="flex justify-between items-center select-none">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
               {outputLabel}

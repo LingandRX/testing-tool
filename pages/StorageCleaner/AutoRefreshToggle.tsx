@@ -48,7 +48,7 @@ export default function AutoRefreshToggle({
   return (
     <div
       className={cn(
-        'w-full p-4 rounded-xl border border-border bg-card text-card-foreground shadow-sm transition-all focus-within:ring-1 focus-within:ring-ring flex justify-between items-center',
+        'w-full p-4 rounded-xl border border-border bg-card text-card-foreground shadow-sm flex justify-between items-center',
         className,
       )}
       {...props}

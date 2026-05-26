@@ -16,7 +16,7 @@ export default function DashboardPage() {
     <div
       className={cn(
         'grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(290px,1fr))] auto-rows-auto gap-3.5 p-3.5 w-full h-auto',
-        'animate-in fade-in duration-300 select-none',
+        'select-none',
       )}
     >
       {pageOrder.map((key) => {

@@ -62,7 +62,7 @@ export default function JsonFormatSection() {
       : null;
 
   return (
-    <div className="w-full flex flex-col gap-4 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col gap-4">
       {/* 工具控制栏 */}
       <div className="flex h-10 items-center justify-between px-1.5 bg-secondary/40 rounded-xl border border-border/60">
         <div className="flex gap-4 items-center w-full">
@@ -95,7 +95,7 @@ export default function JsonFormatSection() {
             />
             <Label
               htmlFor="sort-keys-checkbox"
-              className="text-xs font-bold text-foreground/80 cursor-pointer tracking-tight group-hover:text-foreground transition-colors"
+              className="text-xs font-bold text-foreground/80 cursor-pointer tracking-tight group-hover:text-foreground"
             >
               {t('jsonFormat:sortKeys')}
             </Label>
@@ -118,7 +118,7 @@ export default function JsonFormatSection() {
 
       {/* 格式化结果流面板展示 */}
       {result && result.formatted ? (
-        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden animate-in slide-in-from-bottom-2 duration-300">
+        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
           {/* 结果栏头部 */}
           <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
             <div className="flex gap-4 items-center">
