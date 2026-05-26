@@ -17,10 +17,7 @@ export default function CleaningResult({ result, className, ...props }: Cleaning
   const isSuccess = result.success;
 
   return (
-    <div
-      className={cn('animate-in fade-in slide-in-from-top-1 duration-200 w-full', className)}
-      {...props}
-    >
+    <div className={cn('w-full', className)} {...props}>
       {/* 2. 彻底重构容器类名结构：
         - 成功状态：采用 Tailwind 官方推荐的 emerald 体系，利用 /10 (10% 透明度) 和 /20 (边框)。
         - 失败状态：完全放权给标准的 border-destructive/20 和 bg-destructive/5。

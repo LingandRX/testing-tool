@@ -80,7 +80,7 @@ const LiveClock = React.memo(({ unit, onUseNow, className, ...props }: LiveClock
         type="button"
         onClick={handleUseNow}
         title={t('timestamp:useNowTooltip')}
-        className="flex h-7 w-7 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-all hover:bg-accent hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="flex h-7 w-7 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
         <Clock className="w-3.5 h-3.5" />
       </button>

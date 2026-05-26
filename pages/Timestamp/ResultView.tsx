@@ -50,7 +50,7 @@ const ResultView = React.memo(
       return (
         <div
           className={cn(
-            'flex-1 flex items-center justify-center text-sm font-medium border border-dashed border-border/60 rounded-xl py-12 px-4 text-center text-muted-foreground bg-muted/20 min-h-[320px] animate-in fade-in duration-200',
+            'flex-1 flex items-center justify-center text-sm font-medium border border-dashed border-border/60 rounded-xl py-12 px-4 text-center text-muted-foreground bg-muted/20 min-h-[320px]',
             className,
           )}
           {...props}
@@ -61,13 +61,7 @@ const ResultView = React.memo(
     }
 
     return (
-      <div
-        className={cn(
-          'animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-col w-full',
-          className,
-        )}
-        {...props}
-      >
+      <div className={cn('flex flex-col w-full', className)} {...props}>
         {/* 顶部小标签 */}
         <span className="block text-muted-foreground/90 mb-2.5 text-xs font-semibold tracking-wider uppercase">
           {t('timestamp:resultLabel')}
@@ -78,7 +72,7 @@ const ResultView = React.memo(
           对齐 shadcn 官方卡片风格，使用 bg-card、border-border 构筑多层级阴影。
           核心数值直接拉粗为 text-foreground (在黑夜模式下会自动转为大气的纯白，完美避开刺眼强光)
         */}
-        <div className="bg-card text-card-foreground border border-border p-4 sm:p-5 rounded-xl relative mb-3.5 shadow-sm flex justify-between items-center gap-4 focus-within:ring-1 focus-within:ring-ring transition-all">
+        <div className="bg-card text-card-foreground border border-border p-4 sm:p-5 rounded-xl relative mb-3.5 shadow-sm flex justify-between items-center gap-4 focus-within:ring-1 focus-within:ring-ring">
           <span className="font-mono font-extrabold text-foreground break-all text-xl sm:text-2xl tracking-tight leading-tight select-all tabular-nums">
             {result}
           </span>

@@ -74,10 +74,7 @@ export default function JsonConvertSection({
       : null;
 
   return (
-    <div
-      className={cn('w-full flex flex-col gap-4 animate-in fade-in duration-300', className)}
-      {...props}
-    >
+    <div className={cn('w-full flex flex-col gap-4', className)} {...props}>
       {/* 输入区 */}
       <TextInputArea
         placeholder={t(`jsonFormat:${pk}InputPlaceholder`)}
@@ -93,7 +90,7 @@ export default function JsonConvertSection({
 
       {/* 4. 结果展示或状态引导卡片区 */}
       {result && result.output ? (
-        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden animate-in slide-in-from-bottom-2 duration-300">
+        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
           {/* 结果栏精致头部 */}
           <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
             <div className="flex gap-4 items-center">

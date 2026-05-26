@@ -52,7 +52,7 @@ export default function ImageMode() {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-4 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col space-y-4">
       <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
         <SwitchButtonGroup
           value={direction}
@@ -82,7 +82,7 @@ export default function ImageMode() {
             }}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              'flex flex-col items-center justify-center min-h-[190px] border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all duration-300',
+              'flex flex-col items-center justify-center min-h-[190px] border-2 border-dashed rounded-2xl p-8 cursor-pointer',
               isDragging
                 ? 'border-primary bg-primary/10'
                 : info
@@ -103,7 +103,7 @@ export default function ImageMode() {
             {isLoading ? (
               <div className="w-9 h-9 border-3 border-primary/20 border-t-primary rounded-full animate-spin" />
             ) : info ? (
-              <div className="flex flex-col items-center gap-1.5 text-center animate-in fade-in duration-200 w-full">
+              <div className="flex flex-col items-center gap-1.5 text-center w-full">
                 {result && (
                   <div className="relative p-1 border border-border bg-background rounded-lg shadow-sm mb-1 max-w-[180px] overflow-hidden">
                     <img
@@ -233,7 +233,7 @@ export default function ImageMode() {
             onClear={resetAll}
           />
           {decoded && (
-            <div className="animate-in slide-in-from-bottom-2 duration-300">
+            <div>
               <DecodeResultPaper
                 title={t('decodedImageOutput')}
                 mimeType={decoded.mimeType}
