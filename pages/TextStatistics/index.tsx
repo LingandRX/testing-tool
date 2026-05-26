@@ -26,7 +26,7 @@ export default function Index() {
   ];
 
   return (
-    <div className="p-4 w-full space-y-4 animate-in fade-in duration-300">
+    <div className="p-4 w-full space-y-4">
       {/* 文本输入区域 */}
       <TextInputArea
         value={text}
@@ -45,7 +45,6 @@ export default function Index() {
             key={item.label}
             className={cn(
               'flex flex-col justify-center items-center p-4 text-center rounded-xl border border-border bg-card shadow-sm text-card-foreground',
-              'transition-all duration-200 ease-out',
               'hover:-translate-y-0.5 hover:shadow-md hover:border-primary/50 focus-within:ring-1 focus-within:ring-ring',
             )}
           >

@@ -57,7 +57,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
   };
 
   return (
-    <div className="w-full flex flex-col space-y-4 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col space-y-4">
       <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
         <SwitchButtonGroup
           value={direction}
@@ -86,7 +86,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
             }}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              'flex flex-col items-center justify-center min-h-[190px] border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all duration-300',
+              'flex flex-col items-center justify-center min-h-[190px] border-2 border-dashed rounded-2xl p-8 cursor-pointer',
               isDragging
                 ? 'border-primary bg-primary/10'
                 : info
@@ -107,7 +107,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
             {isLoading ? (
               <div className="w-9 h-9 border-3 border-primary/20 border-t-primary rounded-full animate-spin" />
             ) : info ? (
-              <div className="flex flex-col items-center gap-1.5 text-center w-full animate-in fade-in duration-200">
+              <div className="flex flex-col items-center gap-1.5 text-center w-full">
                 {mode === 'image' && result && (
                   <div className="relative p-1 border border-border bg-background rounded-lg shadow-sm mb-1 max-w-[180px] overflow-hidden">
                     <img
@@ -117,9 +117,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                     />
                   </div>
                 )}
-                <Upload
-                  className={cn('w-8 h-8 text-primary', mode === 'file' && 'animate-bounce')}
-                />
+                <Upload className={cn('w-8 h-8 text-primary')} />
                 <span className="text-sm font-bold text-foreground/90 max-w-[280px] truncate">
                   {info.name}
                 </span>

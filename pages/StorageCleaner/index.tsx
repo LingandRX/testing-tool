@@ -33,8 +33,8 @@ export default function Index() {
 
   if (isInitializing) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full animate-in fade-in duration-200">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/80" />
+      <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full">
+        <Loader2 className="h-6 w-6 text-muted-foreground/80" />
         <span className="text-xs text-muted-foreground mt-2 font-medium tracking-wide">
           正在读取站点数据...
         </span>
@@ -47,7 +47,7 @@ export default function Index() {
   }
 
   return (
-    <div className="p-4 w-full flex flex-col space-y-3.5 animate-in fade-in duration-300">
+    <div className="p-4 w-full flex flex-col space-y-3.5">
       <StorageOptionsGrid
         options={options}
         sizes={sizes}
@@ -67,7 +67,7 @@ export default function Index() {
         size="default"
         onClick={() => setShowConfirm(true)}
         disabled={isButtonDisabled}
-        className="w-full h-10 font-bold shadow-sm text-sm tracking-wide transition-all active:scale-[0.99]"
+        className="w-full h-10 font-bold shadow-sm text-sm tracking-wide"
       >
         {loading ? (
           <>
