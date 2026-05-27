@@ -15,7 +15,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   text,
   tooltip,
   variant = 'ghost',
-  size = 'sm',
+  size = 'icon',
   className,
   ...props
 }) => {
@@ -55,7 +55,6 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       title={tooltip ?? t('buttons.copy')}
       className={cn(
         buttonVariants({ variant, size }),
-        'h-8 w-8',
         copied &&
           'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10',
         className,

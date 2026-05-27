@@ -88,8 +88,7 @@ const LiveClock = React.memo(({ unit, onUseNow, className, ...props }: LiveClock
       <CopyButton
         text={currentDisplay.text}
         tooltip={t('timestamp:copyTsTooltip')}
-        size="sm"
-        className="h-7 w-7 rounded-md border" // 移除了硬编码的颜色配置表，完全交由组件的内置 Class 渲染
+        className="h-7 w-7 rounded-md border"
       />
     </div>
   );
