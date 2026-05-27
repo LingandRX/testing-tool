@@ -37,7 +37,7 @@ const PREVIEW_STYLES = `
   .markdown-body h1 { border-bottom: 1px solid var(--md-border); padding-bottom: 0.3em; font-size: 1.6em; }
   .markdown-body h2 { border-bottom: 1px solid var(--md-border); padding-bottom: 0.3em; font-size: 1.35em; }
   .markdown-body p { margin-top: 0; margin-bottom: 16px; }
-  .markdown-body a { color: #3b82f6; text-decoration: none; }
+  .markdown-body a { color: var(--md-link-color); text-decoration: none; }
   .markdown-body a:hover { text-decoration: underline; }
   .markdown-body code {
     background-color: var(--md-code-bg);
@@ -110,6 +110,7 @@ export default function MarkdownToHtmlPage() {
           --md-pre-bg: rgba(255,255,255,0.04); 
           --md-muted: #8b949e;
           --md-quote-line: rgba(255,255,255,0.25);
+          --md-link-color: #58a6ff;
         }`
       : `:root { 
           --md-bg: #ffffff;
@@ -119,6 +120,7 @@ export default function MarkdownToHtmlPage() {
           --md-pre-bg: rgba(128,128,128,0.03); 
           --md-muted: #4b5563;
           --md-quote-line: rgba(128,128,128,0.3);
+          --md-link-color: #3b82f6;
         }`;
 
     // 💡 3. 核心大清洗：将全局基础树（html, body）与派生样式完全独立硬编码，杜绝任何语法踩踏
