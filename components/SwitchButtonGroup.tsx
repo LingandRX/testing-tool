@@ -34,14 +34,10 @@ export default function SwitchButtonGroup<T extends string | number = string>({
     large: 'text-base h-11 px-4 py-2 rounded-lg',
   };
 
-  const containerPadding = size === 'large' ? 'p-1' : 'p-1';
-
   return (
     <div
       className={cn(
-        // 将默认布局设计得更为通用（去掉一刀切的 mb-4，由外部控制布局空间）
-        'inline-flex w-full items-center justify-center rounded-lg bg-muted text-muted-foreground',
-        containerPadding,
+        'inline-flex w-full items-center justify-center rounded-lg bg-muted text-muted-foreground p-1',
         className,
       )}
       {...props}

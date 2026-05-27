@@ -182,9 +182,7 @@ export default function Index() {
           ) : (
             <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[140px]">
               <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[260px] leading-relaxed">
-                {leftError || rightError
-                  ? '请修正上方 JSON 的语法错误以开启实时流式比对'
-                  : t('jsonDiff:emptyHint')}
+                {leftError || rightError ? t('jsonDiff:fixErrorHint') : t('jsonDiff:emptyHint')}
               </p>
             </div>
           )}

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Copy, Download } from 'lucide-react';
 import { useLazyTranslation } from '@/utils/useLazyTranslation';
-import { cn } from '@/lib/utils'; // 1. 引入标准的 shadcn 工具函数
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 // 继承原生 HTML Div 属性，方便外部无缝扩充类名或监听事件
 interface QrCodePreviewProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -59,27 +60,16 @@ const QrCodePreview = ({
           />
         </div>
 
-        {/* 3. 按钮群全面向 shadcn 官方 Button 视觉规范对齐 */}
         <div className="flex w-full gap-2 mt-5">
-          {/* 下载按钮：使用标准的次要按钮风格 (Outline) */}
-          <button
-            type="button"
-            onClick={onDownload}
-            className="flex-1 inline-flex h-9 items-center justify-center gap-2 px-3 text-sm font-medium rounded-md border border-input bg-background shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
+          <Button variant="outline" size="sm" onClick={onDownload} className="flex-1">
             <Download className="w-4 h-4 text-muted-foreground" />
             <span className="truncate">{t('qrCode:downloadButton')}</span>
-          </button>
+          </Button>
 
-          {/* 复制按钮：使用标准的主要行动按钮风格 (Default) */}
-          <button
-            type="button"
-            onClick={onCopy}
-            className="flex-1 inline-flex h-9 items-center justify-center gap-2 px-3 text-sm font-medium rounded-md bg-primary text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
+          <Button variant="default" size="sm" onClick={onCopy} className="flex-1">
             <Copy className="w-4 h-4" />
             <span className="truncate">{t('qrCode:copyQrButton')}</span>
-          </button>
+          </Button>
         </div>
       </div>
     </div>
