@@ -6,6 +6,10 @@
  * 2. 通过 useSnackbarState Hook 使用：在组件内部自动管理状态
  * 3. 通过 SnackbarProvider 和 useSnackbar Hook 使用：全局单例模式
  *
+ * NOTE: 项目同时使用 sonner 的 toast 进行简单的一次性提示。
+ * 本组件适用于需要 severity 级别、Provider 上下文、自定义定位等高级场景。
+ * 简单场景（如复制成功、操作提示）优先使用 `import { toast } from 'sonner'`。
+ *
  * @module GlobalSnackbar
  * @version 1.1.0
  *
