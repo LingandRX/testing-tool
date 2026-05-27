@@ -183,19 +183,19 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     onChange?.('');
     setError('');
     internalRef.current?.focus();
-    toast.success('已清空内容');
+    toast.success(t('textInputArea.cleared'));
     onClear?.();
-  }, [isControlled, onChange, onClear]);
+  }, [isControlled, onChange, onClear, t]);
 
   const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(value);
-      toast.success('复制成功');
+      toast.success(t('messages.copySuccess'));
     } catch {
-      setError('复制失败');
-      toast.error('复制失败');
+      setError(t('messages.copyError'));
+      toast.error(t('messages.copyError'));
     }
-  }, [value]);
+  }, [value, t]);
 
   const handleAction = useCallback(
     (action: ToolbarAction) => {
