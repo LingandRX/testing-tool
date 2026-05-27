@@ -21,6 +21,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
+  withTranslation: () => (Component: any) => Component,
 }));
 
 describe('Options App', () => {
