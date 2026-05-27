@@ -4,6 +4,7 @@ import TextMode from '../TextMode';
 
 // Mock CopyButton
 vi.mock('@/components/CopyButton', () => ({
+  CopyButton: ({ text }: { text: string }) => <button data-testid="copy-button">{text}</button>,
   default: ({ text }: { text: string }) => <button data-testid="copy-button">{text}</button>,
 }));
 
@@ -39,7 +40,7 @@ describe('TextMode', () => {
     await waitFor(() => {
       expect(screen.getByText('base64Converter:base64Output')).toBeInTheDocument();
     });
-    expect(screen.getByTestId('copy-button')).toHaveTextContent('SGVsbG8=');
+    expect(screen.getByRole('button', { name: 'SGVsbG8=' })).toBeInTheDocument();
   });
 
   it('应该解码 Base64 文本', async () => {
@@ -58,7 +59,7 @@ describe('TextMode', () => {
     await waitFor(() => {
       expect(screen.getByText('base64Converter:textOutput')).toBeInTheDocument();
     });
-    expect(screen.getByTestId('copy-button')).toHaveTextContent('Hello');
+    expect(screen.getByRole('button', { name: 'Hello' })).toBeInTheDocument();
   });
 
   it('应该对无效 Base64 显示错误', async () => {
@@ -91,7 +92,7 @@ describe('TextMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('copy-button')).toHaveTextContent('SGVsbG8=');
+      expect(screen.getByRole('button', { name: 'SGVsbG8=' })).toBeInTheDocument();
     });
 
     // 切换方向
@@ -99,7 +100,7 @@ describe('TextMode', () => {
 
     // 输出应该被清除
     await waitFor(() => {
-      expect(screen.queryByTestId('copy-button')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'SGVsbG8=' })).not.toBeInTheDocument();
     });
   });
 
@@ -114,13 +115,13 @@ describe('TextMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('copy-button')).toHaveTextContent('SGVsbG8=');
+      expect(screen.getByRole('button', { name: 'SGVsbG8=' })).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'textInputArea.clear' }));
 
     await waitFor(() => {
-      expect(screen.queryByTestId('copy-button')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'SGVsbG8=' })).not.toBeInTheDocument();
       expect(input).toHaveValue('');
     });
   });
