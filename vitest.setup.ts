@@ -80,7 +80,11 @@ vi.mock('@/components/CopyButton', () => ({
         type: 'button',
         onClick: async (e: React.MouseEvent) => {
           if (text) {
-            await navigator.clipboard.writeText(text);
+            try {
+              await navigator.clipboard.writeText(text);
+            } catch {
+              // 与真实 CopyButton 行为一致：失败时静默处理
+            }
           }
           onClick?.(e);
         },
