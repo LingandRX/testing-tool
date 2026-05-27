@@ -1,6 +1,7 @@
 import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
 import { Suspense, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
 import PageSkeleton from '@/components/PageSkeleton';
 import { cn } from '@/lib/utils'; // 1. 引入标准的 shadcn 工具函数
@@ -8,6 +9,7 @@ import { AlertTriangle } from 'lucide-react'; // 用于标准的 404 异常展�
 
 export default function RouterContainer() {
   const { currentPage, isLoaded } = useRouter();
+  const { t } = useTranslation('common');
 
   // 2. 稳定的动态动画类名映射
   const animationClass = useMemo(() => {
@@ -50,9 +52,9 @@ export default function RouterContainer() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive mb-4">
                 <AlertTriangle className="h-6 w-6" />
               </div>
-              <h3 className="text-sm font-semibold text-foreground">页面未找到</h3>
+              <h3 className="text-sm font-semibold text-foreground">{t('router.notFound')}</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
-                该功能在当前运行环境（{entryPointType}）下不可用或已被移除。
+                {t('router.notFoundDescription', { entryPointType })}
               </p>
             </div>
           )}
