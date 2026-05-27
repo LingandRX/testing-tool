@@ -15,6 +15,7 @@ import { useRouter } from '@/providers/RouterProvider';
 import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
+import { openExtensionPage } from '@/utils/chromeTabs';
 import { useTranslation } from 'react-i18next';
 import { normalizeLanguage, SUPPORTED_LANGUAGES } from '@/i18n';
 import { cn } from '@/lib/utils'; // 1. 引入 shadcn 核心工具函数
@@ -125,17 +126,19 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (selectedIndex >= 0) {
+      if (selectedIndex >= 0 && selectedIndex < totalItems) {
         if (searchQuery.trim()) {
           handleSelectFeature(searchResults[selectedIndex]);
         } else {
           const selectedQuery = displayedHistory[selectedIndex];
-          setSearchQuery(selectedQuery);
-          setSelectedIndex(-1);
-          const matched = FEATURES.find(
-            (f) => f.key !== 'dashboard' && t(f.labelKey) === selectedQuery,
-          );
-          if (matched) handleSelectFeature(matched);
+          if (selectedQuery) {
+            setSearchQuery(selectedQuery);
+            setSelectedIndex(-1);
+            const matched = FEATURES.find(
+              (f) => f.key !== 'dashboard' && t(f.labelKey) === selectedQuery,
+            );
+            if (matched) handleSelectFeature(matched);
+          }
         }
       } else if (searchQuery.trim() && searchResults.length > 0) {
         handleSelectFeature(searchResults[0]);
