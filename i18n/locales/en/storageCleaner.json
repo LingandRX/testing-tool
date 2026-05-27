@@ -2,6 +2,7 @@
   "pageTitle": "Storage Cleaner",
   "pageSubtitle": "Clear cache, cookies, and local storage",
   "loading": "Loading...",
+  "initializing": "Reading site data...",
   "occupied": "Occupied {{size}}",
   "cleaning": "Cleaning...",
   "cleanNow": "Clean Now",

@@ -106,14 +106,12 @@ JSON 工具集：差异比较、格式化、YAML/TOML/Minify 转换。
 
 Base64 编解码工具，支持文本/文件/图片三种模式。
 
-| 文件                         | 用途                 |
-| ---------------------------- | -------------------- |
-| `index.tsx`                  | 页面入口，子模式切换 |
-| `useBase64Converter.ts`      | 业务逻辑 Hook        |
-| `TextMode.tsx`               | 文本模式             |
-| `FileMode.tsx`               | 文件模式             |
-| `ImageMode.tsx`              | 图片模式             |
-| `Base64ConverterSection.tsx` | 通用转换区域         |
+| 文件                         | 用途                  |
+| ---------------------------- | --------------------- |
+| `index.tsx`                  | 页面入口，子模式切换  |
+| `useBase64Converter.ts`      | 业务逻辑 Hook         |
+| `TextMode.tsx`               | 文本模式              |
+| `Base64ConverterSection.tsx` | 文件/图片通用转换区域 |
 
 ### MarkdownToHtml/
 

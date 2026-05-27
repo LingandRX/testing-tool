@@ -133,7 +133,7 @@ export default function JsonConvertSection({
         /* 5. 空状态提示容器：完美的中性虚线引导，不喧宾夺主 */
         <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
           <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
-            {error ? '请修正上方 JSON 的语法错误以激活流式转换' : t(`jsonFormat:${pk}EmptyHint`)}
+            {error ? t('jsonFormat:fixErrorHint') : t(`jsonFormat:${pk}EmptyHint`)}
           </p>
         </div>
       )}
