@@ -1,8 +1,9 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
-import { Copy, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner'; // 推荐使用 shadcn 的默认 Toast
+import { CopyButton } from '@/components/CopyButton';
 
 export type ValidateRule = {
   validator: (value: string) => boolean;
@@ -187,16 +188,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     onClear?.();
   }, [isControlled, onChange, onClear, t]);
 
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      toast.success(t('messages.copySuccess'));
-    } catch {
-      setError(t('messages.copyError'));
-      toast.error(t('messages.copyError'));
-    }
-  }, [value, t]);
-
   const handleAction = useCallback(
     (action: ToolbarAction) => {
       const isDisabled =
@@ -284,14 +275,12 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
             {/* 右侧系统按钮组 */}
             <div className="flex items-center gap-1.5 ml-auto shrink-0">
               {allowCopy && value && (
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  aria-label={t('textInputArea.copyContent')}
-                  className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <Copy className="h-4 w-4" />
-                </button>
+                <CopyButton
+                  text={value}
+                  tooltip={t('textInputArea.copyContent')}
+                  size="sm"
+                  className="h-7 w-7 p-1"
+                />
               )}
               {showClear && value && !disabled && !readOnly && (
                 <button
