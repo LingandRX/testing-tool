@@ -24,7 +24,22 @@
   },
   "messages": {
     "copySuccess": "Copied to clipboard",
-    "copyError": "Copy failed"
+    "copyError": "Copy failed",
+    "copyEmpty": "Nothing to copy"
+  },
+  "errorBoundary": {
+    "title": "Oops, something went wrong",
+    "description": "The app encountered an unexpected error. You can try refreshing the page or resetting the app.",
+    "refresh": "Refresh App",
+    "retry": "Retry"
+  },
+  "pageErrorBoundary": {
+    "title": "This feature has encountered an error",
+    "description": "An internal script error occurred while loading or rendering this page. You can try again or switch to another tool from the navigation menu."
+  },
+  "router": {
+    "notFound": "Page Not Found",
+    "notFoundDescription": "This feature is not available or has been removed in the current runtime ({{entryPointType}})."
   },
   "textInputArea": {
     "clear": "Clear",
