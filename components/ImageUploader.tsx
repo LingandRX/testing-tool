@@ -41,7 +41,7 @@ const ImageUploader = ({
     [onFileChange, onPreviewUrlChange],
   );
 
-  const handleClearFile = () => {
+  const handleClearFile = useCallback(() => {
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
@@ -50,7 +50,7 @@ const ImageUploader = ({
       severity: 'success',
       autoHideDuration: 1000,
     });
-  };
+  }, [previewUrl, onClearFile, showMessage, t]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
