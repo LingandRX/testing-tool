@@ -14,9 +14,7 @@ export default function RouterContainer() {
     return currentPage === 'dashboard' ? 'page-transition-dashboard' : 'page-transition-enter';
   }, [currentPage]);
 
-  const entryPointType = useMemo(() => {
-    return getEntryPointType();
-  }, []);
+  const entryPointType = getEntryPointType();
 
   // 骨架屏加载状态守卫
   if (!isLoaded) {
