@@ -10,7 +10,7 @@ const PALETTE_COLORS: Record<PaletteColorKey, string> = {
   success: '22, 163, 74', // green
   warning: '217, 119, 6', // amber (存储清理的橙色轴)
   error: '220, 38, 38', // red
-  secondary: '147, 51, 2 purple',
+  secondary: '147, 51, 232',
   info: '37, 99, 235', // blue
 };
 

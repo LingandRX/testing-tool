@@ -15,6 +15,7 @@
   "diffCount": "{{count}} 处差异",
   "invalidJson": "无效的 JSON 格式",
   "emptyHint": "输入两侧 JSON 后点击比较",
+  "fixErrorHint": "请修正上方 JSON 的语法错误以开启实时流式比对",
   "added": "新增",
   "removed": "删除",
   "modified": "修改"

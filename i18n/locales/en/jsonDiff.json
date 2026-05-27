@@ -15,6 +15,7 @@
   "diffCount": "{{count}} differences",
   "invalidJson": "Invalid JSON format",
   "emptyHint": "Enter JSON on both sides and click Compare",
+  "fixErrorHint": "Fix the JSON syntax errors above to enable live comparison",
   "added": "Added",
   "removed": "Removed",
   "modified": "Modified"

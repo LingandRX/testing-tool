@@ -14,6 +14,7 @@
   "noContent": "无内容可复制",
   "invalidJson": "无效的 JSON 格式",
   "emptyHint": "输入 JSON 后点击格式化",
+  "fixErrorHint": "请修正上方 JSON 的语法错误以开启实时流式格式化",
   "originalSize": "原始大小",
   "formattedSize": "格式化后大小",
   "diffMode": "差异比较",

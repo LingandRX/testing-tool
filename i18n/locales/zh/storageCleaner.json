@@ -2,6 +2,7 @@
   "pageTitle": "存储清理",
   "pageSubtitle": "清理缓存、Cookies 及本地存储",
   "loading": "加载中...",
+  "initializing": "正在读取站点数据...",
   "occupied": "已占用 {{size}}",
   "cleaning": "正在清理...",
   "cleanNow": "立即清理",
