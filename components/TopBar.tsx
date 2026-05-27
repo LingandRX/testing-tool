@@ -15,6 +15,7 @@ import { useRouter } from '@/providers/RouterProvider';
 import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
+import { openExtensionPage } from '@/utils/chromeTabs';
 import { useTranslation } from 'react-i18next';
 import { normalizeLanguage, SUPPORTED_LANGUAGES } from '@/i18n';
 import { cn } from '@/lib/utils'; // 1. 引入 shadcn 核心工具函数
