@@ -41,24 +41,26 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="mt-16 mx-auto max-w-md">
-          <div className="p-6 text-center rounded-xl border border-red-200 bg-red-50">
-            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-extrabold text-red-600 mb-2">糟糕，出了点问题</h2>
+        <div className="flex flex-col items-center justify-center mt-16 mx-auto max-w-md">
+          <div className="p-6 text-center rounded-xl border border-destructive/20 bg-destructive/5 shadow-sm">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive mx-auto mb-4">
+              <AlertCircle className="h-8 w-8" />
+            </div>
+            <h2 className="text-xl font-extrabold text-destructive mb-2">糟糕，出了点问题</h2>
             <p className="text-sm text-muted-foreground mb-6">
               应用遇到了一些意外错误。您可以尝试刷新页面或重置应用。
             </p>
             {this.state.error && (
-              <div className="mb-6 p-4 bg-muted rounded-lg text-left max-h-[200px] overflow-auto">
-                <pre className="font-mono text-xs whitespace-pre-wrap break-all text-red-700">
+              <div className="mb-6 p-4 rounded-lg bg-zinc-950 dark:bg-zinc-900 text-left max-h-[200px] overflow-auto border border-border/40">
+                <pre className="font-mono text-xs whitespace-pre-wrap break-all text-zinc-200 selection:bg-zinc-700">
                   {this.state.error.toString()}
                 </pre>
               </div>
             )}
             <Button
-              variant="default"
+              variant="destructive"
               onClick={this.handleReset}
-              className="rounded-lg font-bold bg-red-600 hover:bg-red-700 text-white"
+              className="rounded-lg font-bold shadow-sm"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
               刷新应用
