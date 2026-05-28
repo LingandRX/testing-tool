@@ -1,15 +1,13 @@
 import { useRouter } from '@/providers/RouterProvider';
 import { getFeatureByKey } from '@/config/features';
 import type { PageType } from '@/types/storage';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
-import { Search } from 'lucide-react';
 
 export default function DashboardPage() {
   const { navigateTo, visiblePages, pageOrder, recentlyUsedTools } = useRouter();
   const { t } = useI18n(['features']);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const visibleSet = useMemo(() => new Set<string>(visiblePages), [visiblePages]);
 
@@ -20,16 +18,6 @@ export default function DashboardPage() {
       .filter((item) => item.feature?.themeColorKey && item.feature.icon != null);
   }, [pageOrder, visibleSet]);
 
-  const filteredFeatures = useMemo(() => {
-    if (!searchQuery.trim()) return visibleFeatures;
-    const query = searchQuery.toLowerCase();
-    return visibleFeatures.filter(
-      (item) =>
-        t(item.feature!.labelKey).toLowerCase().includes(query) ||
-        t(item.feature!.descriptionKey).toLowerCase().includes(query),
-    );
-  }, [visibleFeatures, searchQuery, t]);
-
   const recentFeatures = useMemo(() => {
     return recentlyUsedTools
       .filter((key) => visibleSet.has(key))
@@ -37,27 +25,10 @@ export default function DashboardPage() {
       .filter((item) => item.feature?.themeColorKey && item.feature.icon != null);
   }, [recentlyUsedTools, visibleSet]);
 
-  const showRecent = !searchQuery.trim() && recentFeatures.length > 0;
+  const showRecent = recentFeatures.length > 0;
 
   return (
     <div className={cn('flex flex-col gap-4 p-3.5 w-full h-auto select-none')}>
-      {/* 搜索栏 */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t('dashboard_searchPlaceholder')}
-          className={cn(
-            'w-full h-9 pl-9 pr-3 rounded-lg border border-border/70 bg-background text-sm',
-            'placeholder:text-muted-foreground/50 outline-none',
-            'focus:border-primary/50 focus:ring-1 focus:ring-primary/20',
-            'transition-colors',
-          )}
-        />
-      </div>
-
       {/* 最近使用 */}
       {showRecent && (
         <div className="flex flex-col gap-2">
@@ -94,7 +65,7 @@ export default function DashboardPage() {
           {t('dashboard_allTools')}
         </h3>
         <div className={cn('grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2')}>
-          {filteredFeatures.map(({ key, feature }) => {
+          {visibleFeatures.map(({ key, feature }) => {
             const IconComponent = feature!.icon!;
             return (
               <button
