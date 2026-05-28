@@ -30,10 +30,6 @@ function manualChunksForHtmlOnly(): Plugin {
           if (id.includes('@dnd-kit')) {
             return 'vendor-dnd';
           }
-          // Markdown 高性能转换引擎分流
-          if (id.includes('marked')) {
-            return 'vendor-markdown';
-          }
 
           return undefined;
         },

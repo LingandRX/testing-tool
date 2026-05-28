@@ -131,22 +131,6 @@
     "message": "文本、文件与图像的 Base64 编码转换",
     "description": "Translation key: base64Converter_description"
   },
-  "markdownToHtml_title": {
-    "message": "Markdown 转 HTML",
-    "description": "Translation key: markdownToHtml_title"
-  },
-  "markdownToHtml_description": {
-    "message": "实时 Markdown 转换与 HTML 预览",
-    "description": "Translation key: markdownToHtml_description"
-  },
-  "htmlToMarkdown_title": {
-    "message": "HTML 转 Markdown",
-    "description": "Translation key: htmlToMarkdown_title"
-  },
-  "htmlToMarkdown_description": {
-    "message": "实时 HTML 转换与 Markdown 预览",
-    "description": "Translation key: htmlToMarkdown_description"
-  },
   "rightClickRestorer_title": {
     "message": "右键恢复",
     "description": "Translation key: rightClickRestorer_title"
@@ -290,54 +274,6 @@
   "base64Converter_decodedSize": {
     "message": "解码大小",
     "description": "Translation key: base64Converter_decodedSize"
-  },
-  "htmlToMarkdown_pageTitle": {
-    "message": "HTML 转 Markdown",
-    "description": "Translation key: htmlToMarkdown_pageTitle"
-  },
-  "htmlToMarkdown_splitMode": {
-    "message": "分屏",
-    "description": "Translation key: htmlToMarkdown_splitMode"
-  },
-  "htmlToMarkdown_previewMode": {
-    "message": "预览",
-    "description": "Translation key: htmlToMarkdown_previewMode"
-  },
-  "htmlToMarkdown_markdownMode": {
-    "message": "Markdown",
-    "description": "Translation key: htmlToMarkdown_markdownMode"
-  },
-  "htmlToMarkdown_clear": {
-    "message": "清空",
-    "description": "Translation key: htmlToMarkdown_clear"
-  },
-  "htmlToMarkdown_inputLabel": {
-    "message": "HTML 输入",
-    "description": "Translation key: htmlToMarkdown_inputLabel"
-  },
-  "htmlToMarkdown_previewLabel": {
-    "message": "Markdown 预览",
-    "description": "Translation key: htmlToMarkdown_previewLabel"
-  },
-  "htmlToMarkdown_markdownOutputLabel": {
-    "message": "Markdown 输出",
-    "description": "Translation key: htmlToMarkdown_markdownOutputLabel"
-  },
-  "htmlToMarkdown_inputPlaceholder": {
-    "message": "在此输入 HTML 内容...",
-    "description": "Translation key: htmlToMarkdown_inputPlaceholder"
-  },
-  "htmlToMarkdown_charCount": {
-    "message": "{{count}} 字符",
-    "description": "Translation key: htmlToMarkdown_charCount"
-  },
-  "htmlToMarkdown_download": {
-    "message": "下载",
-    "description": "Translation key: htmlToMarkdown_download"
-  },
-  "htmlToMarkdown_emptyHint": {
-    "message": "输入 HTML 内容以查看转换结果",
-    "description": "Translation key: htmlToMarkdown_emptyHint"
   },
   "jsonDiff_pageTitle": {
     "message": "JSON 差异比较",
@@ -542,54 +478,6 @@
   "jwt_errors_parsePayloadFailed": {
     "message": "解析 Payload 失败：",
     "description": "Translation key: jwt_errors_parsePayloadFailed"
-  },
-  "markdownToHtml_pageTitle": {
-    "message": "Markdown 转 HTML",
-    "description": "Translation key: markdownToHtml_pageTitle"
-  },
-  "markdownToHtml_splitMode": {
-    "message": "分屏",
-    "description": "Translation key: markdownToHtml_splitMode"
-  },
-  "markdownToHtml_previewMode": {
-    "message": "预览",
-    "description": "Translation key: markdownToHtml_previewMode"
-  },
-  "markdownToHtml_htmlMode": {
-    "message": "HTML",
-    "description": "Translation key: markdownToHtml_htmlMode"
-  },
-  "markdownToHtml_clear": {
-    "message": "清空",
-    "description": "Translation key: markdownToHtml_clear"
-  },
-  "markdownToHtml_print": {
-    "message": "打印",
-    "description": "Translation key: markdownToHtml_print"
-  },
-  "markdownToHtml_download": {
-    "message": "下载",
-    "description": "Translation key: markdownToHtml_download"
-  },
-  "markdownToHtml_inputLabel": {
-    "message": "Markdown 输入",
-    "description": "Translation key: markdownToHtml_inputLabel"
-  },
-  "markdownToHtml_previewLabel": {
-    "message": "实时预览",
-    "description": "Translation key: markdownToHtml_previewLabel"
-  },
-  "markdownToHtml_htmlOutputLabel": {
-    "message": "HTML 输出",
-    "description": "Translation key: markdownToHtml_htmlOutputLabel"
-  },
-  "markdownToHtml_inputPlaceholder": {
-    "message": "在此输入 Markdown 内容...",
-    "description": "Translation key: markdownToHtml_inputPlaceholder"
-  },
-  "markdownToHtml_charCount": {
-    "message": "{{count}} 字符",
-    "description": "Translation key: markdownToHtml_charCount"
   },
   "qrCode_pageTitle": {
     "message": "二维码工具",

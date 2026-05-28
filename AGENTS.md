@@ -142,7 +142,6 @@ src/pages/FeatureName/
 
 - `@webext-core/messaging` — 扩展消息通信
 - `@dnd-kit` — 拖拽排序（用于页面顺序管理）
-- `marked` — Markdown 解析
 - `qrious` + `qr-scanner` — 二维码生成与解析
 - `dayjs` — 日期处理（时间戳转换）
 - `sonner` — Toast 通知（替代传统 snackbar）
