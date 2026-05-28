@@ -7,12 +7,6 @@ import { SnackbarProvider } from '@/components/GlobalSnackbar';
 import { MessageAction, sendMessage } from '@/utils/messages';
 
 export default function App() {
-  const handleOpenOptions = () => {
-    chrome.runtime.openOptionsPage().catch((err) => {
-      console.error('Failed to open options page:', err);
-    });
-  };
-
   useEffect(() => {
     sendMessage(MessageAction.SIDE_PANEL_STATE_CHANGED, { isOpen: true });
     return () => {
@@ -24,7 +18,7 @@ export default function App() {
     <RouterProvider defaultRoute="dashboard" syncKey="app/sidepanelRoute">
       <SnackbarProvider initialOptions={{ autoHideDuration: 1500 }}>
         <div className="app flex flex-col h-screen w-full overflow-hidden">
-          <TopBar onOpenOptions={handleOpenOptions} />
+          <TopBar />
           <ErrorBoundary>
             <RouterContainer />
           </ErrorBoundary>

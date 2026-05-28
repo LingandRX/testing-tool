@@ -7,10 +7,7 @@
     "message": "清理",
     "description": "Translation key: buttons_clear"
   },
-  "buttons_settings": {
-    "message": "设置",
-    "description": "Translation key: buttons_settings"
-  },
+
   "messages_copySuccess": {
     "message": "已复制到剪贴板",
     "description": "Translation key: messages_copySuccess"
@@ -851,10 +848,7 @@
     "message": "在标签页打开",
     "description": "Translation key: buttons_openInTab"
   },
-  "common_buttons_settings": {
-    "message": "设置",
-    "description": "Translation key: buttons_settings"
-  },
+
   "common_errorBoundary_title": {
     "message": "糟糕，出了点问题",
     "description": "Translation key: errorBoundary_title"
