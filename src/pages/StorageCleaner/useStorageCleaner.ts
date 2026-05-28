@@ -18,7 +18,7 @@ import {
 } from '@/utils/storageCleaner';
 import { MessageAction, sendMessage } from '@/utils/messages';
 import { useI18n } from '@/utils/chromeI18n';
-import { toast } from 'sonner'; // 1. 直接引用 shadcn 推荐的 Sonner 单例通知，踢出回调依赖
+import { toast } from 'sonner';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
   localStorage: true,

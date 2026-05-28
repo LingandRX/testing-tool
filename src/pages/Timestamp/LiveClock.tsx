@@ -4,7 +4,7 @@ import CopyButton from '@/components/CopyButton';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import type { UnitType } from './constants';
 import { useI18n } from '@/utils/chromeI18n';
-import { cn } from '@/lib/utils'; // 引入标准的 shadcn 工具函数
+import { cn } from '@/lib/utils';
 
 interface LiveClockProps extends React.HTMLAttributes<HTMLDivElement> {
   unit: UnitType;
@@ -24,12 +24,10 @@ const LiveClock = React.memo(({ unit, onUseNow, className, ...props }: LiveClock
     };
   });
 
-  // 始终保持外部回调指针最新
   useEffect(() => {
     onUseNowRef.current = onUseNow;
   }, [onUseNow]);
 
-  // 2. 高频高灵敏度计时器 (200ms 刷新率)
   useEffect(() => {
     const tick = () => {
       const rightNow = Date.now();

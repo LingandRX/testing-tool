@@ -15,7 +15,6 @@ export default function Index() {
 
   useContextMenuData({ featureKey: 'textStatistics', onData: handleContextMenuData });
 
-  // 实时计算统计信息，由 useMemo 拦截非必要计算
   const stats = useMemo(() => getTextStats(text), [text]);
 
   const statItems = [

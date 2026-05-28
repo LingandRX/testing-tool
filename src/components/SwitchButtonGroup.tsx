@@ -1,12 +1,11 @@
 import React from 'react';
-import { cn } from '@/lib/utils'; // 1. 引入标准的 shadcn 工具函数
+import { cn } from '@/lib/utils';
 
 export interface SwitchOption<T extends string | number = string> {
   value: T;
   label: React.ReactNode;
 }
 
-// 2. 移除内联 sx，继承标准 HTML 属性，并使用标准的类名注入机制
 export interface SwitchButtonGroupProps<T extends string | number = string> extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   'onChange'
@@ -15,7 +14,7 @@ export interface SwitchButtonGroupProps<T extends string | number = string> exte
   options: SwitchOption<T>[];
   onChange: (value: T) => void;
   size?: 'small' | 'medium' | 'large';
-  buttonClassName?: string; // 替换原有的 buttonSx
+  buttonClassName?: string;
 }
 
 export default function SwitchButtonGroup<T extends string | number = string>({
@@ -27,7 +26,6 @@ export default function SwitchButtonGroup<T extends string | number = string>({
   buttonClassName,
   ...props
 }: SwitchButtonGroupProps<T>) {
-  // 3. 将尺寸和高度、内边距等整体对齐，保证按钮和背景容器成比例缩放
   const sizeClasses = {
     small: 'text-xs h-8 px-2 py-1 rounded-md',
     medium: 'text-sm h-9 px-3 py-1.5 rounded-md',

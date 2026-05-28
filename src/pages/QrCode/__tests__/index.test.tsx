@@ -6,19 +6,16 @@ vi.mock('lucide-react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('lucide-react')>();
   return {
     ...actual,
-    // 增量伪造需要高精嗅探的 QrCode 核心定位图标
     QrCode: () => <div data-testid="mock-lucide-qrcode">Icon</div>,
   };
 });
 
-// Mock useSnackbar
 vi.mock('@/components/GlobalSnackbar', () => ({
   useSnackbar: () => ({
     showMessage: vi.fn(),
   }),
 }));
 
-// Mock getEntryPointType（保留原厂其他特征配置，仅模拟入口路由环境）
 vi.mock('@/config/features', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/config/features')>();
   return {
@@ -27,7 +24,6 @@ vi.mock('@/config/features', async (importOriginal) => {
   };
 });
 
-// Mock 高频变化的子组件，收拢断言边界
 vi.mock('@/components/QrCodePreview', () => ({
   default: () => <div data-testid="qr-code-preview">QrCodePreview</div>,
 }));
@@ -36,7 +32,6 @@ vi.mock('@/components/ImageUploader', () => ({
   default: () => <div data-testid="image-uploader">ImageUploader</div>,
 }));
 
-// Mock QRious 动态图像离屏生成引擎
 vi.mock('qrious', () => ({
   default: vi.fn().mockImplementation(() => ({
     toDataURL: () => 'data:image/png;base64,mock',

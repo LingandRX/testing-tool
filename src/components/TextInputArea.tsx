@@ -121,10 +121,8 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const value = isControlled ? controlledValue : internalValue;
   const displayError = externalError ?? error;
 
-  // 双向合并 ref 指针
   useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement);
 
-  // 1. 高性能的动态高度自适应计算
   const adjustHeight = useCallback(() => {
     const textArea = internalRef.current;
     if (!textArea) return;
@@ -132,14 +130,13 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     // 重置高度计算
     textArea.style.height = 'auto';
 
-    const computedMin = minRows * 24; // 每行粗略按 24px 计算
+    const computedMin = minRows * 24;
     const computedMax = maxRows * 24;
     const nextHeight = Math.max(textArea.scrollHeight, computedMin);
 
     textArea.style.height = `${Math.min(nextHeight, computedMax)}px`;
   }, [minRows, maxRows]);
 
-  // 当数值改变时自适应扩展
   React.useEffect(() => {
     adjustHeight();
   }, [value, adjustHeight]);

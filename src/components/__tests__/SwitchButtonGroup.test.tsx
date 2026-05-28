@@ -21,9 +21,7 @@ describe('SwitchButtonGroup 组件', () => {
     const buttonA = screen.getByRole('button', { name: /选项A/i });
     const buttonB = screen.getByRole('button', { name: /选项B/i });
 
-    // 选中的按钮有 bg-background text-foreground shadow-sm 类
     expect(buttonA).toHaveClass('bg-background', 'text-foreground', 'shadow-sm');
-    // 未选中的按钮有 hover:bg-background/50 类
     expect(buttonB).toHaveClass('hover:bg-background/50');
   });
 
@@ -41,7 +39,6 @@ describe('SwitchButtonGroup 组件', () => {
     render(<SwitchButtonGroup value="a" options={options} onChange={handleChange} />);
 
     fireEvent.click(screen.getByRole('button', { name: /选项A/i }));
-    // 新组件每次点击都会触发 onChange
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 

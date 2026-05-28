@@ -16,9 +16,8 @@ import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
 import { openExtensionPage } from '@/utils/chromeTabs';
 import { useI18n } from '@/utils/chromeI18n';
-import { cn } from '@/lib/utils'; // 1. 引入 shadcn 核心工具函数
+import { cn } from '@/lib/utils';
 
-// 常量配置抽取（无需写在全局变量或 styles 对象里）
 const SEARCH_HISTORY_LIMIT = 10;
 const SEARCH_HISTORY_DISPLAY = 5;
 
@@ -40,7 +39,6 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
     window.close();
   };
 
-  // 2. 健壮的 Click Outside 逻辑：点击空白处收起搜索框
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -51,7 +49,6 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 从 Chrome Storage 异步初始化历史记录
   useEffect(() => {
     storageUtil
       .get('app/searchHistory', [])
@@ -61,7 +58,6 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
       .catch((err) => console.error('加载搜索历史失败:', err));
   }, []);
 
-  // 3. 模糊搜索匹配（移除了无意义的 dashboard 干扰项）
   const searchResults = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return [];
@@ -79,7 +75,6 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
     return searchHistory.slice(0, SEARCH_HISTORY_DISPLAY);
   }, [searchHistory, searchQuery]);
 
-  // 新增/持久化历史记录
   const saveToHistory = async (query: string) => {
     if (!query.trim()) return;
     const nextHistory = [query, ...searchHistory.filter((h) => h !== query)].slice(
@@ -104,7 +99,6 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
 
   const ThemeIcon = mode === 'light' ? Sun : mode === 'dark' ? Moon : Monitor;
 
-  // 4. 健壮的键盘导航交互
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const totalItems = searchQuery.trim() ? searchResults.length : displayedHistory.length;
 
