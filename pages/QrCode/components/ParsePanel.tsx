@@ -2,13 +2,13 @@ import { useCallback, useEffect } from 'react';
 import TextInputArea from '@/components/TextInputArea';
 import ImageUploader from '@/components/ImageUploader';
 import { useSnackbar } from '@/components/GlobalSnackbar';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 export default function ParsePanel() {
-  const { t } = useLazyTranslation('qrCode');
+  const { t } = useI18n('qrCode');
   const { showMessage } = useSnackbar();
   const { parserState, setParserState, handleFileChange, handleClearFile } = useQrCodeContext();
 

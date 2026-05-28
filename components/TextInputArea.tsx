@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner'; // 推荐使用 shadcn 的默认 Toast
 import { CopyButton } from '@/components/CopyButton';
@@ -114,7 +114,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [error, setError] = useState<string>('');
 
-  const { t } = useTranslation('common');
+  const { t } = useI18n('common');
   const placeholder = placeholderProp ?? t('textInputArea.placeholder');
 
   const isControlled = controlledValue !== undefined;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import JsonDiffInput from './JsonDiffInput';
 import DiffResult from './DiffResult';
 import DiffNavigator from './DiffNavigator';
@@ -37,7 +37,7 @@ const isValidPageMode = (val: unknown): val is JsonToolsPageMode =>
 type PageMode = JsonToolsPageMode;
 
 export default function Index() {
-  const { t } = useLazyTranslation(['jsonDiff', 'jsonFormat']);
+  const { t } = useI18n(['jsonDiff', 'jsonFormat']);
   const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
 
   // 1. 受控原始输入源
