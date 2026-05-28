@@ -1,15 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ArrowLeft,
-  ExternalLink,
-  History,
-  Monitor,
-  Moon,
-  Search,
-  Settings,
-  Sun,
-  X,
-} from 'lucide-react';
+import { ArrowLeft, ExternalLink, Monitor, Moon, Search, Settings, Sun, X } from 'lucide-react';
 import { useRouter } from '@/providers/RouterProvider';
 import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FeatureConfig, FEATURES } from '@/config/features';
@@ -85,12 +75,15 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
 
   const displayedHistory = useMemo(() => {
     if (searchQuery.trim()) return [];
-    return searchHistory.slice(0, SEARCH_HISTORY_DISPLAY);
+    return searchHistory
+      .slice(0, SEARCH_HISTORY_DISPLAY)
+      .map((key) => ({ key, feature: FEATURES.find((f) => f.key === key) }))
+      .filter((item) => item.feature && item.feature.key !== 'dashboard');
   }, [searchHistory, searchQuery]);
 
-  const saveToHistory = async (query: string) => {
-    if (!query.trim()) return;
-    const nextHistory = [query, ...searchHistory.filter((h) => h !== query)].slice(
+  const saveToHistory = async (featureKey: string) => {
+    if (!featureKey.trim()) return;
+    const nextHistory = [featureKey, ...searchHistory.filter((h) => h !== featureKey)].slice(
       0,
       SEARCH_HISTORY_LIMIT,
     );
@@ -100,7 +93,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
 
   const handleSelectFeature = (feature: FeatureConfig) => {
     navigateTo(feature.key);
-    saveToHistory(t(feature.labelKey));
+    saveToHistory(feature.key);
     setSearchQuery('');
     setShowResults(false);
   };
@@ -127,14 +120,9 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         if (searchQuery.trim()) {
           handleSelectFeature(searchResults[selectedIndex]);
         } else {
-          const selectedQuery = displayedHistory[selectedIndex];
-          if (selectedQuery) {
-            setSearchQuery(selectedQuery);
-            setSelectedIndex(-1);
-            const matched = FEATURES.find(
-              (f) => f.key !== 'dashboard' && t(f.labelKey) === selectedQuery,
-            );
-            if (matched) handleSelectFeature(matched);
+          const selected = displayedHistory[selectedIndex];
+          if (selected?.feature) {
+            handleSelectFeature(selected.feature);
           }
         }
       } else if (searchQuery.trim() && searchResults.length > 0) {
@@ -252,13 +240,10 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                   </div>
                   {displayedHistory.map((item, index) => (
                     <li
-                      key={item}
+                      key={item.key}
                       role="option"
                       aria-selected={selectedIndex === index}
-                      onClick={() => {
-                        setSearchQuery(item);
-                        setSelectedIndex(-1);
-                      }}
+                      onClick={() => item.feature && handleSelectFeature(item.feature)}
                       className={cn(
                         'flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer text-sm transition-colors',
                         selectedIndex === index
@@ -266,8 +251,22 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
                           : 'hover:bg-muted/60',
                       )}
                     >
-                      <History className="h-4 w-4 text-muted-foreground/60 shrink-0" />
-                      <span className="truncate">{item}</span>
+                      <div
+                        className={cn(
+                          'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+                          'bg-muted/80 text-muted-foreground',
+                        )}
+                      >
+                        {item.feature?.icon && <item.feature.icon className="h-4 w-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground truncate">
+                          {item.feature && t(item.feature.labelKey)}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {item.feature && t(item.feature.descriptionKey)}
+                        </p>
+                      </div>
                     </li>
                   ))}
                 </>
