@@ -85,7 +85,6 @@
 │   │   └── features.tsx   # 功能定义与路由映射
 │   ├── entrypoints/       # 扩展程序入口点
 │   │   ├── popup/         # 点击图标弹出的主界面
-│   │   ├── options/       # 扩展程序设置页面
 │   │   ├── sidepanel/     # 浏览器侧边栏集成
 │   │   ├── background.ts  # 后台 Service Worker
 │   │   └── content.ts     # 网页注入脚本
