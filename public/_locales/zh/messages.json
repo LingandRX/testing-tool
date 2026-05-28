@@ -1,0 +1,876 @@
+{
+  "buttons_copy": {
+    "message": "复制",
+    "description": "Translation key: buttons_copy"
+  },
+  "buttons_clear": {
+    "message": "清理",
+    "description": "Translation key: buttons_clear"
+  },
+
+  "messages_copySuccess": {
+    "message": "已复制到剪贴板",
+    "description": "Translation key: messages_copySuccess"
+  },
+  "messages_copyError": {
+    "message": "复制失败",
+    "description": "Translation key: messages_copyError"
+  },
+  "messages_copyEmpty": {
+    "message": "无内容可复制",
+    "description": "Translation key: messages_copyEmpty"
+  },
+  "errorBoundary_title": {
+    "message": "糟糕，出了点问题",
+    "description": "Translation key: errorBoundary_title"
+  },
+  "errorBoundary_description": {
+    "message": "应用遇到了一些意外错误。您可以尝试刷新页面或重置应用。",
+    "description": "Translation key: errorBoundary_description"
+  },
+  "errorBoundary_refresh": {
+    "message": "刷新应用",
+    "description": "Translation key: errorBoundary_refresh"
+  },
+  "errorBoundary_retry": {
+    "message": "重新尝试",
+    "description": "Translation key: errorBoundary_retry"
+  },
+  "pageErrorBoundary_title": {
+    "message": "该功能运行异常",
+    "description": "Translation key: pageErrorBoundary_title"
+  },
+  "pageErrorBoundary_description": {
+    "message": "该页面在加载或渲染时遇到了内部脚本错误。您可以尝试重试，或者通过导航菜单切换到其他工具。",
+    "description": "Translation key: pageErrorBoundary_description"
+  },
+  "router_notFound": {
+    "message": "页面未找到",
+    "description": "Translation key: router_notFound"
+  },
+  "router_notFoundDescription": {
+    "message": "该功能在当前运行环境（{{entryPointType}}）下不可用或已被移除。",
+    "description": "Translation key: router_notFoundDescription"
+  },
+  "textInputArea_clear": {
+    "message": "清空",
+    "description": "Translation key: textInputArea_clear"
+  },
+  "textInputArea_copyContent": {
+    "message": "复制内容",
+    "description": "Translation key: textInputArea_copyContent"
+  },
+  "textInputArea_cleared": {
+    "message": "已清空",
+    "description": "Translation key: textInputArea_cleared"
+  },
+  "textInputArea_placeholder": {
+    "message": "请输入文本",
+    "description": "Translation key: textInputArea_placeholder"
+  },
+  "dashboard_title": {
+    "message": "仪表盘",
+    "description": "Translation key: dashboard_title"
+  },
+  "dashboard_searchPlaceholder": {
+    "message": "搜索工具...",
+    "description": "Translation key: dashboard_searchPlaceholder"
+  },
+  "dashboard_recentlyUsed": {
+    "message": "最近使用",
+    "description": "Translation key: dashboard_recentlyUsed"
+  },
+  "dashboard_allTools": {
+    "message": "全部工具",
+    "description": "Translation key: dashboard_allTools"
+  },
+  "timestamp_title": {
+    "message": "时间戳",
+    "description": "Translation key: timestamp_title"
+  },
+  "timestamp_description": {
+    "message": "Unix 毫秒数转换与格式化",
+    "description": "Translation key: timestamp_description"
+  },
+  "storageCleaner_title": {
+    "message": "存储清理",
+    "description": "Translation key: storageCleaner_title"
+  },
+  "storageCleaner_description": {
+    "message": "清理缓存、Cookies 及本地存储",
+    "description": "Translation key: storageCleaner_description"
+  },
+  "qrCode_title": {
+    "message": "二维码工具",
+    "description": "Translation key: qrCode_title"
+  },
+  "qrCode_description": {
+    "message": "生成当前选中的 URL 的二维码",
+    "description": "Translation key: qrCode_description"
+  },
+  "textStatistics_title": {
+    "message": "文本统计",
+    "description": "Translation key: textStatistics_title"
+  },
+  "textStatistics_description": {
+    "message": "实时分析文本字符、单词及字节",
+    "description": "Translation key: textStatistics_description"
+  },
+  "jwt_title": {
+    "message": "JWT 解析",
+    "description": "Translation key: jwt_title"
+  },
+  "jwt_description": {
+    "message": "JSON Web Token 解码与查看",
+    "description": "Translation key: jwt_description"
+  },
+  "jsonDiff_title": {
+    "message": "JSON 工具",
+    "description": "Translation key: jsonDiff_title"
+  },
+  "jsonDiff_description": {
+    "message": "差异比较、格式化、YAML/TOML 转换及压缩",
+    "description": "Translation key: jsonDiff_description"
+  },
+  "base64Converter_title": {
+    "message": "Base64 转换器",
+    "description": "Translation key: base64Converter_title"
+  },
+  "base64Converter_description": {
+    "message": "文本、文件与图像的 Base64 编码转换",
+    "description": "Translation key: base64Converter_description"
+  },
+  "rightClickRestorer_title": {
+    "message": "右键恢复",
+    "description": "Translation key: rightClickRestorer_title"
+  },
+  "rightClickRestorer_description": {
+    "message": "检测并恢复被网站禁用的浏览器右键菜单",
+    "description": "Translation key: rightClickRestorer_description"
+  },
+  "base64Converter_pageTitle": {
+    "message": "Base64 转换器",
+    "description": "Translation key: base64Converter_pageTitle"
+  },
+  "base64Converter_textMode": {
+    "message": "文本",
+    "description": "Translation key: base64Converter_textMode"
+  },
+  "base64Converter_fileMode": {
+    "message": "文件",
+    "description": "Translation key: base64Converter_fileMode"
+  },
+  "base64Converter_imageMode": {
+    "message": "图像",
+    "description": "Translation key: base64Converter_imageMode"
+  },
+  "base64Converter_encode": {
+    "message": "编码",
+    "description": "Translation key: base64Converter_encode"
+  },
+  "base64Converter_decode": {
+    "message": "解码",
+    "description": "Translation key: base64Converter_decode"
+  },
+  "base64Converter_clear": {
+    "message": "清空",
+    "description": "Translation key: base64Converter_clear"
+  },
+  "base64Converter_textInputPlaceholder": {
+    "message": "输入需要编码为 Base64 的文本...",
+    "description": "Translation key: base64Converter_textInputPlaceholder"
+  },
+  "base64Converter_base64InputPlaceholder": {
+    "message": "输入需要解码的 Base64 字符串...",
+    "description": "Translation key: base64Converter_base64InputPlaceholder"
+  },
+  "base64Converter_base64Output": {
+    "message": "Base64 编码结果",
+    "description": "Translation key: base64Converter_base64Output"
+  },
+  "base64Converter_textOutput": {
+    "message": "解码文本结果",
+    "description": "Translation key: base64Converter_textOutput"
+  },
+  "base64Converter_copyRaw": {
+    "message": "复制纯 Base64",
+    "description": "Translation key: base64Converter_copyRaw"
+  },
+  "base64Converter_copyDataUri": {
+    "message": "复制 Data URI",
+    "description": "Translation key: base64Converter_copyDataUri"
+  },
+  "base64Converter_clickOrDropToFile": {
+    "message": "点击或拖拽文件到此处",
+    "description": "Translation key: base64Converter_clickOrDropToFile"
+  },
+  "base64Converter_clickOrDropToImage": {
+    "message": "点击或拖拽图像到此处",
+    "description": "Translation key: base64Converter_clickOrDropToImage"
+  },
+  "base64Converter_clickOrDropToReplace": {
+    "message": "点击或拖拽以替换文件",
+    "description": "Translation key: base64Converter_clickOrDropToReplace"
+  },
+  "base64Converter_maxFileSize": {
+    "message": "最大文件大小：{{max}}",
+    "description": "Translation key: base64Converter_maxFileSize"
+  },
+  "base64Converter_supportedFormats": {
+    "message": "支持 PNG、JPG、WEBP、GIF、BMP、SVG 等格式",
+    "description": "Translation key: base64Converter_supportedFormats"
+  },
+  "base64Converter_fileSizeExceeded": {
+    "message": "文件大小超出限制（最大 {{max}}）",
+    "description": "Translation key: base64Converter_fileSizeExceeded"
+  },
+  "base64Converter_unsupportedImageType": {
+    "message": "不支持的图像格式",
+    "description": "Translation key: base64Converter_unsupportedImageType"
+  },
+  "base64Converter_conversionFailed": {
+    "message": "转换失败",
+    "description": "Translation key: base64Converter_conversionFailed"
+  },
+  "base64Converter_originalSize": {
+    "message": "原始大小",
+    "description": "Translation key: base64Converter_originalSize"
+  },
+  "base64Converter_encodedSize": {
+    "message": "编码大小",
+    "description": "Translation key: base64Converter_encodedSize"
+  },
+  "base64Converter_invalidBase64": {
+    "message": "Base64 字符串无效",
+    "description": "Translation key: base64Converter_invalidBase64"
+  },
+  "base64Converter_binaryDataDetected": {
+    "message": "输入似乎是二进制数据（如图片）。请切换到「图像」选项卡。",
+    "description": "Translation key: base64Converter_binaryDataDetected"
+  },
+  "base64Converter_imageDataUriHint": {
+    "message": "检测到图片的 data URI，请使用「图像」选项卡进行解码。",
+    "description": "Translation key: base64Converter_imageDataUriHint"
+  },
+  "base64Converter_switchToImageMode": {
+    "message": "切换到图像模式",
+    "description": "Translation key: base64Converter_switchToImageMode"
+  },
+  "base64Converter_download": {
+    "message": "下载",
+    "description": "Translation key: base64Converter_download"
+  },
+  "base64Converter_decodedFileName": {
+    "message": "解码后文件名",
+    "description": "Translation key: base64Converter_decodedFileName"
+  },
+  "base64Converter_decodeBase64Placeholder": {
+    "message": "输入需要解码的 Base64 或 data URI...",
+    "description": "Translation key: base64Converter_decodeBase64Placeholder"
+  },
+  "base64Converter_decodedFileOutput": {
+    "message": "解码文件",
+    "description": "Translation key: base64Converter_decodedFileOutput"
+  },
+  "base64Converter_decodedImageOutput": {
+    "message": "解码图像",
+    "description": "Translation key: base64Converter_decodedImageOutput"
+  },
+  "base64Converter_inferredMimeType": {
+    "message": "推断的 MIME 类型",
+    "description": "Translation key: base64Converter_inferredMimeType"
+  },
+  "base64Converter_decodedSize": {
+    "message": "解码大小",
+    "description": "Translation key: base64Converter_decodedSize"
+  },
+  "jsonDiff_pageTitle": {
+    "message": "JSON 差异比较",
+    "description": "Translation key: jsonDiff_pageTitle"
+  },
+  "jsonDiff_leftPlaceholder": {
+    "message": "输入原始 JSON...",
+    "description": "Translation key: jsonDiff_leftPlaceholder"
+  },
+  "jsonDiff_rightPlaceholder": {
+    "message": "输入目标 JSON...",
+    "description": "Translation key: jsonDiff_rightPlaceholder"
+  },
+  "jsonDiff_leftLabel": {
+    "message": "原始 JSON",
+    "description": "Translation key: jsonDiff_leftLabel"
+  },
+  "jsonDiff_rightLabel": {
+    "message": "目标 JSON",
+    "description": "Translation key: jsonDiff_rightLabel"
+  },
+  "jsonDiff_sideBySideMode": {
+    "message": "并排",
+    "description": "Translation key: jsonDiff_sideBySideMode"
+  },
+  "jsonDiff_unifiedMode": {
+    "message": "统一",
+    "description": "Translation key: jsonDiff_unifiedMode"
+  },
+  "jsonDiff_previousDiff": {
+    "message": "上一个",
+    "description": "Translation key: jsonDiff_previousDiff"
+  },
+  "jsonDiff_nextDiff": {
+    "message": "下一个",
+    "description": "Translation key: jsonDiff_nextDiff"
+  },
+  "jsonDiff_noDiffs": {
+    "message": "无差异",
+    "description": "Translation key: jsonDiff_noDiffs"
+  },
+  "jsonDiff_invalidJson": {
+    "message": "无效的 JSON 格式",
+    "description": "Translation key: jsonDiff_invalidJson"
+  },
+  "jsonDiff_emptyHint": {
+    "message": "输入两侧 JSON 后点击比较",
+    "description": "Translation key: jsonDiff_emptyHint"
+  },
+  "jsonDiff_fixErrorHint": {
+    "message": "请修正上方 JSON 的语法错误以开启实时流式比对",
+    "description": "Translation key: jsonDiff_fixErrorHint"
+  },
+  "jsonDiff_added": {
+    "message": "新增",
+    "description": "Translation key: jsonDiff_added"
+  },
+  "jsonDiff_removed": {
+    "message": "删除",
+    "description": "Translation key: jsonDiff_removed"
+  },
+  "jsonDiff_modified": {
+    "message": "修改",
+    "description": "Translation key: jsonDiff_modified"
+  },
+  "jsonFormat_inputPlaceholder": {
+    "message": "输入需要格式化的 JSON...",
+    "description": "Translation key: jsonFormat_inputPlaceholder"
+  },
+  "jsonFormat_sortKeys": {
+    "message": "键名排序",
+    "description": "Translation key: jsonFormat_sortKeys"
+  },
+  "jsonFormat_indentSize": {
+    "message": "缩进",
+    "description": "Translation key: jsonFormat_indentSize"
+  },
+  "jsonFormat_outputLabel": {
+    "message": "格式化结果",
+    "description": "Translation key: jsonFormat_outputLabel"
+  },
+  "jsonFormat_invalidJson": {
+    "message": "无效的 JSON 格式",
+    "description": "Translation key: jsonFormat_invalidJson"
+  },
+  "jsonFormat_emptyHint": {
+    "message": "输入 JSON 后点击格式化",
+    "description": "Translation key: jsonFormat_emptyHint"
+  },
+  "jsonFormat_fixErrorHint": {
+    "message": "请修正上方 JSON 的语法错误以开启实时流式格式化",
+    "description": "Translation key: jsonFormat_fixErrorHint"
+  },
+  "jsonFormat_originalSize": {
+    "message": "原始大小",
+    "description": "Translation key: jsonFormat_originalSize"
+  },
+  "jsonFormat_formattedSize": {
+    "message": "格式化后大小",
+    "description": "Translation key: jsonFormat_formattedSize"
+  },
+  "jsonFormat_diffMode": {
+    "message": "差异比较",
+    "description": "Translation key: jsonFormat_diffMode"
+  },
+  "jsonFormat_formatMode": {
+    "message": "格式化",
+    "description": "Translation key: jsonFormat_formatMode"
+  },
+  "jsonFormat_yamlMode": {
+    "message": "YAML",
+    "description": "Translation key: jsonFormat_yamlMode"
+  },
+  "jsonFormat_tomlMode": {
+    "message": "TOML",
+    "description": "Translation key: jsonFormat_tomlMode"
+  },
+  "jsonFormat_minifyMode": {
+    "message": "压缩",
+    "description": "Translation key: jsonFormat_minifyMode"
+  },
+  "jsonFormat_yamlModeInputPlaceholder": {
+    "message": "输入需要转换的 JSON...",
+    "description": "Translation key: jsonFormat_yamlModeInputPlaceholder"
+  },
+  "jsonFormat_yamlModeOutputLabel": {
+    "message": "YAML 结果",
+    "description": "Translation key: jsonFormat_yamlModeOutputLabel"
+  },
+  "jsonFormat_yamlModeEmptyHint": {
+    "message": "输入 JSON 后点击转换",
+    "description": "Translation key: jsonFormat_yamlModeEmptyHint"
+  },
+  "jsonFormat_tomlModeInputPlaceholder": {
+    "message": "输入需要转换的 JSON...",
+    "description": "Translation key: jsonFormat_tomlModeInputPlaceholder"
+  },
+  "jsonFormat_tomlModeOutputLabel": {
+    "message": "TOML 结果",
+    "description": "Translation key: jsonFormat_tomlModeOutputLabel"
+  },
+  "jsonFormat_tomlModeEmptyHint": {
+    "message": "输入 JSON 后点击转换",
+    "description": "Translation key: jsonFormat_tomlModeEmptyHint"
+  },
+  "jsonFormat_minifyModeInputPlaceholder": {
+    "message": "输入需要压缩的 JSON...",
+    "description": "Translation key: jsonFormat_minifyModeInputPlaceholder"
+  },
+  "jsonFormat_minifyModeOutputLabel": {
+    "message": "压缩结果",
+    "description": "Translation key: jsonFormat_minifyModeOutputLabel"
+  },
+  "jsonFormat_minifyModeEmptyHint": {
+    "message": "输入 JSON 后点击压缩",
+    "description": "Translation key: jsonFormat_minifyModeEmptyHint"
+  },
+  "jwt_pageTitle": {
+    "message": "JWT 解析",
+    "description": "Translation key: jwt_pageTitle"
+  },
+  "jwt_placeholder": {
+    "message": "在此粘贴 JWT 令牌 (Encoded JWT)...",
+    "description": "Translation key: jwt_placeholder"
+  },
+  "jwt_headerTitle": {
+    "message": "HEADER: 算法 & 令牌类型",
+    "description": "Translation key: jwt_headerTitle"
+  },
+  "jwt_payloadTitle": {
+    "message": "PAYLOAD: 数据",
+    "description": "Translation key: jwt_payloadTitle"
+  },
+  "jwt_signatureTitle": {
+    "message": "签名",
+    "description": "Translation key: jwt_signatureTitle"
+  },
+  "jwt_noSignature": {
+    "message": "无签名",
+    "description": "Translation key: jwt_noSignature"
+  },
+  "jwt_invalidFormat": {
+    "message": "无法解析",
+    "description": "Translation key: jwt_invalidFormat"
+  },
+  "jwt_errors_invalidBase64String": {
+    "message": "无效的 Base64URL 字符串",
+    "description": "Translation key: jwt_errors_invalidBase64String"
+  },
+  "jwt_errors_failedToDecode": {
+    "message": "Base64URL 解码失败：",
+    "description": "Translation key: jwt_errors_failedToDecode"
+  },
+  "jwt_errors_invalidFormat": {
+    "message": "JWT 格式错误：必须包含三个由 . 分隔的部分",
+    "description": "Translation key: jwt_errors_invalidFormat"
+  },
+  "jwt_errors_parseHeaderFailed": {
+    "message": "解析 Header 失败：",
+    "description": "Translation key: jwt_errors_parseHeaderFailed"
+  },
+  "jwt_errors_parsePayloadFailed": {
+    "message": "解析 Payload 失败：",
+    "description": "Translation key: jwt_errors_parsePayloadFailed"
+  },
+  "qrCode_pageTitle": {
+    "message": "二维码工具",
+    "description": "Translation key: qrCode_pageTitle"
+  },
+  "qrCode_urlToQr": {
+    "message": "文本转二维码",
+    "description": "Translation key: qrCode_urlToQr"
+  },
+  "qrCode_qrToUrl": {
+    "message": "二维码转文本",
+    "description": "Translation key: qrCode_qrToUrl"
+  },
+  "qrCode_urlInputLabel": {
+    "message": "输入 URL 或文本",
+    "description": "Translation key: qrCode_urlInputLabel"
+  },
+  "qrCode_urlInputPlaceholder": {
+    "message": "请输入 URL 或文本内容，将自动生成二维码",
+    "description": "Translation key: qrCode_urlInputPlaceholder"
+  },
+  "qrCode_generating": {
+    "message": "生成中...",
+    "description": "Translation key: qrCode_generating"
+  },
+  "qrCode_qrCodeWillShow": {
+    "message": "二维码将显示在这里",
+    "description": "Translation key: qrCode_qrCodeWillShow"
+  },
+  "qrCode_downloadButton": {
+    "message": "下载二维码",
+    "description": "Translation key: qrCode_downloadButton"
+  },
+  "qrCode_copyQrButton": {
+    "message": "复制二维码",
+    "description": "Translation key: qrCode_copyQrButton"
+  },
+  "qrCode_qrCodeDownloadSuccess": {
+    "message": "二维码下载成功",
+    "description": "Translation key: qrCode_qrCodeDownloadSuccess"
+  },
+  "qrCode_qrCodeCopySuccess": {
+    "message": "二维码已复制到剪贴板",
+    "description": "Translation key: qrCode_qrCodeCopySuccess"
+  },
+  "qrCode_parseSuccess": {
+    "message": "二维码解析成功",
+    "description": "Translation key: qrCode_parseSuccess"
+  },
+  "qrCode_noQrDetected": {
+    "message": "未检测到二维码，请确保图片清晰且包含二维码",
+    "description": "Translation key: qrCode_noQrDetected"
+  },
+  "qrCode_parseError": {
+    "message": "解析二维码失败，请重试",
+    "description": "Translation key: qrCode_parseError"
+  },
+  "qrCode_copyError": {
+    "message": "复制失败，请重试",
+    "description": "Translation key: qrCode_copyError"
+  },
+  "qrCode_imagePasted": {
+    "message": "图片粘贴成功，正在解析...",
+    "description": "Translation key: qrCode_imagePasted"
+  },
+  "qrCode_imagePasteError": {
+    "message": "粘贴图片失败，请重试",
+    "description": "Translation key: qrCode_imagePasteError"
+  },
+  "qrCode_imageCleared": {
+    "message": "图片已清除",
+    "description": "Translation key: qrCode_imageCleared"
+  },
+  "qrCode_clickToUpload": {
+    "message": "点击、拖拽或粘贴上传二维码图片",
+    "description": "Translation key: qrCode_clickToUpload"
+  },
+  "qrCode_supportFormats": {
+    "message": "支持 PNG、JPG、WEBP、Base64 格式",
+    "description": "Translation key: qrCode_supportFormats"
+  },
+  "qrCode_resultLabel": {
+    "message": "解析结果",
+    "description": "Translation key: qrCode_resultLabel"
+  },
+  "qrCode_clickToChange": {
+    "message": "点击更换图片",
+    "description": "Translation key: qrCode_clickToChange"
+  },
+  "rightClickRestorer_loading": {
+    "message": "正在加载...",
+    "description": "Translation key: rightClickRestorer_loading"
+  },
+  "rightClickRestorer_currentDomain": {
+    "message": "当前域名",
+    "description": "Translation key: rightClickRestorer_currentDomain"
+  },
+  "rightClickRestorer_statusLocked": {
+    "message": "未解锁",
+    "description": "Translation key: rightClickRestorer_statusLocked"
+  },
+  "rightClickRestorer_statusUnlocked": {
+    "message": "已解锁",
+    "description": "Translation key: rightClickRestorer_statusUnlocked"
+  },
+  "rightClickRestorer_unsupported": {
+    "message": "不支持",
+    "description": "Translation key: rightClickRestorer_unsupported"
+  },
+  "rightClickRestorer_unsupportedDesc": {
+    "message": "当前页面为浏览器内部页面或扩展页面，无法解锁右键功能。请切换到普通网页后重试。",
+    "description": "Translation key: rightClickRestorer_unsupportedDesc"
+  },
+  "rightClickRestorer_unlockDesc": {
+    "message": "点击下方按钮，为当前网站临时解锁右键菜单。刷新页面后需要重新解锁。",
+    "description": "Translation key: rightClickRestorer_unlockDesc"
+  },
+  "rightClickRestorer_unlockBtn": {
+    "message": "解锁当前网站右键",
+    "description": "Translation key: rightClickRestorer_unlockBtn"
+  },
+  "rightClickRestorer_alreadyUnlocked": {
+    "message": "右键已解锁",
+    "description": "Translation key: rightClickRestorer_alreadyUnlocked"
+  },
+  "storageCleaner_pageTitle": {
+    "message": "存储清理",
+    "description": "Translation key: storageCleaner_pageTitle"
+  },
+  "storageCleaner_loading": {
+    "message": "加载中...",
+    "description": "Translation key: storageCleaner_loading"
+  },
+  "storageCleaner_initializing": {
+    "message": "正在读取站点数据...",
+    "description": "Translation key: storageCleaner_initializing"
+  },
+  "storageCleaner_cleaning": {
+    "message": "正在清理...",
+    "description": "Translation key: storageCleaner_cleaning"
+  },
+  "storageCleaner_cleanNow": {
+    "message": "立即清理",
+    "description": "Translation key: storageCleaner_cleanNow"
+  },
+  "storageCleaner_autoRefresh": {
+    "message": "清理后自动刷新页面",
+    "description": "Translation key: storageCleaner_autoRefresh"
+  },
+  "storageCleaner_selectAll": {
+    "message": "全选所有项",
+    "description": "Translation key: storageCleaner_selectAll"
+  },
+  "storageCleaner_noData": {
+    "message": "无数据",
+    "description": "Translation key: storageCleaner_noData"
+  },
+  "storageCleaner_errorNoTab": {
+    "message": "无法获取当前标签页",
+    "description": "Translation key: storageCleaner_errorNoTab"
+  },
+  "storageCleaner_errorRestricted": {
+    "message": "存储清理功能不支持此页面",
+    "description": "Translation key: storageCleaner_errorRestricted"
+  },
+  "storageCleaner_cleanSuccessReload": {
+    "message": "清理成功，即将刷新页面",
+    "description": "Translation key: storageCleaner_cleanSuccessReload"
+  },
+  "storageCleaner_errorStandardOnly": {
+    "message": "存储清理功能仅适用于标准网页",
+    "description": "Translation key: storageCleaner_errorStandardOnly"
+  },
+  "storageCleaner_confirmTitle": {
+    "message": "确认清理数据？",
+    "description": "Translation key: storageCleaner_confirmTitle"
+  },
+  "storageCleaner_confirmDesc": {
+    "message": "您将永久删除当前页面的以下选定存储项。",
+    "description": "Translation key: storageCleaner_confirmDesc"
+  },
+  "storageCleaner_irreversible": {
+    "message": "此操作不可撤销",
+    "description": "Translation key: storageCleaner_irreversible"
+  },
+  "storageCleaner_confirmAction": {
+    "message": "确认清理",
+    "description": "Translation key: storageCleaner_confirmAction"
+  },
+  "storageCleaner_cleanedSummary": {
+    "message": "清理了 {{items}}",
+    "description": "Translation key: storageCleaner_cleanedSummary"
+  },
+  "storageCleaner_noDataToClean": {
+    "message": "该页面没有可清理的存储数据",
+    "description": "Translation key: storageCleaner_noDataToClean"
+  },
+  "storageCleaner_partialFailure": {
+    "message": "部分清理失败",
+    "description": "Translation key: storageCleaner_partialFailure"
+  },
+  "storageCleaner_options_localStorage": {
+    "message": "Local Storage",
+    "description": "Translation key: storageCleaner_options_localStorage"
+  },
+  "storageCleaner_options_sessionStorage": {
+    "message": "Session Storage",
+    "description": "Translation key: storageCleaner_options_sessionStorage"
+  },
+  "storageCleaner_options_indexedDB": {
+    "message": "IndexedDB",
+    "description": "Translation key: storageCleaner_options_indexedDB"
+  },
+  "storageCleaner_options_cookies": {
+    "message": "Cookies",
+    "description": "Translation key: storageCleaner_options_cookies"
+  },
+  "storageCleaner_options_cacheStorage": {
+    "message": "Cache Storage",
+    "description": "Translation key: storageCleaner_options_cacheStorage"
+  },
+  "storageCleaner_options_serviceWorkers": {
+    "message": "Service Workers",
+    "description": "Translation key: storageCleaner_options_serviceWorkers"
+  },
+  "textStatistics_pageTitle": {
+    "message": "文本统计",
+    "description": "Translation key: textStatistics_pageTitle"
+  },
+  "textStatistics_placeholder": {
+    "message": "在此输入或粘贴文本...",
+    "description": "Translation key: textStatistics_placeholder"
+  },
+  "textStatistics_characters": {
+    "message": "字符数",
+    "description": "Translation key: textStatistics_characters"
+  },
+  "textStatistics_words": {
+    "message": "单词数",
+    "description": "Translation key: textStatistics_words"
+  },
+  "textStatistics_lines": {
+    "message": "行数",
+    "description": "Translation key: textStatistics_lines"
+  },
+  "textStatistics_bytes": {
+    "message": "字节大小",
+    "description": "Translation key: textStatistics_bytes"
+  },
+  "timestamp_pageTitle": {
+    "message": "时间戳转换",
+    "description": "Translation key: timestamp_pageTitle"
+  },
+  "timestamp_tsToDate": {
+    "message": "时间戳 → 日期",
+    "description": "Translation key: timestamp_tsToDate"
+  },
+  "timestamp_dateToTs": {
+    "message": "日期 → 时间戳",
+    "description": "Translation key: timestamp_dateToTs"
+  },
+  "timestamp_placeholderTs": {
+    "message": "输入时间戳...",
+    "description": "Translation key: timestamp_placeholderTs"
+  },
+  "timestamp_placeholderDate": {
+    "message": "YYYY-MM-DD HH:mm:ss",
+    "description": "Translation key: timestamp_placeholderDate"
+  },
+  "timestamp_unitMs": {
+    "message": "毫秒 (ms)",
+    "description": "Translation key: timestamp_unitMs"
+  },
+  "timestamp_currentTs": {
+    "message": "当前时间戳",
+    "description": "Translation key: timestamp_currentTs"
+  },
+  "timestamp_useNowTooltip": {
+    "message": "填充到下方",
+    "description": "Translation key: timestamp_useNowTooltip"
+  },
+  "timestamp_copyTsTooltip": {
+    "message": "复制时间戳",
+    "description": "Translation key: timestamp_copyTsTooltip"
+  },
+  "timestamp_usedSuccess": {
+    "message": "已使用当前时间戳",
+    "description": "Translation key: timestamp_usedSuccess"
+  },
+  "timestamp_resultLabel": {
+    "message": "转换结果",
+    "description": "Translation key: timestamp_resultLabel"
+  },
+  "timestamp_copyResultTooltip": {
+    "message": "复制结果",
+    "description": "Translation key: timestamp_copyResultTooltip"
+  },
+  "timestamp_relativeTime": {
+    "message": "相对时间",
+    "description": "Translation key: timestamp_relativeTime"
+  },
+  "timestamp_iso8601": {
+    "message": "ISO 8601",
+    "description": "Translation key: timestamp_iso8601"
+  },
+  "timestamp_utcTime": {
+    "message": "UTC 时间",
+    "description": "Translation key: timestamp_utcTime"
+  },
+  "timestamp_copyTooltip": {
+    "message": "复制",
+    "description": "Translation key: timestamp_copyTooltip"
+  },
+  "timestamp_resultEmpty": {
+    "message": "请输入并点击转换",
+    "description": "Translation key: timestamp_resultEmpty"
+  },
+  "common_buttons_cancel": {
+    "message": "取消",
+    "description": "Translation key: buttons_cancel"
+  },
+  "common_buttons_copy": {
+    "message": "复制",
+    "description": "Translation key: buttons_copy"
+  },
+  "common_buttons_themeMode_light": {
+    "message": "切换到深色模式",
+    "description": "Translation key: buttons_themeMode_light"
+  },
+  "common_buttons_themeMode_dark": {
+    "message": "切换到系统模式",
+    "description": "Translation key: buttons_themeMode_dark"
+  },
+  "common_buttons_themeMode_system": {
+    "message": "切换到浅色模式",
+    "description": "Translation key: buttons_themeMode_system"
+  },
+  "common_buttons_search": {
+    "message": "搜索工具...",
+    "description": "Translation key: buttons_search"
+  },
+  "common_buttons_back": {
+    "message": "返回",
+    "description": "Translation key: buttons_back"
+  },
+  "common_buttons_clearSearch": {
+    "message": "清除搜索",
+    "description": "Translation key: buttons_clearSearch"
+  },
+  "common_buttons_recentSearch": {
+    "message": "最近搜索",
+    "description": "Translation key: buttons_recentSearch"
+  },
+  "common_buttons_noResults": {
+    "message": "未找到相关工具",
+    "description": "Translation key: buttons_noResults"
+  },
+  "common_buttons_openInTab": {
+    "message": "在标签页打开",
+    "description": "Translation key: buttons_openInTab"
+  },
+
+  "common_errorBoundary_title": {
+    "message": "糟糕，出了点问题",
+    "description": "Translation key: errorBoundary_title"
+  },
+  "common_errorBoundary_description": {
+    "message": "应用遇到了一些意外错误。您可以尝试刷新页面或重置应用。",
+    "description": "Translation key: errorBoundary_description"
+  },
+  "common_errorBoundary_refresh": {
+    "message": "刷新应用",
+    "description": "Translation key: errorBoundary_refresh"
+  },
+  "common_errorBoundary_retry": {
+    "message": "重新尝试",
+    "description": "Translation key: errorBoundary_retry"
+  },
+  "common_pageErrorBoundary_title": {
+    "message": "该功能运行异常",
+    "description": "Translation key: pageErrorBoundary_title"
+  },
+  "common_pageErrorBoundary_description": {
+    "message": "该页面在加载或渲染时遇到了内部脚本错误。您可以尝试重试，或者通过导航菜单切换到其他工具。",
+    "description": "Translation key: pageErrorBoundary_description"
+  }
+}

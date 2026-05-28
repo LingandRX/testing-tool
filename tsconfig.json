@@ -29,21 +29,6 @@
     "noImplicitAny": true
   },
   // 确保包含你的源代码目录
-  "include": [
-    "entrypoints/**/*",
-    "pages/**/*",
-    "components/**/*",
-    "providers/**/*",
-    "utils/**/*",
-    "config/**/*",
-    "types/**/*",
-    "assets/**/*",
-    "hooks/**/*",
-    "lib/**/*",
-    "src/**/*",
-    ".wxt/types/**/*.ts",
-    ".wxt/types/*.d.ts",
-    "eslint.config.ts"
-  ],
+  "include": ["src/**/*", ".wxt/types/**/*.ts", ".wxt/types/*.d.ts", "eslint.config.ts"],
   "exclude": ["node_modules", ".wxt", "dist"]
 }
