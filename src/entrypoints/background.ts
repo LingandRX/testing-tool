@@ -79,7 +79,6 @@ export default defineBackground(() => {
 
           const PROTECTED = ['contextmenu', 'copy', 'paste', 'cut', 'selectstart'];
 
-          /* 1. 屏蔽 MouseEvent.prototype.preventDefault（含 mousedown 右键） */
           const _origPreventDefault = MouseEvent.prototype.preventDefault;
           Object.defineProperty(MouseEvent.prototype, 'preventDefault', {
             value: function (this: MouseEvent) {
@@ -93,7 +92,6 @@ export default defineBackground(() => {
             configurable: true,
           });
 
-          /* 2. 屏蔽 Event.prototype.stopPropagation / stopImmediatePropagation */
           const _origStopPropagation = Event.prototype.stopPropagation;
           Object.defineProperty(Event.prototype, 'stopPropagation', {
             value: function (this: Event) {
@@ -114,7 +112,6 @@ export default defineBackground(() => {
             configurable: true,
           });
 
-          /* 3. 拦截 document.oncontextmenu（处理 return false 方式） */
           let _docOnContextMenu: unknown = null;
           Object.defineProperty(document, 'oncontextmenu', {
             get() {
@@ -147,7 +144,6 @@ export default defineBackground(() => {
     }
   });
 
-  // 4. 异步刷新请求监听（统一使用 alarms API，避免 MV3 Service Worker 被销毁导致任务丢失）
   onMessage(MessageAction.RELOAD_TAB, async (message) => {
     const { tabId, delay = 0 } = message.data;
 
@@ -164,10 +160,8 @@ export default defineBackground(() => {
 
     const alarmName = `reload-tab-${tabId}-${Date.now()}`;
 
-    // 创建一次性 Alarm，由浏览器内核保障触发（不受 Service Worker 生命周期影响）
     await browser.alarms.create(alarmName, { when: Date.now() + delay });
 
-    // 兜底清理：若 alarm 因异常未触发，delay 后 5 秒强制移除监听器并清理 alarm
     const cleanupTimeout = setTimeout(() => {
       browser.alarms.onAlarm.removeListener(alarmListener);
       browser.alarms.clear(alarmName).catch(() => {});

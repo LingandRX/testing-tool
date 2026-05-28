@@ -10,7 +10,7 @@ interface StorageOptionsGridProps extends React.HTMLAttributes<HTMLDivElement> {
   options: StorageCleanerOptions;
   sizes: Record<string, number>;
   allSelected: boolean;
-  someSelected: boolean; // 重新激活半选状态
+  someSelected: boolean;
   onOptionChange: (key: keyof StorageCleanerOptions) => void;
   onSelectAll: (checked: boolean) => void;
 }
@@ -36,9 +36,7 @@ export default function StorageOptionsGrid({
     { key: 'serviceWorkers', isCount: true },
   ];
 
-  // 2. 处理全选栏点击事件：包裹整个栏变成超级热区
   const handleToggleAll = () => {
-    // 如果当前已经是全选，点击则取消全选；否则，点击就是全选
     onSelectAll(!allSelected);
   };
 

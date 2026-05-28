@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'; // 引入标准的高级阻尼 Spinner 图标
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorageCleanerConfirm from '@/pages/StorageCleaner/StorageCleanerConfirm';
 import { useStorageCleaner } from './useStorageCleaner';

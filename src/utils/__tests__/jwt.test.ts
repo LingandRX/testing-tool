@@ -4,27 +4,15 @@ import { decodeBase64Url, parseJwt } from '@/utils/jwt';
 describe('jwt utils', () => {
   describe('decodeBase64Url', () => {
     it('should decode standard base64url', () => {
-      // "test" -> "dGVzdA"
       expect(decodeBase64Url('dGVzdA')).toBe('test');
     });
 
     it('should handle padding correctly', () => {
-      // "a" -> "YQ" (needs ==)
       expect(decodeBase64Url('YQ')).toBe('a');
-      // "ab" -> "YWI" (needs =)
       expect(decodeBase64Url('YWI')).toBe('ab');
     });
 
     it('should handle - and _ correctly', () => {
-      // Validating base64url specific chars
-      // standard base64 of binary 0xFF 0xEF is "/+8="
-      // base64url should be "_-8"
-      // Wait, let's use a simpler one.
-      // 0xFB 0xFF -> "+/8=" in base64, "-_8=" in base64url? No.
-      // + -> -
-      // / -> _
-      // let's try to encode something that results in + and /
-      // binary 0xFB 0xFF 0xBE -> "+/++" in base64 -> "-_--" in base64url
       expect(decodeBase64Url('-_--')).toBeDefined();
     });
 

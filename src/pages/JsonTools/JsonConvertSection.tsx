@@ -75,7 +75,7 @@ export default function JsonConvertSection({
         placeholder={t(`jsonFormat:${pk}InputPlaceholder`)}
         value={input}
         onChange={setInput}
-        externalError={error || runtimeError || undefined} // 融合语法错误与运行时转换错误
+        externalError={error || runtimeError || undefined}
         showClear={true}
         allowCopy={true}
         minRows={7}
@@ -86,14 +86,12 @@ export default function JsonConvertSection({
       {/* Result display */}
       {result && result.output ? (
         <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
-          {/* 结果栏精致头部 */}
           <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
             <div className="flex gap-4 items-center">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
                 {t(`jsonFormat:${pk}OutputLabel`)}
               </span>
 
-              {/* 字节比对注入 tabular-nums font-mono，防止容量大小变动时字符横向抽搐 */}
               <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
                 <span>
                   {t('jsonFormat:originalSize')}:{' '}
@@ -117,15 +115,11 @@ export default function JsonConvertSection({
             />
           </div>
 
-          {/* 转换出的数据流承载区：
-            💡 修复点：移除了互相冲突打架的 select-all 类名，仅保留纯净、支持自由划线选中的 select-text 样式 
-          */}
           <div className="p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all max-h-[380px] overflow-y-auto leading-relaxed select-text">
             {result.output}
           </div>
         </div>
       ) : (
-        /* Empty state */
         <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
           <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
             {error ? t('jsonFormat:fixErrorHint') : t(`jsonFormat:${pk}EmptyHint`)}

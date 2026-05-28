@@ -96,7 +96,6 @@ export function RouterProvider({
   visiblePagesKey = 'app/visiblePages',
   pageOrderKey = 'app/pageOrder',
 }: RouterProviderProps) {
-  // 1. Initialize state with sync snapshot
   const [currentPage, setCurrentPage] = useState<PageType>(() =>
     getSyncSnapshot(syncKey as string, defaultRoute, isValidPage),
   );
@@ -153,7 +152,6 @@ export function RouterProvider({
     }
   }, [defaultRoute, syncKey, syncRoute, visiblePagesKey, pageOrderKey]);
 
-  // Load initial data from async storage on mount
   useEffect(() => {
     let cancelled = false;
 

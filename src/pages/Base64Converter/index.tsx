@@ -2,7 +2,7 @@ import { useI18n } from '@/utils/chromeI18n';
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConverterPageMode } from '@/types/storage';
 import TextMode from './TextMode';
-import Base64ConverterSection from './Base64ConverterSection'; // ✅ 正确对接全新的一体化大组件
+import Base64ConverterSection from './Base64ConverterSection';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
 const VALID_PAGE_MODES: readonly Base64ConverterPageMode[] = ['text', 'file', 'image'];

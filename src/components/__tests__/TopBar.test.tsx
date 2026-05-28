@@ -6,7 +6,6 @@ import TopBar from '@/components/TopBar';
 import { RouterProvider } from '@/providers/RouterProvider';
 import { ThemeModeProvider } from '@/providers/ThemeModeProvider';
 
-// matchMedia must be mocked before ThemeModeProvider is imported
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({

@@ -18,7 +18,6 @@ describe('QrCodePreview 组件', () => {
   describe('渲染测试', () => {
     it('当 qrCodeDataUrl 为空时应显示占位文本', () => {
       render(<QrCodePreview qrCodeDataUrl="" onDownload={mockOnDownload} onCopy={mockOnCopy} />);
-      // 💡 修复点 2：全面拥抱柔性正则匹配，直接终结多层 'qrCode:qrCode:' 前缀踩踏！
       expect(screen.getByText(/二维码将显示/)).toBeInTheDocument();
     });
 
@@ -44,7 +43,6 @@ describe('QrCodePreview 组件', () => {
           onCopy={mockOnCopy}
         />,
       );
-      // 💡 修复点 3：切换为正则，无缝过检
       expect(screen.getByText(/下载二维码/)).toBeInTheDocument();
     });
 

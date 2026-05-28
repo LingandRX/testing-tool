@@ -4,7 +4,6 @@ import { StorageCleanerConfirm } from '@/pages/StorageCleaner/StorageCleanerConf
 import type { StorageCleanerOptions } from '@/types/storage';
 import React from 'react';
 
-// 💡 1. 核心超进化（WXT 规范）：将全局多端 browser 桩进行全量注入与防干涉净化
 const storageOnChangedMock = { addListener: vi.fn(), removeListener: vi.fn() };
 (globalThis as any).chrome = { storage: { onChanged: storageOnChangedMock } };
 (globalThis as any).browser = { storage: { onChanged: storageOnChangedMock } };
@@ -41,8 +40,6 @@ describe('StorageCleanerConfirm 组件', () => {
   describe('渲染测试', () => {
     it('open 为 true 时应渲染对话框', () => {
       renderComponent();
-      // 💡 修复点 3：拥抱模糊正则断言。
-      // 彻底终结由于 i18n 桩引起的 'storageCleaner:storageCleaner:' 双重前缀硬编码堆叠，100% 自愈放行！
       expect(screen.getByRole('heading', { name: /确认清理/ })).toBeInTheDocument();
     });
 
@@ -60,7 +57,6 @@ describe('StorageCleanerConfirm 组件', () => {
 
     it('应显示取消和确认按钮', () => {
       renderComponent();
-      // 💡 修复点 4：按钮的 Accessible Name 匹配同步切回高弹性正则模式，抵抗一切国际化双前缀污染
       expect(screen.getByRole('button', { name: /取消/ })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /确认清理/ })).toBeInTheDocument();
     });
