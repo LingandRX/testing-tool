@@ -1,4 +1,4 @@
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConverterPageMode } from '@/types/storage';
 import TextMode from './TextMode';
@@ -12,7 +12,7 @@ const isValidPageMode = (val: unknown): val is Base64ConverterPageMode =>
 type PageMode = Base64ConverterPageMode;
 
 export default function Index() {
-  const { t } = useLazyTranslation('base64Converter');
+  const { t } = useI18n('base64Converter');
   const [pageMode, setPageMode] = useStorageState(
     'base64Converter/pageMode',
     'text',

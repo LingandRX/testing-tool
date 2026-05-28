@@ -26,7 +26,7 @@ describe('RightClickRestorerPage', () => {
 
   it('should render locked status', () => {
     render(<RightClickRestorerPage />);
-    expect(screen.getByText(/statusLocked/)).toBeInTheDocument();
+    expect(screen.getByText(/未解锁/)).toBeInTheDocument();
   });
 
   it('should call unlock when button clicked', () => {

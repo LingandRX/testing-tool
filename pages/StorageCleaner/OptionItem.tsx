@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatSize } from '@/utils/storageCleaner';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 // 引入官方的 Checkbox 原子组件
 import { Checkbox } from '@/components/ui/checkbox';
@@ -22,7 +22,7 @@ export default function OptionItem({
   className,
   ...props
 }: OptionItemProps) {
-  const { t } = useLazyTranslation('storageCleaner');
+  const { t } = useI18n('storageCleaner');
 
   return (
     <div

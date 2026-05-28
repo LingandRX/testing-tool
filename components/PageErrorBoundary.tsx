@@ -1,9 +1,9 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import { withTranslation, type WithTranslation } from 'react-i18next';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getMessage } from '@/utils/chromeI18n';
 
-interface Props extends WithTranslation {
+interface Props {
   children: ReactNode;
   resetKey?: string | number;
 }
@@ -13,7 +13,7 @@ interface State {
   error: Error | null;
 }
 
-class PageErrorBoundaryBase extends Component<Props, State> {
+class PageErrorBoundary extends Component<Props, State> {
   state: State = {
     hasError: false,
     error: null,
@@ -38,7 +38,6 @@ class PageErrorBoundaryBase extends Component<Props, State> {
   };
 
   render() {
-    const { t } = this.props;
     if (this.state.hasError) {
       return (
         <div className="flex flex-col items-center justify-center flex-1 p-6 min-h-[300px] animate-in fade-in zoom-in-95 duration-200">
@@ -48,10 +47,10 @@ class PageErrorBoundaryBase extends Component<Props, State> {
             </div>
 
             <h3 className="text-base font-semibold text-foreground mb-1.5">
-              {t('pageErrorBoundary.title')}
+              {getMessage('pageErrorBoundary_title')}
             </h3>
             <p className="text-xs text-muted-foreground mb-5">
-              {t('pageErrorBoundary.description')}
+              {getMessage('pageErrorBoundary_description')}
             </p>
 
             {this.state.error && (
@@ -69,7 +68,7 @@ class PageErrorBoundaryBase extends Component<Props, State> {
               className="font-medium shadow-sm"
             >
               <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-              {t('errorBoundary.retry')}
+              {getMessage('errorBoundary_retry')}
             </Button>
           </div>
         </div>
@@ -80,5 +79,5 @@ class PageErrorBoundaryBase extends Component<Props, State> {
   }
 }
 
-export const PageErrorBoundary = withTranslation('common')(PageErrorBoundaryBase);
+export { PageErrorBoundary };
 export default PageErrorBoundary;

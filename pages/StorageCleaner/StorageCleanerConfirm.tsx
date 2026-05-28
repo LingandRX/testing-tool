@@ -10,7 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
 import type { StorageCleanerOptions } from '@/types/storage';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 export interface StorageCleanerConfirmProps {
@@ -26,7 +26,7 @@ export function StorageCleanerConfirm({
   onConfirm,
   options,
 }: StorageCleanerConfirmProps) {
-  const { t } = useLazyTranslation('storageCleaner');
+  const { t } = useI18n('storageCleaner');
 
   const selectedOptions = Object.entries(options)
     .filter(([_, value]) => value)
@@ -99,7 +99,7 @@ export function StorageCleanerConfirm({
             onClick={onClose}
             className="w-full text-xs font-semibold shadow-sm h-9 text-muted-foreground hover:text-foreground"
           >
-            {t('common:buttons.cancel')}
+            {t('common_buttons_cancel')}
           </Button>
         </DialogFooter>
       </DialogContent>

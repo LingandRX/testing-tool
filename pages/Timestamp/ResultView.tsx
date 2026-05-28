@@ -3,7 +3,7 @@ import dayjs from '@/utils/dayjs';
 import CopyButton from '@/components/CopyButton';
 import type { UnitType } from './constants';
 import { DATE_FORMAT } from './constants';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils'; // shadcn 核心类名合并工具
 
 interface ResultViewProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -25,7 +25,7 @@ const ResultView = React.memo(
     className,
     ...props
   }: ResultViewProps) => {
-    const { t } = useLazyTranslation('timestamp');
+    const { t } = useI18n('timestamp');
 
     // 严谨计算时间衍生的附加时区/相对时间状态
     const extraInfo = useMemo(() => {

@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ExternalLink,
-  Globe,
   History,
   Monitor,
   Moon,
@@ -16,8 +15,7 @@ import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
 import { openExtensionPage } from '@/utils/chromeTabs';
-import { useTranslation } from 'react-i18next';
-import { normalizeLanguage, SUPPORTED_LANGUAGES } from '@/i18n';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils'; // 1. 引入 shadcn 核心工具函数
 
 // 常量配置抽取（无需写在全局变量或 styles 对象里）
@@ -27,7 +25,7 @@ const SEARCH_HISTORY_DISPLAY = 5;
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
   const { mode, setMode } = useThemeMode();
-  const { t, i18n } = useTranslation(['common', 'features']);
+  const { t } = useI18n(['common', 'features']);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -99,14 +97,6 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
     setShowResults(false);
   };
 
-  const toggleLanguage = async () => {
-    const currentLng = normalizeLanguage(i18n.language);
-    const currentIndex = SUPPORTED_LANGUAGES.indexOf(currentLng);
-    const nextLng = SUPPORTED_LANGUAGES[(currentIndex + 1) % SUPPORTED_LANGUAGES.length];
-    await i18n.changeLanguage(nextLng);
-    await storageUtil.set('app/language', nextLng);
-  };
-
   const cycleThemeMode = () => {
     const nextMap = { light: 'dark', dark: 'system', system: 'light' } as const;
     setMode(nextMap[mode]);
@@ -159,7 +149,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           <button
             type="button"
             onClick={goBack}
-            aria-label={t('common:buttons.back')}
+            aria-label={t('common_buttons_back')}
             className="flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -174,7 +164,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           <input
             ref={inputRef}
             type="text"
-            placeholder={t('common:buttons.search')}
+            placeholder={t('common_buttons_search')}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -183,7 +173,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
             }}
             onFocus={() => setShowResults(true)}
             onKeyDown={handleKeyDown}
-            aria-label={t('common:buttons.search')}
+            aria-label={t('common_buttons_search')}
             className="w-full h-9 pl-9 pr-8 text-sm rounded-md border border-input bg-muted/50 transition-all placeholder:text-muted-foreground focus:bg-background focus:outline-none focus:ring-1 focus:ring-ring focus:border-input"
           />
           {searchQuery && (
@@ -272,16 +262,13 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
 
       {/* 右侧：操作区 */}
       <div className="flex items-center gap-1 shrink-0">
-        <IconButton onClick={toggleLanguage} title={t('common:buttons.toggleLanguage')}>
-          <Globe className="h-4 w-4" />
-        </IconButton>
         <IconButton onClick={cycleThemeMode} title={t(`common:buttons.themeMode.${mode}`)}>
           <ThemeIcon className="h-4 w-4" />
         </IconButton>
         <IconButton onClick={handleOpenInTab} title={t('common:buttons.openInTab')}>
           <ExternalLink className="h-4 w-4" />
         </IconButton>
-        <IconButton onClick={onOpenOptions} title={t('common:buttons.settings')}>
+        <IconButton onClick={onOpenOptions} title={t('common_buttons_settings')}>
           <Settings className="h-4 w-4" />
         </IconButton>
       </div>
