@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ExternalLink, Monitor, Moon, Search, Settings, Sun, X } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Monitor, Moon, Search, Sun, X } from 'lucide-react';
 import { useRouter } from '@/providers/RouterProvider';
 import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FeatureConfig, FEATURES } from '@/config/features';
@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 const SEARCH_HISTORY_LIMIT = 10;
 const SEARCH_HISTORY_DISPLAY = 5;
 
-export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
+export default function TopBar() {
   const { currentPage, goBack, navigateTo } = useRouter();
   const { mode, setMode } = useThemeMode();
   const { t } = useI18n(['common', 'features']);
@@ -283,9 +283,6 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         </IconButton>
         <IconButton onClick={handleOpenInTab} title={t('common:buttons.openInTab')}>
           <ExternalLink className="h-4 w-4" />
-        </IconButton>
-        <IconButton onClick={onOpenOptions} title={t('common_buttons_settings')}>
-          <Settings className="h-4 w-4" />
         </IconButton>
       </div>
     </header>
