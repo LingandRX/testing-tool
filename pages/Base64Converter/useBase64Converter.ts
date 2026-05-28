@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import type { FileToBase64Result } from '@/utils/base64Converter';
 import {
   base64ToBlob,
@@ -21,7 +21,7 @@ interface UseBase64ConverterProps {
 }
 
 export function useBase64Converter({ mode }: UseBase64ConverterProps) {
-  const { t } = useLazyTranslation('base64Converter');
+  const { t } = useI18n('base64Converter');
 
   const [result, setResult] = useState<FileToBase64Result | null>(null);
   const [info, setInfo] = useState<FileInfo | null>(null);

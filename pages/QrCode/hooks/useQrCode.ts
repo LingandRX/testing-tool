@@ -3,13 +3,13 @@ import QRious from 'qrious';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 import { useContextMenuData } from '@/utils/useContextMenuData';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { useDebounce } from '@/utils/useDebounce';
 import type { QrCodeContextValue } from '../contexts/QrCodeContext';
 import type { QrCodeGeneratorState, QrCodeMode, QrCodeParserState } from '../types';
 
 export function useQrCode(): QrCodeContextValue {
-  const { t } = useLazyTranslation('qrCode');
+  const { t } = useI18n('qrCode');
   const { showMessage } = useSnackbar();
 
   // 核心路由视图模式

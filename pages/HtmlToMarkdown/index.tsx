@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Download, Trash2 } from 'lucide-react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { Button } from '@/components/ui/button'; // 💡 1. 全面回归规范：引入原生的 shadcn 原子 Button
@@ -13,7 +13,7 @@ const isValidPreviewMode = (val: unknown): val is HtmlToMarkdownPreviewMode =>
   typeof val === 'string' && ['split', 'preview', 'markdown'].includes(val);
 
 export default function HtmlToMarkdownPage() {
-  const { t } = useLazyTranslation('htmlToMarkdown');
+  const { t } = useI18n('htmlToMarkdown');
   const [previewMode, setPreviewMode] = useStorageState(
     'htmlToMarkdown/previewMode',
     'split' as HtmlToMarkdownPreviewMode,

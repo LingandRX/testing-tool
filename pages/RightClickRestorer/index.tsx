@@ -3,10 +3,10 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Shield, ShieldCheck, MousePointerClick, AlertTriangle } from 'lucide-react';
 import { useRightClickRestorer } from './useRightClickRestorer';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 
 export default function RightClickRestorerPage() {
-  const { t } = useLazyTranslation('rightClickRestorer');
+  const { t } = useI18n('rightClickRestorer');
   const { domain, isLoading, isUnlocked, isUnsupported, unlock } = useRightClickRestorer();
 
   if (isLoading) {

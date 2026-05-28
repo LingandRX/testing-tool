@@ -2,19 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import QrCodePreview from '@/components/QrCodePreview';
 
-// 💡 1. 规范对齐：在这个测试文件的头部同样挂载统一的 react-i18next 桩函数，
-// 与你整个工程的国际化解耦架构完美闭环。
-vi.mock('react-i18next', () => ({
-  useTranslation: vi.fn((ns: string | string[]) => {
-    const nsArray = Array.isArray(ns) ? ns : [ns];
-    return {
-      t: (key: string) => `${nsArray.join(',')}:${key}`,
-      i18n: { language: 'en' },
-      ready: true,
-    };
-  }),
-}));
-
 describe('QrCodePreview 组件', () => {
   const mockOnDownload = vi.fn();
   const mockOnCopy = vi.fn();
@@ -32,7 +19,7 @@ describe('QrCodePreview 组件', () => {
     it('当 qrCodeDataUrl 为空时应显示占位文本', () => {
       render(<QrCodePreview qrCodeDataUrl="" onDownload={mockOnDownload} onCopy={mockOnCopy} />);
       // 💡 修复点 2：全面拥抱柔性正则匹配，直接终结多层 'qrCode:qrCode:' 前缀踩踏！
-      expect(screen.getByText(/qrCodeWillShow/)).toBeInTheDocument();
+      expect(screen.getByText(/二维码将显示/)).toBeInTheDocument();
     });
 
     it('当 qrCodeDataUrl 有值时应显示二维码图片', () => {
@@ -58,7 +45,7 @@ describe('QrCodePreview 组件', () => {
         />,
       );
       // 💡 修复点 3：切换为正则，无缝过检
-      expect(screen.getByText(/downloadButton/)).toBeInTheDocument();
+      expect(screen.getByText(/下载二维码/)).toBeInTheDocument();
     });
 
     it('当 qrCodeDataUrl 有值时应显示复制按钮', () => {
@@ -69,14 +56,13 @@ describe('QrCodePreview 组件', () => {
           onCopy={mockOnCopy}
         />,
       );
-      // 💡 修复点 4：切换为正则，无缝过检
-      expect(screen.getByText(/copyQrButton/)).toBeInTheDocument();
+      expect(screen.getByText(/复制二维码/)).toBeInTheDocument();
     });
 
     it('当 qrCodeDataUrl 为空时不应显示操作按钮', () => {
       render(<QrCodePreview qrCodeDataUrl="" onDownload={mockOnDownload} onCopy={mockOnCopy} />);
-      expect(screen.queryByText(/downloadButton/)).not.toBeInTheDocument();
-      expect(screen.queryByText(/copyQrButton/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/下载二维码/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/复制二维码/)).not.toBeInTheDocument();
     });
   });
 
@@ -89,8 +75,7 @@ describe('QrCodePreview 组件', () => {
           onCopy={mockOnCopy}
         />,
       );
-      // 💡 修复点 5：点击行为同步更改为正则匹配定位，保障状态修改流一帧直达
-      fireEvent.click(screen.getByText(/downloadButton/));
+      fireEvent.click(screen.getByText(/下载二维码/));
       expect(mockOnDownload).toHaveBeenCalledTimes(1);
     });
 
@@ -102,8 +87,7 @@ describe('QrCodePreview 组件', () => {
           onCopy={mockOnCopy}
         />,
       );
-      // 💡 修复点 6：彻底修复第 88 行报错位置，改用正则解开死锁！
-      fireEvent.click(screen.getByText(/copyQrButton/));
+      fireEvent.click(screen.getByText(/复制二维码/));
       expect(mockOnCopy).toHaveBeenCalledTimes(1);
     });
   });

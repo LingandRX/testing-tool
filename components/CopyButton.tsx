@@ -4,7 +4,7 @@ import { copyTextToClipboard } from '@/utils/clipboard';
 import { cn } from '@/lib/utils';
 import { buttonVariants, type ButtonProps } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/utils/chromeI18n';
 
 interface CopyButtonProps extends Omit<ButtonProps, 'children' | 'onClick'> {
   text: string;
@@ -19,7 +19,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   className,
   ...props
 }) => {
-  const { t } = useTranslation('common');
+  const { t } = useI18n('common');
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

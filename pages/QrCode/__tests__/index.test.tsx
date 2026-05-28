@@ -11,15 +11,6 @@ vi.mock('lucide-react', async (importOriginal) => {
   };
 });
 
-// Mock useLazyTranslation
-vi.mock('@/utils/useLazyTranslation', () => ({
-  useLazyTranslation: () => ({
-    t: (key: string) => key,
-    i18n: { changeLanguage: vi.fn(), language: 'zh-CN' },
-    isLoaded: true,
-  }),
-}));
-
 // Mock useSnackbar
 vi.mock('@/components/GlobalSnackbar', () => ({
   useSnackbar: () => ({
@@ -64,13 +55,13 @@ describe('QrCodePage', () => {
 
   it('应该渲染模式切换按钮', () => {
     render(<QrCodePage />);
-    expect(screen.getByText('qrCode:urlToQr')).toBeInTheDocument();
-    expect(screen.getByText('qrCode:qrToUrl')).toBeInTheDocument();
+    expect(screen.getByText('文本转二维码')).toBeInTheDocument();
+    expect(screen.getByText('二维码转文本')).toBeInTheDocument();
   });
 
   it('切换到解析模式应该渲染 ImageUploader', () => {
     render(<QrCodePage />);
-    fireEvent.click(screen.getByText('qrCode:qrToUrl'));
+    fireEvent.click(screen.getByText('二维码转文本'));
     expect(screen.getByTestId('image-uploader')).toBeInTheDocument();
     expect(screen.queryByTestId('qr-code-preview')).not.toBeInTheDocument();
   });
@@ -78,16 +69,16 @@ describe('QrCodePage', () => {
   it('切换回生成模式应该渲染 QrCodePreview', () => {
     render(<QrCodePage />);
     // 先切换到解析模式
-    fireEvent.click(screen.getByText('qrCode:qrToUrl'));
+    fireEvent.click(screen.getByText('二维码转文本'));
     expect(screen.getByTestId('image-uploader')).toBeInTheDocument();
     // 再切换回生成模式
-    fireEvent.click(screen.getByText('qrCode:urlToQr'));
+    fireEvent.click(screen.getByText('文本转二维码'));
     expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
   });
 
   it('应该渲染输入区域的系统标签（对齐新版 Label 机制）', () => {
     render(<QrCodePage />);
-    expect(screen.getByText('qrCode:urlInputLabel')).toBeInTheDocument();
+    expect(screen.getByText('输入 URL 或文本')).toBeInTheDocument();
   });
 
   it('应该渲染双翼响应式卡片网格布局', () => {

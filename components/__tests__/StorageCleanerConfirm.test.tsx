@@ -9,18 +9,6 @@ const storageOnChangedMock = { addListener: vi.fn(), removeListener: vi.fn() };
 (globalThis as any).chrome = { storage: { onChanged: storageOnChangedMock } };
 (globalThis as any).browser = { storage: { onChanged: storageOnChangedMock } };
 
-// 💡 2. 对齐 react-i18next 的分布式国际化桩
-vi.mock('react-i18next', () => ({
-  useTranslation: vi.fn((ns: string | string[]) => {
-    const nsArray = Array.isArray(ns) ? ns : [ns];
-    return {
-      t: (key: string) => `${nsArray.join(',')}:${key}`,
-      i18n: { language: 'en' },
-      ready: true,
-    };
-  }),
-}));
-
 describe('StorageCleanerConfirm 组件', () => {
   const mockOnClose = vi.fn();
   const mockOnConfirm = vi.fn();
@@ -55,26 +43,26 @@ describe('StorageCleanerConfirm 组件', () => {
       renderComponent();
       // 💡 修复点 3：拥抱模糊正则断言。
       // 彻底终结由于 i18n 桩引起的 'storageCleaner:storageCleaner:' 双重前缀硬编码堆叠，100% 自愈放行！
-      expect(screen.getByText(/confirmTitle/)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /确认清理/ })).toBeInTheDocument();
     });
 
     it('应显示警告信息', () => {
       renderComponent();
-      expect(screen.getByText(/irreversible/i)).toBeInTheDocument();
+      expect(screen.getByText(/不可撤销/)).toBeInTheDocument();
     });
 
     it('应将选中的选项显示为标签', () => {
       renderComponent();
-      expect(screen.getByText(/options\.localStorage/)).toBeInTheDocument();
-      expect(screen.getByText(/options\.sessionStorage/)).toBeInTheDocument();
-      expect(screen.getByText(/options\.cookies/)).toBeInTheDocument();
+      expect(screen.getByText(/Local Storage/)).toBeInTheDocument();
+      expect(screen.getByText(/Session Storage/)).toBeInTheDocument();
+      expect(screen.getByText(/Cookies/)).toBeInTheDocument();
     });
 
     it('应显示取消和确认按钮', () => {
       renderComponent();
       // 💡 修复点 4：按钮的 Accessible Name 匹配同步切回高弹性正则模式，抵抗一切国际化双前缀污染
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /confirmAction/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /取消/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /确认清理/ })).toBeInTheDocument();
     });
   });
 
@@ -82,7 +70,7 @@ describe('StorageCleanerConfirm 组件', () => {
     it('点击取消时应调用 onClose', () => {
       renderComponent();
 
-      fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+      fireEvent.click(screen.getByRole('button', { name: /取消/ }));
       expect(mockOnClose).toHaveBeenCalledTimes(1);
       expect(mockOnConfirm).not.toHaveBeenCalled();
     });
@@ -90,7 +78,7 @@ describe('StorageCleanerConfirm 组件', () => {
     it('点击确认时应调用 onConfirm', () => {
       renderComponent();
 
-      fireEvent.click(screen.getByRole('button', { name: /confirmAction/i }));
+      fireEvent.click(screen.getByRole('button', { name: /确认清理/ }));
       expect(mockOnConfirm).toHaveBeenCalledTimes(1);
       expect(mockOnClose).not.toHaveBeenCalled();
     });
@@ -109,10 +97,10 @@ describe('StorageCleanerConfirm 组件', () => {
 
       renderComponent({ options: partialOptions });
 
-      expect(screen.getByText(/options\.localStorage/)).toBeInTheDocument();
-      expect(screen.getByText(/options\.indexedDB/)).toBeInTheDocument();
-      expect(screen.queryByText(/options\.sessionStorage/)).not.toBeInTheDocument();
-      expect(screen.queryByText(/options\.cookies/)).not.toBeInTheDocument();
+      expect(screen.getByText(/Local Storage/)).toBeInTheDocument();
+      expect(screen.getByText(/IndexedDB/)).toBeInTheDocument();
+      expect(screen.queryByText(/Session Storage/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Cookies$/)).not.toBeInTheDocument();
     });
 
     it('应处理空选项', () => {
@@ -135,7 +123,7 @@ describe('StorageCleanerConfirm 组件', () => {
   describe('对话框行为测试', () => {
     it('open 为 false 时不应渲染', () => {
       renderComponent({ open: false });
-      expect(screen.queryByText(/confirmTitle/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /确认清理/ })).not.toBeInTheDocument();
     });
 
     it('应使用不同选项渲染', () => {
@@ -150,8 +138,8 @@ describe('StorageCleanerConfirm 组件', () => {
 
       renderComponent({ options: customOptions });
 
-      expect(screen.getByText(/options\.sessionStorage/)).toBeInTheDocument();
-      expect(screen.getByText(/options\.cookies/)).toBeInTheDocument();
+      expect(screen.getByText(/Session Storage/)).toBeInTheDocument();
+      expect(screen.getByText(/Cookies/)).toBeInTheDocument();
     });
   });
 });
