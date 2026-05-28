@@ -2,7 +2,7 @@
  * JWT 解析工具
  */
 
-import i18n from '@/i18n';
+import { getMessage } from '@/utils/chromeI18n';
 
 export interface JwtHeader {
   alg: string;
@@ -43,7 +43,7 @@ export function decodeBase64Url(str: string): string {
   const pad = base64.length % 4;
   if (pad) {
     if (pad === 1) {
-      throw new Error(i18n.t('jwt:errors.invalidBase64String'));
+      throw new Error(getMessage('jwt_errors_invalidBase64String'));
     }
     base64 += new Array(5 - pad).join('=');
   }
@@ -59,7 +59,7 @@ export function decodeBase64Url(str: string): string {
     return decoder.decode(bytes);
   } catch (e) {
     throw new Error(
-      i18n.t('jwt:errors.failedToDecode') + (e instanceof Error ? e.message : String(e)),
+      getMessage('jwt_errors_failedToDecode') + (e instanceof Error ? e.message : String(e)),
       { cause: e },
     );
   }
@@ -78,7 +78,7 @@ export function parseJwt(token: string): JwtResult {
       payload: null,
       signature: '',
       raw: { header: '', payload: '', signature: '' },
-      error: i18n.t('jwt:errors.invalidFormat'),
+      error: getMessage('jwt_errors_invalidFormat'),
     };
   }
 
@@ -99,7 +99,7 @@ export function parseJwt(token: string): JwtResult {
     result.header = JSON.parse(headerJson);
   } catch (e) {
     result.error =
-      i18n.t('jwt:errors.parseHeaderFailed') + (e instanceof Error ? e.message : String(e));
+      getMessage('jwt_errors_parseHeaderFailed') + (e instanceof Error ? e.message : String(e));
     return result;
   }
 
@@ -108,7 +108,7 @@ export function parseJwt(token: string): JwtResult {
     result.payload = JSON.parse(payloadJson);
   } catch (e) {
     result.error =
-      i18n.t('jwt:errors.parsePayloadFailed') + (e instanceof Error ? e.message : String(e));
+      getMessage('jwt_errors_parsePayloadFailed') + (e instanceof Error ? e.message : String(e));
     return result;
   }
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import {
   formatJson,
   type JsonFormatOptions,
@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
 export default function JsonFormatSection() {
-  const { t } = useLazyTranslation('jsonFormat');
+  const { t } = useI18n('jsonFormat');
 
   const [input, setInput] = useState('');
   const [debouncedInput, setDebouncedInput] = useState('');

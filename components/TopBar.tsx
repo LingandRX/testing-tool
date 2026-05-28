@@ -16,8 +16,8 @@ import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
 import { openExtensionPage } from '@/utils/chromeTabs';
-import { useTranslation } from 'react-i18next';
-import { normalizeLanguage, SUPPORTED_LANGUAGES } from '@/i18n';
+import { useI18n } from '@/utils/chromeI18n';
+import { normalizeLanguage, SUPPORTED_LANGUAGES } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils'; // 1. 引入 shadcn 核心工具函数
 
 // 常量配置抽取（无需写在全局变量或 styles 对象里）
@@ -27,7 +27,7 @@ const SEARCH_HISTORY_DISPLAY = 5;
 export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void }) {
   const { currentPage, goBack, navigateTo } = useRouter();
   const { mode, setMode } = useThemeMode();
-  const { t, i18n } = useTranslation(['common', 'features']);
+  const { t, i18n } = useI18n(['common', 'features']);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -159,7 +159,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           <button
             type="button"
             onClick={goBack}
-            aria-label={t('common:buttons.back')}
+            aria-label={t('common_buttons_back')}
             className="flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -174,7 +174,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
           <input
             ref={inputRef}
             type="text"
-            placeholder={t('common:buttons.search')}
+            placeholder={t('common_buttons_search')}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -183,7 +183,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
             }}
             onFocus={() => setShowResults(true)}
             onKeyDown={handleKeyDown}
-            aria-label={t('common:buttons.search')}
+            aria-label={t('common_buttons_search')}
             className="w-full h-9 pl-9 pr-8 text-sm rounded-md border border-input bg-muted/50 transition-all placeholder:text-muted-foreground focus:bg-background focus:outline-none focus:ring-1 focus:ring-ring focus:border-input"
           />
           {searchQuery && (
@@ -281,7 +281,7 @@ export default function TopBar({ onOpenOptions }: { onOpenOptions: () => void })
         <IconButton onClick={handleOpenInTab} title={t('common:buttons.openInTab')}>
           <ExternalLink className="h-4 w-4" />
         </IconButton>
-        <IconButton onClick={onOpenOptions} title={t('common:buttons.settings')}>
+        <IconButton onClick={onOpenOptions} title={t('common_buttons_settings')}>
           <Settings className="h-4 w-4" />
         </IconButton>
       </div>

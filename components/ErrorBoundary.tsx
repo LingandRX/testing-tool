@@ -1,9 +1,9 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import { withTranslation, type WithTranslation } from 'react-i18next';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getMessage } from '@/utils/chromeI18n';
 
-interface Props extends WithTranslation {
+interface Props {
   children: ReactNode;
 }
 
@@ -12,7 +12,7 @@ interface State {
   error: Error | null;
 }
 
-class ErrorBoundaryBase extends Component<Props, State> {
+class ErrorBoundary extends Component<Props, State> {
   state: State = {
     hasError: false,
     error: null,
@@ -37,7 +37,6 @@ class ErrorBoundaryBase extends Component<Props, State> {
   };
 
   render() {
-    const { t } = this.props;
     if (this.state.hasError) {
       return (
         <div className="flex flex-col items-center justify-center mt-16 mx-auto max-w-md">
@@ -46,9 +45,11 @@ class ErrorBoundaryBase extends Component<Props, State> {
               <AlertCircle className="h-8 w-8" />
             </div>
             <h2 className="text-xl font-extrabold text-destructive mb-2">
-              {t('errorBoundary.title')}
+              {getMessage('errorBoundary_title')}
             </h2>
-            <p className="text-sm text-muted-foreground mb-6">{t('errorBoundary.description')}</p>
+            <p className="text-sm text-muted-foreground mb-6">
+              {getMessage('errorBoundary_description')}
+            </p>
             {this.state.error && (
               <div className="mb-6 p-4 rounded-lg bg-zinc-950 dark:bg-zinc-900 text-left max-h-[200px] overflow-auto border border-border/40">
                 <pre className="font-mono text-xs whitespace-pre-wrap break-all text-zinc-200 selection:bg-zinc-700">
@@ -62,7 +63,7 @@ class ErrorBoundaryBase extends Component<Props, State> {
               className="rounded-lg font-bold shadow-sm"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
-              {t('errorBoundary.refresh')}
+              {getMessage('errorBoundary_refresh')}
             </Button>
           </div>
         </div>
@@ -73,5 +74,5 @@ class ErrorBoundaryBase extends Component<Props, State> {
   }
 }
 
-export const ErrorBoundary = withTranslation('common')(ErrorBoundaryBase);
+export { ErrorBoundary };
 export default ErrorBoundary;

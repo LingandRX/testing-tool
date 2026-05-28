@@ -1,12 +1,12 @@
 import TextInputArea from '@/components/TextInputArea';
 import QrCodePreview from '@/components/QrCodePreview';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 export default function GeneratePanel() {
-  const { t } = useLazyTranslation('qrCode');
+  const { t } = useI18n('qrCode');
   const { generatorState, setTextToEncode, downloadQrCode, copyQrCode } = useQrCodeContext();
 
   return (

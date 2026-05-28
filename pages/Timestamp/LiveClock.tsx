@@ -3,7 +3,7 @@ import { Clock } from 'lucide-react';
 import CopyButton from '@/components/CopyButton';
 import { useSnackbar } from '@/components/GlobalSnackbar';
 import type { UnitType } from './constants';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils'; // 引入标准的 shadcn 工具函数
 
 interface LiveClockProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -12,7 +12,7 @@ interface LiveClockProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const LiveClock = React.memo(({ unit, onUseNow, className, ...props }: LiveClockProps) => {
-  const { t } = useLazyTranslation('timestamp');
+  const { t } = useI18n('timestamp');
   const { showMessage } = useSnackbar();
   const onUseNowRef = useRef(onUseNow);
 

@@ -3,12 +3,12 @@ import ToolCard from '@/pages/Dashboard/ToolCard';
 import { getFeatureByKey } from '@/config/features';
 import type { PageType } from '@/types/storage';
 import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { navigateTo, visiblePages, pageOrder } = useRouter();
-  const { t } = useTranslation(['features']);
+  const { t } = useI18n(['features']);
 
   const visibleSet = useMemo(() => new Set<string>(visiblePages), [visiblePages]);
 

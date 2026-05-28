@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { parseJwt, stringifyJson } from '@/utils/jwt';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ interface SectionProps {
 }
 
 const Section = ({ title, content, colorClass, bgClass, borderClass }: SectionProps) => {
-  const { t } = useLazyTranslation('jwt');
+  const { t } = useI18n('jwt');
   return (
     <div className={cn('p-4 rounded-xl border border-solid', bgClass, borderClass)}>
       <div className="flex justify-between items-center mb-2 select-none">
@@ -39,7 +39,7 @@ const Section = ({ title, content, colorClass, bgClass, borderClass }: SectionPr
 };
 
 export default function Index() {
-  const { t } = useLazyTranslation(['jwt', 'jsonFormat']);
+  const { t } = useI18n(['jwt', 'jsonFormat']);
   const [jwtInput, setJwtInput] = useState('');
 
   // 2. 防抖中转管道：切断高频键盘敲击时的红色语法闪烁
@@ -74,7 +74,7 @@ export default function Index() {
         <TextInputArea
           minRows={5}
           maxRows={10}
-          placeholder={t('jwt:placeholder')}
+          placeholder={t('jwt_placeholder')}
           value={jwtInput}
           onChange={(val) => {
             const cleaned = val.replace(/^Bearer\s*/i, '').trim();

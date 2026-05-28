@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 import TextInputArea from '@/components/TextInputArea';
 import { formatByteSize, getTextStats } from '@/utils/textStatistics';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 import { cn } from '@/lib/utils';
 
 export default function Index() {
-  const { t } = useLazyTranslation('textStatistics');
+  const { t } = useI18n('textStatistics');
   const [text, setText] = useState('');
 
   const handleContextMenuData = useCallback((payload: string) => {
