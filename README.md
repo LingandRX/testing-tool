@@ -84,25 +84,25 @@
 ## 项目结构
 
 ```text
-├── components/           # 可复用 React 组件
-├── config/              # 应用配置
-│   └── features.tsx     # 功能定义与路由映射
-├── entrypoints/         # 扩展程序入口点
-│   ├── popup/           # 点击图标弹出的主界面
-│   ├── options/         # 扩展程序设置页面
-│   ├── sidepanel/       # 浏览器侧边栏集成
-│   ├── background.ts    # 后台 Service Worker
-│   └── content.ts       # 网页注入脚本
-├── pages/               # 各功能模块的页面组件
-├── providers/           # 全局状态提供者 (Router, Theme 等)
-├── hooks/               # 自定义 React Hooks
-├── utils/               # 工具函数与服务抽象
-├── types/               # TypeScript 类型声明
-├── lib/                 # 通用工具函数 (cn, utils 等)
-├── i18n/                # 国际化资源
-├── public/              # 静态资源 (图标、manifest 资源等)
-├── wxt.config.ts        # WXT 框架核心配置
-└── package.json         # 项目元数据与依赖管理
+├── src/                   # 源代码根目录
+│   ├── components/        # 可复用 React 组件
+│   ├── config/            # 应用配置
+│   │   └── features.tsx   # 功能定义与路由映射
+│   ├── entrypoints/       # 扩展程序入口点
+│   │   ├── popup/         # 点击图标弹出的主界面
+│   │   ├── options/       # 扩展程序设置页面
+│   │   ├── sidepanel/     # 浏览器侧边栏集成
+│   │   ├── background.ts  # 后台 Service Worker
+│   │   └── content.ts     # 网页注入脚本
+│   ├── pages/             # 各功能模块的页面组件
+│   ├── providers/         # 全局状态提供者 (Router, Theme 等)
+│   ├── hooks/             # 自定义 React Hooks
+│   ├── utils/             # 工具函数与服务抽象
+│   ├── types/             # TypeScript 类型声明
+│   └── lib/               # 通用工具函数 (cn, utils 等)
+├── public/                # 静态资源 (图标、manifest 资源等)
+├── wxt.config.ts          # WXT 框架核心配置
+└── package.json           # 项目元数据与依赖管理
 ```
 
 ## 开发与部署

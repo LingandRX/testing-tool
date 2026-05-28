@@ -1,4 +1,4 @@
-import '../.wxt/types/imports.d.ts';
+import '../../.wxt/types/imports.d.ts';
 import { initMessageHandler } from './content/messageHandler';
 
 export default defineContentScript({

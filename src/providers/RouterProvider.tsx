@@ -147,6 +147,7 @@ export function RouterProvider({
       if (isValidPageList(savedPageOrder) && savedPageOrder.length > 0) {
         setPageOrder(mergeWithDefaults(savedPageOrder, getDefaultPageOrder()));
       }
+      setIsLoaded(true);
     } catch (error) {
       console.error('[Router Init Error] Core data fetch failed:', error);
     }
@@ -156,10 +157,10 @@ export function RouterProvider({
   useEffect(() => {
     let cancelled = false;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Valid async data loading pattern on mount
     loadInitialData()
       .then(() => {
         if (cancelled) return;
-        setIsLoaded(true);
 
         // 检查 URL 参数中的右键菜单高阶中转数据
         if (typeof window !== 'undefined') {

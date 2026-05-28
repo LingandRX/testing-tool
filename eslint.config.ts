@@ -28,14 +28,7 @@ export default tseslint.config(
 
   // 4. 核心业务全受控大管线（Hooks, Entrypoints, Components 统一护航）
   {
-    files: [
-      'hooks/**/*.{ts,tsx}',
-      'entrypoints/**/*.{ts,tsx}',
-      'pages/**/*.{ts,tsx}',
-      'utils/**/*.{ts,tsx}',
-      'components/**/*.{ts,tsx}',
-      'services/**/*.{ts,tsx}',
-    ],
+    files: ['src/**/*.{ts,tsx}'],
     ignores: ['**/__tests__/**', '**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
 
     languageOptions: {
