@@ -7,10 +7,6 @@ import { getEntryPointType } from '@/config/features';
 import { useMemo } from 'react';
 
 export default function App() {
-  const handleOpenOptions = () => {
-    chrome.runtime.openOptionsPage().catch(console.error);
-  };
-
   const entryType = useMemo(() => getEntryPointType(), []);
 
   const routerConfig = useMemo(() => {
@@ -36,7 +32,7 @@ export default function App() {
     >
       <SnackbarProvider initialOptions={{ autoHideDuration: 1500 }}>
         <div className="app flex flex-col w-[400px] max-w-[400px] min-w-[400px] h-[600px] min-h-[600px] overflow-hidden bg-background sm:w-screen sm:max-w-none sm:min-w-0 sm:h-screen sm:min-h-0">
-          <TopBar onOpenOptions={handleOpenOptions} />
+          <TopBar />
           <ErrorBoundary>
             <RouterContainer />
           </ErrorBoundary>

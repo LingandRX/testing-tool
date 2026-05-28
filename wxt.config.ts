@@ -65,10 +65,6 @@ export default defineConfig({
     side_panel: {
       default_path: 'entrypoints/sidepanel/index.html',
     },
-    options_ui: {
-      page: 'entrypoints/options/index.html',
-      open_in_tab: true,
-    },
   },
   vite: () => ({
     plugins: [manualChunksForHtmlOnly()],

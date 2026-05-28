@@ -53,34 +53,21 @@ describe('TopBar 组件', () => {
   describe('渲染测试', () => {
     it('不在 dashboard 时应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'timestamp';
-      renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
+      renderWithProvider(<TopBar />);
       expect(screen.getByLabelText('返回')).toBeInTheDocument();
     });
 
     it('在 dashboard 上不应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'dashboard';
-      renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
+      renderWithProvider(<TopBar />);
       expect(screen.queryByLabelText('返回')).not.toBeInTheDocument();
-    });
-
-    it('应渲染设置按钮', () => {
-      renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.getByLabelText('设置')).toBeInTheDocument();
     });
   });
 
   describe('交互测试', () => {
-    it('点击设置按钮时应调用 onOpenOptions', () => {
-      const handleOpenOptions = vi.fn();
-      renderWithProvider(<TopBar onOpenOptions={handleOpenOptions} />);
-
-      fireEvent.click(screen.getByLabelText('设置'));
-      expect(handleOpenOptions).toHaveBeenCalledTimes(1);
-    });
-
     it('点击返回按钮时应调用 goBack', () => {
       mockRouterValue.currentPage = 'timestamp';
-      renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
+      renderWithProvider(<TopBar />);
 
       fireEvent.click(screen.getByLabelText('返回'));
       expect(mockRouterValue.goBack).toHaveBeenCalledTimes(1);

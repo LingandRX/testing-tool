@@ -106,14 +106,6 @@ describe('chromeTabs', () => {
       });
     });
 
-    it('应该支持带查询参数的扩展页面', async () => {
-      await openExtensionPage('options.html', { tab: 'settings', id: '123' });
-
-      expect(chrome.tabs.create).toHaveBeenCalledWith({
-        url: 'chrome-extension://test-extension-id/options.html?tab=settings&id=123',
-      });
-    });
-
     it('当创建标签页失败时应记录错误', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       (chrome.tabs.create as any).mockRejectedValue(new Error('Tab creation failed'));
