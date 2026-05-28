@@ -79,12 +79,12 @@ export function isSupportedImageType(mimeType: string): boolean {
 
 | 场景        | 导出方式                                         | 示例                              |
 | ----------- | ------------------------------------------------ | --------------------------------- |
-| 页面组件    | `export default function ComponentName()`        | `pages/Timestamp/index.tsx`       |
+| 页面组件    | `export default function ComponentName()`        | `src/pages/Timestamp/index.tsx`   |
 | 业务组件    | `const X = React.memo(...)` + `export default X` | `LiveClock.tsx`, `ResultView.tsx` |
-| UI 原子组件 | `React.forwardRef(...)` + `export { X }`         | `components/ui/button.tsx`        |
-| 工具函数    | `export function xxx()`                          | `utils/clipboard.ts`              |
-| 自定义 Hook | `export function useXxx()`                       | `utils/useStorageState.ts`        |
-| 类型/接口   | `export interface` / `export type`               | `types/storage.d.ts`              |
+| UI 原子组件 | `React.forwardRef(...)` + `export { X }`         | `src/components/ui/button.tsx`    |
+| 工具函数    | `export function xxx()`                          | `src/utils/clipboard.ts`          |
+| 自定义 Hook | `export function useXxx()`                       | `src/utils/useStorageState.ts`    |
+| 类型/接口   | `export interface` / `export type`               | `src/types/storage.d.ts`          |
 
 ```typescript
 // ✅ 页面组件 — default export
@@ -473,7 +473,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 | 类型        | 命名模式                   | 示例                                                     |
 | ----------- | -------------------------- | -------------------------------------------------------- |
 | 页面目录    | PascalCase                 | `Timestamp/`, `Base64Converter/`, `StorageCleaner/`      |
-| 页面入口    | `index.tsx`                | `pages/Timestamp/index.tsx`                              |
+| 页面入口    | `index.tsx`                | `src/pages/Timestamp/index.tsx`                          |
 | 组件文件    | PascalCase `.tsx`          | `TopBar.tsx`, `LiveClock.tsx`, `ResultView.tsx`          |
 | 自定义 Hook | camelCase `.ts`            | `useTimestampConverter.ts`, `useStorageCleaner.ts`       |
 | 工具函数    | camelCase `.ts`            | `chromeStorage.ts`, `base64Converter.ts`, `clipboard.ts` |
@@ -527,12 +527,12 @@ const handleClean = useCallback(async () => { ... }, []);
 测试文件放在源代码同级的 `__tests__/` 目录下：
 
 ```
-utils/__tests__/jwt.test.ts
-utils/__tests__/base64Converter.test.ts
-utils/__tests__/useStorageState.test.ts
-components/__tests__/SwitchButtonGroup.test.tsx
-components/__tests__/ErrorBoundary.test.tsx
-pages/Timestamp/__tests__/index.test.tsx
+src/utils/__tests__/jwt.test.ts
+src/utils/__tests__/base64Converter.test.ts
+src/utils/__tests__/useStorageState.test.ts
+src/components/__tests__/SwitchButtonGroup.test.tsx
+src/components/__tests__/ErrorBoundary.test.tsx
+src/pages/Timestamp/__tests__/index.test.tsx
 ```
 
 ### 7.2 describe / it 命名
@@ -653,16 +653,16 @@ export function useTimestampConverter(): UseTimestampConverterReturn { ... }
 
 ### 8.2 Hook 存放位置
 
-- **全局通用 Hook**：放在 `utils/` 目录下
+- **全局通用 Hook**：放在 `src/utils/` 目录下
 - **页面专属 Hook**：与页面组件同目录
 
 ```
-utils/useStorageState.ts          — Chrome Storage 状态持久化
-utils/useLazyTranslation.ts       — i18n 懒加载
-utils/useContextMenuData.ts       — 右键菜单数据
-utils/useDebounce.ts              — 防抖
-pages/Timestamp/useTimestampConverter.ts    — 页面级 Hook
-pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
+src/utils/useStorageState.ts          — Chrome Storage 状态持久化
+src/utils/useLazyTranslation.ts       — i18n 懒加载
+src/utils/useContextMenuData.ts       — 右键菜单数据
+src/utils/useDebounce.ts              — 防抖
+src/pages/Timestamp/useTimestampConverter.ts    — 页面级 Hook
+src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
 ```
 
 ---
@@ -767,7 +767,7 @@ const [themeMode, setThemeMode, isInitialized] = useStorageState(
 ### 11.1 页面组件结构
 
 ```
-pages/FeatureName/
+src/pages/FeatureName/
 ├── index.tsx              # 页面 UI（纯展示，使用 shadcn/ui 组件）
 ├── useFeatureName.ts      # 业务逻辑 Hook（状态管理 + 转换逻辑）
 ├── constants.ts           # 常量定义（可选）
@@ -779,20 +779,19 @@ pages/FeatureName/
 
 ### 11.2 目录职责
 
-| 目录             | 职责                                                         |
-| ---------------- | ------------------------------------------------------------ |
-| `config/`        | 应用配置（功能定义、路由映射）                               |
-| `entrypoints/`   | 扩展入口点（popup、options、sidepanel、background、content） |
-| `pages/`         | 功能页面组件（懒加载）                                       |
-| `components/`    | 可复用 UI 组件                                               |
-| `components/ui/` | shadcn/ui 基础组件（button、dialog、select 等）              |
-| `providers/`     | React Context（Router、Theme 等）                            |
-| `hooks/`         | 自定义 React Hooks                                           |
-| `utils/`         | 工具函数与服务抽象                                           |
-| `types/`         | TypeScript 类型声明                                          |
-| `lib/`           | 通用工具函数（cn、utils）                                    |
-| `i18n/`          | 国际化资源                                                   |
-| `public/`        | 静态资源                                                     |
+| 目录                 | 职责                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| `src/config/`        | 应用配置（功能定义、路由映射）                               |
+| `src/entrypoints/`   | 扩展入口点（popup、options、sidepanel、background、content） |
+| `src/pages/`         | 功能页面组件（懒加载）                                       |
+| `src/components/`    | 可复用 UI 组件                                               |
+| `src/components/ui/` | shadcn/ui 基础组件（button、dialog、select 等）              |
+| `src/providers/`     | React Context（Router、Theme 等）                            |
+| `src/hooks/`         | 自定义 React Hooks                                           |
+| `src/utils/`         | 工具函数与服务抽象                                           |
+| `src/types/`         | TypeScript 类型声明                                          |
+| `src/lib/`           | 通用工具函数（cn、utils）                                    |
+| `public/`            | 静态资源                                                     |
 
 ---
 
