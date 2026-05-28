@@ -1,0 +1,52 @@
+import { describe, expect, it } from 'vitest';
+import { decodeBase64Url, parseJwt } from '@/utils/jwt';
+
+describe('jwt utils', () => {
+  describe('decodeBase64Url', () => {
+    it('should decode standard base64url', () => {
+      expect(decodeBase64Url('dGVzdA')).toBe('test');
+    });
+
+    it('should handle padding correctly', () => {
+      expect(decodeBase64Url('YQ')).toBe('a');
+      expect(decodeBase64Url('YWI')).toBe('ab');
+    });
+
+    it('should handle - and _ correctly', () => {
+      expect(decodeBase64Url('-_--')).toBeDefined();
+    });
+
+    it('should decode UTF-8 characters correctly', () => {
+      // "你好" -> "5L2g5aW9"
+      expect(decodeBase64Url('5L2g5aW9')).toBe('你好');
+    });
+  });
+
+  describe('parseJwt', () => {
+    it('should return error for invalid format', () => {
+      const result = parseJwt('invalid-token');
+      expect(result.error).toBeDefined();
+      expect(result.error?.length).toBeGreaterThan(0);
+    });
+
+    it('should parse a valid JWT structure', () => {
+      // Header: {"alg":"HS256","typ":"JWT"}
+      // Payload: {"sub":"1234567890","name":"John Doe","iat":1516239022}
+      const token =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+      const result = parseJwt(token);
+
+      expect(result.error).toBeUndefined();
+      expect(result.header?.alg).toBe('HS256');
+      expect(result.payload?.name).toBe('John Doe');
+      expect(result.signature).toBe('SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
+    });
+
+    it('should handle malformed json in header/payload', () => {
+      // Base64 of "{"
+      const token = 'ew.ew.signature';
+      const result = parseJwt(token);
+      expect(result.error).toBeDefined();
+    });
+  });
+});

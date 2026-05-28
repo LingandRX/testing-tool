@@ -1,66 +1,71 @@
 import '@testing-library/jest-dom';
 import { afterEach, beforeEach, vi } from 'vitest';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import React from 'react';
 
-// 读取中文翻译文件用于 withTranslation mock
-const zhCommon = JSON.parse(
-  readFileSync(resolve(__dirname, 'i18n/locales/zh/common.json'), 'utf-8'),
-);
+// Load actual zh translations for getMessage mock
+const zhMessages: Record<string, { message: string }> =
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('./public/_locales/zh/messages.json');
 
-// 支持嵌套 key 查找，如 "errorBoundary.title" → zhCommon.errorBoundary.title
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function nestedLookup(obj: Record<string, any>, key: string): string | undefined {
-  const parts = key.split('.');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let current: any = obj;
-  for (const part of parts) {
-    if (current == null || typeof current !== 'object') return undefined;
-    current = current[part];
-  }
-  return typeof current === 'string' ? current : undefined;
-}
-
-vi.mock('@/utils/useLazyTranslation', () => ({
-  useLazyTranslation: (ns?: string) => ({
-    // 自动承接命名空间前缀过滤，100% 模拟真实多语种直出
-    t: (key: string) => (ns ? `${ns}:${key}` : key),
+vi.mock('@/utils/chromeI18n', () => ({
+  useI18n: (ns?: string | string[]) => ({
+    t: (key: string) => {
+      let msgId = key;
+      // Handle namespace:key format
+      if (key.includes(':')) {
+        msgId = key.replace(':', '_').replace(/\./g, '_');
+      }
+      // Try direct key first
+      if (zhMessages[msgId]) return zhMessages[msgId].message;
+      // Try namespace prefix (using converted msgId)
+      if (ns) {
+        const namespaces = Array.isArray(ns) ? ns : [ns];
+        for (const n of namespaces) {
+          const candidate = `${n}_${msgId}`;
+          if (zhMessages[candidate]) return zhMessages[candidate].message;
+        }
+      }
+      return msgId;
+    },
     i18n: {
       changeLanguage: vi.fn().mockResolvedValue(undefined),
-      language: 'zh-CN',
+      language: 'zh',
     },
     isLoaded: true,
   }),
+  getMessage: (msgId: string) => zhMessages[msgId]?.message ?? msgId,
+  getLanguage: () => 'zh',
+  preloadNamespaces: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {
-      changeLanguage: vi.fn().mockResolvedValue(undefined),
-      language: 'zh-CN',
-    },
-  }),
-  withTranslation: (ns?: string) => {
-    const translations = ns === 'common' ? zhCommon : {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (Component: React.ComponentType<any>) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const Wrapped = (props: any) =>
-        React.createElement(Component, {
-          ...props,
-          t: (key: string) => nestedLookup(translations, key) || key,
-          i18n: { language: 'zh-CN', changeLanguage: vi.fn() },
-        });
-      Wrapped.displayName = `withTranslation(${Component.displayName || Component.name || 'Component'})`;
-      return Wrapped;
-    };
-  },
-  initReactI18next: {
-    type: '3rdParty',
-    init: vi.fn().mockResolvedValue(undefined),
-  },
+vi.mock('@/components/CopyButton', () => ({
+  CopyButton: ({
+    text,
+    tooltip,
+    onClick,
+  }: {
+    text: string;
+    tooltip?: string;
+    onClick?: (e: React.MouseEvent) => void;
+  }) =>
+    React.createElement(
+      'button',
+      {
+        'aria-label': tooltip || 'copy',
+        type: 'button',
+        onClick: async (e: React.MouseEvent) => {
+          if (text) {
+            try {
+              await navigator.clipboard.writeText(text);
+            } catch {
+              // 与真实 CopyButton 行为一致：失败时静默处理
+            }
+          }
+          onClick?.(e);
+        },
+      },
+      'Copy',
+    ),
 }));
 
 vi.mock('@/components/CopyButton', () => ({

@@ -22,13 +22,6 @@ function manualChunksForHtmlOnly(): Plugin {
           ) {
             return 'vendor-react';
           }
-          if (
-            id.includes('i18next') ||
-            id.includes('react-i18next') ||
-            id.includes('intl-messageformat')
-          ) {
-            return 'vendor-i18n';
-          }
           // 二维码活态感知依赖分流
           if (id.includes('qr-scanner') || id.includes('qrious')) {
             return 'vendor-qr';
@@ -36,10 +29,6 @@ function manualChunksForHtmlOnly(): Plugin {
           // 拖拽排序高级组件分流
           if (id.includes('@dnd-kit')) {
             return 'vendor-dnd';
-          }
-          // Markdown 高性能转换引擎分流
-          if (id.includes('marked')) {
-            return 'vendor-markdown';
           }
 
           return undefined;
@@ -51,10 +40,12 @@ function manualChunksForHtmlOnly(): Plugin {
 
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
+  srcDir: 'src',
   manifest: {
     name: 'Testing Tool',
     description: 'A tool for testing web applications.',
     version_name: undefined,
+    default_locale: 'zh',
     permissions: [
       'storage',
       'unlimitedStorage',
@@ -69,14 +60,10 @@ export default defineConfig({
     ],
     host_permissions: ['<all_urls>'],
     action: {
-      default_title: '__MSG_extName__',
+      default_title: '__MSG_appName__',
     },
     side_panel: {
       default_path: 'entrypoints/sidepanel/index.html',
-    },
-    options_ui: {
-      page: 'entrypoints/options/index.html',
-      open_in_tab: true,
     },
   },
   vite: () => ({
