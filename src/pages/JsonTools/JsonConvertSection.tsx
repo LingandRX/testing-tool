@@ -32,7 +32,7 @@ export default function JsonConvertSection({
 
   const pk = translationPrefix;
 
-  // 1. 高阶性能调优：将文本变化收拢进行 250ms 极速防抖落盘，避免每一次敲击键盘都触发底层的复杂序列化算法
+  // Debounce input
   useEffect(() => {
     const handle = setTimeout(() => {
       setDebouncedInput(input);
@@ -40,14 +40,10 @@ export default function JsonConvertSection({
     return () => clearTimeout(handle);
   }, [input]);
 
-  // 💡 2. 贯彻方案 A（衍生变量超进化）：
-  // 彻底删掉 error 状态和对应的受控 useEffect 节点。
-  // 语法错误由防抖文本在内存中同步推导，彻底斩断二次级联渲染链条，ESLint 警告自愈！
   const error = useMemo(() => {
     return validateJson(debouncedInput);
   }, [debouncedInput]);
 
-  // 3. 核心魔法：纯净的即时流式转换转换管线 (Live Compilation Pipeline)
   const conversionPipeline = useMemo(() => {
     const trimmed = debouncedInput.trim();
     if (!trimmed || error) return null;
@@ -63,7 +59,6 @@ export default function JsonConvertSection({
     }
   }, [debouncedInput, error, convertFunction]);
 
-  // 判定运行时异常
   const runtimeError =
     conversionPipeline && 'isRuntimeError' in conversionPipeline
       ? conversionPipeline.errorMessage
@@ -88,7 +83,7 @@ export default function JsonConvertSection({
         onClear={() => setInput('')}
       />
 
-      {/* 4. 结果展示或状态引导卡片区 */}
+      {/* Result display */}
       {result && result.output ? (
         <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
           {/* 结果栏精致头部 */}
@@ -130,7 +125,7 @@ export default function JsonConvertSection({
           </div>
         </div>
       ) : (
-        /* 5. 空状态提示容器：完美的中性虚线引导，不喧宾夺主 */
+        /* Empty state */
         <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
           <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
             {error ? t('jsonFormat:fixErrorHint') : t(`jsonFormat:${pk}EmptyHint`)}

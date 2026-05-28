@@ -40,11 +40,11 @@ export default function Index() {
   const { t } = useI18n(['jsonDiff', 'jsonFormat']);
   const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
 
-  // 1. 受控原始输入源
+  // Debounce input
   const [leftInput, setLeftInput] = useState('');
   const [rightInput, setRightInput] = useState('');
 
-  // 2. 纯净的异步防抖管道：仅负责切断高频打字开销
+  // Debounced values
   const [debouncedLeft, setDebouncedLeft] = useState('');
   const [debouncedRight, setDebouncedRight] = useState('');
 
@@ -56,7 +56,7 @@ export default function Index() {
     return () => clearTimeout(handle);
   }, [leftInput, rightInput]);
 
-  // 3. 贯彻方案A：利用 useMemo 将防抖文本同步转化为解析树和错误提示
+  // Parse debounced inputs
   const parseState = useMemo(() => {
     const invalidMsg = t('jsonDiff:invalidJson');
     return {
@@ -71,7 +71,7 @@ export default function Index() {
   const [viewMode, setViewMode] = useState<ViewMode>('sideBySide');
   const [currentDiffIndex, setCurrentDiffIndex] = useState(0);
 
-  // 4. 实时比对流式计算
+  // Real-time diff computation
   const diffResult = useMemo(() => {
     const { left, right } = parseState;
     if (left.error || right.error || debouncedLeft.trim() === '' || debouncedRight.trim() === '') {
@@ -79,9 +79,6 @@ export default function Index() {
     }
     return diffJson(left.value, right.value);
   }, [parseState, debouncedLeft, debouncedRight]);
-
-  // 💡 彻底删除了原本在此处的侦听 [diffResult] 的 useEffect。
-  // 状态重置已完全委托给事件源头，级联更新警告从根源上永久自愈！
 
   const total = diffResult?.diffPaths.length ?? 0;
 

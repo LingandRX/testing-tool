@@ -43,7 +43,7 @@ const diffNode = (
     return {
       key,
       type: 'added',
-      oldValue: undefined, // 💡 补齐：对齐移除 ? 后的类型规范
+      oldValue: undefined,
       newValue: right,
       path,
       isLeaf: !isObject(right) && !isArray(right),
@@ -58,7 +58,7 @@ const diffNode = (
       key,
       type: 'removed',
       oldValue: left,
-      newValue: undefined, // 💡 补齐：对齐移除 ? 后的类型规范
+      newValue: undefined,
       path,
       isLeaf: !isObject(left) && !isArray(left),
       hasDiffInChildren: false, // 自身即是删除，子树无需向下检索
@@ -87,7 +87,6 @@ const diffNode = (
       children.push(diffNode(l, r, k, childPath, diffPaths));
     });
 
-    // 💡 核心改良：判定子节点中是否存在任何变动
     const hasDiffInChildren = children.some((c) => c.type !== 'unchanged' || c.hasDiffInChildren);
 
     return {
@@ -115,7 +114,6 @@ const diffNode = (
       children[i] = diffNode(l, r, k, childPath, diffPaths);
     }
 
-    // 💡 核心改良：判定子项中是否存在任何变动
     const hasDiffInChildren = children.some((c) => c.type !== 'unchanged' || c.hasDiffInChildren);
 
     return {

@@ -44,8 +44,6 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
 
   useContextMenuData({ featureKey: 'base64Converter', onData: handleContextMenuData });
 
-  // 💡 4. 贯彻方案 A（彻底消灭 setOutput / setError）：
-  // 让所有的转化逻辑、类型安全校验在 useMemo 内存管道中单次渲染一气呵成！
   const conversionPipeline = useMemo(() => {
     const trimmed = debouncedInput.trim();
     if (!trimmed) return { output: '', error: null };
@@ -112,7 +110,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
         placeholder={placeholder}
         value={input}
         onChange={setInput}
-        externalError={error || undefined} // 💡 流式异常大闸动态注入
+        externalError={error || undefined}
         showClear={true}
         allowCopy={true}
         minRows={5}

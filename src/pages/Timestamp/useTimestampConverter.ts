@@ -31,11 +31,8 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
   const [unit, setUnit] = useState<UnitType>('ms');
   const [zone, setZone] = useState<ZoneType>('Asia/Shanghai');
 
-  // 1. 唯一受控源：不再区分 ts/dt，输入框在当前模式下展现的就是它的值
   const [input, setInput] = useState(() => String(Date.now()));
 
-  // 2. 核心魔法：利用 useMemo 达成 0 延迟响应式转换 (Reactive Pipeline)
-  // 只要 input, mode, unit, zone 任何一个发生改变，结果和错误信息自动流出，废除 convert 按钮
   const conversionPipeline = useMemo(() => {
     const rawInput = input.trim();
     if (!rawInput) return { result: '', error: '' };
@@ -63,7 +60,6 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
 
   const { result, error } = conversionPipeline;
 
-  // 3. 处理右键菜单联动（直接修改唯一的 input，衍生转换自动触发）
   const handleContextMenuData = useCallback((payload: string) => {
     const trimmed = payload.trim();
     if (isTimestampLike(trimmed)) {
@@ -96,8 +92,6 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
     [mode, unit, zone],
   );
 
-  // 4. 尊享级连贯交互：切换 Mode 时，自动把上一个模式计算出的结果喂进输入框
-  // 比如：输入时间戳 -> 得到日期 -> 切换模式 -> 日期直接进入输入框，方便用户进行微调反向转换
   const handleSetMode = useCallback(
     (newMode: 'ts2dt' | 'dt2ts') => {
       setMode(newMode);
