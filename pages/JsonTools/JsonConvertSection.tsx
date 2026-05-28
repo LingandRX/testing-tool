@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { formatByteSize } from '@/utils/textStatistics';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
@@ -25,7 +25,7 @@ export default function JsonConvertSection({
   className,
   ...props
 }: JsonConvertSectionProps) {
-  const { t } = useLazyTranslation('jsonFormat');
+  const { t } = useI18n('jsonFormat');
 
   const [input, setInput] = useState('');
   const [debouncedInput, setDebouncedInput] = useState('');

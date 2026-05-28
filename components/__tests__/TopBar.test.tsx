@@ -55,18 +55,18 @@ describe('TopBar 组件', () => {
     it('不在 dashboard 时应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.getByLabelText('common:buttons.back')).toBeInTheDocument();
+      expect(screen.getByLabelText('返回')).toBeInTheDocument();
     });
 
     it('在 dashboard 上不应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'dashboard';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.queryByLabelText('common:buttons.back')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('返回')).not.toBeInTheDocument();
     });
 
     it('应渲染设置按钮', () => {
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
-      expect(screen.getByLabelText('common:buttons.settings')).toBeInTheDocument();
+      expect(screen.getByLabelText('设置')).toBeInTheDocument();
     });
   });
 
@@ -75,7 +75,7 @@ describe('TopBar 组件', () => {
       const handleOpenOptions = vi.fn();
       renderWithProvider(<TopBar onOpenOptions={handleOpenOptions} />);
 
-      fireEvent.click(screen.getByLabelText('common:buttons.settings'));
+      fireEvent.click(screen.getByLabelText('设置'));
       expect(handleOpenOptions).toHaveBeenCalledTimes(1);
     });
 
@@ -83,7 +83,7 @@ describe('TopBar 组件', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar onOpenOptions={vi.fn()} />);
 
-      fireEvent.click(screen.getByLabelText('common:buttons.back'));
+      fireEvent.click(screen.getByLabelText('返回'));
       expect(mockRouterValue.goBack).toHaveBeenCalledTimes(1);
     });
   });

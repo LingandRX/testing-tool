@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils'; // 1. 引入标准的 shadcn 工具函数
 
 export interface DiffNavigatorProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -19,7 +19,7 @@ export default function DiffNavigator({
   className,
   ...props
 }: DiffNavigatorProps) {
-  const { t } = useLazyTranslation('jsonDiff');
+  const { t } = useI18n('jsonDiff');
 
   // 计算当前的边界禁用状态守卫
   const isFirst = currentIndex <= 0;

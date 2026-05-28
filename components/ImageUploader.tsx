@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Image, X } from 'lucide-react';
 import { useSnackbar } from '@/components/GlobalSnackbar';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 
 interface ImageUploaderProps {
   /** 选中的文件 */
@@ -29,7 +29,7 @@ const ImageUploader = ({
   dragging,
   onDraggingChange,
 }: ImageUploaderProps) => {
-  const { t } = useLazyTranslation('qrCode');
+  const { t } = useI18n('qrCode');
   const { showMessage } = useSnackbar();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

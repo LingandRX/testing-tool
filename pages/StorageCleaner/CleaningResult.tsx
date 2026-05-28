@@ -2,7 +2,7 @@ import React from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import type { CleaningResult as CleaningResultType } from '@/types/storage';
 import { formatCleaningResult } from '@/utils/storageCleaner';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils'; // 1. 引入 shadcn 核心类名合并工具
 
 interface CleaningResultProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -10,7 +10,7 @@ interface CleaningResultProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function CleaningResult({ result, className, ...props }: CleaningResultProps) {
-  const { t } = useLazyTranslation('storageCleaner');
+  const { t } = useI18n('storageCleaner');
 
   if (!result) return null;
 
