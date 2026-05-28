@@ -1,4 +1,4 @@
-import '../.wxt/types/imports.d.ts';
+import '../../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
 import { MessageAction, onMessage, sendMessage } from '@/utils/messages';
 import { createAllContextMenus, parseContextMenuClick } from '@/utils/contextMenu';

@@ -44,6 +44,7 @@ function manualChunksForHtmlOnly(): Plugin {
 
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
+  srcDir: 'src',
   manifest: {
     name: 'Testing Tool',
     description: 'A tool for testing web applications.',
