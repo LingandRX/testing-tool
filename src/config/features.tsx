@@ -9,8 +9,6 @@ import {
   Key,
   GitCompareArrows,
   ArrowLeftRight,
-  Code,
-  File,
   MousePointerClick,
 } from 'lucide-react';
 
@@ -25,8 +23,6 @@ const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
 const JwtPage = lazy(() => import('@/pages/Jwt'));
 const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
 const Base64ConverterPage = lazy(() => import('@/pages/Base64Converter'));
-const MarkdownToHtmlPage = lazy(() => import('@/pages/MarkdownToHtml'));
-const HtmlToMarkdownPage = lazy(() => import('@/pages/HtmlToMarkdown'));
 const RightClickRestorerPage = lazy(() => import('@/pages/RightClickRestorer'));
 
 export interface FeatureConfig {
@@ -144,32 +140,6 @@ export const FEATURES: FeatureConfig[] = [
       popup: Base64ConverterPage,
       sidepanel: Base64ConverterPage,
       tab: Base64ConverterPage,
-    },
-  },
-  {
-    key: 'markdownToHtml',
-    labelKey: 'markdownToHtml_title',
-    descriptionKey: 'markdownToHtml_description',
-    themeColorKey: 'secondary',
-    icon: Code,
-    defaultVisible: true,
-    components: {
-      popup: MarkdownToHtmlPage,
-      sidepanel: MarkdownToHtmlPage,
-      tab: MarkdownToHtmlPage,
-    },
-  },
-  {
-    key: 'htmlToMarkdown',
-    labelKey: 'htmlToMarkdown_title',
-    descriptionKey: 'htmlToMarkdown_description',
-    themeColorKey: 'secondary',
-    icon: File,
-    defaultVisible: true,
-    components: {
-      popup: HtmlToMarkdownPage,
-      sidepanel: HtmlToMarkdownPage,
-      tab: HtmlToMarkdownPage,
     },
   },
   {
