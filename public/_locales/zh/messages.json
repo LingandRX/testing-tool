@@ -1,20 +1,4 @@
 {
-  "appName": {
-    "message": "测试工具",
-    "description": "Translation key: appName"
-  },
-  "buttons_save": {
-    "message": "保存",
-    "description": "Translation key: buttons_save"
-  },
-  "buttons_cancel": {
-    "message": "取消",
-    "description": "Translation key: buttons_cancel"
-  },
-  "buttons_confirm": {
-    "message": "确认",
-    "description": "Translation key: buttons_confirm"
-  },
   "buttons_copy": {
     "message": "复制",
     "description": "Translation key: buttons_copy"
@@ -22,54 +6,6 @@
   "buttons_clear": {
     "message": "清理",
     "description": "Translation key: buttons_clear"
-  },
-  "buttons_refresh": {
-    "message": "刷新",
-    "description": "Translation key: buttons_refresh"
-  },
-  "buttons_toggleLanguage": {
-    "message": "切换语言",
-    "description": "Translation key: buttons_toggleLanguage"
-  },
-  "buttons_toggleTheme": {
-    "message": "切换主题",
-    "description": "Translation key: buttons_toggleTheme"
-  },
-  "buttons_themeMode_light": {
-    "message": "切换到深色模式",
-    "description": "Translation key: buttons_themeMode_light"
-  },
-  "buttons_themeMode_dark": {
-    "message": "切换到系统模式",
-    "description": "Translation key: buttons_themeMode_dark"
-  },
-  "buttons_themeMode_system": {
-    "message": "切换到浅色模式",
-    "description": "Translation key: buttons_themeMode_system"
-  },
-  "buttons_search": {
-    "message": "搜索工具...",
-    "description": "Translation key: buttons_search"
-  },
-  "buttons_back": {
-    "message": "返回",
-    "description": "Translation key: buttons_back"
-  },
-  "buttons_clearSearch": {
-    "message": "清除搜索",
-    "description": "Translation key: buttons_clearSearch"
-  },
-  "buttons_recentSearch": {
-    "message": "最近搜索",
-    "description": "Translation key: buttons_recentSearch"
-  },
-  "buttons_noResults": {
-    "message": "未找到相关工具",
-    "description": "Translation key: buttons_noResults"
-  },
-  "buttons_openInTab": {
-    "message": "在标签页打开",
-    "description": "Translation key: buttons_openInTab"
   },
   "buttons_settings": {
     "message": "设置",
@@ -223,10 +159,6 @@
     "message": "Base64 转换器",
     "description": "Translation key: base64Converter_pageTitle"
   },
-  "base64Converter_pageSubtitle": {
-    "message": "文本、文件与图像的 Base64 编码与解码",
-    "description": "Translation key: base64Converter_pageSubtitle"
-  },
   "base64Converter_textMode": {
     "message": "文本",
     "description": "Translation key: base64Converter_textMode"
@@ -363,10 +295,6 @@
     "message": "HTML 转 Markdown",
     "description": "Translation key: htmlToMarkdown_pageTitle"
   },
-  "htmlToMarkdown_pageSubtitle": {
-    "message": "实时将 HTML 转换为 Markdown 格式",
-    "description": "Translation key: htmlToMarkdown_pageSubtitle"
-  },
   "htmlToMarkdown_splitMode": {
     "message": "分屏",
     "description": "Translation key: htmlToMarkdown_splitMode"
@@ -403,10 +331,6 @@
     "message": "{{count}} 字符",
     "description": "Translation key: htmlToMarkdown_charCount"
   },
-  "htmlToMarkdown_copyMarkdown": {
-    "message": "复制 Markdown",
-    "description": "Translation key: htmlToMarkdown_copyMarkdown"
-  },
   "htmlToMarkdown_download": {
     "message": "下载",
     "description": "Translation key: htmlToMarkdown_download"
@@ -418,10 +342,6 @@
   "jsonDiff_pageTitle": {
     "message": "JSON 差异比较",
     "description": "Translation key: jsonDiff_pageTitle"
-  },
-  "jsonDiff_pageSubtitle": {
-    "message": "对比两个 JSON 数据的差异",
-    "description": "Translation key: jsonDiff_pageSubtitle"
   },
   "jsonDiff_leftPlaceholder": {
     "message": "输入原始 JSON...",
@@ -438,14 +358,6 @@
   "jsonDiff_rightLabel": {
     "message": "目标 JSON",
     "description": "Translation key: jsonDiff_rightLabel"
-  },
-  "jsonDiff_compareButton": {
-    "message": "比较",
-    "description": "Translation key: jsonDiff_compareButton"
-  },
-  "jsonDiff_clearButton": {
-    "message": "清空",
-    "description": "Translation key: jsonDiff_clearButton"
   },
   "jsonDiff_sideBySideMode": {
     "message": "并排",
@@ -466,10 +378,6 @@
   "jsonDiff_noDiffs": {
     "message": "无差异",
     "description": "Translation key: jsonDiff_noDiffs"
-  },
-  "jsonDiff_diffCount": {
-    "message": "{{count}} 处差异",
-    "description": "Translation key: jsonDiff_diffCount"
   },
   "jsonDiff_invalidJson": {
     "message": "无效的 JSON 格式",
@@ -495,57 +403,21 @@
     "message": "修改",
     "description": "Translation key: jsonDiff_modified"
   },
-  "jsonFormat_formatTitle": {
-    "message": "JSON 格式化",
-    "description": "Translation key: jsonFormat_formatTitle"
-  },
-  "jsonFormat_formatSubtitle": {
-    "message": "美化和格式化 JSON 数据",
-    "description": "Translation key: jsonFormat_formatSubtitle"
-  },
   "jsonFormat_inputPlaceholder": {
     "message": "输入需要格式化的 JSON...",
     "description": "Translation key: jsonFormat_inputPlaceholder"
-  },
-  "jsonFormat_formatButton": {
-    "message": "格式化",
-    "description": "Translation key: jsonFormat_formatButton"
-  },
-  "jsonFormat_clearButton": {
-    "message": "清空",
-    "description": "Translation key: jsonFormat_clearButton"
   },
   "jsonFormat_sortKeys": {
     "message": "键名排序",
     "description": "Translation key: jsonFormat_sortKeys"
   },
-  "jsonFormat_sortKeysTooltip": {
-    "message": "按字母顺序对 JSON 对象键进行排序",
-    "description": "Translation key: jsonFormat_sortKeysTooltip"
-  },
   "jsonFormat_indentSize": {
     "message": "缩进",
     "description": "Translation key: jsonFormat_indentSize"
   },
-  "jsonFormat_indentSpaces": {
-    "message": "{{count}} 个空格",
-    "description": "Translation key: jsonFormat_indentSpaces"
-  },
   "jsonFormat_outputLabel": {
     "message": "格式化结果",
     "description": "Translation key: jsonFormat_outputLabel"
-  },
-  "jsonFormat_copySuccess": {
-    "message": "复制成功",
-    "description": "Translation key: jsonFormat_copySuccess"
-  },
-  "jsonFormat_copyFail": {
-    "message": "复制失败",
-    "description": "Translation key: jsonFormat_copyFail"
-  },
-  "jsonFormat_noContent": {
-    "message": "无内容可复制",
-    "description": "Translation key: jsonFormat_noContent"
   },
   "jsonFormat_invalidJson": {
     "message": "无效的 JSON 格式",
@@ -587,14 +459,6 @@
     "message": "压缩",
     "description": "Translation key: jsonFormat_minifyMode"
   },
-  "jsonFormat_yamlTitle": {
-    "message": "JSON 转 YAML",
-    "description": "Translation key: jsonFormat_yamlTitle"
-  },
-  "jsonFormat_yamlSubtitle": {
-    "message": "将 JSON 数据转换为 YAML 格式",
-    "description": "Translation key: jsonFormat_yamlSubtitle"
-  },
   "jsonFormat_yamlModeInputPlaceholder": {
     "message": "输入需要转换的 JSON...",
     "description": "Translation key: jsonFormat_yamlModeInputPlaceholder"
@@ -606,18 +470,6 @@
   "jsonFormat_yamlModeEmptyHint": {
     "message": "输入 JSON 后点击转换",
     "description": "Translation key: jsonFormat_yamlModeEmptyHint"
-  },
-  "jsonFormat_convertButton": {
-    "message": "转换",
-    "description": "Translation key: jsonFormat_convertButton"
-  },
-  "jsonFormat_tomlTitle": {
-    "message": "JSON 转 TOML",
-    "description": "Translation key: jsonFormat_tomlTitle"
-  },
-  "jsonFormat_tomlSubtitle": {
-    "message": "将 JSON 数据转换为 TOML 格式",
-    "description": "Translation key: jsonFormat_tomlSubtitle"
   },
   "jsonFormat_tomlModeInputPlaceholder": {
     "message": "输入需要转换的 JSON...",
@@ -631,14 +483,6 @@
     "message": "输入 JSON 后点击转换",
     "description": "Translation key: jsonFormat_tomlModeEmptyHint"
   },
-  "jsonFormat_minifyTitle": {
-    "message": "JSON 压缩",
-    "description": "Translation key: jsonFormat_minifyTitle"
-  },
-  "jsonFormat_minifySubtitle": {
-    "message": "将 JSON 压缩为紧凑的单行格式",
-    "description": "Translation key: jsonFormat_minifySubtitle"
-  },
   "jsonFormat_minifyModeInputPlaceholder": {
     "message": "输入需要压缩的 JSON...",
     "description": "Translation key: jsonFormat_minifyModeInputPlaceholder"
@@ -651,17 +495,9 @@
     "message": "输入 JSON 后点击压缩",
     "description": "Translation key: jsonFormat_minifyModeEmptyHint"
   },
-  "jsonFormat_minifyButton": {
-    "message": "压缩",
-    "description": "Translation key: jsonFormat_minifyButton"
-  },
   "jwt_pageTitle": {
     "message": "JWT 解析",
     "description": "Translation key: jwt_pageTitle"
-  },
-  "jwt_pageSubtitle": {
-    "message": "JSON Web Token 解码与查看",
-    "description": "Translation key: jwt_pageSubtitle"
   },
   "jwt_placeholder": {
     "message": "在此粘贴 JWT 令牌 (Encoded JWT)...",
@@ -711,10 +547,6 @@
     "message": "Markdown 转 HTML",
     "description": "Translation key: markdownToHtml_pageTitle"
   },
-  "markdownToHtml_pageSubtitle": {
-    "message": "实时将 Markdown 转换为 HTML 并预览",
-    "description": "Translation key: markdownToHtml_pageSubtitle"
-  },
   "markdownToHtml_splitMode": {
     "message": "分屏",
     "description": "Translation key: markdownToHtml_splitMode"
@@ -759,33 +591,9 @@
     "message": "{{count}} 字符",
     "description": "Translation key: markdownToHtml_charCount"
   },
-  "markdownToHtml_copyHtml": {
-    "message": "复制 HTML",
-    "description": "Translation key: markdownToHtml_copyHtml"
-  },
-  "markdownToHtml_downloadSuccess": {
-    "message": "文件下载成功",
-    "description": "Translation key: markdownToHtml_downloadSuccess"
-  },
-  "markdownToHtml_printSuccess": {
-    "message": "打印窗口已打开",
-    "description": "Translation key: markdownToHtml_printSuccess"
-  },
   "qrCode_pageTitle": {
     "message": "二维码工具",
     "description": "Translation key: qrCode_pageTitle"
-  },
-  "qrCode_pageSubtitle": {
-    "message": "生成和解析二维码",
-    "description": "Translation key: qrCode_pageSubtitle"
-  },
-  "qrCode_generateMode": {
-    "message": "生成二维码",
-    "description": "Translation key: qrCode_generateMode"
-  },
-  "qrCode_parseMode": {
-    "message": "解析二维码",
-    "description": "Translation key: qrCode_parseMode"
   },
   "qrCode_urlToQr": {
     "message": "文本转二维码",
@@ -803,10 +611,6 @@
     "message": "请输入 URL 或文本内容，将自动生成二维码",
     "description": "Translation key: qrCode_urlInputPlaceholder"
   },
-  "qrCode_generateButton": {
-    "message": "生成二维码",
-    "description": "Translation key: qrCode_generateButton"
-  },
   "qrCode_generating": {
     "message": "生成中...",
     "description": "Translation key: qrCode_generating"
@@ -823,10 +627,6 @@
     "message": "复制二维码",
     "description": "Translation key: qrCode_copyQrButton"
   },
-  "qrCode_qrCodeSuccess": {
-    "message": "二维码生成成功",
-    "description": "Translation key: qrCode_qrCodeSuccess"
-  },
   "qrCode_qrCodeDownloadSuccess": {
     "message": "二维码下载成功",
     "description": "Translation key: qrCode_qrCodeDownloadSuccess"
@@ -834,10 +634,6 @@
   "qrCode_qrCodeCopySuccess": {
     "message": "二维码已复制到剪贴板",
     "description": "Translation key: qrCode_qrCodeCopySuccess"
-  },
-  "qrCode_selectImage": {
-    "message": "请选择二维码图片",
-    "description": "Translation key: qrCode_selectImage"
   },
   "qrCode_parseSuccess": {
     "message": "二维码解析成功",
@@ -850,10 +646,6 @@
   "qrCode_parseError": {
     "message": "解析二维码失败，请重试",
     "description": "Translation key: qrCode_parseError"
-  },
-  "qrCode_generateError": {
-    "message": "生成二维码失败，请检查输入内容",
-    "description": "Translation key: qrCode_generateError"
   },
   "qrCode_copyError": {
     "message": "复制失败，请重试",
@@ -879,41 +671,13 @@
     "message": "支持 PNG、JPG、WEBP、Base64 格式",
     "description": "Translation key: qrCode_supportFormats"
   },
-  "qrCode_parseButton": {
-    "message": "解析二维码",
-    "description": "Translation key: qrCode_parseButton"
-  },
-  "qrCode_parsing": {
-    "message": "解析中...",
-    "description": "Translation key: qrCode_parsing"
-  },
   "qrCode_resultLabel": {
     "message": "解析结果",
     "description": "Translation key: qrCode_resultLabel"
   },
-  "qrCode_copyTooltip": {
-    "message": "复制",
-    "description": "Translation key: qrCode_copyTooltip"
-  },
-  "qrCode_enterUrlError": {
-    "message": "请输入 URL 或文本",
-    "description": "Translation key: qrCode_enterUrlError"
-  },
   "qrCode_clickToChange": {
     "message": "点击更换图片",
     "description": "Translation key: qrCode_clickToChange"
-  },
-  "qrCode_pasteHint": {
-    "message": "支持 Ctrl+V 粘贴图片或 Base64 字符串",
-    "description": "Translation key: qrCode_pasteHint"
-  },
-  "qrCode_autoGenerateHint": {
-    "message": "输入内容后将自动生成二维码",
-    "description": "Translation key: qrCode_autoGenerateHint"
-  },
-  "qrCode_autoParseHint": {
-    "message": "上传图片后将自动解析二维码",
-    "description": "Translation key: qrCode_autoParseHint"
   },
   "rightClickRestorer_loading": {
     "message": "正在加载...",
@@ -955,10 +719,6 @@
     "message": "存储清理",
     "description": "Translation key: storageCleaner_pageTitle"
   },
-  "storageCleaner_pageSubtitle": {
-    "message": "清理缓存、Cookies 及本地存储",
-    "description": "Translation key: storageCleaner_pageSubtitle"
-  },
   "storageCleaner_loading": {
     "message": "加载中...",
     "description": "Translation key: storageCleaner_loading"
@@ -966,10 +726,6 @@
   "storageCleaner_initializing": {
     "message": "正在读取站点数据...",
     "description": "Translation key: storageCleaner_initializing"
-  },
-  "storageCleaner_occupied": {
-    "message": "已占用 {{size}}",
-    "description": "Translation key: storageCleaner_occupied"
   },
   "storageCleaner_cleaning": {
     "message": "正在清理...",
@@ -987,21 +743,9 @@
     "message": "全选所有项",
     "description": "Translation key: storageCleaner_selectAll"
   },
-  "storageCleaner_cleanSuccess": {
-    "message": "清理完成",
-    "description": "Translation key: storageCleaner_cleanSuccess"
-  },
-  "storageCleaner_cleanError": {
-    "message": "清理失败",
-    "description": "Translation key: storageCleaner_cleanError"
-  },
   "storageCleaner_noData": {
     "message": "无数据",
     "description": "Translation key: storageCleaner_noData"
-  },
-  "storageCleaner_countUnit": {
-    "message": "个",
-    "description": "Translation key: storageCleaner_countUnit"
   },
   "storageCleaner_errorNoTab": {
     "message": "无法获取当前标签页",
@@ -1075,10 +819,6 @@
     "message": "文本统计",
     "description": "Translation key: textStatistics_pageTitle"
   },
-  "textStatistics_pageSubtitle": {
-    "message": "实时分析文本的字符、单词、行数及字节大小",
-    "description": "Translation key: textStatistics_pageSubtitle"
-  },
   "textStatistics_placeholder": {
     "message": "在此输入或粘贴文本...",
     "description": "Translation key: textStatistics_placeholder"
@@ -1103,10 +843,6 @@
     "message": "时间戳转换",
     "description": "Translation key: timestamp_pageTitle"
   },
-  "timestamp_pageSubtitle": {
-    "message": "Unix 毫秒数转换与格式化",
-    "description": "Translation key: timestamp_pageSubtitle"
-  },
   "timestamp_tsToDate": {
     "message": "时间戳 → 日期",
     "description": "Translation key: timestamp_tsToDate"
@@ -1126,14 +862,6 @@
   "timestamp_unitMs": {
     "message": "毫秒 (ms)",
     "description": "Translation key: timestamp_unitMs"
-  },
-  "timestamp_unitS": {
-    "message": "秒 (s)",
-    "description": "Translation key: timestamp_unitS"
-  },
-  "timestamp_convertButton": {
-    "message": "立即转换",
-    "description": "Translation key: timestamp_convertButton"
   },
   "timestamp_currentTs": {
     "message": "当前时间戳",
@@ -1179,49 +907,13 @@
     "message": "请输入并点击转换",
     "description": "Translation key: timestamp_resultEmpty"
   },
-  "timestamp_errors_invalidNumber": {
-    "message": "无效数字",
-    "description": "Translation key: timestamp_errors_invalidNumber"
-  },
-  "timestamp_errors_invalidTimestamp": {
-    "message": "无效时间戳",
-    "description": "Translation key: timestamp_errors_invalidTimestamp"
-  },
-  "timestamp_errors_invalidFormat": {
-    "message": "格式错误",
-    "description": "Translation key: timestamp_errors_invalidFormat"
-  },
-  "common_buttons_save": {
-    "message": "保存",
-    "description": "Translation key: buttons_save"
-  },
   "common_buttons_cancel": {
     "message": "取消",
     "description": "Translation key: buttons_cancel"
   },
-  "common_buttons_confirm": {
-    "message": "确认",
-    "description": "Translation key: buttons_confirm"
-  },
   "common_buttons_copy": {
     "message": "复制",
     "description": "Translation key: buttons_copy"
-  },
-  "common_buttons_clear": {
-    "message": "清理",
-    "description": "Translation key: buttons_clear"
-  },
-  "common_buttons_refresh": {
-    "message": "刷新",
-    "description": "Translation key: buttons_refresh"
-  },
-  "common_buttons_toggleLanguage": {
-    "message": "切换语言",
-    "description": "Translation key: buttons_toggleLanguage"
-  },
-  "common_buttons_toggleTheme": {
-    "message": "切换主题",
-    "description": "Translation key: buttons_toggleTheme"
   },
   "common_buttons_themeMode_light": {
     "message": "切换到深色模式",
