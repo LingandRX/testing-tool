@@ -17,6 +17,8 @@ import {
 } from '@/config/features';
 import { CONTEXT_MENU_DATA_EXPIRY_MS, saveContextMenuData } from '@/utils/useContextMenuData';
 
+const MAX_RECENTLY_USED = 3;
+
 /**
  * 校验是否为合法的页面类型
  */
@@ -48,6 +50,7 @@ interface RouterContextType {
   currentPage: PageType;
   visiblePages: PageType[];
   pageOrder: PageType[];
+  recentlyUsedTools: PageType[];
   isLoaded: boolean;
   navigateTo: (page: PageType) => void;
   goBack: () => void;
@@ -118,6 +121,10 @@ export function RouterProvider({
     return mergeWithDefaults(snapshot, getDefaultPageOrder());
   });
 
+  const [recentlyUsedTools, setRecentlyUsedTools] = useState<PageType[]>(() =>
+    getSyncSnapshot('app/recentlyUsedTools', [], isValidPageList),
+  );
+
   const [isLoaded, setIsLoaded] = useState(() => {
     const snapshotKey = localStorage.getItem(`snapshot/${syncKey as string}`);
     const snapshotVisible = localStorage.getItem(`snapshot/${visiblePagesKey as string}`);
@@ -136,6 +143,7 @@ export function RouterProvider({
         getDefaultVisibleFeatureKeys(),
       );
       const savedPageOrder = await storageUtil.get(pageOrderKey, getDefaultPageOrder());
+      const savedRecentTools = await storageUtil.get('app/recentlyUsedTools', []);
 
       if (isValidPage(savedRoute) && syncRoute) {
         setCurrentPage(savedRoute);
@@ -145,6 +153,9 @@ export function RouterProvider({
       }
       if (isValidPageList(savedPageOrder) && savedPageOrder.length > 0) {
         setPageOrder(mergeWithDefaults(savedPageOrder, getDefaultPageOrder()));
+      }
+      if (isValidPageList(savedRecentTools)) {
+        setRecentlyUsedTools(savedRecentTools);
       }
       setIsLoaded(true);
     } catch (error) {
@@ -234,6 +245,17 @@ export function RouterProvider({
     }
   }, [pageOrder, isLoaded, pageOrderKey]);
 
+  useEffect(() => {
+    if (isLoaded) {
+      void storageUtil.set('app/recentlyUsedTools', recentlyUsedTools).catch(console.error);
+      try {
+        localStorage.setItem('snapshot/app/recentlyUsedTools', JSON.stringify(recentlyUsedTools));
+      } catch (err) {
+        console.error('[Router LocalStorage Error]', err);
+      }
+    }
+  }, [recentlyUsedTools, isLoaded]);
+
   const currentPageRef = useRef(currentPage);
   useEffect(() => {
     currentPageRef.current = currentPage;
@@ -261,6 +283,12 @@ export function RouterProvider({
           setPageOrder(newOrder);
         }
       }
+      if (changes['app/recentlyUsedTools']) {
+        const newRecent = changes['app/recentlyUsedTools'].newValue;
+        if (isValidPageList(newRecent)) {
+          setRecentlyUsedTools(newRecent);
+        }
+      }
       if (changes['contextMenu/pendingData']) {
         const newData = changes['contextMenu/pendingData']
           .newValue as ContextMenuPendingData | null;
@@ -282,6 +310,10 @@ export function RouterProvider({
 
   const navigateTo = (page: PageType) => {
     setCurrentPage(page);
+    setRecentlyUsedTools((prev) => {
+      const filtered = prev.filter((p) => p !== page);
+      return [page, ...filtered].slice(0, MAX_RECENTLY_USED);
+    });
   };
 
   const goBack = () => {
@@ -294,6 +326,7 @@ export function RouterProvider({
         currentPage,
         visiblePages,
         pageOrder,
+        recentlyUsedTools,
         isLoaded,
         navigateTo,
         goBack,
