@@ -3,7 +3,6 @@ import type { StorageCleanerOptions } from '@/types/storage';
 import OptionItem from './OptionItem';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
-// 1. 引入官方标准的 Checkbox 原子组件
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
@@ -51,12 +50,9 @@ export default function StorageOptionsGrid({
       )}
       {...props}
     >
-      {/* 核心网格区 */}
       <div className="p-3">
-        {/* 💡 优化点：加入 items-stretch，确保左右卡片高度绝对对齐 */}
         <div className="grid grid-cols-2 gap-2.5 items-stretch">
           {optionKeys.map(({ key, isCount }) => (
-            /* 💡 终极修复：直接把 key 挂在 OptionItem 上，移除了无意义的包裹 div */
             <OptionItem
               key={key}
               labelKey={`storageCleaner:options.${key}`}
@@ -69,10 +65,6 @@ export default function StorageOptionsGrid({
         </div>
       </div>
 
-      {/* 3. 全选功能底护栏超进化：
-        - 整体赋予 cursor-pointer 和 onClick，点击一整行都能触发全选。
-        - 悬停时自动变色提示可点击 (hover:bg-muted/50)。
-      */}
       <div
         onClick={handleToggleAll}
         className="border-t border-border flex justify-between items-center px-4 py-2.5 bg-muted/20 hover:bg-muted/50 cursor-pointer select-none"
@@ -81,11 +73,6 @@ export default function StorageOptionsGrid({
           {t('storageCleaner:selectAll')}
         </Label>
 
-        {/* 4. 降维打击：调用标准的 shadcn/ui Checkbox
-          - 阻止冒泡：防止事件重复触发。
-          - 完美注入半选逻辑：当 allSelected 为 false 但 someSelected 为 true 时，
-            组件会自动呈现优雅的 "—" (减号) 半选视觉状态，向主流系统控制台高标准看齐！
-        */}
         <Checkbox
           checked={allSelected ? true : someSelected ? 'indeterminate' : false}
           onClick={(e) => e.stopPropagation()}

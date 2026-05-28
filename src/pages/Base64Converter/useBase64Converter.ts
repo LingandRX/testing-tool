@@ -130,7 +130,6 @@ export function useBase64Converter({ mode }: UseBase64ConverterProps) {
     return '';
   }, [customFileName, decoded]);
 
-  // 💡 托管最大文件体积字符串算子，清除下游引入风险
   const maxFileSizeStr = `${MAX_FILE_SIZE / 1024 / 1024} MB`;
 
   return {

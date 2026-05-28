@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 interface SectionProps {
   title: string;
   content: unknown;
-  colorClass: string; // 💡 1. 废除硬编码十六进制色值，改用语义化的 Tailwind 类名
+  colorClass: string;
   bgClass: string;
   borderClass: string;
 }
@@ -27,10 +27,6 @@ const Section = ({ title, content, colorClass, bgClass, borderClass }: SectionPr
           className="h-6 w-6 rounded-md border text-muted-foreground"
         />
       </div>
-      {/* 💡 排版微距精雕：
-        - 彻底移除 border-black/5 这种非暗黑模式友好的硬隔离。
-        - 统一收拢为标准的 bg-muted/40 配合 font-mono text-xs
-      */}
       <pre className="m-0 p-3 bg-muted/30 dark:bg-muted/10 rounded-lg text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border border-border/50 text-foreground/90 leading-relaxed select-text">
         {content ? stringifyJson(content) : t('jwt:invalidFormat')}
       </pre>
@@ -59,7 +55,6 @@ export default function Index() {
 
   useContextMenuData({ featureKey: 'jwt', onData: handleContextMenuData });
 
-  // 3. 贯彻方案 A：衍生变量流。直接消费防抖后的文本
   const result = useMemo(() => {
     if (!debouncedInput.trim()) {
       return null;
