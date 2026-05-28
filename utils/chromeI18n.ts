@@ -19,27 +19,6 @@ export function getMessage(msgId: string, substitutions?: string[]): string {
 }
 
 /**
- * 获取当前浏览器语言
- * @returns 语言代码（如 'zh', 'en'）
- */
-export function getLanguage(): string {
-  const lang = chrome.i18n.getUILanguage();
-  return lang.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-}
-
-/**
- * 支持的语言列表
- */
-export const SUPPORTED_LANGUAGES: readonly ('zh' | 'en')[] = ['zh', 'en'] as const;
-
-/**
- * 规范化语言代码
- */
-export function normalizeLanguage(lng: string): 'zh' | 'en' {
-  return lng.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-}
-
-/**
  * react-i18next 兼容的 Hook
  * 返回 t 函数和相关信息
  */
@@ -82,7 +61,7 @@ export function useI18n(namespace?: string | string[]) {
   return {
     t,
     i18n: {
-      language: getLanguage(),
+      language: 'zh',
       changeLanguage: (_lng?: string) => {
         // chrome.i18n 无法动态切换语言，需要刷新页面
         console.warn('[chrome.i18n] 无法动态切换语言，需要刷新页面');

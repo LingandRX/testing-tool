@@ -3,11 +3,9 @@ import { afterEach, beforeEach, vi } from 'vitest';
 import React from 'react';
 
 // Load actual zh translations for getMessage mock
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const zhMessages: Record<
-  string,
-  { message: string }
-> = require('./public/_locales/zh/messages.json');
+const zhMessages: Record<string, { message: string }> =
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('./public/_locales/zh/messages.json');
 
 vi.mock('@/utils/chromeI18n', () => ({
   useI18n: (ns?: string | string[]) => ({
@@ -37,8 +35,6 @@ vi.mock('@/utils/chromeI18n', () => ({
   }),
   getMessage: (msgId: string) => zhMessages[msgId]?.message ?? msgId,
   getLanguage: () => 'zh',
-  normalizeLanguage: (lng: string) => (lng.startsWith('zh') ? 'zh' : 'en'),
-  SUPPORTED_LANGUAGES: ['zh', 'en'],
   preloadNamespaces: vi.fn().mockResolvedValue(undefined),
 }));
 
