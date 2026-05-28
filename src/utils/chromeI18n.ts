@@ -36,8 +36,8 @@ export function useI18n(namespace?: string | string[]) {
     // 先尝试直接查找 key
     let message = getMessage(msgId);
 
-    // 如果直接查找未命中，尝试命名空间前缀（使用转换后的 msgId）
-    if (message === msgId && namespaces.length > 0) {
+    // 如果直接查找未命中（空字符串或返回 key 本身），尝试命名空间前缀（使用转换后的 msgId）
+    if ((!message || message === msgId) && namespaces.length > 0) {
       for (const ns of namespaces) {
         const candidate = `${ns}_${msgId}`;
         const result = getMessage(candidate);
