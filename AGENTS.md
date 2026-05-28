@@ -59,18 +59,22 @@ public/                # 静态资源（图标、_locales 等）
 
 ### 页面组件模式
 
-典型功能页面遵循 **UI + Hook 分离** 模式：
+典型功能页面遵循 **UI + Hook 分离** 模式。详见 [CODING_STANDARDS.md § 11](./.github/CODING_STANDARDS.md#11-页面开发规范)。
 
 ```
 src/pages/FeatureName/
-├── index.tsx              # 页面 UI（纯展示，使用 shadcn/ui 组件）
+├── index.tsx              # 页面 UI（纯展示，仅负责渲染布局）
 ├── useFeatureName.ts      # 业务逻辑 Hook（状态管理 + 转换逻辑）
-└── constants.ts           # 常量定义
+├── constants.ts           # 常量定义（可选，≥3 个常量时创建）
+└── __tests__/
+    └── index.test.tsx
 ```
 
-- 页面组件调用 `useLazyTranslation('featureName')` 获取翻译函数
+- 页面入口组件统一命名为 `Index`，通过 `export default function Index()` 导出
 - Hook 负责所有状态管理和业务逻辑，通过返回值暴露给页面
-- 子组件可进一步拆分（如 `LiveClock.tsx`、`ResultView.tsx`）
+- 子组件可以独立调用 `useI18n`、`useSnackbar` 等全局 Hook
+- 当 `index.tsx` 超过 150 行时，必须拆分为 UI + Hook 模式
+- 复杂页面可增加 `contexts/`、`hooks/`、`components/` 子目录
 
 ## 关键架构决策
 
