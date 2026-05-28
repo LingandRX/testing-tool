@@ -6,10 +6,10 @@ import StorageOptionsGrid from './StorageOptionsGrid';
 import AutoRefreshToggle from './AutoRefreshToggle';
 import ErrorDisplay from './ErrorDisplay';
 import CleaningResult from './CleaningResult';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 
 export default function Index() {
-  const { t } = useLazyTranslation('storageCleaner');
+  const { t } = useI18n('storageCleaner');
 
   const {
     error,

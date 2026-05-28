@@ -1,6 +1,6 @@
 import React from 'react';
 import { Copy, Download } from 'lucide-react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -21,7 +21,7 @@ const QrCodePreview = ({
   className,
   ...props
 }: QrCodePreviewProps) => {
-  const { t } = useLazyTranslation('qrCode');
+  const { t } = useI18n('qrCode');
 
   // 空状态下的虚线骨架屏
   if (!qrCodeDataUrl) {

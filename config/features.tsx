@@ -46,7 +46,7 @@ export interface FeatureConfig {
 export const FEATURES: FeatureConfig[] = [
   {
     key: 'dashboard',
-    labelKey: 'features:dashboard.title',
+    labelKey: 'dashboard_title',
     descriptionKey: '',
     defaultVisible: true,
     components: {
@@ -57,8 +57,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'timestamp',
-    labelKey: 'features:timestamp.title',
-    descriptionKey: 'features:timestamp.description',
+    labelKey: 'timestamp_title',
+    descriptionKey: 'timestamp_description',
     themeColorKey: 'primary',
     icon: Clock,
     defaultVisible: true,
@@ -70,8 +70,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'storageCleaner',
-    labelKey: 'features:storageCleaner.title',
-    descriptionKey: 'features:storageCleaner.description',
+    labelKey: 'storageCleaner_title',
+    descriptionKey: 'storageCleaner_description',
     themeColorKey: 'warning',
     icon: Database,
     defaultVisible: true,
@@ -83,8 +83,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'qrCode',
-    labelKey: 'features:qrCode.title',
-    descriptionKey: 'features:qrCode.description',
+    labelKey: 'qrCode_title',
+    descriptionKey: 'qrCode_description',
     themeColorKey: 'success',
     icon: QrCode,
     defaultVisible: true,
@@ -96,8 +96,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'textStatistics',
-    labelKey: 'features:textStatistics.title',
-    descriptionKey: 'features:textStatistics.description',
+    labelKey: 'textStatistics_title',
+    descriptionKey: 'textStatistics_description',
     themeColorKey: 'secondary',
     icon: FileText,
     defaultVisible: true,
@@ -109,8 +109,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'jwt',
-    labelKey: 'features:jwt.title',
-    descriptionKey: 'features:jwt.description',
+    labelKey: 'jwt_title',
+    descriptionKey: 'jwt_description',
     themeColorKey: 'info',
     icon: Key,
     defaultVisible: true,
@@ -122,8 +122,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'jsonDiff',
-    labelKey: 'features:jsonDiff.title',
-    descriptionKey: 'features:jsonDiff.description',
+    labelKey: 'jsonDiff_title',
+    descriptionKey: 'jsonDiff_description',
     themeColorKey: 'primary',
     icon: GitCompareArrows,
     defaultVisible: true,
@@ -135,8 +135,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'base64Converter',
-    labelKey: 'features:base64Converter.title',
-    descriptionKey: 'features:base64Converter.description',
+    labelKey: 'base64Converter_title',
+    descriptionKey: 'base64Converter_description',
     themeColorKey: 'info',
     icon: ArrowLeftRight,
     defaultVisible: true,
@@ -148,8 +148,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'markdownToHtml',
-    labelKey: 'features:markdownToHtml.title',
-    descriptionKey: 'features:markdownToHtml.description',
+    labelKey: 'markdownToHtml_title',
+    descriptionKey: 'markdownToHtml_description',
     themeColorKey: 'secondary',
     icon: Code,
     defaultVisible: true,
@@ -161,8 +161,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'htmlToMarkdown',
-    labelKey: 'features:htmlToMarkdown.title',
-    descriptionKey: 'features:htmlToMarkdown.description',
+    labelKey: 'htmlToMarkdown_title',
+    descriptionKey: 'htmlToMarkdown_description',
     themeColorKey: 'secondary',
     icon: File,
     defaultVisible: true,
@@ -174,8 +174,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'rightClickRestorer',
-    labelKey: 'features:rightClickRestorer.title',
-    descriptionKey: 'features:rightClickRestorer.description',
+    labelKey: 'rightClickRestorer_title',
+    descriptionKey: 'rightClickRestorer_description',
     themeColorKey: 'success',
     icon: MousePointerClick,
     defaultVisible: true,

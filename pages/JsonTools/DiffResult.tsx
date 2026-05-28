@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import JsonTree from './JsonTree';
 import type { DiffNode, DiffResult as DiffResultType, DiffType, ViewMode } from './types';
@@ -18,7 +18,7 @@ export default function DiffResult({
   className,
   ...props
 }: DiffResultProps) {
-  const { t } = useLazyTranslation('jsonDiff');
+  const { t } = useI18n('jsonDiff');
 
   if (viewMode === 'sideBySide') {
     return (

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import dayjs from '@/utils/dayjs';
 import type { UnitType, ZoneType } from './constants';
 import { DATE_FORMAT } from './constants';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 
 export interface UseTimestampConverterReturn {
@@ -26,7 +26,7 @@ function isTimestampLike(input: string): boolean {
 }
 
 export function useTimestampConverter(): UseTimestampConverterReturn {
-  const { t } = useLazyTranslation('timestamp');
+  const { t } = useI18n('timestamp');
   const [mode, setMode] = useState<'ts2dt' | 'dt2ts'>('ts2dt');
   const [unit, setUnit] = useState<UnitType>('ms');
   const [zone, setZone] = useState<ZoneType>('Asia/Shanghai');

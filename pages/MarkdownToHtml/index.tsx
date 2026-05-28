@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Download, Printer, Trash2 } from 'lucide-react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { Button } from '@/components/ui/button';
@@ -82,7 +82,7 @@ const PREVIEW_STYLES = `
 `;
 
 export default function MarkdownToHtmlPage() {
-  const { t } = useLazyTranslation('markdownToHtml');
+  const { t } = useI18n('markdownToHtml');
   const [previewMode, setPreviewMode] = useStorageState(
     'markdownToHtml/previewMode',
     'split' as MarkdownToHtmlPreviewMode,

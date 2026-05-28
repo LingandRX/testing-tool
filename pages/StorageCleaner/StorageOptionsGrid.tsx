@@ -1,7 +1,7 @@
 import React from 'react';
 import type { StorageCleanerOptions } from '@/types/storage';
 import OptionItem from './OptionItem';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 // 1. 引入官方标准的 Checkbox 原子组件
 import { Checkbox } from '@/components/ui/checkbox';
@@ -26,7 +26,7 @@ export default function StorageOptionsGrid({
   className,
   ...props
 }: StorageOptionsGridProps) {
-  const { t } = useLazyTranslation('storageCleaner');
+  const { t } = useI18n('storageCleaner');
 
   const optionKeys: { key: keyof StorageCleanerOptions; isCount?: boolean }[] = [
     { key: 'localStorage' },

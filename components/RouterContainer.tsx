@@ -1,7 +1,7 @@
 import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
 import { Suspense, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/utils/chromeI18n';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
 import PageSkeleton from '@/components/PageSkeleton';
 import { cn } from '@/lib/utils'; // 1. 引入标准的 shadcn 工具函数
@@ -9,7 +9,7 @@ import { AlertTriangle } from 'lucide-react'; // 用于标准的 404 异常展�
 
 export default function RouterContainer() {
   const { currentPage, isLoaded } = useRouter();
-  const { t } = useTranslation('common');
+  const { t } = useI18n('common');
 
   // 2. 稳定的动态动画类名映射
   const animationClass = useMemo(() => {

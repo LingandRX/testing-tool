@@ -3,7 +3,7 @@ import { ZONES } from './constants';
 import LiveClock from './LiveClock';
 import ResultView from './ResultView';
 import { useTimestampConverter } from './useTimestampConverter';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 // 1. 引入标准的 shadcn/ui 原子表单组件（代替原生的原生 Input 和 Select）
@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 export default function Index() {
-  const { t } = useLazyTranslation('timestamp');
+  const { t } = useI18n('timestamp');
 
   // 2. 完美对接全新重构后的统一单源响应式 Hook
   const {

@@ -7,18 +7,6 @@ const storageOnChangedMock = { addListener: vi.fn(), removeListener: vi.fn() };
 (globalThis as any).chrome = { storage: { onChanged: storageOnChangedMock } };
 (globalThis as any).browser = { storage: { onChanged: storageOnChangedMock } };
 
-// 💡 1. 规范对齐：挂载标准的 react-i18next 统一桩函数，防止多进程前缀破产
-vi.mock('react-i18next', () => ({
-  useTranslation: vi.fn((ns: string | string[]) => {
-    const nsArray = Array.isArray(ns) ? ns : [ns];
-    return {
-      t: (key: string) => `${nsArray.join(',')}:${key}`,
-      i18n: { language: 'en' },
-      ready: true,
-    };
-  }),
-}));
-
 // 模拟 URL API
 const mockCreateObjectURL = vi.fn();
 const mockRevokeObjectURL = vi.fn();
@@ -62,8 +50,8 @@ describe('ImageUploader 组件', () => {
     it('当没有选中文件时应显示上传提示', () => {
       render(<ImageUploader {...defaultProps} />);
       // 💡 修复点 2：全面切换为高弹性正则，斩断双重命名空间死锁！
-      expect(screen.getByText(/clickToUpload/)).toBeInTheDocument();
-      expect(screen.getByText(/supportFormats/)).toBeInTheDocument();
+      expect(screen.getByText(/点击.*拖拽/)).toBeInTheDocument();
+      expect(screen.getByText(/格式/)).toBeInTheDocument();
     });
 
     it('当没有选中文件时应显示 ImageIcon', () => {
@@ -78,7 +66,7 @@ describe('ImageUploader 组件', () => {
       );
       expect(screen.getByText('test.png')).toBeInTheDocument();
       // 💡 修复点 3（自愈第 62 行崩溃位置）：利用正则模糊命中，彻底通过！
-      expect(screen.getByText(/clickToChange/)).toBeInTheDocument();
+      expect(screen.getByText(/点击更换/)).toBeInTheDocument();
     });
 
     it('当选中文件时应显示预览图片', () => {

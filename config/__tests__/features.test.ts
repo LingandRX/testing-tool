@@ -50,14 +50,14 @@ describe('features', () => {
       const feature = getFeatureByKey('dashboard');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('dashboard');
-      expect(feature?.labelKey).toBe('features:dashboard.title');
+      expect(feature?.labelKey).toBe('dashboard_title');
     });
 
     it('should return timestamp feature', () => {
       const feature = getFeatureByKey('timestamp');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('timestamp');
-      expect(feature?.labelKey).toBe('features:timestamp.title');
+      expect(feature?.labelKey).toBe('timestamp_title');
       expect(feature?.themeColorKey).toBeDefined();
     });
 
@@ -65,7 +65,7 @@ describe('features', () => {
       const feature = getFeatureByKey('storageCleaner');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('storageCleaner');
-      expect(feature?.labelKey).toBe('features:storageCleaner.title');
+      expect(feature?.labelKey).toBe('storageCleaner_title');
     });
 
     it('should return undefined for invalid key', () => {

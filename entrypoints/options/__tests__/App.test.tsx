@@ -7,6 +7,7 @@ import {
   getDefaultPageOrder,
   getFeatureByKey,
 } from '@/config/features';
+import { getMessage } from '@/utils/chromeI18n';
 
 // Mock storageUtil
 vi.mock('@/utils/chromeStorage', () => ({
@@ -14,14 +15,6 @@ vi.mock('@/utils/chromeStorage', () => ({
     get: vi.fn(),
     set: vi.fn(() => Promise.resolve()),
   },
-}));
-
-// Mock i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-  withTranslation: () => (Component: any) => Component,
 }));
 
 describe('Options App', () => {
@@ -47,7 +40,7 @@ describe('Options App', () => {
     for (const key of defaultOrder) {
       const feature = getFeatureByKey(key);
       if (feature) {
-        expect(screen.getByText(feature.labelKey)).toBeInTheDocument();
+        expect(screen.getByText(getMessage(feature.labelKey))).toBeInTheDocument();
       }
     }
   });
@@ -72,7 +65,7 @@ describe('Options App', () => {
     for (const key of defaultVisible) {
       const feature = getFeatureByKey(key);
       if (feature && key !== 'dashboard') {
-        expect(screen.getByText(feature.labelKey)).toBeInTheDocument();
+        expect(screen.getByText(getMessage(feature.labelKey))).toBeInTheDocument();
       }
     }
   });
@@ -97,7 +90,7 @@ describe('Options App', () => {
     for (const key of defaultOrder) {
       const feature = getFeatureByKey(key);
       if (feature) {
-        expect(screen.getByText(feature.labelKey)).toBeInTheDocument();
+        expect(screen.getByText(getMessage(feature.labelKey))).toBeInTheDocument();
       }
     }
   });
@@ -125,7 +118,7 @@ describe('Options App', () => {
     for (const key of defaultOrder) {
       const feature = getFeatureByKey(key);
       if (feature) {
-        expect(screen.getByText(feature.labelKey)).toBeInTheDocument();
+        expect(screen.getByText(getMessage(feature.labelKey))).toBeInTheDocument();
       }
     }
   });

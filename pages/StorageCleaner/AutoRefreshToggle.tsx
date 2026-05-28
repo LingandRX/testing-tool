@@ -14,7 +14,7 @@
  */
 
 import React from 'react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -43,7 +43,7 @@ export default function AutoRefreshToggle({
   className,
   ...props
 }: AutoRefreshToggleProps) {
-  const { t } = useLazyTranslation('storageCleaner');
+  const { t } = useI18n('storageCleaner');
 
   return (
     <div

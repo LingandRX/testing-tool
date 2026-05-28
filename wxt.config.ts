@@ -22,13 +22,6 @@ function manualChunksForHtmlOnly(): Plugin {
           ) {
             return 'vendor-react';
           }
-          if (
-            id.includes('i18next') ||
-            id.includes('react-i18next') ||
-            id.includes('intl-messageformat')
-          ) {
-            return 'vendor-i18n';
-          }
           // 二维码活态感知依赖分流
           if (id.includes('qr-scanner') || id.includes('qrious')) {
             return 'vendor-qr';
@@ -55,6 +48,7 @@ export default defineConfig({
     name: 'Testing Tool',
     description: 'A tool for testing web applications.',
     version_name: undefined,
+    default_locale: 'zh',
     permissions: [
       'storage',
       'unlimitedStorage',
@@ -69,7 +63,7 @@ export default defineConfig({
     ],
     host_permissions: ['<all_urls>'],
     action: {
-      default_title: '__MSG_extName__',
+      default_title: '__MSG_appName__',
     },
     side_panel: {
       default_path: 'entrypoints/sidepanel/index.html',

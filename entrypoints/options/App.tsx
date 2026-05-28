@@ -28,7 +28,7 @@ import {
 } from '@/config/features';
 import GlobalSnackbar, { useSnackbarState } from '@/components/GlobalSnackbar';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/utils/chromeI18n';
 
 const PALETTE_COLORS: Record<PaletteColorKey, string> = {
   primary: '#1976d2',
@@ -66,7 +66,7 @@ function SortableFeatureRow({
   isDisabled,
   onToggle,
 }: SortableFeatureRowProps) {
-  const { t } = useTranslation(['features']);
+  const { t } = useI18n(['features']);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: pageKey,
   });
@@ -154,7 +154,7 @@ function SortableFeatureRow({
 }
 
 export default function App() {
-  const { t } = useTranslation(['features', 'common']);
+  const { t } = useI18n(['features', 'common']);
 
   const initialWindowType = useMemo(() => {
     if (typeof window === 'undefined') return 'popup';

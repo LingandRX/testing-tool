@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 interface ErrorDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -7,7 +7,7 @@ interface ErrorDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function ErrorDisplay({ error, className, ...props }: ErrorDisplayProps) {
-  const { t } = useLazyTranslation('storageCleaner');
+  const { t } = useI18n('storageCleaner');
 
   return (
     // 1. 精简层级：单层外壳直接搞定居中、响应式高度与外部类名扩展

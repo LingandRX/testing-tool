@@ -1,6 +1,6 @@
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useI18n } from '@/utils/chromeI18n';
 import { QrCodeContext } from './contexts/QrCodeContext';
 import { useQrCode } from './hooks/useQrCode';
 import GeneratePanel from './components/GeneratePanel';
@@ -8,7 +8,7 @@ import ParsePanel from './components/ParsePanel';
 import type { QrCodeMode } from './types';
 
 export default function Index() {
-  const { t } = useLazyTranslation('qrCode');
+  const { t } = useI18n('qrCode');
   const qrCode = useQrCode();
 
   // 模式选项驱动骨架
