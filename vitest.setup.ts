@@ -68,6 +68,36 @@ vi.mock('@/components/CopyButton', () => ({
     ),
 }));
 
+vi.mock('@/components/CopyButton', () => ({
+  CopyButton: ({
+    text,
+    tooltip,
+    onClick,
+  }: {
+    text: string;
+    tooltip?: string;
+    onClick?: (e: React.MouseEvent) => void;
+  }) =>
+    React.createElement(
+      'button',
+      {
+        'aria-label': tooltip || 'copy',
+        type: 'button',
+        onClick: async (e: React.MouseEvent) => {
+          if (text) {
+            try {
+              await navigator.clipboard.writeText(text);
+            } catch {
+              // 与真实 CopyButton 行为一致：失败时静默处理
+            }
+          }
+          onClick?.(e);
+        },
+      },
+      'Copy',
+    ),
+}));
+
 const storageMock = {
   local: {
     get: vi.fn().mockImplementation(() => Promise.resolve({})),
