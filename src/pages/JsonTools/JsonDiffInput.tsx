@@ -2,8 +2,6 @@ import React from 'react';
 import TextInputArea from '@/components/TextInputArea';
 import { cn } from '@/lib/utils';
 
-// 💡 核心修复：使用 Omit<..., 'onChange'> 强行挖掉原生的 onChange 签名
-// 这样我们自定义的 (value: string) => void 就能独占鳌头，彻底消灭 TS2430 接口冲突！
 export interface JsonDiffInputProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   label: string;
   placeholder: string;

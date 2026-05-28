@@ -38,7 +38,6 @@ const getValueForSide = (node: DiffNode, side: TreeSide): unknown => {
   return side === 'left' ? node.oldValue : node.newValue;
 };
 
-// 1. 核心状态色彩映射调色盘：完美自适应双色模式
 const typeThemeMap = {
   added: {
     text: 'text-emerald-600 dark:text-emerald-400',
@@ -62,10 +61,6 @@ const isContainerValue = (v: unknown): boolean => {
   return (typeof v === 'object' && v !== null) || Array.isArray(v);
 };
 
-/**
- * 💡 性能调优大闸：将 NodeRow 抽离为顶层独立组件并裹上 React.memo。
- * 配合精准的 Props Diff，使得某一行的展开闭合绝对不会连累到其他平级和上级节点。
- */
 const NodeRow = React.memo(
   ({ node, side, depth, defaultExpandDepth, activePath, isLastChild }: NodeRowProps) => {
     const [override, setOverride] = useState<'auto' | 'open' | 'closed'>('auto');
@@ -113,8 +108,6 @@ const NodeRow = React.memo(
     const isActive = activePath === node.path;
     const isRoot = depth === 0;
 
-    // 缩进样式封装：
-    // 💡 视觉魔法：通过在左侧追加 before 细线，在每一层级下自动垂下一条优雅的 IDE 级“缩进指引线”
     const indentStyle = {
       paddingLeft: `${Math.max(0.25, depth * 1.15)}rem`,
     };

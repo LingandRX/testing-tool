@@ -41,7 +41,6 @@ export function htmlToMarkdown(html: string): HtmlToMarkdownResult {
     const parser = new DOMParser();
     const doc = parser.parseFromString(trimmed, 'text/html');
 
-    // 检查解析错误
     const parserError = doc.querySelector('parsererror');
     if (parserError) {
       return {
@@ -225,7 +224,6 @@ function convertTable(table: HTMLElement): string {
 
   const lines: string[] = [];
 
-  // 处理表头
   const headerRow = rows[0];
   const headerCells = Array.from(headerRow.querySelectorAll('th, td'));
   const headers = headerCells.map((cell) => (cell.textContent ?? '').trim());

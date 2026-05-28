@@ -48,7 +48,6 @@ export function useI18n(namespace?: string | string[]) {
       }
     }
 
-    // 处理插值
     if (options) {
       for (const [placeholder, value] of Object.entries(options)) {
         message = message.replace(`{{${placeholder}}}`, String(value));

@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import JsonTree from './JsonTree';
 import type { DiffNode, DiffResult as DiffResultType, DiffType, ViewMode } from './types';
 
-// 💡 顶层 Interface 继承原生 HTML 容器属性，扩展灵活性
 export interface DiffResultProps extends React.HTMLAttributes<HTMLDivElement> {
   result: DiffResultType;
   viewMode: ViewMode;
@@ -39,10 +38,6 @@ export default function DiffResult({
   }
 
   return (
-    /* 1. 单栏拍平视图容器：
-      - 对齐 shadcn 规范，使用 bg-card、border-border 隔离。
-      - 注入 tabular-nums 配合 font-mono，消灭任何行高和字符抖动。
-    */
     <div
       className={cn(
         'rounded-xl border border-border bg-card font-mono text-xs shadow-sm overflow-x-auto min-h-[200px] max-h-[520px] overflow-y-auto p-1.5',
@@ -79,8 +74,6 @@ const prefixForType = (type: DiffType): string => {
   return ' ';
 };
 
-// 2. 状态色彩超进化：
-// 拒绝硬编码实色系，全部换用高度安全的语义色变体与暗黑模式自适应。
 const typeThemeMap = {
   added: {
     text: 'text-emerald-600 dark:text-emerald-400',
@@ -191,7 +184,6 @@ interface UnifiedRowProps {
 }
 
 const UnifiedRow = ({ depth, type, text, active, multiline }: UnifiedRowProps) => {
-  // 3. 高精度提取状态样式映射
   const currentTheme = typeThemeMap[type] || typeThemeMap.unchanged;
 
   return (
@@ -200,17 +192,14 @@ const UnifiedRow = ({ depth, type, text, active, multiline }: UnifiedRowProps) =
         'flex items-start w-full font-mono py-0.5 select-text group',
         currentTheme.bg,
         currentTheme.text,
-        // 4. 高亮定位条：不再使用生硬的蓝圆环，改为现代编辑器的“侧边左高亮带”设计，质感直接拉满
         active &&
           'bg-primary/10 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-500',
       )}
       style={{
-        // 维持高精度的 Padding 基线缩进
         paddingLeft: `${Math.max(0.5, depth * 1.25)}rem`,
         paddingRight: '0.5rem',
       }}
     >
-      {/* 5. 前缀标识：等宽锁定，强行占据 w-5 并让符号居中对齐，达成 VSCode 般的整洁排版 */}
       <span className="font-bold w-5 shrink-0 text-center select-none opacity-70 tabular-nums">
         {prefixForType(type)}
       </span>

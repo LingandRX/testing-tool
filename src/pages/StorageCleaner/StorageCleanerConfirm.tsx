@@ -34,11 +34,6 @@ export function StorageCleanerConfirm({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      {/* 💡 终极修复秘诀：
-        - 移除原来的 sm:max-w-[360px]，改用 max-w-[calc(100%-32px)] 或者是 w-[88%]。
-        - 这样无论插件弹窗多窄，它的左右两侧都必然会被强制挤出至少 16px 的完美空白护边！
-        - 将 p-5 转换为明确的 p-6，增大弹窗内部的呼吸感。
-      */}
       <DialogContent
         className={cn(
           'w-[90%] max-w-[340px] p-6 gap-0 rounded-2xl overflow-hidden shadow-xl border border-border bg-card text-card-foreground',
@@ -79,11 +74,6 @@ export function StorageCleanerConfirm({
           </div>
         </div>
 
-        {/* 底部操作按钮区：
-          💡 修复要点：
-          - 增加 pt-2 隔开上方危险条。
-          - 显式通过 w-full 配合 flex-col 铺满，在移动端/窄插件下垂直堆叠，最符合小屏直觉。
-        */}
         <DialogFooter className="flex flex-col gap-2 w-full pt-2">
           <Button
             variant="destructive"

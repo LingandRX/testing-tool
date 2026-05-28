@@ -3,7 +3,7 @@ import { Download, Trash2 } from 'lucide-react';
 import { useI18n } from '@/utils/chromeI18n';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
-import { Button } from '@/components/ui/button'; // 💡 1. 全面回归规范：引入原生的 shadcn 原子 Button
+import { Button } from '@/components/ui/button';
 import { useStorageState } from '@/utils/useStorageState';
 import type { HtmlToMarkdownPreviewMode } from '@/types/storage';
 import { downloadMarkdownFile, htmlToMarkdown, SAMPLE_HTML } from '@/utils/htmlToMarkdown';

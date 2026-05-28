@@ -18,7 +18,6 @@ import { cn } from '@/lib/utils';
 const isValidPreviewMode = (val: unknown): val is MarkdownToHtmlPreviewMode =>
   typeof val === 'string' && ['split', 'preview', 'html'].includes(val);
 
-// 💡 规范回归：保持最纯净的通用选择器集合，内部变量全部交由全局 :root 驱动
 const PREVIEW_STYLES = `
   .markdown-body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -94,7 +93,6 @@ export default function MarkdownToHtmlPage() {
   const result = useMemo(() => markdownToHtml(markdown), [markdown]);
   const error = result.hasError ? (result.error ?? null) : null;
 
-  // 💡 自适应大总管：以极高严谨度拼装明暗大闸，用标准换行切断粘连风险
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
@@ -123,7 +121,6 @@ export default function MarkdownToHtmlPage() {
           --md-link-color: #3b82f6;
         }`;
 
-    // 💡 3. 核心大清洗：将全局基础树（html, body）与派生样式完全独立硬编码，杜绝任何语法踩踏
     const baseGlobalStyles = `
       html, body { 
         margin: 0; 

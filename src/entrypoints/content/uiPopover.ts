@@ -125,7 +125,6 @@ function getOrCreatePopover(): HTMLElement {
   return popover;
 }
 
-// 💡 2. 安全防线：字符实体转义沙箱，彻底掐灭任意恶意脚本的执行通道
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
     '&': '&amp;',
@@ -171,7 +170,6 @@ export function showPopover(
 ): void {
   const popover = getOrCreatePopover();
 
-  // 💡 3. 坚固的无障碍绑定：废除违规的行内 inline onclick，改用标准原生节点监听
   popover.innerHTML = '';
 
   if (title) {

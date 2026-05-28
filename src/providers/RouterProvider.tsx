@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { browser } from 'wxt/browser'; // 💡 1. 规范回归：引入 WXT 标准多端一致性代理空间
+import { browser } from 'wxt/browser';
 import type { ContextMenuPendingData, PageType, StorageSchema } from '@/types/storage';
 import { storageUtil } from '@/utils/chromeStorage';
 import {
@@ -96,7 +96,7 @@ export function RouterProvider({
   visiblePagesKey = 'app/visiblePages',
   pageOrderKey = 'app/pageOrder',
 }: RouterProviderProps) {
-  // 1. 初始化派生状态流（0 延迟快照同步）
+  // 1. Initialize state with sync snapshot
   const [currentPage, setCurrentPage] = useState<PageType>(() =>
     getSyncSnapshot(syncKey as string, defaultRoute, isValidPage),
   );
@@ -153,7 +153,7 @@ export function RouterProvider({
     }
   }, [defaultRoute, syncKey, syncRoute, visiblePagesKey, pageOrderKey]);
 
-  // 副作用 1：组件挂载时，激活初始路由校验与右键菜单传递载荷（Context Payload）的嗅探
+  // Load initial data from async storage on mount
   useEffect(() => {
     let cancelled = false;
 
@@ -162,7 +162,7 @@ export function RouterProvider({
       .then(() => {
         if (cancelled) return;
 
-        // 检查 URL 参数中的右键菜单高阶中转数据
+        // Check URL params for context menu data
         if (typeof window !== 'undefined') {
           const params = new URLSearchParams(window.location.search);
           const feature = params.get('feature') as PageType | null;
@@ -182,7 +182,7 @@ export function RouterProvider({
           }
         }
 
-        // 检查 storage 中的右键菜单待处理数据（针对 openPopup 的闭环场景）
+        // Check storage for pending context menu data
         storageUtil
           .get('contextMenu/pendingData', undefined)
           .then((pendingData) => {
@@ -276,7 +276,6 @@ export function RouterProvider({
       }
     };
 
-    // 💡 修复点：全域绑定 WXT 跨浏览器代理监听器，彻底闭环多端多进程广播
     browser.storage.onChanged.addListener(handleStorageChange);
     return () => {
       browser.storage.onChanged.removeListener(handleStorageChange);

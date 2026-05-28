@@ -12,10 +12,8 @@ export function useQrCode(): QrCodeContextValue {
   const { t } = useI18n('qrCode');
   const { showMessage } = useSnackbar();
 
-  // 核心路由视图模式
   const [mode, setMode] = useState<QrCodeMode>('generate');
 
-  // 1. 生成器状态流（大幅瘦身：剔除 generating 状态）
   const [generatorState, setGeneratorState] = useState<
     Omit<QrCodeGeneratorState, 'generating' | 'qrCodeDataUrl'>
   >({
@@ -23,7 +21,6 @@ export function useQrCode(): QrCodeContextValue {
     inputError: '',
   });
 
-  // 2. 解析器状态流
   const [parserState, setParserState] = useState<QrCodeParserState>({
     decodedResult: '',
     parsing: false,
@@ -33,12 +30,8 @@ export function useQrCode(): QrCodeContextValue {
     dragging: false,
   });
 
-  // 3. 高频打字极速防抖
   const debouncedTextToEncode = useDebounce(generatorState.textToEncode, 200);
 
-  // 💡 4. 贯彻方案 A（无副作用超导管线）：
-  // 彻底删除原有的 generateQrCodeRef、3个 useEffect、1个 useRef 以及相关的复杂状态机。
-  // 二维码画布纯粹作为防抖文本的派生变量同步算出，0重绘死循环风险，体验平滑如镜！
   const qrCodeDataUrl = useMemo(() => {
     const text = debouncedTextToEncode.trim();
     if (!text) return '';
@@ -49,14 +42,12 @@ export function useQrCode(): QrCodeContextValue {
         url = 'https://' + url;
       }
 
-      // 💡 暗黑模式自适应大闸：实时嗅探系统 DOM 阶度
       const isDark = document.documentElement.classList.contains('dark');
 
       const qr = new QRious({
         value: url,
         size: 260,
         level: 'H',
-        // 暗黑模式下使用透明底、月白前景色；白天模式下使用标准现代黑白配
         foreground: isDark ? '#f3f4f6' : '#0f172a',
         background: isDark ? 'transparent' : '#ffffff',
       });
@@ -68,7 +59,6 @@ export function useQrCode(): QrCodeContextValue {
     }
   }, [debouncedTextToEncode]);
 
-  // 融合派生数据至完整状态体，满足外部组件强类型契合
   const fullGeneratorState = useMemo<QrCodeGeneratorState>(
     () => ({
       ...generatorState,
@@ -78,12 +68,10 @@ export function useQrCode(): QrCodeContextValue {
     [generatorState, qrCodeDataUrl],
   );
 
-  // 设置输入文本
   const setTextToEncode = useCallback((text: string) => {
     setGeneratorState((prev) => ({ ...prev, textToEncode: text, inputError: '' }));
   }, []);
 
-  // 处理右键菜单数据上下文
   const handleContextMenuData = useCallback((payload: string) => {
     setMode('generate');
     setGeneratorState((prev) => ({ ...prev, textToEncode: payload, inputError: '' }));
@@ -119,7 +107,6 @@ export function useQrCode(): QrCodeContextValue {
     [t, showMessage],
   );
 
-  // 下载二维码
   const downloadQrCode = useCallback(() => {
     if (!qrCodeDataUrl) return;
 
@@ -130,7 +117,6 @@ export function useQrCode(): QrCodeContextValue {
     showMessage(t('qrCode:qrCodeDownloadSuccess'), { severity: 'success', autoHideDuration: 1000 });
   }, [qrCodeDataUrl, showMessage, t]);
 
-  // 复制二维码至剪贴板
   const copyQrCode = useCallback(async () => {
     if (!qrCodeDataUrl) return;
 
@@ -151,7 +137,6 @@ export function useQrCode(): QrCodeContextValue {
     }
   }, [qrCodeDataUrl, showMessage, t]);
 
-  // 处理文件选择
   const handleFileChange = useCallback(
     (file: File) => {
       setParserState((prev) => {

@@ -51,7 +51,6 @@ export default function SwitchButtonGroup<T extends string | number = string>({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              // 4. 完美继承 shadcn 的 Tabs 交互和动效微调
               'flex-1 inline-flex items-center justify-center font-medium whitespace-nowrap transition-all',
               'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2',
               'disabled:pointer-events-none disabled:opacity-50',

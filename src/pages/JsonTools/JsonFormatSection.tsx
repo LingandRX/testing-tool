@@ -21,7 +21,7 @@ export default function JsonFormatSection() {
   const [indentSize, setIndentSize] = useState<number>(2);
   const [sortKeys, setSortKeys] = useState(false);
 
-  // 1. 高频打字防抖落盘：防止大体积 JSON 在高频输入时发生卡顿
+  // Debounce input
   useEffect(() => {
     const handle = setTimeout(() => {
       setDebouncedInput(input);
@@ -29,14 +29,11 @@ export default function JsonFormatSection() {
     return () => clearTimeout(handle);
   }, [input]);
 
-  // 💡 2. 贯彻方案 A（衍生变量超进化）：
-  // 彻底删除原有的 setError 状态和相关的 useEffect。
-  // 语法错误由防抖文本在内存中同步推导，彻底斩断二次级联渲染链条，ESLint 警告瞬间消亡！
   const error = useMemo(() => {
     return validateJson(debouncedInput);
   }, [debouncedInput]);
 
-  // 3. 实时流式格式化管线
+  // Real-time formatting pipeline
   const formattedPipeline = useMemo(() => {
     const trimmed = debouncedInput.trim();
     if (!trimmed || error) return null;
@@ -149,9 +146,6 @@ export default function JsonFormatSection() {
             />
           </div>
 
-          {/* 核心格式化数据面板：
-            💡 修复点：移除了互相打架的 select-all 类名，仅保留纯正的代码高亮可选样式 select-text
-          */}
           <div className="p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all max-h-[420px] overflow-y-auto leading-relaxed select-text">
             {result.formatted}
           </div>
