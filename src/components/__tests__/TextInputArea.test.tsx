@@ -353,7 +353,6 @@ describe('TextInputArea 组件', () => {
 
     it('readOnly 时输入框应只读', () => {
       render(<TextInputArea value="内容" onChange={() => {}} readOnly />);
-      // MUI TextField 的 readOnly 通过 inputProps 设置，textarea 不会被禁用
       expect(screen.getByRole('textbox')).not.toBeDisabled();
     });
   });

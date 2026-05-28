@@ -7,7 +7,7 @@ import { useContextMenuData } from '@/utils/useContextMenuData';
 
 export interface UseTimestampConverterReturn {
   mode: 'ts2dt' | 'dt2ts';
-  input: string; // 统一为单一受控输入源
+  input: string;
   unit: UnitType;
   zone: ZoneType;
   result: string;

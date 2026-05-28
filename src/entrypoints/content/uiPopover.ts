@@ -22,7 +22,7 @@ function injectStyles(): void {
       font-size: 13px;
       line-height: 1.5;
       opacity: 0;
-      visibility: hidden; /* 💡 1. 规整隐藏状态：允许排版引擎计算尺寸，同时阻断视觉呈现 */
+      visibility: hidden;
       transform: translateY(-8px);
       transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
       pointer-events: none;

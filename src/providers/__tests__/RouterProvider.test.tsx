@@ -3,7 +3,6 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { RouterProvider, useRouter } from '@/providers/RouterProvider';
 import { storageUtil } from '@/utils/chromeStorage';
 
-// Mock storageUtil
 vi.mock('@/utils/chromeStorage', () => ({
   storageUtil: {
     get: vi.fn(),
@@ -11,7 +10,6 @@ vi.mock('@/utils/chromeStorage', () => ({
   },
 }));
 
-// Helper 辅助受控组件：用于实时嗅探并映射 useRouter 上下文状态
 const TestComponent = () => {
   const { currentPage, navigateTo, visiblePages, pageOrder } = useRouter();
   return (
@@ -31,10 +29,6 @@ describe('RouterProvider', () => {
     vi.clearAllMocks();
     localStorage.clear();
 
-    // 💡 1. 核心修复点：
-    // - 采用标准的通用大对象 globalThis 代理，彻底掐灭 TS2304 报错。
-    // - 物理让 chrome 空间和统一多端 browser 空间共享相同的事件监听桩，
-    // - 完美承接生产代码内部全新升级的 browser.storage.onChanged 大闸！
     const storageOnChangedMock = {
       addListener: vi.fn(),
       removeListener: vi.fn(),
@@ -100,8 +94,6 @@ describe('RouterProvider', () => {
 
     const btn = screen.getByTestId('navigate-btn');
 
-    // 💡 2. 交互进化：废除高风险的原生 btn.click()，改用 Testing Library 的标准事件投递，
-    // 在一帧之内顺畅闭环受控状态改流，完美抹平悬空微任务警告。
     await act(async () => {
       fireEvent.click(btn);
     });

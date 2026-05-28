@@ -22,12 +22,10 @@ interface TextModeProps {
 export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   const { t } = useI18n('base64Converter');
 
-  // 1. 纯净的核心源状态机：只保留输入源和转换方向
   const [input, setInput] = useState('');
   const [debouncedInput, setDebouncedInput] = useState('');
   const [direction, setDirection] = useState<'encode' | 'decode'>('encode');
 
-  // 2. 文本高频敲击防抖大闸：斩断频繁进行文本转 Base64 带来的 CPU 计算过热
   useEffect(() => {
     const handle = setTimeout(() => {
       setDebouncedInput(input);
@@ -35,7 +33,6 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
     return () => clearTimeout(handle);
   }, [input]);
 
-  // 3. 右键联动数据上下文：优雅原地合并受控状态
   const handleContextMenuData = useCallback((payload: string) => {
     setInput(payload);
     setDebouncedInput(payload);

@@ -4,14 +4,14 @@ import CopyButton from '@/components/CopyButton';
 import type { UnitType } from './constants';
 import { DATE_FORMAT } from './constants';
 import { useI18n } from '@/utils/chromeI18n';
-import { cn } from '@/lib/utils'; // shadcn 核心类名合并工具
+import { cn } from '@/lib/utils';
 
 interface ResultViewProps extends React.HTMLAttributes<HTMLDivElement> {
   result: string;
   mode: 'ts2dt' | 'dt2ts';
   unit: UnitType;
   zone: string;
-  /** 无结果时是否渲染占位（桌面端右栏使用），默认 false */
+
   showEmptyPlaceholder?: boolean;
 }
 
@@ -27,7 +27,6 @@ const ResultView = React.memo(
   }: ResultViewProps) => {
     const { t } = useI18n('timestamp');
 
-    // 严谨计算时间衍生的附加时区/相对时间状态
     const extraInfo = useMemo(() => {
       if (!result) return null;
       const d =
@@ -44,7 +43,6 @@ const ResultView = React.memo(
       };
     }, [result, mode, zone, unit]);
 
-    // 1. 空状态骨架面板：优雅匹配 shadcn 的中性灰色居中占位
     if (!result) {
       if (!showEmptyPlaceholder) return null;
       return (
@@ -95,7 +93,7 @@ const ResultView = React.memo(
                 <span
                   className={cn(
                     'text-xs text-foreground/90 font-medium break-all text-left sm:text-right tabular-nums',
-                    item.isMono && 'font-mono text-[11px]', // ISO/UTC 等机器时间使用精细化等宽代码体
+                    item.isMono && 'font-mono text-[11px]',
                   )}
                 >
                   {item.value}

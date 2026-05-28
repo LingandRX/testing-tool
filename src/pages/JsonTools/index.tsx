@@ -146,7 +146,7 @@ export default function Index() {
               value={leftInput}
               onChange={(val) => {
                 setLeftInput(val);
-                setCurrentDiffIndex(0); // 💡 在同一个用户键盘事件中打包批处理，0 副作用开销
+                setCurrentDiffIndex(0);
               }}
               error={leftError}
               minRows={9}
@@ -157,7 +157,7 @@ export default function Index() {
               value={rightInput}
               onChange={(val) => {
                 setRightInput(val);
-                setCurrentDiffIndex(0); // 💡 在同一个用户键盘事件中打包批处理，0 副作用开销
+                setCurrentDiffIndex(0);
               }}
               error={rightError}
               minRows={9}

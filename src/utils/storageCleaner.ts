@@ -111,8 +111,6 @@ export async function getOriginStorageEstimate(tabId: number): Promise<number> {
       target: { tabId },
       func: async () => {
         try {
-          // 注意：navigator.storage.estimate() 返回的是整个 Origin 的估算值
-          // 包含 IndexedDB, CacheStorage, ServiceWorker 注册等
           if (navigator.storage && navigator.storage.estimate) {
             const estimate = await navigator.storage.estimate();
             return estimate.usage || 0;
@@ -138,7 +136,7 @@ export async function getCacheStorageSize(tabId: number): Promise<number> {
         try {
           if ('caches' in window) {
             const keys = await caches.keys();
-            return keys.length; // 对于 CacheStorage，我们先返回缓存库的数量
+            return keys.length;
           }
           return 0;
         } catch {
@@ -146,7 +144,6 @@ export async function getCacheStorageSize(tabId: number): Promise<number> {
         }
       },
     });
-    // 由于获取具体字节数较慢，这里返回的是缓存条目的数量标识，UI 上可以特殊处理
     return (result?.result as number) || 0;
   } catch (error) {
     console.error('Failed to get CacheStorage size:', error);

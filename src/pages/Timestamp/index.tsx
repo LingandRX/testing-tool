@@ -76,7 +76,7 @@ export default function Index() {
                   ]}
                   onChange={(v) => setUnit(v as 'ms' | 's')}
                   size="small"
-                  className="sm:w-auto shrink-0" // 窄屏下全宽，宽屏下自适应收缩
+                  className="sm:w-auto shrink-0"
                 />
 
                 <Select value={zone} onValueChange={(v: string) => setZone(v as typeof zone)}>

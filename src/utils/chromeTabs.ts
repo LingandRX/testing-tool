@@ -59,13 +59,9 @@ export async function ensureContentScriptInjected(): Promise<boolean> {
     const tab = await getActiveTab();
     if (!tab?.id) return false;
 
-    // 尝试发送一个简单的探测消息
     try {
-      // 这里可以根据实际情况发送一个简单的 Ping 消息
-      // 目前暂时保留原有注入逻辑，由调用方决定
       return true;
     } catch (e) {
-      // 如果报错，说明没注入，执行注入
       console.log('内容脚本未注入，尝试注入...');
       console.error('注入内容脚本失败:', e);
       await chrome.scripting.executeScript({

@@ -55,7 +55,7 @@ describe('useStorageState', () => {
     await waitFor(() => {
       // 异步加载后应覆盖为存储值
       expect(result.current[0]).toBe(false);
-      expect(result.current[2]).toBe(true); // isInitialized
+      expect(result.current[2]).toBe(true);
     });
   });
 
@@ -67,7 +67,7 @@ describe('useStorageState', () => {
     const { result } = renderHook(() => useStorageState('qrCode/urlExpanded', true));
 
     await waitFor(() => {
-      expect(result.current[2]).toBe(true); // isInitialized
+      expect(result.current[2]).toBe(true);
     });
 
     await act(async () => {
@@ -77,7 +77,6 @@ describe('useStorageState', () => {
     expect(result.current[0]).toBe(false);
     expect(storageUtil.set).toHaveBeenCalledWith('qrCode/urlExpanded', false);
 
-    // 应同时写入 localStorage 快照
     expect(localStorage.getItem('snapshot/qrCode/urlExpanded')).toBe(JSON.stringify(false));
   });
 

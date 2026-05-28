@@ -229,5 +229,3 @@ const stringifyMultiline = (v: unknown, depth: number): string => {
     return formatPrimitive(v);
   }
 };
-
-// 💡 彻底移除了文件底部引发 TS2484 冲突的 export type { DiffResultProps } 声明

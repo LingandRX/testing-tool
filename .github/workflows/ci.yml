@@ -13,8 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # 💡 1. 提速核心：前置基建节点（Infrastructure Initialization）
-  # 专门负责锁死环境、同步下载并缓存 node_modules，下游节点直接满血复用！
   setup:
     name: Prepare Dependencies
     runs-on: ubuntu-latest
@@ -29,7 +27,6 @@ jobs:
         with:
           node-version: '22'
 
-      # 建立基于 package-lock.json 唯一哈希的缓存大闸
       - name: Cache Node Modules
         id: cache-nodemodules
         uses: actions/cache@v4
@@ -47,7 +44,6 @@ jobs:
         id: cache-info
         run: echo "key=${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}" >> $GITHUB_OUTPUT
 
-  # 💡 2. 静态语法质检节点（依赖前置节点完成）
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -70,7 +66,6 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-  # 💡 3. 强类型守卫节点（2秒瞬时恢复，开箱即查）
   typecheck:
     name: TypeScript Check
     runs-on: ubuntu-latest
@@ -96,7 +91,6 @@ jobs:
       - name: Run TypeScript type check
         run: npm run typecheck
 
-  # 💡 4. 单元测试节点（无缝运行你刚刚修复完的 setupTests.ts 套件）
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -122,16 +116,12 @@ jobs:
       - name: Run tests
         run: npm run test
 
-  # 💡 5. 多端分布式最终编译节点（Production Matrix Compliance）
   build:
     name: Build (${{ matrix.browser }})
     runs-on: ubuntu-latest
-    # 只有当 Linter、类型大闸、Vitest 单元测试全数满分通过，才放行最终打包编译
     needs: [ lint, typecheck, test ]
     strategy:
       matrix:
-        # 💡 完美对齐 WXT 跨端架构：将 firefox 同步纳入生产编译大矩阵，
-        # 如果 firefox 编译因任何多端不兼容挂掉，CI 会立刻拉起警报，防护力拉满！
         browser: [ chrome, firefox ]
       fail-fast: false
     steps:
@@ -149,7 +139,6 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node-v22-${{ hashFiles('**/package-lock.json') }}
 
-      # 💡 动态代理编译指令：完美匹配 WXT / 各类多端打包器的标准构建命令
       - name: Generate WXT types
         run: npx wxt prepare
 
