@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
-export default function DashboardPage() {
+export default function Index() {
   const { navigateTo, visiblePages, pageOrder, recentlyUsedTools } = useRouter();
   const { t } = useI18n(['features']);
 

@@ -5,7 +5,7 @@ import { Shield, ShieldCheck, MousePointerClick, AlertTriangle } from 'lucide-re
 import { useRightClickRestorer } from './useRightClickRestorer';
 import { useI18n } from '@/utils/chromeI18n';
 
-export default function RightClickRestorerPage() {
+export default function Index() {
   const { t } = useI18n('rightClickRestorer');
   const { domain, isLoading, isUnlocked, isUnsupported, unlock } = useRightClickRestorer();
 
