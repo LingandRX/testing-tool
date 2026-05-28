@@ -102,7 +102,7 @@ pages/FeatureName/
 
 ### 代码分割
 
-`wxt.config.ts` 通过 `manualChunksForHtmlOnly()` 自动分组 vendor 依赖（vendor-react、vendor-i18n、vendor-qr、vendor-dnd、vendor-markdown），无需手动配置。
+`wxt.config.ts` 通过 `manualChunksForHtmlOnly()` 自动分组 vendor 依赖（vendor-react、vendor-i18n、vendor-qr、vendor-dnd），无需手动配置。
 
 ### 代码风格
 

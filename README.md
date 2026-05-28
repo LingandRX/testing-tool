@@ -63,11 +63,6 @@
 - **文件转换**: 支持文件与 Base64 字符串互转.
 - **图像预览**: 支持图片 Base64 编码与实时预览.
 
-### 📝 Markdown ↔ HTML 转换
-
-- **Markdown 转 HTML**: 实时预览 Markdown 渲染结果，支持导出 HTML 源码.
-- **HTML 转 Markdown**: 将 HTML 内容转换为 Markdown 格式.
-
 ## 技术栈
 
 - **框架**: [WXT (Web Extension Toolkit)](https://wxt.dev/)

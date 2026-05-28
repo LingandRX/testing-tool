@@ -37,7 +37,6 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.20",
     "lucide-react": "^1.16.0",
-    "marked": "^18.0.4",
     "qr-scanner": "^1.4.2",
     "qrious": "^4.0.2",
     "react": "^19.2.6",
