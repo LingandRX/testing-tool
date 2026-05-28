@@ -113,6 +113,8 @@ export interface StorageSchema {
   'app/language': string;
   /** 右键菜单待处理数据 */
   'contextMenu/pendingData': ContextMenuPendingData;
+  /** 最近使用的工具列表（最多保留 3 个） */
+  'app/recentlyUsedTools': PageType[];
 }
 
 /**

@@ -75,6 +75,18 @@
     "message": "仪表盘",
     "description": "Translation key: dashboard_title"
   },
+  "dashboard_searchPlaceholder": {
+    "message": "搜索工具...",
+    "description": "Translation key: dashboard_searchPlaceholder"
+  },
+  "dashboard_recentlyUsed": {
+    "message": "最近使用",
+    "description": "Translation key: dashboard_recentlyUsed"
+  },
+  "dashboard_allTools": {
+    "message": "全部工具",
+    "description": "Translation key: dashboard_allTools"
+  },
   "timestamp_title": {
     "message": "时间戳",
     "description": "Translation key: timestamp_title"
