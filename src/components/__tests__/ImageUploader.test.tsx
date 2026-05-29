@@ -13,10 +13,11 @@ const mockRevokeObjectURL = vi.fn();
 Object.defineProperty(window.URL, 'createObjectURL', { value: mockCreateObjectURL });
 Object.defineProperty(window.URL, 'revokeObjectURL', { value: mockRevokeObjectURL });
 
-vi.mock('@/components/GlobalSnackbar', () => ({
-  useSnackbar: () => ({
-    showMessage: vi.fn(),
-  }),
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 describe('ImageUploader 组件', () => {
