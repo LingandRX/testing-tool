@@ -1,5 +1,5 @@
 import TextInputArea from '@/components/TextInputArea';
-import { formatByteSize } from '@/utils/textStatistics';
+import { formatBytes } from '@/utils/format';
 import { useI18n } from '@/utils/chromeI18n';
 import { useTextStatistics } from './useTextStatistics';
 import { cn } from '@/lib/utils';
@@ -12,7 +12,7 @@ export default function Index() {
     { label: t('textStatistics:characters'), value: stats.characters },
     { label: t('textStatistics:words'), value: stats.words },
     { label: t('textStatistics:lines'), value: stats.lines },
-    { label: t('textStatistics:bytes'), value: formatByteSize(stats.bytes) },
+    { label: t('textStatistics:bytes'), value: formatBytes(stats.bytes) },
   ];
 
   return (
