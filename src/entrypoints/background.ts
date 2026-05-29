@@ -93,30 +93,11 @@ export default defineBackground(() => {
       });
     };
 
-    if (delay <= 0) {
+    if (delay > 0) {
+      setTimeout(executeReload, delay);
+    } else {
       executeReload();
-      return { success: true };
     }
-
-    const alarmName = `reload-tab-${tabId}-${Date.now()}`;
-
-    await browser.alarms.create(alarmName, { when: Date.now() + delay });
-
-    const cleanupTimeout = setTimeout(() => {
-      browser.alarms.onAlarm.removeListener(alarmListener);
-      browser.alarms.clear(alarmName).catch(() => {});
-    }, delay + 5000);
-
-    const alarmListener = (alarm: { name: string }) => {
-      if (alarm.name !== alarmName) return;
-
-      clearTimeout(cleanupTimeout);
-      executeReload();
-      browser.alarms.onAlarm.removeListener(alarmListener);
-      browser.alarms.clear(alarmName).catch(() => {});
-    };
-
-    browser.alarms.onAlarm.addListener(alarmListener);
 
     return { success: true };
   });
