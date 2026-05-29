@@ -42,7 +42,7 @@ export default function StorageOptionsGrid({
 
   return (
     <div className={cn('w-full overflow-hidden', className)} {...props}>
-      <div className="px-0 pt-3.5 pb-2">
+      <div className="px-3.5 pt-3.5 pb-2">
         <div className="grid grid-cols-2 gap-2 items-stretch">
           {optionKeys.map(({ key, isCount }) => (
             <OptionItem
@@ -59,7 +59,7 @@ export default function StorageOptionsGrid({
 
       <div
         onClick={handleToggleAll}
-        className="border-t border-border flex justify-between items-center px-3.5 py-2.5 bg-muted/20 hover:bg-muted/40 cursor-pointer select-none transition-colors"
+        className="border-t border-border flex justify-between items-center pl-3.5 pr-7 py-2.5 bg-muted/20 hover:bg-muted/40 cursor-pointer select-none transition-colors"
       >
         <Label className="text-xs font-bold text-muted-foreground/90 cursor-pointer tracking-wide uppercase">
           {t('storageCleaner:selectAll')}
