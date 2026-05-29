@@ -56,7 +56,7 @@ Router 同时使用 `chrome.storage.local` 持久化和 `localStorage` 快照来
 
 ### 页面组件模式
 
-功能页面遵循 **UI + Hook 分离** 模式：
+功能页面遵循 **UI + Hook 分离** 模式，详见 [CODING_STANDARDS.md § 11](./CODING_STANDARDS.md#11-页面开发规范)：
 
 ```
 pages/FeatureName/
@@ -65,7 +65,7 @@ pages/FeatureName/
 └── constants.ts           # 常量定义（可选）
 ```
 
-- 页面组件调用 `useLazyTranslation('featureName')` 获取翻译函数
+- 页面组件调用 `useI18n('featureName')` 获取翻译函数
 - Hook 负责所有状态管理，通过返回值暴露给页面
 - 子组件可进一步拆分（如 `LiveClock.tsx`、`ResultView.tsx`）
 

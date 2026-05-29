@@ -1,113 +1,39 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import JsonDiffInput from './JsonDiffInput';
 import DiffResult from './DiffResult';
 import DiffNavigator from './DiffNavigator';
 import JsonFormatSection from './JsonFormatSection';
-import type { ConvertFunction } from './JsonConvertSection';
 import JsonConvertSection from './JsonConvertSection';
-import { diffJson } from './diffEngine';
-import { jsonToYaml } from '@/utils/jsonToYaml';
-import { jsonToToml } from '@/utils/jsonToToml';
-import { minifyJson } from '@/utils/jsonFormatter';
-import { useStorageState } from '@/utils/useStorageState';
-import type { JsonToolsPageMode } from '@/types/storage';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
+import { useJsonTools } from './useJsonTools';
+import type { JsonToolsPageMode } from '@/types/storage';
 import type { ViewMode } from './types';
-
-interface ParseState {
-  value: unknown;
-  error: string | null;
-}
-
-const tryParse = (raw: string, invalidMsg: string): ParseState => {
-  const trimmed = raw.trim();
-  if (!trimmed) return { value: undefined, error: null };
-  try {
-    return { value: JSON.parse(trimmed), error: null };
-  } catch {
-    return { value: undefined, error: invalidMsg };
-  }
-};
-
-const VALID_PAGE_MODES: readonly JsonToolsPageMode[] = ['diff', 'format', 'yaml', 'toml', 'minify'];
-const isValidPageMode = (val: unknown): val is JsonToolsPageMode =>
-  typeof val === 'string' && (VALID_PAGE_MODES as readonly string[]).includes(val);
 
 type PageMode = JsonToolsPageMode;
 
 export default function Index() {
   const { t } = useI18n(['jsonDiff', 'jsonFormat']);
-  const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
-
-  // Debounce input
-  const [leftInput, setLeftInput] = useState('');
-  const [rightInput, setRightInput] = useState('');
-
-  // Debounced values
-  const [debouncedLeft, setDebouncedLeft] = useState('');
-  const [debouncedRight, setDebouncedRight] = useState('');
-
-  useEffect(() => {
-    const handle = setTimeout(() => {
-      setDebouncedLeft(leftInput);
-      setDebouncedRight(rightInput);
-    }, 250);
-    return () => clearTimeout(handle);
-  }, [leftInput, rightInput]);
-
-  // Parse debounced inputs
-  const parseState = useMemo(() => {
-    const invalidMsg = t('jsonDiff:invalidJson');
-    return {
-      left: tryParse(debouncedLeft, invalidMsg),
-      right: tryParse(debouncedRight, invalidMsg),
-    };
-  }, [debouncedLeft, debouncedRight, t]);
-
-  const leftError = parseState.left.error;
-  const rightError = parseState.right.error;
-
-  const [viewMode, setViewMode] = useState<ViewMode>('sideBySide');
-  const [currentDiffIndex, setCurrentDiffIndex] = useState(0);
-
-  // Real-time diff computation
-  const diffResult = useMemo(() => {
-    const { left, right } = parseState;
-    if (left.error || right.error || debouncedLeft.trim() === '' || debouncedRight.trim() === '') {
-      return null;
-    }
-    return diffJson(left.value, right.value);
-  }, [parseState, debouncedLeft, debouncedRight]);
-
-  const total = diffResult?.diffPaths.length ?? 0;
-
-  const handlePrev = useCallback(() => {
-    if (total === 0) return;
-    setCurrentDiffIndex((idx) => (idx - 1 + total) % total);
-  }, [total]);
-
-  const handleNext = useCallback(() => {
-    if (total === 0) return;
-    setCurrentDiffIndex((idx) => (idx + 1) % total);
-  }, [total]);
-
-  const activePath = diffResult && total > 0 ? diffResult.diffPaths[currentDiffIndex] : undefined;
-
-  const yamlConvert: ConvertFunction = useCallback((text: string) => {
-    const r = jsonToYaml(text);
-    return { output: r.output, originalBytes: r.originalBytes, outputBytes: r.outputBytes };
-  }, []);
-
-  const tomlConvert: ConvertFunction = useCallback((text: string) => {
-    const r = jsonToToml(text);
-    return { output: r.output, originalBytes: r.originalBytes, outputBytes: r.outputBytes };
-  }, []);
-
-  const minifyConvert: ConvertFunction = useCallback((text: string) => {
-    const r = minifyJson(text);
-    return { output: r.minified, originalBytes: r.originalBytes, outputBytes: r.minifiedBytes };
-  }, []);
+  const {
+    pageMode,
+    setPageMode,
+    leftInput,
+    rightInput,
+    setLeftInput,
+    setRightInput,
+    leftError,
+    rightError,
+    viewMode,
+    setViewMode,
+    diffResult,
+    total,
+    currentDiffIndex,
+    handlePrev,
+    handleNext,
+    activePath,
+    yamlConvert,
+    tomlConvert,
+    minifyConvert,
+  } = useJsonTools();
 
   return (
     <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none">
@@ -144,10 +70,7 @@ export default function Index() {
               label={t('jsonDiff:leftLabel')}
               placeholder={t('jsonDiff:leftPlaceholder')}
               value={leftInput}
-              onChange={(val) => {
-                setLeftInput(val);
-                setCurrentDiffIndex(0);
-              }}
+              onChange={setLeftInput}
               error={leftError}
               minRows={9}
             />
@@ -155,10 +78,7 @@ export default function Index() {
               label={t('jsonDiff:rightLabel')}
               placeholder={t('jsonDiff:rightPlaceholder')}
               value={rightInput}
-              onChange={(val) => {
-                setRightInput(val);
-                setCurrentDiffIndex(0);
-              }}
+              onChange={setRightInput}
               error={rightError}
               minRows={9}
             />

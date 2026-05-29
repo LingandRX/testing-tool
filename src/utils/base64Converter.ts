@@ -213,8 +213,9 @@ export function extractMimeTypeFromDataUri(dataUri: string): string {
 }
 
 /**
- * 格式化文件大小显示（兼容旧接口，内部委托给 formatBytes）
+ * 格式化文件大小显示
  *
+ * @deprecated 直接使用 {@link formatBytes} 代替
  * @param bytes 字节数
  * @returns 格式化后的字符串
  */
@@ -270,12 +271,7 @@ const MAGIC_BYTE_SIGNATURES: ReadonlyArray<{
  * @returns 字节序列
  */
 export function base64ToBytes(b64: string): Uint8Array {
-  const binary = atob(b64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
+  return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 }
 
 /**
@@ -287,25 +283,11 @@ export function base64ToBytes(b64: string): Uint8Array {
 export function sniffMimeFromBytes(bytes: Uint8Array): { mime: string; ext: string } | null {
   for (const sig of MAGIC_BYTE_SIGNATURES) {
     if (bytes.length < sig.bytes.length) continue;
-    let matched = true;
-    for (let i = 0; i < sig.bytes.length; i += 1) {
-      if (bytes[i] !== sig.bytes[i]) {
-        matched = false;
-        break;
-      }
-    }
-    if (!matched) continue;
+    if (!sig.bytes.every((b, i) => bytes[i] === b)) continue;
     if (sig.tail) {
       const { offset, bytes: tailBytes } = sig.tail;
       if (bytes.length < offset + tailBytes.length) continue;
-      let tailMatched = true;
-      for (let i = 0; i < tailBytes.length; i += 1) {
-        if (bytes[offset + i] !== tailBytes[i]) {
-          tailMatched = false;
-          break;
-        }
-      }
-      if (!tailMatched) continue;
+      if (!tailBytes.every((b, i) => bytes[offset + i] === b)) continue;
     }
     return { mime: sig.mime, ext: sig.ext };
   }

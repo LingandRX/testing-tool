@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 import TextInputArea from '@/components/TextInputArea';
 import ImageUploader from '@/components/ImageUploader';
-import { useSnackbar } from '@/components/GlobalSnackbar';
 import { useI18n } from '@/utils/chromeI18n';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 
 export default function ParsePanel() {
   const { t } = useI18n('qrCode');
-  const { showMessage } = useSnackbar();
   const { parserState, setParserState, handleFileChange, handleClearFile } = useQrCodeContext();
 
   // 全局粘贴事件监听
@@ -24,7 +23,7 @@ export default function ParsePanel() {
           const file = items[i].getAsFile();
           if (file) {
             handleFileChange(file);
-            showMessage(t('qrCode:imagePasted'), { severity: 'success', autoHideDuration: 1000 });
+            toast.success(t('qrCode:imagePasted'));
           }
           return;
         }
@@ -38,14 +37,14 @@ export default function ParsePanel() {
           const blob = await response.blob();
           const file = new File([blob], 'pasted-image.png', { type: blob.type });
           handleFileChange(file);
-          showMessage(t('qrCode:imagePasted'), { severity: 'success', autoHideDuration: 1000 });
+          toast.success(t('qrCode:imagePasted'));
         } catch (error) {
           console.error('处理 Base64 图片失败:', error);
-          showMessage(t('qrCode:imagePasteError'), { severity: 'error', autoHideDuration: 3000 });
+          toast.error(t('qrCode:imagePasteError'));
         }
       }
     },
-    [handleFileChange, showMessage, t],
+    [handleFileChange, t],
   );
 
   useEffect(() => {

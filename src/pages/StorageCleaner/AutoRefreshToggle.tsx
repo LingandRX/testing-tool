@@ -1,8 +1,8 @@
 /**
- * 自动刷新开关组件
+ * 自动刷新开关行
  *
- * 用于 StorageCleaner 页面，控制是否自动刷新存储数据列表。
- * 以卡片形式展示，左侧为标签文本，右侧为 shadcn/ui Switch 开关。
+ * 用于 StorageCleaner 页面的操作区域内（非独立卡片），
+ * 控制清理后是否自动刷新页面。左侧为标签文本，右侧为 shadcn/ui Switch 开关。
  *
  * @example
  * ```tsx
@@ -48,15 +48,14 @@ export default function AutoRefreshToggle({
   return (
     <div
       className={cn(
-        'w-full p-4 rounded-xl border border-border bg-card text-card-foreground shadow-sm flex justify-between items-center',
+        'w-full px-3.5 py-3 border-t border-border flex justify-between items-center',
         className,
       )}
       {...props}
     >
-      {/* Label 与 Switch 通过 htmlFor + id 关联，支持点击文字触发开关 */}
       <Label
         htmlFor="auto-refresh-switch"
-        className="text-sm font-bold text-foreground cursor-pointer select-none tracking-tight"
+        className="text-xs font-bold text-muted-foreground/90 cursor-pointer select-none tracking-wide uppercase"
       >
         {t('storageCleaner:autoRefresh')}
       </Label>

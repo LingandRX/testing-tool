@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import QRious from 'qrious';
-import { useSnackbar } from '@/components/GlobalSnackbar';
+import { toast } from 'sonner';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 import { useI18n } from '@/utils/chromeI18n';
@@ -10,7 +10,6 @@ import type { QrCodeGeneratorState, QrCodeMode, QrCodeParserState } from '../typ
 
 export function useQrCode(): QrCodeContextValue {
   const { t } = useI18n('qrCode');
-  const { showMessage } = useSnackbar();
 
   const [mode, setMode] = useState<QrCodeMode>('generate');
 
@@ -89,22 +88,22 @@ export function useQrCode(): QrCodeContextValue {
 
         if (result.success && result.data) {
           setParserState((prev) => ({ ...prev, decodedResult: result.data! }));
-          showMessage(t('qrCode:parseSuccess'), { severity: 'success', autoHideDuration: 1000 });
+          toast.success(t('qrCode:parseSuccess'));
         } else {
           const errorMsg = result.error || t('qrCode:noQrDetected');
           setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-          showMessage(errorMsg, { severity: 'error', autoHideDuration: 3000 });
+          toast.error(errorMsg);
         }
       } catch (error) {
         console.error('解析二维码失败:', error);
         const errorMsg = error instanceof Error ? error.message : t('qrCode:parseError');
         setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-        showMessage(errorMsg, { severity: 'error', autoHideDuration: 3000 });
+        toast.error(errorMsg);
       } finally {
         setParserState((prev) => ({ ...prev, parsing: false }));
       }
     },
-    [t, showMessage],
+    [t],
   );
 
   const downloadQrCode = useCallback(() => {
@@ -114,8 +113,8 @@ export function useQrCode(): QrCodeContextValue {
     link.href = qrCodeDataUrl;
     link.download = 'qrcode.png';
     link.click();
-    showMessage(t('qrCode:qrCodeDownloadSuccess'), { severity: 'success', autoHideDuration: 1000 });
-  }, [qrCodeDataUrl, showMessage, t]);
+    toast.success(t('qrCode:qrCodeDownloadSuccess'));
+  }, [qrCodeDataUrl, t]);
 
   const copyQrCode = useCallback(async () => {
     if (!qrCodeDataUrl) return;
@@ -130,12 +129,12 @@ export function useQrCode(): QrCodeContextValue {
         }),
       ]);
 
-      showMessage(t('qrCode:qrCodeCopySuccess'), { severity: 'success', autoHideDuration: 1000 });
+      toast.success(t('qrCode:qrCodeCopySuccess'));
     } catch (error) {
       console.error('复制二维码失败:', error);
-      showMessage(t('qrCode:copyError'), { severity: 'error', autoHideDuration: 3000 });
+      toast.error(t('qrCode:copyError'));
     }
-  }, [qrCodeDataUrl, showMessage, t]);
+  }, [qrCodeDataUrl, t]);
 
   const handleFileChange = useCallback(
     (file: File) => {

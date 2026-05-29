@@ -31,3 +31,4 @@ stats-*.json
 dev/*
 
 docs/*
+!docs/VISUAL_STYLE_GUIDE.md

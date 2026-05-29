@@ -6,7 +6,7 @@ import {
   type JsonFormatResult,
   validateJson,
 } from '@/utils/jsonFormatter';
-import { formatByteSize } from '@/utils/textStatistics';
+import { formatBytes } from '@/utils/format';
 import CopyButton from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import TextInputArea from '@/components/TextInputArea';
@@ -127,7 +127,7 @@ export default function JsonFormatSection() {
                 <span>
                   {t('jsonFormat:originalSize')}:{' '}
                   <span className="font-semibold text-foreground/80">
-                    {formatByteSize(result.originalBytes)}
+                    {formatBytes(result.originalBytes)}
                   </span>
                 </span>
                 <span className="text-border/60">|</span>

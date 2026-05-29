@@ -59,18 +59,22 @@ public/                # 静态资源（图标、_locales 等）
 
 ### 页面组件模式
 
-典型功能页面遵循 **UI + Hook 分离** 模式：
+典型功能页面遵循 **UI + Hook 分离** 模式。详见 [CODING_STANDARDS.md § 11](./.github/CODING_STANDARDS.md#11-页面开发规范)。
 
 ```
 src/pages/FeatureName/
-├── index.tsx              # 页面 UI（纯展示，使用 shadcn/ui 组件）
+├── index.tsx              # 页面 UI（纯展示，仅负责渲染布局）
 ├── useFeatureName.ts      # 业务逻辑 Hook（状态管理 + 转换逻辑）
-└── constants.ts           # 常量定义
+├── constants.ts           # 常量定义（可选，≥3 个常量时创建）
+└── __tests__/
+    └── index.test.tsx
 ```
 
-- 页面组件调用 `useLazyTranslation('featureName')` 获取翻译函数
+- 页面入口组件统一命名为 `Index`，通过 `export default function Index()` 导出
 - Hook 负责所有状态管理和业务逻辑，通过返回值暴露给页面
-- 子组件可进一步拆分（如 `LiveClock.tsx`、`ResultView.tsx`）
+- 子组件可以独立调用 `useI18n` 等全局 Hook
+- 当 `index.tsx` 超过 150 行时，必须拆分为 UI + Hook 模式
+- 复杂页面可增加 `contexts/`、`hooks/`、`components/` 子目录
 
 ## 关键架构决策
 
@@ -88,7 +92,7 @@ src/pages/FeatureName/
 
 **浏览器兼容**: 优先使用 `wxt/browser` 导出的 `browser` 对象，而非原生 `chrome` API。
 
-**代码分割**: `wxt.config.ts` 通过 `manualChunksForHtmlOnly()` 自动分组依赖（vendor-react、vendor-i18n、vendor-qr 等），无需手动配置。
+**代码分割**: `wxt.config.ts` 通过 `manualChunksForHtmlOnly()` 自动分组依赖（vendor-react、vendor-qr、vendor-dnd 等），无需手动配置。
 
 ## 测试环境
 
@@ -96,35 +100,37 @@ src/pages/FeatureName/
 - 全局变量: `vitest/globals` (describe, it, expect 等无需导入)
 - Setup 文件: `vitest.setup.ts` 自动 mock:
   - `chrome.*` / `browser.*` API (storage, tabs, runtime, cookies 等)
-  - `react-i18next` (返回 key 作为翻译)
-  - `@/utils/useLazyTranslation` (返回 `ns:key` 格式翻译)
+  - `@/utils/chromeI18n` (从 `public/_locales/zh/messages.json` 加载真实翻译)
   - `window.matchMedia`
 - 测试文件命名: `__tests__/*.test.{ts,tsx}` 或 `*.test.{ts,tsx}`
 - Mock 模式: 使用 `vi.mock()` 进行模块级 mock，避免在测试文件中重复 mock 代码
 - 测试工具: `@testing-library/react` + `@testing-library/user-event` 进行组件测试
 
-## i18n
+## i18n (chrome.i18n)
 
-- 命名空间: `common` (默认), `features`
-- 翻译键格式: `namespace:key` (如 `features:timestamp.title`)
-- 语言: `zh` (默认), `en`
-- 翻译文件结构:
-  - `i18n/locales/{zh,en}/common.json` - 全局通用翻译
-  - `i18n/locales/{zh,en}/features.json` - 功能模块标题和描述
-  - `i18n/locales/{zh,en}/{功能名}.json` - 各功能独立翻译（如 timestamp.json, storageCleaner.json 等）
-- 添加新翻译: 编辑 `i18n/locales/{zh,en}/{common,features}.json` 及对应功能独立 JSON
-- 使用 `useLazyTranslation` hook 加载功能独立翻译，返回 `ns:key` 格式
-- 回退策略: 当翻译 key 在目标语言缺失时，回退到默认语言 `zh`；若默认语言也缺失，返回占位格式 `namespace:key` 并在开发模式下记录 warning
+项目使用 Chrome 扩展标准的 `chrome.i18n` API 进行本地化，通过 `src/utils/chromeI18n.ts` 提供类型安全的 React Hook 包装。
+
+- **翻译文件**: `public/_locales/{zh,en}/messages.json`（Chrome 扩展标准格式）
+- **默认语言**: `zh`（在 `wxt.config.ts` 的 `manifest.default_locale` 中配置）
+- **使用方式**: `import { useI18n } from '@/utils/chromeI18n'`
+- **翻译键格式**:
+  - 直接 key: `t('dashboard_title')` → 查找 `dashboard_title`
+  - 命名空间格式（兼容旧用法）: `t('common:buttons.search')` → 查找 `common_buttons_search`
+  - 带命名空间参数: `useI18n(['common', 'features'])`，会自动尝试 `common_key`、`features_key`
+- **占位符支持**: `t('router_notFoundDescription', { entryPointType: 'popup' })`
+- **Hook 返回值**: `{ t, i18n: { language, changeLanguage }, isLoaded }`
+- **回退策略**: 当翻译 key 未命中时，返回 key 本身（开发模式下在控制台记录 warning）
+- **限制**: `chrome.i18n` 无法动态切换语言，语言跟随浏览器设置，切换后需刷新页面
 
 ## 新功能开发清单
 
 1. 在 `src/types/storage.d.ts` 添加 `PageType` 联合类型
 2. 在 `src/config/features.tsx` 的 `FEATURES` 数组添加配置（指定 key、翻译键、图标、三种渲染模式的组件）
 3. 在 `src/pages/` 创建页面组件 (懒加载)：
-   - `index.tsx` — UI 组件，使用 `useLazyTranslation` 获取翻译
+   - `index.tsx` — UI 组件，使用 `useI18n` 获取翻译
    - `useFeatureName.ts` — 业务逻辑 Hook
    - `constants.ts` — 常量（可选）
-4. 在 `i18n/locales/{zh,en}/features.json` 添加翻译（复杂功能可新建独立 JSON）
+4. 在 `public/_locales/zh/messages.json`（及 `en/messages.json`）添加翻译
 5. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
 6. 添加对应的单元测试
 

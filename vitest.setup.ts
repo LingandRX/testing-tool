@@ -1,11 +1,10 @@
 import '@testing-library/jest-dom';
 import { afterEach, beforeEach, vi } from 'vitest';
 import React from 'react';
+import zhMessages from './public/_locales/zh/messages.json';
 
-// Load actual zh translations for getMessage mock
-const zhMessages: Record<string, { message: string }> =
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('./public/_locales/zh/messages.json');
+// Type assertion to allow string indexing
+const zhMessagesMap = zhMessages as Record<string, { message: string }>;
 
 vi.mock('@/utils/chromeI18n', () => ({
   useI18n: (ns?: string | string[]) => ({
@@ -16,13 +15,13 @@ vi.mock('@/utils/chromeI18n', () => ({
         msgId = key.replace(':', '_').replace(/\./g, '_');
       }
       // Try direct key first
-      if (zhMessages[msgId]) return zhMessages[msgId].message;
+      if (zhMessagesMap[msgId]) return zhMessagesMap[msgId].message;
       // Try namespace prefix (using converted msgId)
       if (ns) {
         const namespaces = Array.isArray(ns) ? ns : [ns];
         for (const n of namespaces) {
           const candidate = `${n}_${msgId}`;
-          if (zhMessages[candidate]) return zhMessages[candidate].message;
+          if (zhMessagesMap[candidate]) return zhMessagesMap[candidate].message;
         }
       }
       return msgId;
@@ -33,7 +32,7 @@ vi.mock('@/utils/chromeI18n', () => ({
     },
     isLoaded: true,
   }),
-  getMessage: (msgId: string) => zhMessages[msgId]?.message ?? msgId,
+  getMessage: (msgId: string) => zhMessagesMap[msgId]?.message ?? msgId,
   getLanguage: () => 'zh',
   preloadNamespaces: vi.fn().mockResolvedValue(undefined),
 }));
@@ -125,7 +124,7 @@ const webExtensionMock = {
     get: vi.fn().mockResolvedValue({}),
     sendMessage: vi.fn().mockResolvedValue(undefined),
     create: vi.fn().mockResolvedValue({}),
-    reload: vi.fn().mockResolvedValue(undefined), // ✅ 承接 MessageAction.RELOAD_TAB 刷新单元测试
+    reload: vi.fn().mockResolvedValue(undefined),
   },
   runtime: {
     id: 'test-extension-id',
@@ -202,7 +201,6 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-// 全局 matchMedia 极客级环境模拟（ThemeModeProvider 依赖）
 beforeEach(() => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,

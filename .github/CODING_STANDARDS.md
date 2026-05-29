@@ -762,22 +762,335 @@ const [themeMode, setThemeMode, isInitialized] = useStorageState(
 
 ---
 
-## 11. 文件组织
+## 11. 页面开发规范
 
-### 11.1 页面组件结构
+### 11.1 目录结构（按复杂度分级）
+
+#### 简单页面（单一功能，无子模式）
+
+适用于 Timestamp、Jwt、TextStatistics、RightClickRestorer 等：
 
 ```
 src/pages/FeatureName/
-├── index.tsx              # 页面 UI（纯展示，使用 shadcn/ui 组件）
-├── useFeatureName.ts      # 业务逻辑 Hook（状态管理 + 转换逻辑）
-├── constants.ts           # 常量定义（可选）
-├── LiveClock.tsx          # 子组件（可选）
-├── ResultView.tsx         # 子组件（可选）
-└── __tests__/             # 测试文件
-    └── index.test.tsx
+├── index.tsx              # 页面入口组件（default export）
+├── useFeatureName.ts      # 业务逻辑 Hook（命名导出）
+├── constants.ts           # 常量定义（可选，命名导出）
+├── SubComponent.tsx       # 子组件（可选，default export）
+└── __tests__/
+    └── index.test.tsx     # 页面集成测试
 ```
 
-### 11.2 目录职责
+#### 中等页面（含多个子模式/标签页切换）
+
+适用于 Base64Converter、StorageCleaner 等：
+
+```
+src/pages/FeatureName/
+├── index.tsx              # 页面入口（模式路由 + 顶层布局）
+├── useFeatureName.ts      # 业务逻辑 Hook（命名导出）
+├── SubModeA.tsx           # 子模式组件
+├── SubModeB.tsx           # 子模式组件
+├── SubComponent.tsx       # 可复用子组件
+└── __tests__/
+    ├── index.test.tsx
+    └── SubModeA.test.tsx
+```
+
+#### 复杂页面（Context + 多组件协作）
+
+适用于 QrCode、JsonTools 等：
+
+```
+src/pages/FeatureName/
+├── index.tsx              # 页面入口（Provider + 布局）
+├── types.ts               # 页面专属类型定义
+├── constants.ts           # 常量（可选）
+├── contexts/              # React Context 定义
+│   └── FeatureContext.ts
+├── hooks/                 # 页面专属 Hooks
+│   └── useFeature.ts
+├── components/            # 页面专属子组件
+│   ├── PanelA.tsx
+│   └── PanelB.tsx
+└── __tests__/
+    ├── index.test.tsx
+    └── useFeature.test.ts
+```
+
+#### 特殊情况（单个文件即可）
+
+功能极简的页面（如 Dashboard），仅需 `index.tsx` 一个文件。当 `index.tsx` 超过 **150 行**时，应拆分为 UI + Hook 模式。
+
+---
+
+### 11.2 页面入口组件（`index.tsx`）规范
+
+#### 组件命名
+
+- 页面入口组件**统一使用 `Index` 作为函数名**，通过 `export default` 导出
+- 使用 `export default function Index()` 而非匿名默认导出
+- **禁止**混用 `XxxPage` 命名（当前 `RightClickRestorerPage`、`DashboardPage` 不合规范，应统一为 `Index`）
+
+```typescript
+// ✅ 正确
+export default function Index() { ... }
+
+// ❌ 错误 — 命名不一致
+export default function RightClickRestorerPage() { ... }
+export default function DashboardPage() { ... }
+```
+
+#### 组件职责
+
+`index.tsx` 只负责三件事：
+
+1. **获取翻译函数**（`useI18n`）
+2. **调用业务 Hook** 获取状态和操作方法
+3. **渲染 UI 布局**（纯展示，无业务逻辑）
+
+```typescript
+// ✅ 标准页面入口模板
+import { useI18n } from '@/utils/chromeI18n';
+import { useFeatureName } from './useFeatureName';
+
+export default function Index() {
+  const { t } = useI18n('featureName');
+  const { state, actions } = useFeatureName();
+
+  return (
+    <div className="p-4 w-full flex flex-col space-y-4 select-none">
+      {/* 纯 UI 渲染 */}
+    </div>
+  );
+}
+```
+
+#### 禁止在 `index.tsx` 中编写的内容
+
+- ❌ `useState` / `useMemo` / `useCallback`（应放在 Hook 中）
+- ❌ 数据转换/格式化逻辑
+- ❌ 异步请求/副作用
+- ❌ 超过 3 行的条件判断逻辑
+
+---
+
+### 11.3 业务 Hook 规范（`useFeatureName.ts`）
+
+#### 命名
+
+- 文件名：`useXxx.ts`（驼峰命名）
+- Hook 函数名：`useXxx()`
+- 返回值接口：`UseXxxReturn`
+
+```typescript
+// ✅ 标准 Hook 结构
+export interface UseTimestampConverterReturn {
+  mode: 'ts2dt' | 'dt2ts';
+  input: string;
+  result: string;
+  error: string;
+  setMode: (mode: 'ts2dt' | 'dt2ts') => void;
+  setInput: (value: string) => void;
+  handleUseNow: (now: number) => void;
+}
+
+export function useTimestampConverter(): UseTimestampConverterReturn {
+  // 所有业务逻辑在此
+}
+```
+
+#### Hook 内部结构（推荐顺序）
+
+```typescript
+export function useFeatureName(): UseFeatureNameReturn {
+  // 1. i18n
+  const { t } = useI18n('featureName');
+
+  // 2. 基础 state（useState）
+  const [mode, setMode] = useState<Mode>('default');
+  const [input, setInput] = useState('');
+
+  // 3. 持久化 state（useStorageState）
+  const [pageMode, setPageMode] = useStorageState('feature/pageMode', 'default', isValidMode);
+
+  // 4. 衍生数据（useMemo）— 响应式计算管线
+  const result = useMemo(() => {
+    // 自动计算，无需手动点击"转换"按钮
+  }, [input, mode]);
+
+  // 5. 事件处理（useCallback）
+  const handleAction = useCallback(() => { ... }, [deps]);
+
+  // 6. 副作用（useEffect）— 防抖、初始化、清理
+  useEffect(() => { ... }, [deps]);
+
+  // 7. 右键菜单数据（页面需要时）
+  useContextMenuData({ featureKey: 'featureName', onData: handleContextMenuData });
+
+  // 8. 返回
+  return { mode, input, result, setMode, setInput, handleAction };
+}
+```
+
+#### 防抖模式
+
+当输入框需要防抖时，在 Hook 中实现：
+
+```typescript
+// ✅ 防抖管道 — 在 useMemo 前定义
+const [input, setInput] = useState('');
+const [debouncedInput, setDebouncedInput] = useState('');
+
+useEffect(() => {
+  const handle = setTimeout(() => setDebouncedInput(input), 250);
+  return () => clearTimeout(handle);
+}, [input]);
+
+// 后续 useMemo 使用 debouncedInput 而非 input
+const result = useMemo(() => compute(debouncedInput), [debouncedInput]);
+```
+
+---
+
+### 11.4 常量文件规范（`constants.ts`）
+
+- 仅在常量超过 **3 个**或需要**导出类型**时创建
+- 使用 `as const` 确保字面量类型
+- 从 `as const` 数组派生联合类型
+
+```typescript
+// ✅ 标准常量文件
+export const DATE_FORMAT = 'YYYY/MM/DD HH:mm:ss';
+
+export const ZONES = ['Asia/Shanghai', 'America/New_York', 'Europe/London'] as const;
+
+export type UnitType = 'ms' | 's';
+export type ZoneType = (typeof ZONES)[number];
+```
+
+---
+
+### 11.5 子组件规范
+
+#### 何时拆分子组件
+
+- `index.tsx` 超过 **150 行**
+- 存在可复用的 UI 片段（如卡片、面板、结果展示区）
+- 需要 `React.memo` 优化的高频渲染区域
+
+#### 子组件 Props 模式
+
+```typescript
+// ✅ 继承 HTML 属性 + 业务 Props
+interface ResultViewProps extends React.HTMLAttributes<HTMLDivElement> {
+  result: string;
+  mode: 'ts2dt' | 'dt2ts';
+  showEmptyPlaceholder?: boolean;
+}
+
+// ✅ 使用 React.memo + displayName
+const ResultView = React.memo(
+  ({ result, mode, showEmptyPlaceholder = false, className, ...props }: ResultViewProps) => {
+    const { t } = useI18n('featureName');
+    // ...
+  },
+);
+ResultView.displayName = 'ResultView';
+export default ResultView;
+```
+
+#### 子组件内可以使用 Hook
+
+子组件可以独立调用 `useI18n`、`useSnackbar` 等全局 Hook，**不需要**通过 props 从父组件传递翻译函数或 toast 方法。
+
+---
+
+### 11.6 存储键命名规范
+
+页面使用的 Storage 键必须遵循 kebab-case 格式：`{功能名}/{用途}`。
+
+```typescript
+// ✅ 正确
+'base64Converter/pageMode';
+'base64Converter/fileMode/direction';
+'jsonTools/pageMode';
+'qrCode/urlExpanded';
+
+// ❌ 错误
+'base64ConverterPageMode';
+'json_tools_page_mode';
+```
+
+在 `types/storage.d.ts` 的 `StorageSchema` 中声明所有键。
+
+---
+
+### 11.7 模式切换通用模式
+
+当页面有多个子模式（标签页切换），统一使用以下模式：
+
+```typescript
+// ✅ 标准模式切换
+const VALID_MODES = ['modeA', 'modeB'] as const;
+type PageMode = (typeof VALID_MODES)[number];
+
+const isValidMode = (val: unknown): val is PageMode =>
+  typeof val === 'string' && (VALID_MODES as readonly string[]).includes(val);
+
+export default function Index() {
+  const { t } = useI18n('featureName');
+  const [pageMode, setPageMode] = useStorageState('feature/pageMode', 'modeA', isValidMode);
+
+  return (
+    <div className="p-4 w-full flex flex-col space-y-4 select-none">
+      <SwitchButtonGroup
+        value={pageMode}
+        options={[
+          { value: 'modeA', label: t('feature:modeA') },
+          { value: 'modeB', label: t('feature:modeB') },
+        ]}
+        onChange={(v: PageMode) => setPageMode(v)}
+        size="small"
+      />
+      {pageMode === 'modeA' ? <PanelA /> : <PanelB />}
+    </div>
+  );
+}
+```
+
+---
+
+### 11.8 页面布局约定
+
+- 所有页面根元素使用统一的外层容器：
+  ```
+  <div className="p-4 w-full flex flex-col space-y-4 select-none">
+  ```
+- 不需要 `<div className="min-h-screen bg-background ...">` — 该样式已由 `AppRoot` 提供
+- 不需要 `min-h-[500px]` 或固定高度（除非确有必要）
+- 卡片容器：`rounded-xl border border-border bg-card text-card-foreground shadow-sm`
+- 使用 `space-y-4` 管理纵向间距，不要手动 `mb-4`
+
+---
+
+### 11.9 页面开发检查清单
+
+新增功能页面时，逐项确认：
+
+1. ✅ 在 `types/storage.d.ts` 添加 `PageType` 联合类型
+2. ✅ 在 `config/features.tsx` 注册 `FEATURES` 配置（key、labelKey、icon、三种渲染模式组件）
+3. ✅ 创建页面目录，使用 `Index` 作为组件名
+4. ✅ 业务逻辑提取到 `useXxx.ts` Hook（index.tsx 不超过 150 行）
+5. ✅ 需要持久化的 UI 状态使用 `useStorageState`
+6. ✅ 常量 ≥3 个时提取到 `constants.ts`
+7. ✅ 在 `i18n/locales/{zh,en}/` 添加翻译
+8. ✅ 创建 `__tests__/index.test.tsx` 测试文件
+9. ✅ 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
+10. ✅ 运行 `npm run lint && npm run typecheck && npm run test` 全部通过
+
+---
+
+### 11.10 目录职责总览
 
 | 目录                 | 职责                                                         |
 | -------------------- | ------------------------------------------------------------ |

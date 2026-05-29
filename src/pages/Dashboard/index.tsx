@@ -1,29 +1,24 @@
 import { useRouter } from '@/providers/RouterProvider';
 import { getFeatureByKey } from '@/config/features';
 import type { PageType } from '@/types/storage';
-import { useMemo } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
-export default function DashboardPage() {
+export default function Index() {
   const { navigateTo, visiblePages, pageOrder, recentlyUsedTools } = useRouter();
   const { t } = useI18n(['features']);
 
-  const visibleSet = useMemo(() => new Set<string>(visiblePages), [visiblePages]);
+  const visibleSet = new Set<string>(visiblePages);
 
-  const visibleFeatures = useMemo(() => {
-    return pageOrder
-      .filter((key) => visibleSet.has(key))
-      .map((key) => ({ key, feature: getFeatureByKey(key) }))
-      .filter((item) => item.feature?.themeColorKey && item.feature.icon != null);
-  }, [pageOrder, visibleSet]);
+  const visibleFeatures = pageOrder
+    .filter((key) => visibleSet.has(key))
+    .map((key) => ({ key, feature: getFeatureByKey(key) }))
+    .filter((item) => item.feature?.themeColorKey && item.feature.icon != null);
 
-  const recentFeatures = useMemo(() => {
-    return recentlyUsedTools
-      .filter((key) => visibleSet.has(key))
-      .map((key) => ({ key, feature: getFeatureByKey(key) }))
-      .filter((item) => item.feature?.themeColorKey && item.feature.icon != null);
-  }, [recentlyUsedTools, visibleSet]);
+  const recentFeatures = recentlyUsedTools
+    .filter((key) => visibleSet.has(key))
+    .map((key) => ({ key, feature: getFeatureByKey(key) }))
+    .filter((item) => item.feature?.themeColorKey && item.feature.icon != null);
 
   const showRecent = recentFeatures.length > 0;
 

@@ -88,7 +88,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-4">
+    <div className="w-full flex flex-col space-y-4 px-2">
       {/* 受控方向切流中枢 */}
       <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
         <SwitchButtonGroup
