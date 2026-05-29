@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
 import type { ContextMenuPendingData, PageType } from '@/types/storage';
 
@@ -23,44 +23,58 @@ export interface UseContextMenuDataOptions {
  * 3. Hook 会自动从 storage 中读取并消费匹配的数据
  */
 export function useContextMenuData({ featureKey, onData }: UseContextMenuDataOptions): void {
-  const checkAndConsumeData = useCallback(async () => {
-    try {
-      const data = await storageUtil.get(STORAGE_KEY, undefined);
-
-      if (!data) return;
-
-      if (data.featureKey !== featureKey) return;
-
-      if (Date.now() - data.timestamp > CONTEXT_MENU_DATA_EXPIRY_MS) {
-        await storageUtil.remove(STORAGE_KEY);
-        return;
-      }
-
-      await storageUtil.remove(STORAGE_KEY);
-
-      onData(data.payload);
-    } catch (error) {
-      console.error('[useContextMenuData] 处理右键菜单数据失败:', error);
-    }
-  }, [featureKey, onData]);
-
   useEffect(() => {
-    checkAndConsumeData();
-  }, [checkAndConsumeData]);
+    const checkAndConsumeData = async () => {
+      try {
+        const data = await storageUtil.get(STORAGE_KEY, undefined);
+
+        if (!data) return;
+
+        if (data.featureKey !== featureKey) return;
+
+        if (Date.now() - data.timestamp > CONTEXT_MENU_DATA_EXPIRY_MS) {
+          await storageUtil.remove(STORAGE_KEY);
+          return;
+        }
+
+        await storageUtil.remove(STORAGE_KEY);
+
+        onData(data.payload);
+      } catch (error) {
+        console.error('[useContextMenuData] 处理右键菜单数据失败:', error);
+      }
+    };
+
+    void checkAndConsumeData();
+  }, [featureKey, onData]);
 
   useEffect(() => {
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
       if (changes[STORAGE_KEY]) {
         const newData = changes[STORAGE_KEY].newValue as ContextMenuPendingData | null;
         if (newData && newData.featureKey === featureKey) {
-          checkAndConsumeData();
+          void (async () => {
+            try {
+              const data = await storageUtil.get(STORAGE_KEY, undefined);
+              if (!data) return;
+              if (data.featureKey !== featureKey) return;
+              if (Date.now() - data.timestamp > CONTEXT_MENU_DATA_EXPIRY_MS) {
+                await storageUtil.remove(STORAGE_KEY);
+                return;
+              }
+              await storageUtil.remove(STORAGE_KEY);
+              onData(data.payload);
+            } catch (error) {
+              console.error('[useContextMenuData] 处理右键菜单数据失败:', error);
+            }
+          })();
         }
       }
     };
 
     chrome.storage.onChanged.addListener(handleStorageChange);
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
-  }, [featureKey, checkAndConsumeData]);
+  }, [featureKey, onData]);
 }
 
 /**

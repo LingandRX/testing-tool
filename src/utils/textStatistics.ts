@@ -1,5 +1,3 @@
-import { formatBytes } from './format';
-
 /**
  * 文本统计信息接口
  */
@@ -35,7 +33,7 @@ export function getTextStats(text: string): TextStats {
     const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
     const segments = segmenter.segment(text);
     for (const segment of segments) {
-      // isWordLike 为 true 表示该片段是“类词”的（非空格、非标点）
+      // isWordLike 为 true 表示该片段是"类词"的（非空格、非标点）
       if (segment.isWordLike) {
         words++;
       }
@@ -44,7 +42,7 @@ export function getTextStats(text: string): TextStats {
     // 降级方案：如果不支持 Intl.Segmenter，使用正则匹配英文单词
     // 但对中文支持较差
     const englishWords = text.match(/\b\w+\b/g) || [];
-    const chineseChars = text.match(/[\u4e00-\u9fa5]/g) || [];
+    const chineseChars = text.match(/[一-龥]/g) || [];
     words = englishWords.length + chineseChars.length;
   }
 
@@ -56,14 +54,4 @@ export function getTextStats(text: string): TextStats {
   const bytes = new TextEncoder().encode(text).length;
 
   return { characters, words, lines, bytes };
-}
-
-/**
- * 格式化字节大小显示（兼容旧接口，内部委托给 formatBytes）
- *
- * @param bytes 字节数
- * @returns 格式化后的字符串
- */
-export function formatByteSize(bytes: number): string {
-  return formatBytes(bytes);
 }

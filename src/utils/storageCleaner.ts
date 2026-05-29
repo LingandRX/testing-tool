@@ -1,10 +1,4 @@
 import type { CleaningResult, StorageCleanerOptions, StorageCleanResult } from '@/types/storage';
-import { formatBytes } from './format';
-
-/** 格式化字节大小显示（兼容旧接口，内部委托给 formatBytes） */
-export function formatSize(bytes: number): string {
-  return formatBytes(bytes);
-}
 
 const RESTRICTED_PROTOCOLS = [
   'chrome:',

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
-import { formatByteSize } from '@/utils/textStatistics';
+import { formatBytes } from '@/utils/format';
 import CopyButton from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
 import { validateJson } from '@/utils/jsonFormatter';
@@ -96,7 +96,7 @@ export default function JsonConvertSection({
                 <span>
                   {t('jsonFormat:originalSize')}:{' '}
                   <span className="font-semibold text-foreground/80">
-                    {formatByteSize(result.originalBytes)}
+                    {formatBytes(result.originalBytes)}
                   </span>
                 </span>
                 <span className="text-border/60">|</span>
