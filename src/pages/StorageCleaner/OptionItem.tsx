@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatSize } from '@/utils/storageCleaner';
+import { formatBytes } from '@/utils/format';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 // 引入官方的 Checkbox 原子组件
@@ -53,7 +53,7 @@ export default function OptionItem({
               checked ? 'text-primary/70' : 'text-muted-foreground/70',
             )}
           >
-            {isCount ? `${size} ${t('storageCleaner:countUnit')}` : formatSize(size)}
+            {isCount ? `${size} ${t('storageCleaner:countUnit')}` : formatBytes(size)}
           </span>
         ) : (
           <span className="block text-[10px] font-medium text-muted-foreground/50 mt-0.5 italic">
