@@ -1,17 +1,11 @@
 import type { ContextMenuClickedPayload } from '@/utils/messages';
 import { MessageAction, onMessage } from '@/utils/messages';
 import { getTextStats } from '@/utils/textStatistics';
+import { getMessage } from '@/utils/chromeI18n';
 import { hidePopover, showTextStatsResult, showTimestampResult } from './uiPopover';
 
-function getI18nText(key: string, fallback: string): string {
-  if (typeof chrome !== 'undefined' && chrome.i18n) {
-    return chrome.i18n.getMessage(key) || fallback;
-  }
-  return fallback;
-}
-
 function convertTimestamp(input: string): string {
-  const invalidText = getI18nText('invalidTimestamp', 'Invalid Timestamp');
+  const invalidText = getMessage('invalidTimestamp') || 'Invalid Timestamp';
   const num = Number(input.trim());
 
   if (isNaN(num)) {
