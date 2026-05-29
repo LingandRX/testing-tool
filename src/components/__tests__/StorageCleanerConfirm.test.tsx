@@ -94,7 +94,7 @@ describe('StorageCleanerConfirm 组件', () => {
       renderComponent({ options: partialOptions });
 
       expect(screen.getByText(/Local Storage/)).toBeInTheDocument();
-      expect(screen.getByText(/IndexedDB/)).toBeInTheDocument();
+      expect(screen.getByText(/站点存储/)).toBeInTheDocument();
       expect(screen.queryByText(/Session Storage/)).not.toBeInTheDocument();
       expect(screen.queryByText(/Cookies$/)).not.toBeInTheDocument();
     });
