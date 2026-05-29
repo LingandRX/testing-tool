@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { clearCookies, formatSize, isRestrictedUrl } from '@/utils/storageCleaner';
+import { clearCookies, isRestrictedUrl } from '@/utils/storageCleaner';
+import { formatBytes } from '@/utils/format';
 
 describe('storageCleaner utils', () => {
   describe('isRestrictedUrl', () => {
@@ -48,36 +49,36 @@ describe('storageCleaner utils', () => {
     });
   });
 
-  describe('formatSize', () => {
+  describe('formatBytes', () => {
     it('should return "0 B" for 0 bytes', () => {
-      expect(formatSize(0)).toBe('0 B');
+      expect(formatBytes(0)).toBe('0 B');
     });
 
     it('should format bytes correctly', () => {
-      expect(formatSize(500)).toBe('500 B');
+      expect(formatBytes(500)).toBe('500 B');
     });
 
     it('should format kilobytes correctly', () => {
-      expect(formatSize(1024)).toBe('1.0 KB');
-      expect(formatSize(1536)).toBe('1.5 KB');
-      expect(formatSize(2048)).toBe('2.0 KB');
+      expect(formatBytes(1024)).toBe('1.0 KB');
+      expect(formatBytes(1536)).toBe('1.5 KB');
+      expect(formatBytes(2048)).toBe('2.0 KB');
     });
 
     it('should format megabytes correctly', () => {
-      expect(formatSize(1048576)).toBe('1.00 MB');
-      expect(formatSize(1572864)).toBe('1.50 MB');
-      expect(formatSize(5242880)).toBe('5.00 MB');
+      expect(formatBytes(1048576)).toBe('1.00 MB');
+      expect(formatBytes(1572864)).toBe('1.50 MB');
+      expect(formatBytes(5242880)).toBe('5.00 MB');
     });
 
     it('should format gigabytes correctly', () => {
-      expect(formatSize(1073741824)).toBe('1.00 GB');
-      expect(formatSize(2147483648)).toBe('2.00 GB');
+      expect(formatBytes(1073741824)).toBe('1.00 GB');
+      expect(formatBytes(2147483648)).toBe('2.00 GB');
     });
 
     it('should handle edge cases', () => {
-      expect(formatSize(1)).toBe('1 B');
-      expect(formatSize(1023)).toBe('1023 B');
-      expect(formatSize(1025)).toBe('1.0 KB');
+      expect(formatBytes(1)).toBe('1 B');
+      expect(formatBytes(1023)).toBe('1023 B');
+      expect(formatBytes(1025)).toBe('1.0 KB');
     });
   });
 

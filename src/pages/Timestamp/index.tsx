@@ -1,5 +1,6 @@
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { ZONES } from './constants';
+import type { ModeType, UnitType, ZoneType } from './constants';
 import LiveClock from './LiveClock';
 import ResultView from './ResultView';
 import { useTimestampConverter } from './useTimestampConverter';
@@ -14,6 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
+const MODE_OPTIONS: { value: ModeType; label: string }[] = [
+  { value: 'ts2dt', label: 'timestamp:tsToDate' },
+  { value: 'dt2ts', label: 'timestamp:dateToTs' },
+];
+
+const UNIT_OPTIONS: { value: UnitType; label: string }[] = [
+  { value: 'ms', label: 'timestamp:unitMs' },
+  { value: 's', label: 'timestamp:unitS' },
+];
 
 export default function Index() {
   const { t } = useI18n('timestamp');
@@ -42,11 +53,8 @@ export default function Index() {
             <div className="flex flex-col gap-4">
               <SwitchButtonGroup
                 value={mode}
-                options={[
-                  { value: 'ts2dt', label: t('timestamp:tsToDate') },
-                  { value: 'dt2ts', label: t('timestamp:dateToTs') },
-                ]}
-                onChange={(newMode) => setMode(newMode as 'ts2dt' | 'dt2ts')}
+                options={MODE_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
+                onChange={setMode}
                 size="small"
               />
 
@@ -57,7 +65,7 @@ export default function Index() {
                     mode === 'ts2dt' ? t('timestamp:placeholderTs') : t('timestamp:placeholderDate')
                   }
                   value={input}
-                  onChange={(e: { target: { value: string } }) => setInput(e.target.value)}
+                  onChange={(e) => setInput(e.target.value)}
                   className={cn(
                     'font-mono font-semibold h-10 shadow-sm placeholder:text-muted-foreground/60 focus:bg-background',
                     error && 'border-destructive focus-visible:ring-destructive',
@@ -70,16 +78,13 @@ export default function Index() {
               <div className="flex flex-col sm:flex-row items-stretch gap-3 w-full">
                 <SwitchButtonGroup
                   value={unit}
-                  options={[
-                    { value: 'ms', label: t('timestamp:unitMs') },
-                    { value: 's', label: t('timestamp:unitS') },
-                  ]}
-                  onChange={(v) => setUnit(v as 'ms' | 's')}
+                  options={UNIT_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
+                  onChange={setUnit}
                   size="small"
                   className="sm:w-auto shrink-0"
                 />
 
-                <Select value={zone} onValueChange={(v: string) => setZone(v as typeof zone)}>
+                <Select value={zone} onValueChange={(v: string) => setZone(v as ZoneType)}>
                   <SelectTrigger className="flex-1 font-mono font-semibold h-9 shadow-sm bg-background">
                     <SelectValue placeholder="选择时区" />
                   </SelectTrigger>
@@ -100,7 +105,7 @@ export default function Index() {
           </div>
 
           <div className="p-5 rounded-xl border border-border bg-card text-card-foreground shadow-sm h-full flex flex-col">
-            <ResultView result={result} mode={mode} unit={unit} zone={zone} showEmptyPlaceholder />
+            <ResultView result={result} showEmptyPlaceholder />
           </div>
         </div>
       </div>

@@ -34,10 +34,14 @@ describe('messages', () => {
       const mockTab = { id: 123, url: 'https://example.com' };
       (chrome.tabs.query as any).mockResolvedValue([mockTab]);
 
-      const result = await sendMessageToContent(MessageAction.RELOAD_TAB, { tabId: 123 });
+      const result = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
 
       expect(result).toEqual(mockResponse);
-      expect(mockSendMessage).toHaveBeenCalledWith(MessageAction.RELOAD_TAB, { tabId: 123 }, 123);
+      expect(mockSendMessage).toHaveBeenCalledWith(
+        MessageAction.RESTORE_RIGHT_CLICK,
+        undefined,
+        123,
+      );
     });
 
     it('应该支持不带数据的消息发送', async () => {
@@ -60,11 +64,11 @@ describe('messages', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       (chrome.tabs.query as any).mockResolvedValue([]);
 
-      const result = await sendMessageToContent(MessageAction.RELOAD_TAB, { tabId: 123 });
+      const result = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
 
       expect(result).toEqual({ success: false, message: '无法获取当前标签页' });
       expect(consoleSpy).toHaveBeenCalledWith(
-        '[Messaging] 无法获取当前标签页，无法发送动作: reloadTab',
+        '[Messaging] 无法获取当前标签页，无法发送动作: restoreRightClick',
       );
       consoleSpy.mockRestore();
     });
@@ -73,7 +77,7 @@ describe('messages', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       (chrome.tabs.query as any).mockResolvedValue([{ url: 'https://example.com' }]);
 
-      const result = await sendMessageToContent(MessageAction.RELOAD_TAB, { tabId: 123 });
+      const result = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
 
       expect(result).toEqual({ success: false, message: '无法获取当前标签页' });
       consoleSpy.mockRestore();
@@ -87,7 +91,7 @@ describe('messages', () => {
       const mockTab = { id: 123, url: 'https://example.com' };
       (chrome.tabs.query as any).mockResolvedValue([mockTab]);
 
-      const result = await sendMessageToContent(MessageAction.RELOAD_TAB, { tabId: 123 });
+      const result = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
 
       expect(result).toEqual({
         success: false,
@@ -104,7 +108,7 @@ describe('messages', () => {
       const mockTab = { id: 123, url: 'https://example.com' };
       (chrome.tabs.query as any).mockResolvedValue([mockTab]);
 
-      const result = await sendMessageToContent(MessageAction.RELOAD_TAB, { tabId: 123 });
+      const result = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
 
       expect(result).toEqual({
         success: false,
@@ -121,7 +125,7 @@ describe('messages', () => {
       const mockTab = { id: 123, url: 'https://example.com' };
       (chrome.tabs.query as any).mockResolvedValue([mockTab]);
 
-      const result = await sendMessageToContent(MessageAction.RELOAD_TAB, { tabId: 123 });
+      const result = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
 
       expect(result).toEqual({
         success: false,
@@ -138,7 +142,7 @@ describe('messages', () => {
       const mockTab = { id: 123, url: 'https://example.com' };
       (chrome.tabs.query as any).mockResolvedValue([mockTab]);
 
-      const result = await sendMessageToContent(MessageAction.RELOAD_TAB, { tabId: 123 });
+      const result = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
 
       expect(result).toEqual({
         success: false,
@@ -151,7 +155,7 @@ describe('messages', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       (chrome.tabs.query as any).mockRejectedValue(new Error('Query failed'));
 
-      const result = await sendMessageToContent(MessageAction.RELOAD_TAB, { tabId: 123 });
+      const result = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
 
       expect(result).toEqual({
         success: false,
