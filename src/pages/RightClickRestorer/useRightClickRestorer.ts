@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MessageAction, sendMessageToContent } from '@/utils/messages';
 
 const UNSUPPORTED_PROTOCOLS = new Set([
@@ -39,17 +39,10 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         const url = tab?.url;
 
-        if (url) {
-          try {
-            setDomain(new URL(url).hostname);
-          } catch {
-            setDomain('');
-          }
-        }
+        setDomain(url ? new URL(url).hostname : '');
 
         if (isUnsupportedPage(url)) {
           setIsUnsupported(true);
-          setIsLoading(false);
           return;
         }
 
@@ -67,7 +60,7 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
     void load();
   }, []);
 
-  const unlock = useCallback(async () => {
+  async function unlock() {
     if (isUnsupported) return;
 
     try {
@@ -78,7 +71,7 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
     } catch (err) {
       console.error('[RightClickRestorer] Failed to unlock:', err);
     }
-  }, [isUnsupported]);
+  }
 
   return {
     domain,

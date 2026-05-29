@@ -1,5 +1,4 @@
 import type { CleaningResult, StorageCleanerOptions, StorageCleanResult } from '@/types/storage';
-import { formatBytes } from './format';
 
 const RESTRICTED_PROTOCOLS = [
   'chrome:',
@@ -10,6 +9,16 @@ const RESTRICTED_PROTOCOLS = [
   'file:',
   'data:',
 ] as const;
+
+/** 清理选项的 key 列表（用于遍历结果） */
+const CLEAN_OPTION_KEYS: (keyof StorageCleanerOptions)[] = [
+  'localStorage',
+  'sessionStorage',
+  'indexedDB',
+  'cookies',
+  'cacheStorage',
+  'serviceWorkers',
+];
 
 export async function getCurrentTab() {
   // For popup pages, we need to get the active tab from the browser window that triggered the popup.
@@ -59,129 +68,122 @@ export async function getCookieSize(url: string): Promise<number> {
   }
 }
 
-export async function getLocalStorageSize(tabId: number): Promise<number> {
+/**
+ * 通用辅助：在指定标签页中执行脚本并返回结果
+ *
+ * @param tabId 标签页 ID
+ * @param func 在页面上下文中执行的函数
+ * @param errorLabel 错误日志前缀
+ * @param fallback 执行失败时的回退值
+ */
+async function runScript<T>(
+  tabId: number,
+  func: () => T | Promise<T>,
+  errorLabel: string,
+  fallback: T,
+): Promise<T> {
   try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: () => {
-        try {
-          const encoder = new TextEncoder();
-          return Object.entries(localStorage).reduce(
-            (acc, [k, v]) => acc + encoder.encode(k).length + encoder.encode(v).length,
-            0,
-          );
-        } catch {
-          return 0;
-        }
-      },
-    });
-    return (result?.result as number) || 0;
+    const [result] = await chrome.scripting.executeScript({ target: { tabId }, func });
+    return (result?.result as T) ?? fallback;
   } catch (error) {
-    console.error('Failed to get LocalStorage size:', error);
-    return 0;
+    console.error(`Failed to ${errorLabel}:`, error);
+    return fallback;
   }
+}
+
+export async function getLocalStorageSize(tabId: number): Promise<number> {
+  return runScript(
+    tabId,
+    () => {
+      try {
+        const encoder = new TextEncoder();
+        return Object.entries(localStorage).reduce(
+          (acc, [k, v]) => acc + encoder.encode(k).length + encoder.encode(v).length,
+          0,
+        );
+      } catch {
+        return 0;
+      }
+    },
+    'get LocalStorage size',
+    0,
+  );
 }
 
 export async function getSessionStorageSize(tabId: number): Promise<number> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: () => {
-        try {
-          const encoder = new TextEncoder();
-          return Object.entries(sessionStorage).reduce(
-            (acc, [k, v]) => acc + encoder.encode(k).length + encoder.encode(v).length,
-            0,
-          );
-        } catch {
-          return 0;
-        }
-      },
-    });
-    return (result?.result as number) || 0;
-  } catch (error) {
-    console.error('Failed to get SessionStorage size:', error);
-    return 0;
-  }
+  return runScript(
+    tabId,
+    () => {
+      try {
+        const encoder = new TextEncoder();
+        return Object.entries(sessionStorage).reduce(
+          (acc, [k, v]) => acc + encoder.encode(k).length + encoder.encode(v).length,
+          0,
+        );
+      } catch {
+        return 0;
+      }
+    },
+    'get SessionStorage size',
+    0,
+  );
 }
 
 export async function getOriginStorageEstimate(tabId: number): Promise<number> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: async () => {
-        try {
-          if (navigator.storage && navigator.storage.estimate) {
-            const estimate = await navigator.storage.estimate();
-            return estimate.usage || 0;
-          }
-          return 0;
-        } catch {
-          return 0;
+  return runScript(
+    tabId,
+    async () => {
+      try {
+        if (navigator.storage && navigator.storage.estimate) {
+          const estimate = await navigator.storage.estimate();
+          return estimate.usage || 0;
         }
-      },
-    });
-    return (result?.result as number) || 0;
-  } catch (error) {
-    console.error('Failed to get origin storage estimate:', error);
-    return 0;
-  }
+        return 0;
+      } catch {
+        return 0;
+      }
+    },
+    'get origin storage estimate',
+    0,
+  );
 }
 
 export async function getCacheStorageSize(tabId: number): Promise<number> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: async () => {
-        try {
-          if ('caches' in window) {
-            const keys = await caches.keys();
-            return keys.length;
-          }
-          return 0;
-        } catch {
-          return 0;
+  return runScript(
+    tabId,
+    async () => {
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          return keys.length;
         }
-      },
-    });
-    return (result?.result as number) || 0;
-  } catch (error) {
-    console.error('Failed to get CacheStorage size:', error);
-    return 0;
-  }
+        return 0;
+      } catch {
+        return 0;
+      }
+    },
+    'get CacheStorage size',
+    0,
+  );
 }
 
 export async function getServiceWorkerCount(tabId: number): Promise<number> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: async () => {
-        try {
-          if ('serviceWorker' in navigator) {
-            const regs = await navigator.serviceWorker.getRegistrations();
-            return regs.length;
-          }
-          return 0;
-        } catch {
-          return 0;
+  return runScript(
+    tabId,
+    async () => {
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          return regs.length;
         }
-      },
-    });
-    return (result?.result as number) || 0;
-  } catch (error) {
-    console.error('Failed to get ServiceWorker count:', error);
-    return 0;
-  }
-}
-
-/**
- * 格式化字节大小显示（兼容旧接口，内部委托给 formatBytes）
- *
- * @param bytes 字节数
- * @returns 格式化后的字符串
- */
-export function formatSize(bytes: number): string {
-  return formatBytes(bytes);
+        return 0;
+      } catch {
+        return 0;
+      }
+    },
+    'get ServiceWorker count',
+    0,
+  );
 }
 
 export async function clearCookies(url: string): Promise<StorageCleanResult> {
@@ -203,148 +205,125 @@ export async function clearCookies(url: string): Promise<StorageCleanResult> {
   }
 }
 
-export async function injectClearLocalStorage(tabId: number): Promise<StorageCleanResult> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: () => {
-        const count = localStorage.length;
-        localStorage.clear();
-        return { count };
-      },
-    });
-    if (result?.result && typeof result.result === 'object' && 'count' in result.result) {
-      return { success: true, count: result.result.count };
-    }
-    return { success: false, error: 'No result returned' };
-  } catch (error) {
-    return { success: false, error: String(error) };
+/**
+ * 通用辅助：执行清理脚本并解析结果
+ *
+ * @param tabId 标签页 ID
+ * @param func 在页面上下文中执行的清理函数
+ * @param errorLabel 错误日志前缀
+ */
+async function runCleanScript(
+  tabId: number,
+  func: () => { count: number } | Promise<{ count: number }>,
+  errorLabel: string,
+): Promise<StorageCleanResult> {
+  const raw = await runScript(tabId, func, errorLabel, { count: 0 });
+  if (raw && typeof raw === 'object' && 'count' in raw) {
+    return { success: true, count: raw.count };
   }
+  return { success: false, error: 'No result returned' };
+}
+
+export async function injectClearLocalStorage(tabId: number): Promise<StorageCleanResult> {
+  return runCleanScript(
+    tabId,
+    () => {
+      const count = localStorage.length;
+      localStorage.clear();
+      return { count };
+    },
+    'clear LocalStorage',
+  );
 }
 
 export async function injectClearSessionStorage(tabId: number): Promise<StorageCleanResult> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: () => {
-        const count = sessionStorage.length;
-        sessionStorage.clear();
-        return { count };
-      },
-    });
-    if (result?.result && typeof result.result === 'object' && 'count' in result.result) {
-      return { success: true, count: result.result.count };
-    }
-    return { success: false, error: 'No result returned' };
-  } catch (error) {
-    return { success: false, error: String(error) };
-  }
+  return runCleanScript(
+    tabId,
+    () => {
+      const count = sessionStorage.length;
+      sessionStorage.clear();
+      return { count };
+    },
+    'clear SessionStorage',
+  );
 }
 
 export async function injectClearIndexedDB(tabId: number): Promise<StorageCleanResult> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: async () => {
-        if (typeof indexedDB.databases === 'function') {
-          const databases = await indexedDB.databases();
-          let count = 0;
-          for (const db of databases) {
-            if (db.name) {
-              const dbName = db.name as string;
-              try {
-                await new Promise<void>((resolve, reject) => {
-                  const deleteReq = indexedDB.deleteDatabase(dbName);
-                  const timeout = setTimeout(() => {
-                    console.warn('IndexedDB delete timeout:', dbName);
-                    resolve(); // Timeout, move to next
-                  }, 5000);
-
-                  deleteReq.onblocked = () => {
-                    console.warn('IndexedDB delete blocked:', dbName);
-                    clearTimeout(timeout);
-                    resolve(); // Blocked, move to next
-                  };
-                  deleteReq.onsuccess = () => {
-                    clearTimeout(timeout);
-                    resolve();
-                  };
-                  deleteReq.onerror = () => {
-                    clearTimeout(timeout);
-                    reject(new Error(`Failed to delete ${dbName}`));
-                  };
-                });
-                count++;
-              } catch (e) {
-                console.error('Delete DB error:', e);
-              }
-            }
-          }
-          return { count };
+  return runCleanScript(
+    tabId,
+    async () => {
+      if (typeof indexedDB.databases !== 'function') {
+        return { count: 0 };
+      }
+      const databases = await indexedDB.databases();
+      let count = 0;
+      for (const db of databases) {
+        if (!db.name) continue;
+        const dbName = db.name;
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const deleteReq = indexedDB.deleteDatabase(dbName);
+            const timeout = setTimeout(() => {
+              console.warn('IndexedDB delete timeout:', dbName);
+              resolve();
+            }, 5000);
+            deleteReq.onblocked = () => {
+              console.warn('IndexedDB delete blocked:', dbName);
+              clearTimeout(timeout);
+              resolve();
+            };
+            deleteReq.onsuccess = () => {
+              clearTimeout(timeout);
+              resolve();
+            };
+            deleteReq.onerror = () => {
+              clearTimeout(timeout);
+              reject(new Error(`Failed to delete ${dbName}`));
+            };
+          });
+          count++;
+        } catch (e) {
+          console.error('Delete DB error:', e);
         }
-        return { error: 'databases_api_unavailable' };
-      },
-    });
-    if (result?.result && typeof result.result === 'object') {
-      if ('error' in result.result) {
-        return { success: false, error: String(result.result.error) };
       }
-      if ('count' in result.result) {
-        return { success: true, count: result.result.count };
-      }
-    }
-    return { success: false, error: 'No result returned' };
-  } catch (error) {
-    return { success: false, error: String(error) };
-  }
+      return { count };
+    },
+    'clear IndexedDB',
+  );
 }
 
 export async function injectClearCacheStorage(tabId: number): Promise<StorageCleanResult> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: async () => {
-        if ('caches' in window) {
-          const cacheNames = await caches.keys();
-          for (const name of cacheNames) {
-            await caches.delete(name);
-          }
-          return { count: cacheNames.length };
+  return runCleanScript(
+    tabId,
+    async () => {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        for (const name of cacheNames) {
+          await caches.delete(name);
         }
-        return { count: 0 };
-      },
-    });
-    if (result?.result && typeof result.result === 'object' && 'count' in result.result) {
-      return { success: true, count: result.result.count };
-    }
-    return { success: false, error: 'No result returned' };
-  } catch (error) {
-    return { success: false, error: String(error) };
-  }
+        return { count: cacheNames.length };
+      }
+      return { count: 0 };
+    },
+    'clear CacheStorage',
+  );
 }
 
 export async function injectUnregisterServiceWorkers(tabId: number): Promise<StorageCleanResult> {
-  try {
-    const [result] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: async () => {
-        if ('serviceWorker' in navigator) {
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          for (const registration of registrations) {
-            await registration.unregister();
-          }
-          return { count: registrations.length };
+  return runCleanScript(
+    tabId,
+    async () => {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          await registration.unregister();
         }
-        return { count: 0 };
-      },
-    });
-    if (result?.result && typeof result.result === 'object' && 'count' in result.result) {
-      return { success: true, count: result.result.count };
-    }
-    return { success: false, error: 'No result returned' };
-  } catch (error) {
-    return { success: false, error: String(error) };
-  }
+        return { count: registrations.length };
+      }
+      return { count: 0 };
+    },
+    'unregister ServiceWorkers',
+  );
 }
 
 export async function clearStorage(
@@ -352,39 +331,32 @@ export async function clearStorage(
   url: string,
   options: StorageCleanerOptions,
 ): Promise<CleaningResult> {
-  const result: CleaningResult = { success: true };
+  const result: CleaningResult = { overallSuccess: true };
 
   if (options.localStorage) {
     result.localStorage = await injectClearLocalStorage(tabId);
   }
-
   if (options.sessionStorage) {
     result.sessionStorage = await injectClearSessionStorage(tabId);
   }
-
   if (options.indexedDB) {
     result.indexedDB = await injectClearIndexedDB(tabId);
   }
-
   if (options.cookies) {
     result.cookies = await clearCookies(url);
   }
-
   if (options.cacheStorage) {
     result.cacheStorage = await injectClearCacheStorage(tabId);
   }
-
   if (options.serviceWorkers) {
     result.serviceWorkers = await injectUnregisterServiceWorkers(tabId);
   }
 
-  // Check if any operation failed
   const failures = Object.values(result).filter(
     (r): r is StorageCleanResult => r?.success === false,
   );
-
   if (failures.length > 0) {
-    result.success = false;
+    result.overallSuccess = false;
   }
 
   return result;
@@ -396,16 +368,7 @@ export function formatCleaningResult(
 ): string {
   const parts: string[] = [];
 
-  const optionKeys: (keyof StorageCleanerOptions)[] = [
-    'localStorage',
-    'sessionStorage',
-    'indexedDB',
-    'cookies',
-    'cacheStorage',
-    'serviceWorkers',
-  ];
-
-  for (const key of optionKeys) {
+  for (const key of CLEAN_OPTION_KEYS) {
     const r = result[key];
     if (r?.success && r.count > 0) {
       parts.push(`${r.count} ${t(`storageCleaner:options.${key}`)}`);

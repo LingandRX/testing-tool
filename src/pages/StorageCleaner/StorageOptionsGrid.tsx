@@ -1,5 +1,6 @@
 import React from 'react';
 import type { StorageCleanerOptions } from '@/types/storage';
+import type { StorageSizeInfo } from './useStorageCleaner';
 import OptionItem from './OptionItem';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
@@ -8,7 +9,7 @@ import { Label } from '@/components/ui/label';
 
 interface StorageOptionsGridProps extends React.HTMLAttributes<HTMLDivElement> {
   options: StorageCleanerOptions;
-  sizes: Record<string, number>;
+  sizes: Record<string, StorageSizeInfo>;
   allSelected: boolean;
   someSelected: boolean;
   onOptionChange: (key: keyof StorageCleanerOptions) => void;
@@ -27,13 +28,13 @@ export default function StorageOptionsGrid({
 }: StorageOptionsGridProps) {
   const { t } = useI18n('storageCleaner');
 
-  const optionKeys: { key: keyof StorageCleanerOptions; isCount?: boolean }[] = [
-    { key: 'localStorage' },
-    { key: 'sessionStorage' },
-    { key: 'indexedDB' },
-    { key: 'cookies' },
-    { key: 'cacheStorage', isCount: true },
-    { key: 'serviceWorkers', isCount: true },
+  const optionKeys: (keyof StorageCleanerOptions)[] = [
+    'localStorage',
+    'sessionStorage',
+    'indexedDB',
+    'cookies',
+    'cacheStorage',
+    'serviceWorkers',
   ];
 
   const handleToggleAll = () => {
@@ -41,22 +42,15 @@ export default function StorageOptionsGrid({
   };
 
   return (
-    <div
-      className={cn(
-        'w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden',
-        className,
-      )}
-      {...props}
-    >
-      <div className="p-3">
-        <div className="grid grid-cols-2 gap-2.5 items-stretch">
-          {optionKeys.map(({ key, isCount }) => (
+    <div className={cn('w-full overflow-hidden', className)} {...props}>
+      <div className="px-3.5 pt-3.5 pb-2">
+        <div className="grid grid-cols-2 gap-2 items-stretch">
+          {optionKeys.map((key) => (
             <OptionItem
               key={key}
               labelKey={`storageCleaner:options.${key}`}
               checked={options[key]}
-              size={sizes[key]}
-              isCount={isCount}
+              sizeInfo={sizes[key]}
               onChange={() => onOptionChange(key)}
             />
           ))}
@@ -65,9 +59,9 @@ export default function StorageOptionsGrid({
 
       <div
         onClick={handleToggleAll}
-        className="border-t border-border flex justify-between items-center px-4 py-2.5 bg-muted/20 hover:bg-muted/50 cursor-pointer select-none"
+        className="border-t border-border flex justify-between items-center pl-3.5 pr-7 py-2.5 bg-muted/20 hover:bg-muted/40 cursor-pointer select-none transition-colors"
       >
-        <Label className="text-xs font-bold text-muted-foreground/90 cursor-pointer">
+        <Label className="text-xs font-bold text-muted-foreground/90 cursor-pointer tracking-wide uppercase">
           {t('storageCleaner:selectAll')}
         </Label>
 
@@ -75,7 +69,7 @@ export default function StorageOptionsGrid({
           checked={allSelected ? true : someSelected ? 'indeterminate' : false}
           onClick={(e) => e.stopPropagation()}
           onCheckedChange={(checked) => onSelectAll(checked === true)}
-          className="h-4 w-4 shrink-0 rounded border-input data-[state=checked]:bg-primary data-[state=indeterminate]:bg-primary"
+          className="h-4 w-4 shrink-0 rounded border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:bg-muted-foreground/40"
         />
       </div>
     </div>

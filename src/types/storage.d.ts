@@ -189,7 +189,7 @@ export type StorageCleanResult =
  */
 export interface CleaningResult {
   /** 整体操作是否成功 */
-  success: boolean;
+  overallSuccess: boolean;
   /** 整体错误信息（如果有） */
   error?: string;
   /** 各项清理的具体结果 */

@@ -3,6 +3,7 @@ import { browser } from 'wxt/browser';
 import { MessageAction, onMessage, sendMessage } from '@/utils/messages';
 import { createAllContextMenus, parseContextMenuClick } from '@/utils/contextMenu';
 import { saveContextMenuData } from '@/utils/useContextMenuData';
+import { mainWorldInjectionScript } from '@/utils/rightClickInjection';
 
 export default defineBackground(() => {
   // 1. 扩展初次安装或更新时，注册右键上下文菜单
@@ -71,68 +72,7 @@ export default defineBackground(() => {
     try {
       await browser.scripting.executeScript({
         target: { tabId },
-        func: () => {
-          'use strict';
-          const w = window as unknown as Record<string, unknown>;
-          if (w.__testingToolsRightClickPatched) return;
-          w.__testingToolsRightClickPatched = true;
-
-          const PROTECTED = ['contextmenu', 'copy', 'paste', 'cut', 'selectstart'];
-
-          const _origPreventDefault = MouseEvent.prototype.preventDefault;
-          Object.defineProperty(MouseEvent.prototype, 'preventDefault', {
-            value: function (this: MouseEvent) {
-              const t = this.type;
-              if (PROTECTED.includes(t) || (t === 'mousedown' && this.button === 2)) {
-                return;
-              }
-              return _origPreventDefault.call(this);
-            },
-            writable: true,
-            configurable: true,
-          });
-
-          const _origStopPropagation = Event.prototype.stopPropagation;
-          Object.defineProperty(Event.prototype, 'stopPropagation', {
-            value: function (this: Event) {
-              if (PROTECTED.includes(this.type)) return;
-              return _origStopPropagation.call(this);
-            },
-            writable: true,
-            configurable: true,
-          });
-
-          const _origStopImmediatePropagation = Event.prototype.stopImmediatePropagation;
-          Object.defineProperty(Event.prototype, 'stopImmediatePropagation', {
-            value: function (this: Event) {
-              if (PROTECTED.includes(this.type)) return;
-              return _origStopImmediatePropagation.call(this);
-            },
-            writable: true,
-            configurable: true,
-          });
-
-          let _docOnContextMenu: unknown = null;
-          Object.defineProperty(document, 'oncontextmenu', {
-            get() {
-              return _docOnContextMenu;
-            },
-            set(fn: unknown) {
-              if (typeof fn === 'function') {
-                _docOnContextMenu = function (this: GlobalEventHandlers, e: MouseEvent) {
-                  const r = (fn as (this: GlobalEventHandlers, ev: MouseEvent) => unknown).call(
-                    this,
-                    e,
-                  );
-                  return r === false ? true : r;
-                };
-              } else {
-                _docOnContextMenu = fn;
-              }
-            },
-            configurable: true,
-          });
-        },
+        func: mainWorldInjectionScript,
         world: 'MAIN',
       });
 
@@ -142,42 +82,5 @@ export default defineBackground(() => {
       console.error('[RightClickRestorer] executeScript failed:', errorMsg);
       return { success: false, message: errorMsg };
     }
-  });
-
-  onMessage(MessageAction.RELOAD_TAB, async (message) => {
-    const { tabId, delay = 0 } = message.data;
-
-    const executeReload = () => {
-      browser.tabs.reload(tabId).catch((err) => {
-        console.error('Failed to execute tab reload operation:', err);
-      });
-    };
-
-    if (delay <= 0) {
-      executeReload();
-      return { success: true };
-    }
-
-    const alarmName = `reload-tab-${tabId}-${Date.now()}`;
-
-    await browser.alarms.create(alarmName, { when: Date.now() + delay });
-
-    const cleanupTimeout = setTimeout(() => {
-      browser.alarms.onAlarm.removeListener(alarmListener);
-      browser.alarms.clear(alarmName).catch(() => {});
-    }, delay + 5000);
-
-    const alarmListener = (alarm: { name: string }) => {
-      if (alarm.name !== alarmName) return;
-
-      clearTimeout(cleanupTimeout);
-      executeReload();
-      browser.alarms.onAlarm.removeListener(alarmListener);
-      browser.alarms.clear(alarmName).catch(() => {});
-    };
-
-    browser.alarms.onAlarm.addListener(alarmListener);
-
-    return { success: true };
   });
 });

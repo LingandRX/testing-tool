@@ -16,7 +16,6 @@ import {
   getSessionStorageSize,
   isRestrictedUrl,
 } from '@/utils/storageCleaner';
-import { MessageAction, sendMessage } from '@/utils/messages';
 import { useI18n } from '@/utils/chromeI18n';
 import { toast } from 'sonner';
 
@@ -34,18 +33,22 @@ const DEFAULT_PREFERENCES: StorageCleanerPreferences = {
   selectedTypes: DEFAULT_OPTIONS,
 };
 
+export interface StorageSizeInfo {
+  value: number;
+  displayType: 'bytes' | 'count';
+}
+
 export interface UseStorageCleanerReturn {
-  domain: string;
   error: string;
   isInitializing: boolean;
   options: StorageCleanerOptions;
-  sizes: Record<string, number>;
+  sizes: Record<string, StorageSizeInfo>;
   reloadAfterClean: boolean;
   loading: boolean;
   result: CleaningResult | null;
   showConfirm: boolean;
   setShowConfirm: (show: boolean) => void;
-  totalSize: number;
+  totalBytes: number;
   allSelected: boolean;
   someSelected: boolean;
 
@@ -57,11 +60,10 @@ export interface UseStorageCleanerReturn {
 
 export function useStorageCleaner(): UseStorageCleanerReturn {
   const { t } = useI18n(['storageCleaner', 'common']);
-  const [domain, setDomain] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
   const [options, setOptions] = useState<StorageCleanerOptions>(DEFAULT_OPTIONS);
-  const [sizes, setSizes] = useState<Record<string, number>>({});
+  const [sizes, setSizes] = useState<Record<string, StorageSizeInfo>>({});
   const [reloadAfterClean, setReloadAfterClean] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
@@ -102,7 +104,6 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       setError('');
       const url = tab.url;
       const tabId = tab.id!;
-      setDomain(new URL(url).hostname);
 
       const [savedPrefs, cSize, lsSize, ssSize, idbSize, cacheCount, swCount] = await Promise.all([
         storageUtil.get('storageCleaner/preferences', DEFAULT_PREFERENCES),
@@ -122,12 +123,12 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       }
 
       setSizes({
-        cookies: cSize,
-        localStorage: lsSize,
-        sessionStorage: ssSize,
-        indexedDB: idbSize,
-        cacheStorage: cacheCount,
-        serviceWorkers: swCount,
+        cookies: { value: cSize, displayType: 'bytes' },
+        localStorage: { value: lsSize, displayType: 'bytes' },
+        sessionStorage: { value: ssSize, displayType: 'bytes' },
+        indexedDB: { value: idbSize, displayType: 'bytes' },
+        cacheStorage: { value: cacheCount, displayType: 'count' },
+        serviceWorkers: { value: swCount, displayType: 'count' },
       });
     } finally {
       if (currentRequestId === requestIdRef.current) {
@@ -217,9 +218,9 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       const cleaningResult = await clearStorage(tab.id, tab.url, options);
       setResult(cleaningResult);
 
-      if (reloadAfterClean && cleaningResult.success) {
+      if (reloadAfterClean && cleaningResult.overallSuccess) {
         toast.success(t('storageCleaner:cleanSuccessReload'));
-        await sendMessage(MessageAction.RELOAD_TAB, { tabId: tab.id, delay: 1000 });
+        await chrome.tabs.reload(tab.id);
       } else {
         await loadInfo();
       }
@@ -231,13 +232,10 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     }
   }, [options, reloadAfterClean, loadInfo, t]);
 
-  const totalSize = useMemo(() => {
-    return (
-      (sizes.cookies || 0) +
-      (sizes.localStorage || 0) +
-      (sizes.sessionStorage || 0) +
-      (sizes.indexedDB || 0)
-    );
+  const totalBytes = useMemo(() => {
+    return Object.values(sizes).reduce((acc, s) => {
+      return s.displayType === 'bytes' ? acc + (s.value || 0) : acc;
+    }, 0);
   }, [sizes]);
 
   const selectionMetrics = useMemo(() => {
@@ -248,7 +246,6 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   }, [options]);
 
   return {
-    domain,
     error,
     isInitializing,
     options,
@@ -258,7 +255,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     result,
     showConfirm,
     setShowConfirm,
-    totalSize,
+    totalBytes,
     allSelected: selectionMetrics.all,
     someSelected: selectionMetrics.some,
     handleReloadAfterCleanChange,

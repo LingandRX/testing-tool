@@ -1,32 +1,22 @@
-import { useCallback, useMemo, useState } from 'react';
 import TextInputArea from '@/components/TextInputArea';
-import { formatByteSize, getTextStats } from '@/utils/textStatistics';
+import { formatBytes } from '@/utils/format';
 import { useI18n } from '@/utils/chromeI18n';
-import { useContextMenuData } from '@/utils/useContextMenuData';
+import { useTextStatistics } from './useTextStatistics';
 import { cn } from '@/lib/utils';
 
 export default function Index() {
   const { t } = useI18n('textStatistics');
-  const [text, setText] = useState('');
-
-  const handleContextMenuData = useCallback((payload: string) => {
-    setText(payload);
-  }, []);
-
-  useContextMenuData({ featureKey: 'textStatistics', onData: handleContextMenuData });
-
-  const stats = useMemo(() => getTextStats(text), [text]);
+  const { text, stats, setText } = useTextStatistics();
 
   const statItems = [
     { label: t('textStatistics:characters'), value: stats.characters },
     { label: t('textStatistics:words'), value: stats.words },
     { label: t('textStatistics:lines'), value: stats.lines },
-    { label: t('textStatistics:bytes'), value: formatByteSize(stats.bytes) },
+    { label: t('textStatistics:bytes'), value: formatBytes(stats.bytes) },
   ];
 
   return (
     <div className="p-4 w-full space-y-4">
-      {/* 文本输入区域 */}
       <TextInputArea
         value={text}
         onChange={setText}
@@ -37,7 +27,6 @@ export default function Index() {
         allowCopy={true}
       />
 
-      {/* 统计结果展示区域 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {statItems.map((item) => (
           <div

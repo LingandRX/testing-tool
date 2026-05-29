@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { formatByteSize, getTextStats } from '@/utils/textStatistics';
+import { formatBytes } from '@/utils/format';
+import { getTextStats } from '@/utils/textStatistics';
 
 describe('textStatistics utils', () => {
   describe('getTextStats', () => {
@@ -49,12 +50,12 @@ describe('textStatistics utils', () => {
     });
   });
 
-  describe('formatByteSize', () => {
+  describe('formatBytes', () => {
     it('should format bytes correctly', () => {
-      expect(formatByteSize(100)).toBe('100 B');
-      expect(formatByteSize(0)).toBe('0 B');
-      expect(formatByteSize(1024)).toBe('1.0 KB');
-      expect(formatByteSize(1024 * 1024)).toBe('1.00 MB');
+      expect(formatBytes(100)).toBe('100 B');
+      expect(formatBytes(0)).toBe('0 B');
+      expect(formatBytes(1024)).toBe('1.0 KB');
+      expect(formatBytes(1024 * 1024)).toBe('1.00 MB');
     });
   });
 });
