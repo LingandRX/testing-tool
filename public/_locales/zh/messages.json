@@ -760,6 +760,10 @@
     "message": "毫秒 (ms)",
     "description": "Translation key: timestamp_unitMs"
   },
+  "timestamp_unitS": {
+    "message": "秒 (s)",
+    "description": "Translation key: timestamp_unitS"
+  },
   "timestamp_currentTs": {
     "message": "当前时间戳",
     "description": "Translation key: timestamp_currentTs"
