@@ -215,98 +215,115 @@ export async function clearCookies(url: string): Promise<StorageCleanResult> {
 async function runCleanScript(
   tabId: number,
   func: () => { count: number } | Promise<{ count: number }>,
+  errorLabel: string,
 ): Promise<StorageCleanResult> {
-  try {
-    const [result] = await chrome.scripting.executeScript({ target: { tabId }, func });
-    if (result?.result && typeof result.result === 'object' && 'count' in result.result) {
-      return { success: true, count: result.result.count };
-    }
-    return { success: false, error: 'No result returned' };
-  } catch (error) {
-    return { success: false, error: String(error) };
+  const raw = await runScript(tabId, func, errorLabel, { count: 0 });
+  if (raw && typeof raw === 'object' && 'count' in raw) {
+    return { success: true, count: raw.count };
   }
+  return { success: false, error: 'No result returned' };
 }
 
 export async function injectClearLocalStorage(tabId: number): Promise<StorageCleanResult> {
-  return runCleanScript(tabId, () => {
-    const count = localStorage.length;
-    localStorage.clear();
-    return { count };
-  });
+  return runCleanScript(
+    tabId,
+    () => {
+      const count = localStorage.length;
+      localStorage.clear();
+      return { count };
+    },
+    'clear LocalStorage',
+  );
 }
 
 export async function injectClearSessionStorage(tabId: number): Promise<StorageCleanResult> {
-  return runCleanScript(tabId, () => {
-    const count = sessionStorage.length;
-    sessionStorage.clear();
-    return { count };
-  });
+  return runCleanScript(
+    tabId,
+    () => {
+      const count = sessionStorage.length;
+      sessionStorage.clear();
+      return { count };
+    },
+    'clear SessionStorage',
+  );
 }
 
 export async function injectClearIndexedDB(tabId: number): Promise<StorageCleanResult> {
-  return runCleanScript(tabId, async () => {
-    if (typeof indexedDB.databases !== 'function') {
-      return { count: 0 };
-    }
-    const databases = await indexedDB.databases();
-    let count = 0;
-    for (const db of databases) {
-      if (!db.name) continue;
-      const dbName = db.name;
-      try {
-        await new Promise<void>((resolve, reject) => {
-          const deleteReq = indexedDB.deleteDatabase(dbName);
-          const timeout = setTimeout(() => {
-            console.warn('IndexedDB delete timeout:', dbName);
-            resolve();
-          }, 5000);
-          deleteReq.onblocked = () => {
-            console.warn('IndexedDB delete blocked:', dbName);
-            clearTimeout(timeout);
-            resolve();
-          };
-          deleteReq.onsuccess = () => {
-            clearTimeout(timeout);
-            resolve();
-          };
-          deleteReq.onerror = () => {
-            clearTimeout(timeout);
-            reject(new Error(`Failed to delete ${dbName}`));
-          };
-        });
-        count++;
-      } catch (e) {
-        console.error('Delete DB error:', e);
+  return runCleanScript(
+    tabId,
+    async () => {
+      if (typeof indexedDB.databases !== 'function') {
+        return { count: 0 };
       }
-    }
-    return { count };
-  });
+      const databases = await indexedDB.databases();
+      let count = 0;
+      for (const db of databases) {
+        if (!db.name) continue;
+        const dbName = db.name;
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const deleteReq = indexedDB.deleteDatabase(dbName);
+            const timeout = setTimeout(() => {
+              console.warn('IndexedDB delete timeout:', dbName);
+              resolve();
+            }, 5000);
+            deleteReq.onblocked = () => {
+              console.warn('IndexedDB delete blocked:', dbName);
+              clearTimeout(timeout);
+              resolve();
+            };
+            deleteReq.onsuccess = () => {
+              clearTimeout(timeout);
+              resolve();
+            };
+            deleteReq.onerror = () => {
+              clearTimeout(timeout);
+              reject(new Error(`Failed to delete ${dbName}`));
+            };
+          });
+          count++;
+        } catch (e) {
+          console.error('Delete DB error:', e);
+        }
+      }
+      return { count };
+    },
+    'clear IndexedDB',
+  );
 }
 
 export async function injectClearCacheStorage(tabId: number): Promise<StorageCleanResult> {
-  return runCleanScript(tabId, async () => {
-    if ('caches' in window) {
-      const cacheNames = await caches.keys();
-      for (const name of cacheNames) {
-        await caches.delete(name);
+  return runCleanScript(
+    tabId,
+    async () => {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        for (const name of cacheNames) {
+          await caches.delete(name);
+        }
+        return { count: cacheNames.length };
       }
-      return { count: cacheNames.length };
-    }
-    return { count: 0 };
-  });
+      return { count: 0 };
+    },
+    'clear CacheStorage',
+  );
 }
 
 export async function injectUnregisterServiceWorkers(tabId: number): Promise<StorageCleanResult> {
-  return runCleanScript(tabId, async () => {
-    if ('serviceWorker' in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      for (const registration of registrations) {
-        await registration.unregister();
+  return runCleanScript(
+    tabId,
+    async () => {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          await registration.unregister();
+        }
+        return { count: registrations.length };
       }
-      return { count: registrations.length };
-    }
-    return { count: 0 };
-  });
+      return { count: 0 };
+    },
+    'unregister ServiceWorkers',
+  );
 }
 
 export async function clearStorage(
@@ -314,7 +331,7 @@ export async function clearStorage(
   url: string,
   options: StorageCleanerOptions,
 ): Promise<CleaningResult> {
-  const result: CleaningResult = { success: true };
+  const result: CleaningResult = { overallSuccess: true };
 
   if (options.localStorage) {
     result.localStorage = await injectClearLocalStorage(tabId);
@@ -339,7 +356,7 @@ export async function clearStorage(
     (r): r is StorageCleanResult => r?.success === false,
   );
   if (failures.length > 0) {
-    result.success = false;
+    result.overallSuccess = false;
   }
 
   return result;

@@ -125,7 +125,7 @@ const webExtensionMock = {
     get: vi.fn().mockResolvedValue({}),
     sendMessage: vi.fn().mockResolvedValue(undefined),
     create: vi.fn().mockResolvedValue({}),
-    reload: vi.fn().mockResolvedValue(undefined), // ✅ 承接 MessageAction.RELOAD_TAB 刷新单元测试
+    reload: vi.fn().mockResolvedValue(undefined),
   },
   runtime: {
     id: 'test-extension-id',
@@ -202,7 +202,6 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-// 全局 matchMedia 极客级环境模拟（ThemeModeProvider 依赖）
 beforeEach(() => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,

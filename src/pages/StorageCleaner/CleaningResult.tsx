@@ -14,7 +14,7 @@ export default function CleaningResult({ result, className, ...props }: Cleaning
 
   if (!result) return null;
 
-  const isSuccess = result.success;
+  const isSuccess = result.overallSuccess;
 
   return (
     <div className={cn('w-full', className)} {...props}>
