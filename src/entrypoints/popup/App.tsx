@@ -3,25 +3,21 @@ import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { getEntryPointType } from '@/config/features';
-import { useMemo } from 'react';
-
 export default function App() {
-  const entryType = useMemo(() => getEntryPointType(), []);
+  const entryType = getEntryPointType();
 
-  const routerConfig = useMemo(() => {
-    if (entryType === 'tab') {
-      return {
-        syncKey: 'app/tabRoute' as const,
-        visiblePagesKey: 'app/tabVisiblePages' as const,
-        pageOrderKey: 'app/tabPageOrder' as const,
-      };
-    }
-    return {
-      syncKey: 'app/popupRoute' as const,
-      visiblePagesKey: 'app/popupVisiblePages' as const,
-      pageOrderKey: 'app/popupPageOrder' as const,
-    };
-  }, [entryType]);
+  const routerConfig =
+    entryType === 'tab'
+      ? {
+          syncKey: 'app/tabRoute' as const,
+          visiblePagesKey: 'app/tabVisiblePages' as const,
+          pageOrderKey: 'app/tabPageOrder' as const,
+        }
+      : {
+          syncKey: 'app/popupRoute' as const,
+          visiblePagesKey: 'app/popupVisiblePages' as const,
+          pageOrderKey: 'app/popupPageOrder' as const,
+        };
 
   return (
     <RouterProvider
