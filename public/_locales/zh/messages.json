@@ -697,7 +697,7 @@
     "description": "Translation key: storageCleaner_options_sessionStorage"
   },
   "storageCleaner_options_indexedDB": {
-    "message": "IndexedDB",
+    "message": "站点存储",
     "description": "Translation key: storageCleaner_options_indexedDB"
   },
   "storageCleaner_options_cookies": {

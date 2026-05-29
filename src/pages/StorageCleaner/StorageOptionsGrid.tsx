@@ -1,5 +1,6 @@
 import React from 'react';
 import type { StorageCleanerOptions } from '@/types/storage';
+import type { StorageSizeInfo } from './useStorageCleaner';
 import OptionItem from './OptionItem';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
@@ -8,7 +9,7 @@ import { Label } from '@/components/ui/label';
 
 interface StorageOptionsGridProps extends React.HTMLAttributes<HTMLDivElement> {
   options: StorageCleanerOptions;
-  sizes: Record<string, number>;
+  sizes: Record<string, StorageSizeInfo>;
   allSelected: boolean;
   someSelected: boolean;
   onOptionChange: (key: keyof StorageCleanerOptions) => void;
@@ -27,13 +28,13 @@ export default function StorageOptionsGrid({
 }: StorageOptionsGridProps) {
   const { t } = useI18n('storageCleaner');
 
-  const optionKeys: { key: keyof StorageCleanerOptions; isCount?: boolean }[] = [
-    { key: 'localStorage' },
-    { key: 'sessionStorage' },
-    { key: 'indexedDB' },
-    { key: 'cookies' },
-    { key: 'cacheStorage', isCount: true },
-    { key: 'serviceWorkers', isCount: true },
+  const optionKeys: (keyof StorageCleanerOptions)[] = [
+    'localStorage',
+    'sessionStorage',
+    'indexedDB',
+    'cookies',
+    'cacheStorage',
+    'serviceWorkers',
   ];
 
   const handleToggleAll = () => {
@@ -44,13 +45,12 @@ export default function StorageOptionsGrid({
     <div className={cn('w-full overflow-hidden', className)} {...props}>
       <div className="px-3.5 pt-3.5 pb-2">
         <div className="grid grid-cols-2 gap-2 items-stretch">
-          {optionKeys.map(({ key, isCount }) => (
+          {optionKeys.map((key) => (
             <OptionItem
               key={key}
               labelKey={`storageCleaner:options.${key}`}
               checked={options[key]}
-              size={sizes[key]}
-              isCount={isCount}
+              sizeInfo={sizes[key]}
               onChange={() => onOptionChange(key)}
             />
           ))}
