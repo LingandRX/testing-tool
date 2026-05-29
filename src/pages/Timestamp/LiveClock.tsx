@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
+import { toast } from 'sonner';
 import CopyButton from '@/components/CopyButton';
-import { useSnackbar } from '@/components/GlobalSnackbar';
 import type { UnitType } from './constants';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,6 @@ interface LiveClockProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const LiveClock = React.memo(({ unit, onUseNow, className, ...props }: LiveClockProps) => {
   const { t } = useI18n('timestamp');
-  const { showMessage } = useSnackbar();
   const onUseNowRef = useRef(onUseNow);
 
   const [currentDisplay, setCurrentDisplay] = useState(() => {
@@ -45,8 +44,8 @@ const LiveClock = React.memo(({ unit, onUseNow, className, ...props }: LiveClock
 
   const handleUseNow = useCallback(() => {
     onUseNowRef.current(currentDisplay.rawTime);
-    showMessage?.(t('timestamp:usedSuccess'), { severity: 'success' });
-  }, [currentDisplay.rawTime, showMessage, t]);
+    toast.success(t('timestamp:usedSuccess'));
+  }, [currentDisplay.rawTime, t]);
 
   return (
     <div

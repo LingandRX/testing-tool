@@ -3,7 +3,6 @@ import RouterProvider from '@/providers/RouterProvider';
 import TopBar from '@/components/TopBar';
 import RouterContainer from '@/components/RouterContainer';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import { SnackbarProvider } from '@/components/GlobalSnackbar';
 import { MessageAction, sendMessage } from '@/utils/messages';
 
 export default function App() {
@@ -16,14 +15,12 @@ export default function App() {
 
   return (
     <RouterProvider defaultRoute="dashboard" syncKey="app/sidepanelRoute">
-      <SnackbarProvider initialOptions={{ autoHideDuration: 1500 }}>
-        <div className="app flex flex-col h-screen w-full overflow-hidden">
-          <TopBar />
-          <ErrorBoundary>
-            <RouterContainer />
-          </ErrorBoundary>
-        </div>
-      </SnackbarProvider>
+      <div className="app flex flex-col h-screen w-full overflow-hidden">
+        <TopBar />
+        <ErrorBoundary>
+          <RouterContainer />
+        </ErrorBoundary>
+      </div>
     </RouterProvider>
   );
 }
