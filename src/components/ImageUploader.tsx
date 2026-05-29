@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Image, X } from 'lucide-react';
-import { useSnackbar } from '@/components/GlobalSnackbar';
+import { toast } from 'sonner';
 import { useI18n } from '@/utils/chromeI18n';
 
 interface ImageUploaderProps {
@@ -30,7 +30,6 @@ const ImageUploader = ({
   onDraggingChange,
 }: ImageUploaderProps) => {
   const { t } = useI18n('qrCode');
-  const { showMessage } = useSnackbar();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback(
@@ -46,11 +45,8 @@ const ImageUploader = ({
       URL.revokeObjectURL(previewUrl);
     }
     onClearFile();
-    showMessage(t('qrCode:imageCleared'), {
-      severity: 'success',
-      autoHideDuration: 1000,
-    });
-  }, [previewUrl, onClearFile, showMessage, t]);
+    toast.success(t('qrCode:imageCleared'));
+  }, [previewUrl, onClearFile, t]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -90,13 +86,10 @@ const ImageUploader = ({
           if (file) {
             try {
               handleFileChange(file);
-              showMessage(t('qrCode:imagePasted'), { severity: 'success', autoHideDuration: 1000 });
+              toast.success(t('qrCode:imagePasted'));
             } catch (error) {
               console.error('处理粘贴图片失败:', error);
-              showMessage(t('qrCode:imagePasteError'), {
-                severity: 'error',
-                autoHideDuration: 3000,
-              });
+              toast.error(t('qrCode:imagePasteError'));
             }
           }
           break;
@@ -109,7 +102,7 @@ const ImageUploader = ({
     return () => {
       document.removeEventListener('paste', handlePaste);
     };
-  }, [showMessage, handleFileChange, t]);
+  }, [handleFileChange, t]);
 
   return (
     <div
