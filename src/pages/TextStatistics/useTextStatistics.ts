@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { getTextStats, type TextStats } from '@/utils/textStatistics';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 
@@ -17,7 +17,7 @@ export function useTextStatistics(): UseTextStatisticsReturn {
 
   useContextMenuData({ featureKey: 'textStatistics', onData: handleContextMenuData });
 
-  const stats = useMemo(() => getTextStats(text), [text]);
+  const stats = getTextStats(text);
 
   return { text, stats, setText };
 }

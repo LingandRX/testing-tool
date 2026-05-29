@@ -1,12 +1,4 @@
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { browser } from 'wxt/browser';
 import { storageUtil } from '@/utils/chromeStorage';
 
@@ -141,12 +133,11 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
     }
   }, [resolvedMode]);
 
-  const contextValue = useMemo(
-    () => ({ mode, resolvedMode, setMode }),
-    [mode, resolvedMode, setMode],
+  return (
+    <ThemeModeContext.Provider value={{ mode, resolvedMode, setMode }}>
+      {children}
+    </ThemeModeContext.Provider>
   );
-
-  return <ThemeModeContext.Provider value={contextValue}>{children}</ThemeModeContext.Provider>;
 }
 
 export function useThemeMode(): ThemeModeContextType {
