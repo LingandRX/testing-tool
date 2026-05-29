@@ -83,22 +83,4 @@ export default defineBackground(() => {
       return { success: false, message: errorMsg };
     }
   });
-
-  onMessage(MessageAction.RELOAD_TAB, async (message) => {
-    const { tabId, delay = 0 } = message.data;
-
-    const executeReload = () => {
-      browser.tabs.reload(tabId).catch((err) => {
-        console.error('Failed to execute tab reload operation:', err);
-      });
-    };
-
-    if (delay > 0) {
-      setTimeout(executeReload, delay);
-    } else {
-      executeReload();
-    }
-
-    return { success: true };
-  });
 });

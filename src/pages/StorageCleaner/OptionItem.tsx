@@ -2,27 +2,28 @@ import React from 'react';
 import { formatBytes } from '@/utils/format';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
-// 引入官方的 Checkbox 原子组件
+import type { StorageSizeInfo } from './useStorageCleaner';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface OptionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   labelKey: string;
   checked: boolean;
-  size?: number;
-  isCount?: boolean;
+  sizeInfo?: StorageSizeInfo;
   onChange: () => void;
 }
 
 export default function OptionItem({
   labelKey,
   checked,
-  size,
-  isCount = false,
+  sizeInfo,
   onChange,
   className,
   ...props
 }: OptionItemProps) {
   const { t } = useI18n('storageCleaner');
+
+  const sizeValue = sizeInfo?.value;
+  const isCount = sizeInfo?.displayType === 'count';
 
   return (
     <div
@@ -46,14 +47,14 @@ export default function OptionItem({
           {t(labelKey)}
         </span>
 
-        {size !== undefined && size > 0 ? (
+        {sizeValue !== undefined && sizeValue > 0 ? (
           <span
             className={cn(
               'block text-[10px] font-mono font-medium mt-0.5 tabular-nums transition-colors',
               checked ? 'text-primary/70' : 'text-muted-foreground/70',
             )}
           >
-            {isCount ? `${size} ${t('storageCleaner:countUnit')}` : formatBytes(size)}
+            {isCount ? `${sizeValue} ${t('storageCleaner:countUnit')}` : formatBytes(sizeValue)}
           </span>
         ) : (
           <span className="block text-[10px] font-medium text-muted-foreground/50 mt-0.5 italic">
