@@ -1,21 +1,20 @@
 import { FEATURES, getEntryPointType } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
-import { Suspense, useMemo } from 'react';
+import { Suspense } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
 import PageSkeleton from '@/components/PageSkeleton';
 import { cn } from '@/lib/utils';
 import { AlertTriangle } from 'lucide-react';
 
+const entryPointType = getEntryPointType();
+
 export default function RouterContainer() {
   const { currentPage, isLoaded } = useRouter();
   const { t } = useI18n('common');
 
-  const animationClass = useMemo(() => {
-    return currentPage === 'dashboard' ? 'page-transition-dashboard' : 'page-transition-enter';
-  }, [currentPage]);
-
-  const entryPointType = getEntryPointType();
+  const animationClass =
+    currentPage === 'dashboard' ? 'page-transition-dashboard' : 'page-transition-enter';
 
   if (!isLoaded) {
     return <PageSkeleton variant={currentPage === 'dashboard' ? 'dashboard' : 'tool'} />;
