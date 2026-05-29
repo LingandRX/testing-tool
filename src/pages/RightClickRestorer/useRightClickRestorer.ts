@@ -39,13 +39,7 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         const url = tab?.url;
 
-        if (url) {
-          try {
-            setDomain(new URL(url).hostname);
-          } catch {
-            setDomain('');
-          }
-        }
+        setDomain(url ? new URL(url).hostname : '');
 
         if (isUnsupportedPage(url)) {
           setIsUnsupported(true);
