@@ -616,6 +616,10 @@
     "message": "解析结果将显示在此处",
     "description": "Translation key: qrCode_resultPlaceholder"
   },
+  "qrCode_imageToQr": {
+    "message": "图片转二维码",
+    "description": "Translation key: qrCode_imageToQr"
+  },
   "rightClickRestorer_loading": {
     "message": "正在加载...",
     "description": "Translation key: rightClickRestorer_loading"
