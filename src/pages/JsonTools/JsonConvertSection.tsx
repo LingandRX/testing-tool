@@ -103,7 +103,7 @@ export default function JsonConvertSection({
                 <span>
                   {t('jsonFormat:formattedSize')}:{' '}
                   <span className="font-semibold text-foreground/80">
-                    {formatByteSize(result.outputBytes)}
+                    {formatBytes(result.outputBytes)}
                   </span>
                 </span>
               </div>
