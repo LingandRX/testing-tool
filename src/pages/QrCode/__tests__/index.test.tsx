@@ -133,8 +133,8 @@ describe('QrCodePage', () => {
     // 点击生成按钮
     fireEvent.click(screen.getByText('生成二维码'));
 
-    // 验证显示截断的文本（100字符 + "..."）
-    const truncatedText = longText.slice(0, 100) + '...';
+    // 验证显示截断的文本（80字符 + "..."）
+    const truncatedText = longText.slice(0, 80) + '...';
     expect(screen.getByText(truncatedText)).toBeInTheDocument();
   });
 
