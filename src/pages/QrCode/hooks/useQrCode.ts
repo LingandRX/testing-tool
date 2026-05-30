@@ -25,6 +25,13 @@ function isUrl(text: string): boolean {
   return domainPattern.test(trimmed);
 }
 
+/** 检测URL是否为图片格式 */
+function isImageUrl(url: string): boolean {
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.ico'];
+  const lowerUrl = url.toLowerCase();
+  return imageExtensions.some((ext) => lowerUrl.includes(ext));
+}
+
 /** 生成二维码的核心逻辑 */
 function generateQrCodeDataUrl(text: string): string {
   const trimmedText = text.trim();
@@ -178,37 +185,90 @@ export function useQrCode(): QrCodeContextValue {
     }));
   }, []);
 
-  /** 右键菜单传入URL时，自动生成二维码 */
-  const handleContextMenuData = useCallback((payload: string) => {
-    setMode('generate');
+  /** 从图片URL解析二维码 */
+  const parseQrCodeFromUrl = useCallback(
+    async (imageUrl: string) => {
+      try {
+        setParserState((prev) => ({
+          ...prev,
+          parsing: true,
+          parseError: '',
+          decodedResult: '',
+          previewUrl: imageUrl,
+          selectedFile: null,
+        }));
 
-    // 直接生成二维码，无需等待
-    const qrCodeDataUrl = generateQrCodeDataUrl(payload);
+        // 从URL获取图片并转换为File对象
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], 'qrcode-image.png', { type: blob.type });
 
-    if (qrCodeDataUrl) {
-      // 生成成功，直接跳转到预览态
-      setGeneratorState((prev) => ({
-        ...prev,
-        step: 'preview',
-        textToEncode: payload,
-        savedText: payload.trim(),
-        qrCodeDataUrl,
-        generating: false,
-        inputError: '',
-      }));
-    } else {
-      // 生成失败，停留在输入态，显示文本供用户编辑
-      setGeneratorState((prev) => ({
-        ...prev,
-        step: 'input',
-        textToEncode: payload,
-        savedText: '',
-        qrCodeDataUrl: '',
-        generating: false,
-        inputError: '',
-      }));
-    }
-  }, []);
+        setParserState((prev) => ({ ...prev, selectedFile: file }));
+
+        const result = await parseQrCodeFromFile(file);
+
+        if (result.success && result.data) {
+          setParserState((prev) => ({ ...prev, decodedResult: result.data! }));
+          toast.success(t('qrCode:parseSuccess'));
+        } else {
+          const errorMsg = result.error || t('qrCode:noQrDetected');
+          setParserState((prev) => ({ ...prev, parseError: errorMsg }));
+          toast.error(errorMsg);
+        }
+      } catch (error) {
+        console.error('解析图片二维码失败:', error);
+        const errorMsg = error instanceof Error ? error.message : t('qrCode:parseError');
+        setParserState((prev) => ({ ...prev, parseError: errorMsg }));
+        toast.error(errorMsg);
+      } finally {
+        setParserState((prev) => ({ ...prev, parsing: false }));
+      }
+    },
+    [t],
+  );
+
+  /** 右键菜单传入URL时，自动生成二维码或解析图片 */
+  const handleContextMenuData = useCallback(
+    (payload: string) => {
+      // 检测是否为图片URL，如果是则切换到解析模式
+      if (isImageUrl(payload)) {
+        setMode('parse');
+        void parseQrCodeFromUrl(payload);
+        return;
+      }
+
+      // 非图片URL，生成二维码
+      setMode('generate');
+
+      // 直接生成二维码，无需等待
+      const qrCodeDataUrl = generateQrCodeDataUrl(payload);
+
+      if (qrCodeDataUrl) {
+        // 生成成功，直接跳转到预览态
+        setGeneratorState((prev) => ({
+          ...prev,
+          step: 'preview',
+          textToEncode: payload,
+          savedText: payload.trim(),
+          qrCodeDataUrl,
+          generating: false,
+          inputError: '',
+        }));
+      } else {
+        // 生成失败，停留在输入态，显示文本供用户编辑
+        setGeneratorState((prev) => ({
+          ...prev,
+          step: 'input',
+          textToEncode: payload,
+          savedText: '',
+          qrCodeDataUrl: '',
+          generating: false,
+          inputError: '',
+        }));
+      }
+    },
+    [parseQrCodeFromUrl],
+  );
 
   useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
 
