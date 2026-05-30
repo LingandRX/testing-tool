@@ -9,21 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
-/** 解析结果文本的最大显示字符数 */
-const RESULT_PREVIEW_MAX_LENGTH = 80;
-
 export default function ParsePanel() {
   const { t } = useI18n('qrCode');
   const { parserState, setParserState, handleFileChange, handleClearFile } = useQrCodeContext();
 
   const hasFile = parserState.selectedFile !== null;
-  const hasResult = parserState.decodedResult.length > 0;
-
-  /** 截断文本用于预览显示 */
-  const getTruncatedText = (text: string) => {
-    if (text.length <= RESULT_PREVIEW_MAX_LENGTH) return text;
-    return text.slice(0, RESULT_PREVIEW_MAX_LENGTH) + '...';
-  };
 
   // 全局粘贴事件监听
   const handlePaste = useCallback(
@@ -107,14 +97,6 @@ export default function ParsePanel() {
           />
           <div className="flex-1 min-w-0">
             <p className="text-sm text-foreground truncate">{parserState.selectedFile?.name}</p>
-            {hasResult && (
-              <p
-                className="text-xs text-muted-foreground mt-1 line-clamp-1"
-                title={parserState.decodedResult}
-              >
-                {getTruncatedText(parserState.decodedResult)}
-              </p>
-            )}
             {parserState.parsing && (
               <p className="text-xs text-primary animate-pulse mt-1">{t('qrCode:parsing')}</p>
             )}
