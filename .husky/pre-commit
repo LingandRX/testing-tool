@@ -1,1 +1,5 @@
+# 后台运行类型检查，结果输出到 stderr 但不阻塞提交
+npx tsc --noEmit &
+
+# 前台运行 lint-staged（自动修复 + 格式化）
 npx lint-staged

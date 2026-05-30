@@ -1,0 +1,6 @@
+# pre-push: 严格检查，阻塞有问题的代码推送到远程
+# 类型检查
+npx tsc --noEmit
+
+# ESLint 严格检查（不允许 warning）
+npx eslint . --max-warnings=0
