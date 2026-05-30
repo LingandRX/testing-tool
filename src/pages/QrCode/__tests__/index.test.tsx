@@ -7,6 +7,8 @@ vi.mock('lucide-react', async (importOriginal) => {
   return {
     ...actual,
     QrCode: () => <div data-testid="mock-lucide-qrcode">Icon</div>,
+    Pencil: () => <div data-testid="mock-lucide-pencil">Icon</div>,
+    Loader2: () => <div data-testid="mock-lucide-loader">Icon</div>,
   };
 });
 
@@ -25,26 +27,39 @@ vi.mock('@/config/features', async (importOriginal) => {
 });
 
 vi.mock('@/components/QrCodePreview', () => ({
-  default: () => <div data-testid="qr-code-preview">QrCodePreview</div>,
+  default: ({ placeholderText }: { placeholderText?: string }) => (
+    <div data-testid="qr-code-preview">
+      QrCodePreview
+      {placeholderText && <span data-testid="placeholder-text">{placeholderText}</span>}
+    </div>
+  ),
 }));
 
 vi.mock('@/components/ImageUploader', () => ({
   default: () => <div data-testid="image-uploader">ImageUploader</div>,
 }));
 
-vi.mock('qrious', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    toDataURL: () => 'data:image/png;base64,mock',
-  })),
-}));
+vi.mock('qrious', () => {
+  return {
+    default: class QRious {
+      constructor() {
+        return {
+          toDataURL: () => 'data:image/png;base64,mock',
+        };
+      }
+    },
+  };
+});
 
 describe('QrCodePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('应该默认渲染生成模式', () => {
+  it('应该默认渲染生成模式的输入态', () => {
     render(<QrCodePage />);
+    expect(screen.getByText('输入 URL 或文本')).toBeInTheDocument();
+    expect(screen.getByText('生成二维码')).toBeInTheDocument();
     expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
   });
 
@@ -71,7 +86,7 @@ describe('QrCodePage', () => {
     expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
   });
 
-  it('应该渲染输入区域的系统标签（对齐新版 Label 机制）', () => {
+  it('应该渲染输入区域的系统标签', () => {
     render(<QrCodePage />);
     expect(screen.getByText('输入 URL 或文本')).toBeInTheDocument();
   });
@@ -80,5 +95,86 @@ describe('QrCodePage', () => {
     const { container } = render(<QrCodePage />);
     const gridContainer = container.querySelector('.grid');
     expect(gridContainer).toBeInTheDocument();
+  });
+
+  it('输入态应该显示生成按钮', () => {
+    render(<QrCodePage />);
+    const generateButton = screen.getByText('生成二维码');
+    expect(generateButton).toBeInTheDocument();
+    expect(generateButton).toBeDisabled(); // 空输入时按钮应该禁用
+  });
+
+  it('有输入内容时生成按钮应该可用', () => {
+    render(<QrCodePage />);
+    const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
+    fireEvent.change(textarea, { target: { value: 'https://example.com' } });
+
+    const generateButton = screen.getByText('生成二维码');
+    expect(generateButton).not.toBeDisabled();
+  });
+
+  it('点击生成按钮应该切换到预览态', () => {
+    render(<QrCodePage />);
+
+    // 输入文本
+    const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
+    fireEvent.change(textarea, { target: { value: 'https://example.com' } });
+
+    // 点击生成按钮
+    const generateButton = screen.getByText('生成二维码');
+    fireEvent.click(generateButton);
+
+    // 验证切换到预览态
+    expect(screen.getByText('原始文本')).toBeInTheDocument();
+    expect(screen.getByText('编辑')).toBeInTheDocument();
+    expect(screen.queryByText('生成二维码')).not.toBeInTheDocument();
+  });
+
+  it('预览态应该显示保存的文本', () => {
+    render(<QrCodePage />);
+
+    // 输入文本
+    const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
+    fireEvent.change(textarea, { target: { value: 'https://example.com' } });
+
+    // 点击生成按钮
+    fireEvent.click(screen.getByText('生成二维码'));
+
+    // 验证显示保存的文本
+    expect(screen.getByText('https://example.com')).toBeInTheDocument();
+  });
+
+  it('点击编辑按钮应该返回输入态', () => {
+    render(<QrCodePage />);
+
+    // 输入文本并生成
+    const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
+    fireEvent.change(textarea, { target: { value: 'https://example.com' } });
+    fireEvent.click(screen.getByText('生成二维码'));
+
+    // 点击编辑按钮
+    fireEvent.click(screen.getByText('编辑'));
+
+    // 验证返回输入态
+    expect(screen.getByText('输入 URL 或文本')).toBeInTheDocument();
+    expect(screen.getByText('生成二维码')).toBeInTheDocument();
+    expect(screen.queryByText('编辑')).not.toBeInTheDocument();
+  });
+
+  it('返回编辑态应该保留上次输入的内容', () => {
+    render(<QrCodePage />);
+
+    // 输入文本并生成
+    const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
+    fireEvent.change(textarea, { target: { value: 'https://example.com' } });
+    fireEvent.click(screen.getByText('生成二维码'));
+
+    // 点击编辑按钮
+    fireEvent.click(screen.getByText('编辑'));
+
+    // 验证输入框保留了上次的内容
+    const textareaAfterEdit =
+      screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
+    expect(textareaAfterEdit).toHaveValue('https://example.com');
   });
 });

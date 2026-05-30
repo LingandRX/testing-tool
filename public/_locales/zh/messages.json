@@ -576,6 +576,30 @@
     "message": "点击更换图片",
     "description": "Translation key: qrCode_clickToChange"
   },
+  "qrCode_generateButton": {
+    "message": "生成二维码",
+    "description": "Translation key: qrCode_generateButton"
+  },
+  "qrCode_editButton": {
+    "message": "编辑",
+    "description": "Translation key: qrCode_editButton"
+  },
+  "qrCode_textPreviewLabel": {
+    "message": "原始文本",
+    "description": "Translation key: qrCode_textPreviewLabel"
+  },
+  "qrCode_generateFirstHint": {
+    "message": "输入文本后点击「生成二维码」按钮",
+    "description": "Translation key: qrCode_generateFirstHint"
+  },
+  "qrCode_inputRequired": {
+    "message": "请输入内容",
+    "description": "Translation key: qrCode_inputRequired"
+  },
+  "qrCode_generateError": {
+    "message": "生成二维码失败，请重试",
+    "description": "Translation key: qrCode_generateError"
+  },
   "rightClickRestorer_loading": {
     "message": "正在加载...",
     "description": "Translation key: rightClickRestorer_loading"
