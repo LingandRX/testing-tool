@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import QRious from 'qrious';
 import { toast } from 'sonner';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
@@ -6,6 +6,24 @@ import { useContextMenuData } from '@/utils/useContextMenuData';
 import { useI18n } from '@/utils/chromeI18n';
 import type { QrCodeContextValue } from '../contexts/QrCodeContext';
 import type { QrCodeGeneratorState, QrCodeMode, QrCodeParserState } from '../types';
+
+/** 防抖延迟时间（毫秒） */
+const DEBOUNCE_DELAY = 500;
+
+/** 检测文本是否为URL格式 */
+function isUrl(text: string): boolean {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+
+  // 检查是否以 http:// 或 https:// 开头
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return true;
+  }
+
+  // 检查是否为域名格式（包含.且不以特殊字符开头）
+  const domainPattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+([/:].*)?$/;
+  return domainPattern.test(trimmed);
+}
 
 /** 生成二维码的核心逻辑 */
 function generateQrCodeDataUrl(text: string): string {
@@ -58,11 +76,62 @@ export function useQrCode(): QrCodeContextValue {
     dragging: false,
   });
 
-  const setTextToEncode = useCallback((text: string) => {
-    setGeneratorState((prev) => ({ ...prev, textToEncode: text, inputError: '' }));
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 清除防抖定时器
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
   }, []);
 
-  /** 显式触发生成二维码并切换到预览态 */
+  /** 自动检测URL并生成二维码 */
+  const autoGenerateIfUrl = useCallback(
+    (text: string) => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      if (!isUrl(text)) {
+        return;
+      }
+
+      debounceTimerRef.current = setTimeout(() => {
+        setGeneratorState((prev) => ({ ...prev, generating: true, inputError: '' }));
+
+        const qrCodeDataUrl = generateQrCodeDataUrl(text);
+
+        if (qrCodeDataUrl) {
+          setGeneratorState((prev) => ({
+            ...prev,
+            step: 'preview',
+            savedText: text.trim(),
+            qrCodeDataUrl,
+            generating: false,
+          }));
+        } else {
+          setGeneratorState((prev) => ({
+            ...prev,
+            generating: false,
+            inputError: t('qrCode:generateError'),
+          }));
+        }
+      }, DEBOUNCE_DELAY);
+    },
+    [t],
+  );
+
+  const setTextToEncode = useCallback(
+    (text: string) => {
+      setGeneratorState((prev) => ({ ...prev, textToEncode: text, inputError: '' }));
+      autoGenerateIfUrl(text);
+    },
+    [autoGenerateIfUrl],
+  );
+
+  /** 手动触发生成二维码（用于非URL文本） */
   const confirmGenerate = useCallback(() => {
     const text = generatorState.textToEncode.trim();
 
@@ -97,6 +166,9 @@ export function useQrCode(): QrCodeContextValue {
 
   /** 返回编辑态，保留上次输入内容 */
   const backToEdit = useCallback(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
     setGeneratorState((prev) => ({
       ...prev,
       step: 'input',
@@ -106,16 +178,36 @@ export function useQrCode(): QrCodeContextValue {
     }));
   }, []);
 
+  /** 右键菜单传入URL时，自动生成二维码 */
   const handleContextMenuData = useCallback((payload: string) => {
     setMode('generate');
-    setGeneratorState((prev) => ({
-      ...prev,
-      step: 'input',
-      textToEncode: payload,
-      savedText: '',
-      qrCodeDataUrl: '',
-      inputError: '',
-    }));
+
+    // 直接生成二维码，无需等待
+    const qrCodeDataUrl = generateQrCodeDataUrl(payload);
+
+    if (qrCodeDataUrl) {
+      // 生成成功，直接跳转到预览态
+      setGeneratorState((prev) => ({
+        ...prev,
+        step: 'preview',
+        textToEncode: payload,
+        savedText: payload.trim(),
+        qrCodeDataUrl,
+        generating: false,
+        inputError: '',
+      }));
+    } else {
+      // 生成失败，停留在输入态，显示文本供用户编辑
+      setGeneratorState((prev) => ({
+        ...prev,
+        step: 'input',
+        textToEncode: payload,
+        savedText: '',
+        qrCodeDataUrl: '',
+        generating: false,
+        inputError: '',
+      }));
+    }
   }, []);
 
   useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
