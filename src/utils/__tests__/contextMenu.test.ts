@@ -12,8 +12,8 @@ describe('contextMenu', () => {
   });
 
   describe('CONTEXT_MENU_CONFIGS', () => {
-    it('应该包含 7 个菜单项配置', () => {
-      expect(CONTEXT_MENU_CONFIGS).toHaveLength(7);
+    it('应该包含 8 个菜单项配置', () => {
+      expect(CONTEXT_MENU_CONFIGS).toHaveLength(8);
     });
 
     it('应该有一个父级菜单项 Testing Tools', () => {
@@ -43,13 +43,22 @@ describe('contextMenu', () => {
       expect(pageMenus).toHaveLength(2);
       expect(pageMenus.map((m) => m.id)).toEqual(['storageCleaner', 'qrCode-page']);
     });
+
+    it('应该有 1 个 image 上下文的子菜单', () => {
+      const imageMenus = CONTEXT_MENU_CONFIGS.filter(
+        (c) => c.contexts[0] === 'image' && c.parentId === 'testing-tools-parent',
+      );
+      expect(imageMenus).toHaveLength(1);
+      expect(imageMenus[0].id).toBe('qrCode-image');
+      expect(imageMenus[0].title).toBe('🖼️ 图片转二维码');
+    });
   });
 
   describe('createAllContextMenus', () => {
     it('应该为每个配置调用 chrome.contextMenus.create', () => {
       createAllContextMenus();
 
-      expect(chrome.contextMenus.create).toHaveBeenCalledTimes(7);
+      expect(chrome.contextMenus.create).toHaveBeenCalledTimes(8);
     });
 
     it('应该使用正确的参数创建菜单项', () => {
@@ -183,6 +192,34 @@ describe('contextMenu', () => {
       expect(result).toEqual({
         success: true,
         data: { featureKey: 'textStatistics', payload: 'short text' },
+      });
+    });
+
+    it('当点击 qrCode-image 菜单时应返回 qrCode 功能和图片URL', () => {
+      const info = createMockOnClickData({
+        srcUrl: 'https://example.com/image.png',
+      });
+
+      const result = parseContextMenuClick('qrCode-image', info);
+
+      expect(result).toEqual({
+        success: true,
+        data: { featureKey: 'qrCode', payload: 'https://example.com/image.png' },
+      });
+    });
+
+    it('srcUrl 优先于 selectionText 和 pageUrl', () => {
+      const info = createMockOnClickData({
+        srcUrl: 'https://example.com/image.png',
+        selectionText: 'selected text',
+        pageUrl: 'https://example.com',
+      });
+
+      const result = parseContextMenuClick('qrCode-image', info);
+
+      expect(result).toEqual({
+        success: true,
+        data: { featureKey: 'qrCode', payload: 'https://example.com/image.png' },
       });
     });
   });
