@@ -80,7 +80,7 @@ export const CONTEXT_MENU_CONFIGS: ContextMenuItemConfig[] = [
   },
   {
     id: 'qrCode-image',
-    title: '🖼️ 图片转二维码',
+    title: '🖼️ 解析图片二维码',
     contexts: [chrome.contextMenus.ContextType.IMAGE],
     parentId: PARENT_MENU_ID,
   },
