@@ -8,6 +8,10 @@ export interface QrCodeContextValue {
 
   generatorState: QrCodeGeneratorState;
   setTextToEncode: (text: string) => void;
+  /** 显式触发生成二维码并切换到预览态 */
+  confirmGenerate: () => void;
+  /** 返回编辑态，保留上次输入内容 */
+  backToEdit: () => void;
 
   downloadQrCode: () => void;
   copyQrCode: () => Promise<void>;

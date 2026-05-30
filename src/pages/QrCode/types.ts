@@ -5,16 +5,23 @@
 /** 二维码功能核心主路由模式 */
 export type QrCodeMode = 'generate' | 'parse';
 
+/** 生成器的操作步骤 */
+export type GeneratorStep = 'input' | 'preview';
+
 /** * 二维码生成器的状态
- * 💡 架构优化：保留与全局 Context 骨架契合的形态，
- * 外部依然可以流畅读取这些状态，但在新架构下运行效率和稳定性大幅提升！
+ * 💡 架构优化：采用两步操作模式（输入态 → 预览态），
+ * 用户显式点击生成按钮后才生成二维码，体验更清晰！
  */
 export interface QrCodeGeneratorState {
+  /** 当前操作步骤：输入态或预览态 */
+  step: GeneratorStep;
   /** 受控的输入源文本（支持 URL 或任意文本快照） */
   textToEncode: string;
-  /** 由防抖源文本流在单次渲染内存中同步派生出的二维码 Base64 Data URL */
+  /** 保存的文本快照，用于预览态展示和编辑态回填 */
+  savedText: string;
+  /** 由用户显式触发生成的二维码 Base64 Data URL */
   qrCodeDataUrl: string;
-  /** 是否正在生成（流式架构下已默认为恒定 false 的非阻塞快照，保留作为 UI 骨架兼容） */
+  /** 是否正在生成 */
   generating: boolean;
   /** 输入文本校验或底层画布崩溃的错误提示信息 */
   inputError: string;
