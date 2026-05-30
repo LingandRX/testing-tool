@@ -25,6 +25,7 @@ export const MAX_PAYLOAD_LENGTH = 10000;
 /** 菜单项 ID 到 PageType 的映射（仅处理非常规映射） */
 const MENU_ID_TO_PAGE_TYPE: Record<string, PageType> = {
   'qrCode-page': 'qrCode',
+  'qrCode-image': 'qrCode',
 };
 
 /**
@@ -77,6 +78,12 @@ export const CONTEXT_MENU_CONFIGS: ContextMenuItemConfig[] = [
     contexts: [chrome.contextMenus.ContextType.PAGE],
     parentId: PARENT_MENU_ID,
   },
+  {
+    id: 'qrCode-image',
+    title: '🖼️ 解析图片二维码',
+    contexts: [chrome.contextMenus.ContextType.IMAGE],
+    parentId: PARENT_MENU_ID,
+  },
 ];
 
 export function createAllContextMenus(): void {
@@ -95,6 +102,14 @@ export function parseContextMenuClick(
   info: chrome.contextMenus.OnClickData,
 ): ParseResult {
   const featureKey = getMenuPageType(menuItemId);
+
+  // 处理图片 URL（右键点击图片时）
+  if (info.srcUrl) {
+    return {
+      success: true,
+      data: { featureKey, payload: info.srcUrl },
+    };
+  }
 
   if (info.selectionText) {
     const text = info.selectionText;
