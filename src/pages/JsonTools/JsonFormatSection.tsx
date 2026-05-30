@@ -134,7 +134,7 @@ export default function JsonFormatSection() {
                 <span>
                   {t('jsonFormat:formattedSize')}:{' '}
                   <span className="font-semibold text-foreground/80">
-                    {formatByteSize(result.formattedBytes)}
+                    {formatBytes(result.formattedBytes)}
                   </span>
                 </span>
               </div>
