@@ -600,6 +600,22 @@
     "message": "生成二维码失败，请重试",
     "description": "Translation key: qrCode_generateError"
   },
+  "qrCode_uploadedImage": {
+    "message": "已上传图片",
+    "description": "Translation key: qrCode_uploadedImage"
+  },
+  "qrCode_reuploadButton": {
+    "message": "重新上传",
+    "description": "Translation key: qrCode_reuploadButton"
+  },
+  "qrCode_parsing": {
+    "message": "解析中...",
+    "description": "Translation key: qrCode_parsing"
+  },
+  "qrCode_resultPlaceholder": {
+    "message": "解析结果将显示在此处",
+    "description": "Translation key: qrCode_resultPlaceholder"
+  },
   "rightClickRestorer_loading": {
     "message": "正在加载...",
     "description": "Translation key: rightClickRestorer_loading"
