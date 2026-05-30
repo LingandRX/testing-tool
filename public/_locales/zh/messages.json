@@ -617,7 +617,7 @@
     "description": "Translation key: qrCode_resultPlaceholder"
   },
   "qrCode_imageToQr": {
-    "message": "图片转二维码",
+    "message": "解析图片二维码",
     "description": "Translation key: qrCode_imageToQr"
   },
   "rightClickRestorer_loading": {
