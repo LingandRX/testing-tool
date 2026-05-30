@@ -50,7 +50,7 @@ describe('contextMenu', () => {
       );
       expect(imageMenus).toHaveLength(1);
       expect(imageMenus[0].id).toBe('qrCode-image');
-      expect(imageMenus[0].title).toBe('🖼️ 图片转二维码');
+      expect(imageMenus[0].title).toBe('🖼️ 解析图片二维码');
     });
   });
 

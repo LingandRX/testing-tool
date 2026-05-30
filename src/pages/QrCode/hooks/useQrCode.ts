@@ -27,9 +27,26 @@ function isUrl(text: string): boolean {
 
 /** 检测URL是否为图片格式 */
 function isImageUrl(url: string): boolean {
+  const trimmedUrl = url.trim().toLowerCase();
+
+  // 检查是否为 data:image 格式
+  if (trimmedUrl.startsWith('data:image/')) {
+    return true;
+  }
+
+  // 检查是否包含图片扩展名
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.ico'];
-  const lowerUrl = url.toLowerCase();
-  return imageExtensions.some((ext) => lowerUrl.includes(ext));
+  if (imageExtensions.some((ext) => trimmedUrl.includes(ext))) {
+    return true;
+  }
+
+  // 检查URL路径中是否包含图片相关关键词
+  const imageKeywords = ['/image/', '/img/', '/photo/', '/pic/', '/upload/'];
+  if (imageKeywords.some((keyword) => trimmedUrl.includes(keyword))) {
+    return true;
+  }
+
+  return false;
 }
 
 /** 生成二维码的核心逻辑 */
