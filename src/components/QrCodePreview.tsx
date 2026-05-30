@@ -12,12 +12,15 @@ interface QrCodePreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   onDownload: () => void;
   /** 复制回调 */
   onCopy: () => void;
+  /** 自定义占位文本，用于空状态提示 */
+  placeholderText?: string;
 }
 
 const QrCodePreview = ({
   qrCodeDataUrl,
   onDownload,
   onCopy,
+  placeholderText,
   className,
   ...props
 }: QrCodePreviewProps) => {
@@ -33,7 +36,9 @@ const QrCodePreview = ({
         )}
         {...props}
       >
-        <p className="text-sm text-muted-foreground text-center">{t('qrCode:qrCodeWillShow')}</p>
+        <p className="text-sm text-muted-foreground text-center">
+          {placeholderText || t('qrCode:qrCodeWillShow')}
+        </p>
       </div>
     );
   }

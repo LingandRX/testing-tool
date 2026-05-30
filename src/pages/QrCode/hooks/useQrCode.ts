@@ -1,22 +1,51 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import QRious from 'qrious';
 import { toast } from 'sonner';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 import { useI18n } from '@/utils/chromeI18n';
-import { useDebounce } from '@/utils/useDebounce';
 import type { QrCodeContextValue } from '../contexts/QrCodeContext';
 import type { QrCodeGeneratorState, QrCodeMode, QrCodeParserState } from '../types';
+
+/** 生成二维码的核心逻辑 */
+function generateQrCodeDataUrl(text: string): string {
+  const trimmedText = text.trim();
+  if (!trimmedText) return '';
+
+  try {
+    let url = trimmedText;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    const isDark = document.documentElement.classList.contains('dark');
+
+    const qr = new QRious({
+      value: url,
+      size: 260,
+      level: 'H',
+      foreground: isDark ? '#f3f4f6' : '#0f172a',
+      background: isDark ? 'transparent' : '#ffffff',
+    });
+
+    return qr.toDataURL();
+  } catch (error) {
+    console.error('QR code generation failed:', error);
+    return '';
+  }
+}
 
 export function useQrCode(): QrCodeContextValue {
   const { t } = useI18n('qrCode');
 
   const [mode, setMode] = useState<QrCodeMode>('generate');
 
-  const [generatorState, setGeneratorState] = useState<
-    Omit<QrCodeGeneratorState, 'generating' | 'qrCodeDataUrl'>
-  >({
+  const [generatorState, setGeneratorState] = useState<QrCodeGeneratorState>({
+    step: 'input',
     textToEncode: '',
+    savedText: '',
+    qrCodeDataUrl: '',
+    generating: false,
     inputError: '',
   });
 
@@ -29,51 +58,64 @@ export function useQrCode(): QrCodeContextValue {
     dragging: false,
   });
 
-  const debouncedTextToEncode = useDebounce(generatorState.textToEncode, 200);
-
-  const qrCodeDataUrl = useMemo(() => {
-    const text = debouncedTextToEncode.trim();
-    if (!text) return '';
-
-    try {
-      let url = text;
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-
-      const isDark = document.documentElement.classList.contains('dark');
-
-      const qr = new QRious({
-        value: url,
-        size: 260,
-        level: 'H',
-        foreground: isDark ? '#f3f4f6' : '#0f172a',
-        background: isDark ? 'transparent' : '#ffffff',
-      });
-
-      return qr.toDataURL();
-    } catch (error) {
-      console.error('QR code generation sync task failed:', error);
-      return '';
-    }
-  }, [debouncedTextToEncode]);
-
-  const fullGeneratorState = useMemo<QrCodeGeneratorState>(
-    () => ({
-      ...generatorState,
-      qrCodeDataUrl,
-      generating: false,
-    }),
-    [generatorState, qrCodeDataUrl],
-  );
-
   const setTextToEncode = useCallback((text: string) => {
     setGeneratorState((prev) => ({ ...prev, textToEncode: text, inputError: '' }));
   }, []);
 
+  /** 显式触发生成二维码并切换到预览态 */
+  const confirmGenerate = useCallback(() => {
+    const text = generatorState.textToEncode.trim();
+
+    if (!text) {
+      setGeneratorState((prev) => ({ ...prev, inputError: t('qrCode:inputRequired') }));
+      toast.error(t('qrCode:inputRequired'));
+      return;
+    }
+
+    setGeneratorState((prev) => ({ ...prev, generating: true, inputError: '' }));
+
+    const qrCodeDataUrl = generateQrCodeDataUrl(text);
+
+    if (!qrCodeDataUrl) {
+      setGeneratorState((prev) => ({
+        ...prev,
+        generating: false,
+        inputError: t('qrCode:generateError'),
+      }));
+      toast.error(t('qrCode:generateError'));
+      return;
+    }
+
+    setGeneratorState((prev) => ({
+      ...prev,
+      step: 'preview',
+      savedText: text,
+      qrCodeDataUrl,
+      generating: false,
+    }));
+  }, [generatorState.textToEncode, t]);
+
+  /** 返回编辑态，保留上次输入内容 */
+  const backToEdit = useCallback(() => {
+    setGeneratorState((prev) => ({
+      ...prev,
+      step: 'input',
+      textToEncode: prev.savedText,
+      qrCodeDataUrl: '',
+      inputError: '',
+    }));
+  }, []);
+
   const handleContextMenuData = useCallback((payload: string) => {
     setMode('generate');
-    setGeneratorState((prev) => ({ ...prev, textToEncode: payload, inputError: '' }));
+    setGeneratorState((prev) => ({
+      ...prev,
+      step: 'input',
+      textToEncode: payload,
+      savedText: '',
+      qrCodeDataUrl: '',
+      inputError: '',
+    }));
   }, []);
 
   useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
@@ -107,20 +149,20 @@ export function useQrCode(): QrCodeContextValue {
   );
 
   const downloadQrCode = useCallback(() => {
-    if (!qrCodeDataUrl) return;
+    if (!generatorState.qrCodeDataUrl) return;
 
     const link = document.createElement('a');
-    link.href = qrCodeDataUrl;
+    link.href = generatorState.qrCodeDataUrl;
     link.download = 'qrcode.png';
     link.click();
     toast.success(t('qrCode:qrCodeDownloadSuccess'));
-  }, [qrCodeDataUrl, t]);
+  }, [generatorState.qrCodeDataUrl, t]);
 
   const copyQrCode = useCallback(async () => {
-    if (!qrCodeDataUrl) return;
+    if (!generatorState.qrCodeDataUrl) return;
 
     try {
-      const response = await fetch(qrCodeDataUrl);
+      const response = await fetch(generatorState.qrCodeDataUrl);
       const blob = await response.blob();
 
       await navigator.clipboard.write([
@@ -134,7 +176,7 @@ export function useQrCode(): QrCodeContextValue {
       console.error('复制二维码失败:', error);
       toast.error(t('qrCode:copyError'));
     }
-  }, [qrCodeDataUrl, t]);
+  }, [generatorState.qrCodeDataUrl, t]);
 
   const handleFileChange = useCallback(
     (file: File) => {
@@ -178,8 +220,10 @@ export function useQrCode(): QrCodeContextValue {
   return {
     mode,
     setMode,
-    generatorState: fullGeneratorState,
+    generatorState,
     setTextToEncode,
+    confirmGenerate,
+    backToEdit,
     parseQrCode,
     downloadQrCode,
     copyQrCode,
