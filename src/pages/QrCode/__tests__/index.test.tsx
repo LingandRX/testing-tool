@@ -27,12 +27,7 @@ vi.mock('@/config/features', async (importOriginal) => {
 });
 
 vi.mock('@/components/QrCodePreview', () => ({
-  default: ({ placeholderText }: { placeholderText?: string }) => (
-    <div data-testid="qr-code-preview">
-      QrCodePreview
-      {placeholderText && <span data-testid="placeholder-text">{placeholderText}</span>}
-    </div>
-  ),
+  default: () => <div data-testid="qr-code-preview">QrCodePreview</div>,
 }));
 
 vi.mock('@/components/ImageUploader', () => ({
@@ -60,7 +55,8 @@ describe('QrCodePage', () => {
     render(<QrCodePage />);
     expect(screen.getByText('输入 URL 或文本')).toBeInTheDocument();
     expect(screen.getByText('生成二维码')).toBeInTheDocument();
-    expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
+    // 输入态应该隐藏二维码预览
+    expect(screen.queryByTestId('qr-code-preview')).not.toBeInTheDocument();
   });
 
   it('应该渲染模式切换按钮', () => {
@@ -73,28 +69,21 @@ describe('QrCodePage', () => {
     render(<QrCodePage />);
     fireEvent.click(screen.getByText('二维码转文本'));
     expect(screen.getByTestId('image-uploader')).toBeInTheDocument();
-    expect(screen.queryByTestId('qr-code-preview')).not.toBeInTheDocument();
   });
 
-  it('切换回生成模式应该渲染 QrCodePreview', () => {
+  it('切换回生成模式应该渲染输入态', () => {
     render(<QrCodePage />);
     // 先切换到解析模式
     fireEvent.click(screen.getByText('二维码转文本'));
-    expect(screen.getByTestId('image-uploader')).toBeInTheDocument();
     // 再切换回生成模式
     fireEvent.click(screen.getByText('文本转二维码'));
-    expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
+    expect(screen.getByText('输入 URL 或文本')).toBeInTheDocument();
+    expect(screen.getByText('生成二维码')).toBeInTheDocument();
   });
 
   it('应该渲染输入区域的系统标签', () => {
     render(<QrCodePage />);
     expect(screen.getByText('输入 URL 或文本')).toBeInTheDocument();
-  });
-
-  it('应该渲染双翼响应式卡片网格布局', () => {
-    const { container } = render(<QrCodePage />);
-    const gridContainer = container.querySelector('.grid');
-    expect(gridContainer).toBeInTheDocument();
   });
 
   it('输入态应该显示生成按钮', () => {
@@ -128,20 +117,40 @@ describe('QrCodePage', () => {
     expect(screen.getByText('原始文本')).toBeInTheDocument();
     expect(screen.getByText('编辑')).toBeInTheDocument();
     expect(screen.queryByText('生成二维码')).not.toBeInTheDocument();
+    // 预览态应该显示二维码
+    expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
   });
 
-  it('预览态应该显示保存的文本', () => {
+  it('预览态应该显示截断的文本', () => {
     render(<QrCodePage />);
 
-    // 输入文本
+    // 输入长文本
+    const longText =
+      'https://example.com/very/long/path/that/should/be/truncated/in/the/preview/because/it/exceeds/the/maximum/length';
     const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
-    fireEvent.change(textarea, { target: { value: 'https://example.com' } });
+    fireEvent.change(textarea, { target: { value: longText } });
 
     // 点击生成按钮
     fireEvent.click(screen.getByText('生成二维码'));
 
-    // 验证显示保存的文本
-    expect(screen.getByText('https://example.com')).toBeInTheDocument();
+    // 验证显示截断的文本（100字符 + "..."）
+    const truncatedText = longText.slice(0, 100) + '...';
+    expect(screen.getByText(truncatedText)).toBeInTheDocument();
+  });
+
+  it('预览态应该显示完整的短文本', () => {
+    render(<QrCodePage />);
+
+    // 输入短文本
+    const shortText = 'https://example.com';
+    const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
+    fireEvent.change(textarea, { target: { value: shortText } });
+
+    // 点击生成按钮
+    fireEvent.click(screen.getByText('生成二维码'));
+
+    // 验证显示完整文本
+    expect(screen.getByText(shortText)).toBeInTheDocument();
   });
 
   it('点击编辑按钮应该返回输入态', () => {
@@ -159,6 +168,8 @@ describe('QrCodePage', () => {
     expect(screen.getByText('输入 URL 或文本')).toBeInTheDocument();
     expect(screen.getByText('生成二维码')).toBeInTheDocument();
     expect(screen.queryByText('编辑')).not.toBeInTheDocument();
+    // 输入态应该隐藏二维码预览
+    expect(screen.queryByTestId('qr-code-preview')).not.toBeInTheDocument();
   });
 
   it('返回编辑态应该保留上次输入的内容', () => {
