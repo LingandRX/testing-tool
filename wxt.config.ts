@@ -45,7 +45,7 @@ export default defineConfig({
     name: 'Testing Tool',
     description: 'A tool for testing web applications.',
     version_name: undefined,
-    default_locale: 'zh',
+    default_locale: 'zh_CN',
     permissions: [
       'storage',
       'unlimitedStorage',
