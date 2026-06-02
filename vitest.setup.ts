@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { afterEach, beforeEach, vi } from 'vitest';
 import React from 'react';
-import zhMessages from './public/_locales/zh/messages.json';
+import zhMessages from './public/_locales/zh_CN/messages.json';
 
 // Type assertion to allow string indexing
 const zhMessagesMap = zhMessages as Record<string, { message: string }>;
