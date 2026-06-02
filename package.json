@@ -2,7 +2,7 @@
   "name": "testing-tools",
   "description": "A browser extension providing useful testing tools including timestamp conversion and storage management",
   "private": false,
-  "version": "1.0.6",
+  "version": "1.0.0",
   "license": "MIT",
   "type": "module",
   "scripts": {
