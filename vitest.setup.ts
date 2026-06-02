@@ -152,13 +152,6 @@ const webExtensionMock = {
     getAll: vi.fn().mockResolvedValue([]),
     remove: vi.fn().mockResolvedValue(undefined),
   },
-  alarms: {
-    create: vi.fn().mockResolvedValue(undefined),
-    onAlarm: {
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-    },
-  },
   contextMenus: {
     create: vi.fn(),
     onClicked: {
