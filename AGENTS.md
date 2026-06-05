@@ -143,6 +143,7 @@ src/pages/FeatureName/
 - 图标: 使用 `lucide-react` 图标库
 - 格式: Prettier (`.prettierrc`: 100 字符宽, 单引号, 尾逗号 all, LF 换行)
 - ESLint 使用 `typescript-eslint` 的 `projectService: true`（无需手动维护 project 路径）
+- **Git Commit**: 必须使用中文描述，遵循 Conventional Commits 规范（如 `fix(组件名): 描述`、`feat(功能名): 描述`）
 
 ## 关键外部库（非显而易见的）
 
