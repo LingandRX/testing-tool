@@ -381,10 +381,3 @@ export function formatCleaningResult(
 
   return t('storageCleaner:cleanedSummary', { items: parts.join(', ') });
 }
-
-export function isEmptyResult(result: CleaningResult): boolean {
-  const values = Object.values(result).filter(
-    (r): r is StorageCleanResult => r?.success === true && r.count > 0,
-  );
-  return values.length === 0;
-}
