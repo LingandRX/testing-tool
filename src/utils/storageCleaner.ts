@@ -224,7 +224,7 @@ async function runCleanScript(
   return { success: false, error: 'No result returned' };
 }
 
-export async function injectClearLocalStorage(tabId: number): Promise<StorageCleanResult> {
+async function injectClearLocalStorage(tabId: number): Promise<StorageCleanResult> {
   return runCleanScript(
     tabId,
     () => {
@@ -236,7 +236,7 @@ export async function injectClearLocalStorage(tabId: number): Promise<StorageCle
   );
 }
 
-export async function injectClearSessionStorage(tabId: number): Promise<StorageCleanResult> {
+async function injectClearSessionStorage(tabId: number): Promise<StorageCleanResult> {
   return runCleanScript(
     tabId,
     () => {
@@ -248,7 +248,7 @@ export async function injectClearSessionStorage(tabId: number): Promise<StorageC
   );
 }
 
-export async function injectClearIndexedDB(tabId: number): Promise<StorageCleanResult> {
+async function injectClearIndexedDB(tabId: number): Promise<StorageCleanResult> {
   return runCleanScript(
     tabId,
     async () => {
@@ -292,7 +292,7 @@ export async function injectClearIndexedDB(tabId: number): Promise<StorageCleanR
   );
 }
 
-export async function injectClearCacheStorage(tabId: number): Promise<StorageCleanResult> {
+async function injectClearCacheStorage(tabId: number): Promise<StorageCleanResult> {
   return runCleanScript(
     tabId,
     async () => {
@@ -309,7 +309,7 @@ export async function injectClearCacheStorage(tabId: number): Promise<StorageCle
   );
 }
 
-export async function injectUnregisterServiceWorkers(tabId: number): Promise<StorageCleanResult> {
+async function injectUnregisterServiceWorkers(tabId: number): Promise<StorageCleanResult> {
   return runCleanScript(
     tabId,
     async () => {

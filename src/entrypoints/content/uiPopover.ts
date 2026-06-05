@@ -161,7 +161,7 @@ function positionPopover(popover: HTMLElement, x: number, y: number): void {
 
 let hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
-export function showPopover(
+function showPopover(
   x: number,
   y: number,
   contentHtml: string,
