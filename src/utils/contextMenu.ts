@@ -103,8 +103,8 @@ export function parseContextMenuClick(
 ): ParseResult {
   const featureKey = getMenuPageType(menuItemId);
 
-  // 处理图片 URL（右键点击图片时）
-  if (info.srcUrl) {
+  // 处理图片 URL（仅 qrCode-image 菜单项，右键点击图片时）
+  if (menuItemId === 'qrCode-image' && info.srcUrl) {
     return {
       success: true,
       data: { featureKey, payload: info.srcUrl },
