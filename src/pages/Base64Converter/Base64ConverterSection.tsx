@@ -1,7 +1,7 @@
 import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
 import { useI18n } from '@/utils/chromeI18n';
-import CopyButton from '@/components/CopyButton';
+import { CopyButton } from '@/components/CopyButton';
 import DecodeResultPaper from '@/components/DecodeResultPaper';
 import { Button } from '@/components/ui/button';
 import { downloadBlob, formatFileSize } from '@/utils/base64Converter';
