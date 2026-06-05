@@ -90,10 +90,3 @@ export async function saveContextMenuData(
   };
   await storageUtil.set(STORAGE_KEY, pendingData);
 }
-
-/**
- * 清除右键菜单待处理数据
- */
-export async function clearContextMenuData(): Promise<void> {
-  await storageUtil.remove(STORAGE_KEY);
-}

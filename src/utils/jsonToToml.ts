@@ -1,7 +1,7 @@
 /**
  * JSON 转 TOML 转换结果
  */
-export interface JsonToTomlResult {
+interface JsonToTomlResult {
   /** 转换后的 TOML 字符串 */
   output: string;
   /** 原始输入的字节大小 */
