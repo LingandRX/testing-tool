@@ -66,11 +66,3 @@ export function useI18n(namespace?: string | string[]) {
     isLoaded: true,
   };
 }
-
-/**
- * 预加载命名空间（无操作，兼容 useLazyTranslation）
- */
-export async function preloadNamespaces(_namespaces: string[]): Promise<void> {
-  // chrome.i18n 是同步的，无需预加载
-  return Promise.resolve();
-}
