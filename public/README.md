@@ -12,7 +12,6 @@
 | `icon/48.png`  | 48×48 图标（扩展管理页）         |
 | `icon/96.png`  | 96×96 图标                       |
 | `icon/128.png` | 128×128 图标（Chrome Web Store） |
-| `wxt.svg`      | WXT 框架标志 SVG 图标            |
 
 ## 注意事项
 
