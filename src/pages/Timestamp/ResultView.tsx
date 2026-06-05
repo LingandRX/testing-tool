@@ -1,5 +1,5 @@
 import React from 'react';
-import CopyButton from '@/components/CopyButton';
+import { CopyButton } from '@/components/CopyButton';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 

@@ -1,5 +1,5 @@
 import TextInputArea from '@/components/TextInputArea';
-import CopyButton from '@/components/CopyButton';
+import { CopyButton } from '@/components/CopyButton';
 import JwtSection from './JwtSection';
 import { useJwt } from './useJwt';
 import { useI18n } from '@/utils/chromeI18n';
