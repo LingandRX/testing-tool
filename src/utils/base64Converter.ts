@@ -8,7 +8,7 @@ import { formatBytes } from './format';
 export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 /** 支持的图像 MIME 类型 */
-export const SUPPORTED_IMAGE_TYPES = [
+const SUPPORTED_IMAGE_TYPES = [
   'image/png',
   'image/jpeg',
   'image/jpg',
@@ -20,7 +20,7 @@ export const SUPPORTED_IMAGE_TYPES = [
 ] as const;
 
 /** 支持的图像文件扩展名 */
-export const SUPPORTED_IMAGE_EXTENSIONS = [
+const SUPPORTED_IMAGE_EXTENSIONS = [
   '.png',
   '.jpg',
   '.jpeg',
@@ -34,7 +34,7 @@ export const SUPPORTED_IMAGE_EXTENSIONS = [
 /**
  * 文本转 Base64 编码结果
  */
-export interface TextToBase64Result {
+interface TextToBase64Result {
   /** Base64 编码结果 */
   output: string;
   /** 原始字节数 */
@@ -226,7 +226,7 @@ export function formatFileSize(bytes: number): string {
 /**
  * Base64 解码为二进制后的产物
  */
-export interface Base64ToBlobResult {
+interface Base64ToBlobResult {
   /** 解码后的 Blob */
   blob: Blob;
   /** 推断出的 MIME 类型 */

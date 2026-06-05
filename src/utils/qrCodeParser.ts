@@ -1,6 +1,6 @@
 import QrScanner from 'qr-scanner';
 
-export interface QrCodeParseResult {
+interface QrCodeParseResult {
   success: boolean;
   data?: string;
   error?: string;
