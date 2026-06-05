@@ -7,7 +7,7 @@ import {
   validateJson,
 } from '@/utils/jsonFormatter';
 import { formatBytes } from '@/utils/format';
-import CopyButton from '@/components/CopyButton';
+import { CopyButton } from '@/components/CopyButton';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import TextInputArea from '@/components/TextInputArea';
 import { Checkbox } from '@/components/ui/checkbox';
