@@ -53,6 +53,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       type="button"
       onClick={handleCopy}
       title={tooltip ?? t('buttons.copy')}
+      aria-label={tooltip ?? t('buttons.copy')}
       className={cn(
         buttonVariants({ variant, size }),
         copied &&
