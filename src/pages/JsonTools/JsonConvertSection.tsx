@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import { formatBytes } from '@/utils/format';
-import CopyButton from '@/components/CopyButton';
+import { CopyButton } from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
 import { validateJson } from '@/utils/jsonFormatter';
 import { cn } from '@/lib/utils';
