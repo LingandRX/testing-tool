@@ -53,6 +53,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       type="button"
       onClick={handleCopy}
       title={tooltip ?? t('buttons.copy')}
+      aria-label={tooltip ?? t('buttons.copy')}
       className={cn(
         buttonVariants({ variant, size }),
         copied &&
@@ -62,7 +63,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       {...props}
     >
       {copied ? (
-        <Check className="h-[1.2em] w-[1.2em] animate-in fade-in zoom-in-75 duration-200" />
+        <Check className="h-[1.2em] w-[1.2em]" />
       ) : (
         <Copy className="h-[1.2em] w-[1.2em]" />
       )}

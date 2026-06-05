@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import TextInputArea from '@/components/TextInputArea';
 import { useI18n } from '@/utils/chromeI18n';
-import CopyButton from '@/components/CopyButton';
+import { CopyButton } from '@/components/CopyButton';
 import { base64ToText, textToBase64 } from '@/utils/base64Converter';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { useContextMenuData } from '@/utils/useContextMenuData';
