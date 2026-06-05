@@ -26,12 +26,8 @@ export function useI18n(namespace?: string | string[]) {
   const namespaces = Array.isArray(namespace) ? namespace : namespace ? [namespace] : [];
 
   const t = (key: string, options?: Record<string, unknown>): string => {
-    let msgId = key;
-
-    // 处理 namespace:key 格式（兼容原 i18next 用法）
-    if (key.includes(':')) {
-      msgId = key.replace(':', '_').replace(/\./g, '_');
-    }
+    // 统一将分隔符转换为下划线，兼容 'namespace:key.path' 和 'key.path' 两种写法
+    const msgId = key.replace(':', '_').replace(/\./g, '_');
 
     // 先尝试直接查找 key
     let message = getMessage(msgId);
