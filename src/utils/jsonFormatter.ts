@@ -71,7 +71,7 @@ export function formatJson(text: string, options: JsonFormatOptions): JsonFormat
 /**
  * JSON 压缩结果
  */
-export interface JsonMinifyResult {
+interface JsonMinifyResult {
   /** 压缩后的 JSON 字符串 */
   minified: string;
   /** 原始输入的字节大小 */

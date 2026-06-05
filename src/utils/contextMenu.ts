@@ -1,18 +1,18 @@
 import type { PageType } from '@/types/storage';
 
-export interface ContextMenuItemConfig {
+interface ContextMenuItemConfig {
   id: string;
   title: string;
   contexts: [`${chrome.contextMenus.ContextType}`, ...`${chrome.contextMenus.ContextType}`[]];
   parentId?: string;
 }
 
-export interface ContextMenuClickedInfo {
+interface ContextMenuClickedInfo {
   featureKey: PageType;
   payload: string;
 }
 
-export interface ParseResult {
+interface ParseResult {
   success: boolean;
   data?: ContextMenuClickedInfo;
   error?: string;
