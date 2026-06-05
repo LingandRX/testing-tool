@@ -165,27 +165,31 @@ export function useQrCode(): QrCodeContextValue {
       return;
     }
 
+    // 先设置 loading 状态，让 React 渲染加载动画
     setGeneratorState((prev) => ({ ...prev, generating: true, inputError: '' }));
 
-    const qrCodeDataUrl = generateQrCodeDataUrl(text);
+    // 延迟到下一帧生成，确保 loading 状态先被渲染显示
+    setTimeout(() => {
+      const qrCodeDataUrl = generateQrCodeDataUrl(text);
 
-    if (!qrCodeDataUrl) {
+      if (!qrCodeDataUrl) {
+        setGeneratorState((prev) => ({
+          ...prev,
+          generating: false,
+          inputError: t('qrCode:generateError'),
+        }));
+        toast.error(t('qrCode:generateError'));
+        return;
+      }
+
       setGeneratorState((prev) => ({
         ...prev,
+        step: 'preview',
+        savedText: text,
+        qrCodeDataUrl,
         generating: false,
-        inputError: t('qrCode:generateError'),
       }));
-      toast.error(t('qrCode:generateError'));
-      return;
-    }
-
-    setGeneratorState((prev) => ({
-      ...prev,
-      step: 'preview',
-      savedText: text,
-      qrCodeDataUrl,
-      generating: false,
-    }));
+    }, 0);
   }, [generatorState.textToEncode, t]);
 
   /** 返回编辑态，保留上次输入内容 */
