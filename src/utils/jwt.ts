@@ -4,13 +4,13 @@
 
 import { getMessage } from '@/utils/chromeI18n';
 
-export interface JwtHeader {
+interface JwtHeader {
   alg: string;
   typ?: string;
   [key: string]: unknown;
 }
 
-export interface JwtPayload {
+interface JwtPayload {
   iss?: string;
   sub?: string;
   aud?: string | string[];
