@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import QrCodePage from '../index';
 
 vi.mock('lucide-react', async (importOriginal) => {
@@ -102,7 +102,7 @@ describe('QrCodePage', () => {
     expect(generateButton).not.toBeDisabled();
   });
 
-  it('点击生成按钮应该切换到预览态', () => {
+  it('点击生成按钮应该切换到预览态', async () => {
     render(<QrCodePage />);
 
     // 输入文本
@@ -114,14 +114,16 @@ describe('QrCodePage', () => {
     fireEvent.click(generateButton);
 
     // 验证切换到预览态
-    expect(screen.getByText('原始文本')).toBeInTheDocument();
-    expect(screen.getByText('编辑')).toBeInTheDocument();
-    expect(screen.queryByText('生成二维码')).not.toBeInTheDocument();
-    // 预览态应该显示二维码
-    expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('原始文本')).toBeInTheDocument();
+      expect(screen.getByText('编辑')).toBeInTheDocument();
+      expect(screen.queryByText('生成二维码')).not.toBeInTheDocument();
+      // 预览态应该显示二维码
+      expect(screen.getByTestId('qr-code-preview')).toBeInTheDocument();
+    });
   });
 
-  it('预览态应该显示截断的文本', () => {
+  it('预览态应该显示截断的文本', async () => {
     render(<QrCodePage />);
 
     // 输入长文本
@@ -135,10 +137,12 @@ describe('QrCodePage', () => {
 
     // 验证显示截断的文本（80字符 + "..."）
     const truncatedText = longText.slice(0, 80) + '...';
-    expect(screen.getByText(truncatedText)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(truncatedText)).toBeInTheDocument();
+    });
   });
 
-  it('预览态应该显示完整的短文本', () => {
+  it('预览态应该显示完整的短文本', async () => {
     render(<QrCodePage />);
 
     // 输入短文本
@@ -150,16 +154,23 @@ describe('QrCodePage', () => {
     fireEvent.click(screen.getByText('生成二维码'));
 
     // 验证显示完整文本
-    expect(screen.getByText(shortText)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(shortText)).toBeInTheDocument();
+    });
   });
 
-  it('点击编辑按钮应该返回输入态', () => {
+  it('点击编辑按钮应该返回输入态', async () => {
     render(<QrCodePage />);
 
     // 输入文本并生成
     const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
     fireEvent.change(textarea, { target: { value: 'https://example.com' } });
     fireEvent.click(screen.getByText('生成二维码'));
+
+    // 等待生成完成
+    await waitFor(() => {
+      expect(screen.getByText('编辑')).toBeInTheDocument();
+    });
 
     // 点击编辑按钮
     fireEvent.click(screen.getByText('编辑'));
@@ -172,13 +183,18 @@ describe('QrCodePage', () => {
     expect(screen.queryByTestId('qr-code-preview')).not.toBeInTheDocument();
   });
 
-  it('返回编辑态应该保留上次输入的内容', () => {
+  it('返回编辑态应该保留上次输入的内容', async () => {
     render(<QrCodePage />);
 
     // 输入文本并生成
     const textarea = screen.getByPlaceholderText('请输入 URL 或文本内容，将自动生成二维码');
     fireEvent.change(textarea, { target: { value: 'https://example.com' } });
     fireEvent.click(screen.getByText('生成二维码'));
+
+    // 等待生成完成
+    await waitFor(() => {
+      expect(screen.getByText('编辑')).toBeInTheDocument();
+    });
 
     // 点击编辑按钮
     fireEvent.click(screen.getByText('编辑'));
