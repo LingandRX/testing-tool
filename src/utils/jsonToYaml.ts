@@ -1,7 +1,7 @@
 /**
  * JSON 转 YAML 转换结果
  */
-export interface JsonToYamlResult {
+interface JsonToYamlResult {
   /** 转换后的 YAML 字符串 */
   output: string;
   /** 原始输入的字节大小 */

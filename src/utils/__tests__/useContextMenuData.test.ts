@@ -1,10 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import {
-  useContextMenuData,
-  saveContextMenuData,
-  clearContextMenuData,
-} from '@/utils/useContextMenuData';
+import { useContextMenuData, saveContextMenuData } from '@/utils/useContextMenuData';
 
 describe('useContextMenuData', () => {
   beforeEach(() => {
@@ -45,14 +41,6 @@ describe('useContextMenuData', () => {
           }),
         }),
       );
-    });
-  });
-
-  describe('clearContextMenuData', () => {
-    it('应该从 storage 中删除数据', async () => {
-      await clearContextMenuData();
-
-      expect(chrome.storage.local.remove).toHaveBeenCalledWith(['contextMenu/pendingData']);
     });
   });
 
