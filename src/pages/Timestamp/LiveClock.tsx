@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import CopyButton from '@/components/CopyButton';
+import { CopyButton } from '@/components/CopyButton';
 import type { UnitType } from './constants';
 import { msToUnit } from './constants';
 import { useI18n } from '@/utils/chromeI18n';

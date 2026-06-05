@@ -1,4 +1,4 @@
-import CopyButton from '@/components/CopyButton';
+import { CopyButton } from '@/components/CopyButton';
 import { useI18n } from '@/utils/chromeI18n';
 import { stringifyJson } from '@/utils/jwt';
 import { cn } from '@/lib/utils';
