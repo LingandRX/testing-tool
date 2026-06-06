@@ -173,8 +173,8 @@ export default function TestDataGeneratorPage() {
     generate(fields, count, format === 'csv');
   }, [fields, count, format, generate]);
 
-  // 获取选中的字段
-  const selectedField = selectedIndex !== null ? fields[selectedIndex] : null;
+  // 获取选中的字段（-1 或 null 表示未选中）
+  const selectedField = selectedIndex !== null && selectedIndex >= 0 ? fields[selectedIndex] : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">

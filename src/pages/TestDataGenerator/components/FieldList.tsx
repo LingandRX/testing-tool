@@ -74,12 +74,12 @@ function SortableFieldItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative rounded-lg border transition-colors ${
+      className={`group relative rounded-lg border transition-all ${
         isDragging ? 'border-primary shadow-lg' : ''
       } ${
         isSelected
-          ? 'border-primary bg-primary/5'
-          : 'border-border hover:border-muted-foreground/30'
+          ? 'border-primary bg-primary/8 shadow-sm ring-1 ring-primary/20'
+          : 'border-border hover:border-muted-foreground/30 hover:shadow-sm'
       }`}
     >
       <div className="flex items-center gap-2 h-full px-3 py-2">
@@ -129,6 +129,14 @@ export default function FieldList({
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
+  );
+
+  // 点击已选中的字段时取消选中
+  const handleToggleSelect = useCallback(
+    (index: number) => {
+      onSelect(selectedIndex === index ? -1 : index);
+    },
+    [selectedIndex, onSelect],
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -232,7 +240,7 @@ export default function FieldList({
                             <SortableFieldItem
                               field={field}
                               isSelected={selectedIndex === realIndex}
-                              onSelect={() => onSelect(realIndex)}
+                              onSelect={() => handleToggleSelect(realIndex)}
                               onRemove={() => onRemove(realIndex)}
                             />
                           </div>
@@ -248,7 +256,7 @@ export default function FieldList({
                         key={field.id}
                         field={field}
                         isSelected={selectedIndex === index}
-                        onSelect={() => onSelect(index)}
+                        onSelect={() => handleToggleSelect(index)}
                         onRemove={() => onRemove(index)}
                       />
                     ))}

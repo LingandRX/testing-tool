@@ -80,6 +80,7 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
             value={field.name}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder={t('testDataGenerator_fieldNamePlaceholder')}
+            maxLength={20}
             className="h-9"
           />
         </div>
@@ -92,6 +93,7 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
             value={field.description || ''}
             onChange={(e) => handleDescriptionChange(e.target.value)}
             placeholder={t('testDataGenerator_fieldDescriptionPlaceholder')}
+            maxLength={50}
             className="h-9"
           />
         </div>

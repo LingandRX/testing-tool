@@ -1,6 +1,6 @@
 /**
  * 字段项组件
- * 展示单个字段的基本信息
+ * 展示单个字段的基本信息，适配固定高度卡片
  */
 
 import { useI18n } from '@/utils/chromeI18n';
@@ -20,30 +20,45 @@ export default function FieldItem({ field, onClick, isSelected }: FieldItemProps
 
   return (
     <div
-      className={`flex-1 cursor-pointer p-2 rounded-md transition-colors ${
-        isSelected ? 'bg-primary/10' : 'hover:bg-muted/50'
+      className={`flex-1 min-w-0 cursor-pointer rounded-md transition-all ${
+        isSelected
+          ? 'bg-primary/10 pl-2 border-l-2 border-l-primary'
+          : 'hover:bg-muted/50 border-l-2 border-l-transparent'
       }`}
       onClick={onClick}
     >
-      <div className="flex items-center gap-2">
-        <span className="font-medium text-sm text-foreground truncate">{field.name}</span>
-        <Badge variant="secondary" className="text-xs">
-          {generator?.name || field.generatorId}
-        </Badge>
-        {!field.required && (
-          <Badge variant="outline" className="text-xs text-muted-foreground">
-            {field.nullRate}%
+      <div
+        className={`h-full ${field.description ? 'flex flex-col justify-center' : 'flex items-center'}`}
+      >
+        {/* 第一行：字段名 + 标签 */}
+        <div className="flex items-center gap-1.5 overflow-hidden">
+          <span className="font-medium text-sm text-foreground truncate shrink-0 max-w-[140px]">
+            {field.name}
+          </span>
+          <Badge variant="secondary" className="text-[10px] shrink-0 px-1 py-0">
+            {generator?.name || field.generatorId}
           </Badge>
-        )}
-        {field.unique && (
-          <Badge variant="outline" className="text-xs text-blue-500">
-            {t('testDataGenerator_unique')}
-          </Badge>
+          {!field.required && (
+            <Badge
+              variant="outline"
+              className="text-[10px] shrink-0 px-1 py-0 text-muted-foreground"
+            >
+              {field.nullRate}%
+            </Badge>
+          )}
+          {field.unique && (
+            <Badge variant="outline" className="text-[10px] shrink-0 px-1 py-0 text-blue-500">
+              {t('testDataGenerator_unique')}
+            </Badge>
+          )}
+        </div>
+        {/* 第二行：描述 */}
+        {field.description && (
+          <p className="text-[11px] text-muted-foreground mt-0.5 truncate leading-tight">
+            {field.description}
+          </p>
         )}
       </div>
-      {field.description && (
-        <p className="text-xs text-muted-foreground mt-1 truncate">{field.description}</p>
-      )}
     </div>
   );
 }
