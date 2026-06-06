@@ -7,7 +7,7 @@ import { Settings, Database, Tag } from 'lucide-react';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import { useGenerator } from './hooks/useGenerator';
-import type { FieldConfig, GenerateResult } from '@/types/testDataGenerator';
+import type { FieldConfig, GenerateResult, DataRule } from '@/types/testDataGenerator';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -36,6 +36,7 @@ export default function TestDataGeneratorPage() {
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [editingRule, setEditingRule] = useState<DataRule | null>(null);
 
   // 生成选项
   const [count, setCount] = useState(100);
@@ -123,10 +124,29 @@ export default function TestDataGeneratorPage() {
     (loadedFields: FieldConfig[]) => {
       setFields(loadedFields);
       setSelectedIndex(null);
+      setEditingRule(null);
       clearResult();
     },
     [clearResult],
   );
+
+  // 编辑规则
+  const handleEditRule = useCallback(
+    (rule: DataRule) => {
+      setFields(rule.fields);
+      setSelectedIndex(null);
+      setEditingRule(rule);
+      setActiveTab('fields');
+      clearResult();
+      toast.success(t('testDataGenerator_editingRule', { name: rule.name }));
+    },
+    [clearResult, t],
+  );
+
+  // 保存规则成功后清除编辑状态
+  const handleRuleSaved = useCallback(() => {
+    setEditingRule(null);
+  }, []);
 
   // 开始生成
   const handleGenerate = useCallback(() => {
@@ -188,6 +208,8 @@ export default function TestDataGeneratorPage() {
                   onAdd={handleAddField}
                   onEdit={handleOpenEditor}
                   onReorder={handleReorder}
+                  editingRule={editingRule}
+                  onRuleSaved={handleRuleSaved}
                 />
               </div>
             )}
@@ -195,7 +217,7 @@ export default function TestDataGeneratorPage() {
             {/* 规则管理标签页 */}
             {activeTab === 'rules' && (
               <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
-                <RuleManager currentFields={fields} onLoad={handleLoadRule} />
+                <RuleManager onLoad={handleLoadRule} onEdit={handleEditRule} />
               </div>
             )}
 
@@ -264,7 +286,7 @@ export default function TestDataGeneratorPage() {
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
         <DialogContent
           showCloseButton={false}
-          className="w-[calc(100vw-4rem)] max-w-[420px] max-h-[calc(100vh-4rem)] p-0 pt-6 flex flex-col"
+          className="w-[calc(100vw-2rem)] max-w-[520px] max-h-[calc(100vh-2rem)] p-0 pt-6 flex flex-col"
         >
           <div className="flex-1 overflow-y-auto px-6 pb-4">
             {selectedField && selectedIndex !== null && (
