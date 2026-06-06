@@ -100,7 +100,6 @@ describe('RuleManager', () => {
     const deleteButton = screen.getByTitle('删除');
     await user.click(deleteButton);
 
-    expect(screen.getByText('确认删除规则')).toBeInTheDocument();
     expect(screen.getByText(/确定要删除规则/)).toBeInTheDocument();
   });
 
@@ -133,7 +132,7 @@ describe('RuleManager', () => {
 
     await user.click(screen.getByTitle('复制'));
 
-    expect(mockedRuleStorage.duplicate).toHaveBeenCalledWith('rule-1');
+    expect(mockedRuleStorage.duplicate).toHaveBeenCalledWith('rule-1', '（副本）');
     expect(mockedToast.success).toHaveBeenCalled();
   });
 

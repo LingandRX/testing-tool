@@ -3,6 +3,7 @@
  * 编辑单个字段的详细配置
  */
 
+import { useState, useCallback } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -15,14 +16,40 @@ import GeneratorConfig from './GeneratorConfig';
 interface FieldEditorProps {
   field: FieldConfig;
   onChange: (field: FieldConfig) => void;
+  /** 所有字段名列表，用于检测重复 */
+  allFieldNames?: string[];
 }
 
-export default function FieldEditor({ field, onChange }: FieldEditorProps) {
+export default function FieldEditor({ field, onChange, allFieldNames = [] }: FieldEditorProps) {
   const { t } = useI18n('testDataGenerator');
   const generator = getGeneratorById(field.generatorId);
+  const [nameError, setNameError] = useState<string | null>(null);
+
+  const validateFieldName = useCallback(
+    (name: string): string | null => {
+      const trimmed = name.trim();
+      if (!trimmed) {
+        return t('testDataGenerator_fieldNameEmpty');
+      }
+      if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(trimmed)) {
+        return t('testDataGenerator_fieldNameInvalid');
+      }
+      const isDuplicate = allFieldNames.some(
+        (n, i) => n === trimmed && i !== allFieldNames.indexOf(field.name),
+      );
+      if (isDuplicate) {
+        return t('testDataGenerator_fieldNameDuplicate');
+      }
+      return null;
+    },
+    [allFieldNames, field.name, t],
+  );
 
   const handleNameChange = (name: string) => {
     onChange({ ...field, name });
+    // 实时校验
+    const error = validateFieldName(name);
+    setNameError(error);
   };
 
   const handleDescriptionChange = (description: string) => {
@@ -93,8 +120,9 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder={t('testDataGenerator_fieldNamePlaceholder')}
             maxLength={20}
-            className="h-9"
+            className={`h-9 ${nameError ? 'border-destructive' : ''}`}
           />
+          {nameError && <p className="text-xs text-destructive mt-1">{nameError}</p>}
         </div>
 
         <div className="space-y-2">

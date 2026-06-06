@@ -4,6 +4,7 @@
  */
 
 import { Copy, Download } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/utils/chromeI18n';
 import { DataExporter } from '@/utils/dataExporter';
@@ -22,12 +23,22 @@ export default function ExportPanel({ result }: ExportPanelProps) {
 
   const handleCopyJSON = async () => {
     const content = DataExporter.toJSON(result.data!);
-    await DataExporter.copyToClipboard(content);
+    const success = await DataExporter.copyToClipboard(content);
+    if (success) {
+      toast.success(t('testDataGenerator_copySuccess'));
+    } else {
+      toast.error(t('testDataGenerator_copyFailed'));
+    }
   };
 
   const handleCopyCSV = async () => {
     const content = DataExporter.toCSV(result.data!);
-    await DataExporter.copyToClipboard(content);
+    const success = await DataExporter.copyToClipboard(content);
+    if (success) {
+      toast.success(t('testDataGenerator_copySuccess'));
+    } else {
+      toast.error(t('testDataGenerator_copyFailed'));
+    }
   };
 
   const handleDownloadJSON = () => {

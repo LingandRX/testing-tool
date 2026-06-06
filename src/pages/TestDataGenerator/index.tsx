@@ -60,64 +60,58 @@ export default function TestDataGeneratorPage() {
 
   // 添加新字段
   const handleAddField = useCallback(() => {
-    if (fields.length >= MAX_FIELDS) return;
-    const newField: FieldConfig = {
-      id: generateId(),
-      name: `field${fields.length + 1}`,
-      generatorId: 'chineseName',
-      params: {},
-      required: true,
-      nullRate: 0,
-      unique: false,
-    };
-    setFields([...fields, newField]);
-    setSelectedIndex(fields.length);
-  }, [fields]);
+    setFields((prev) => {
+      if (prev.length >= MAX_FIELDS) return prev;
+      const newField: FieldConfig = {
+        id: generateId(),
+        name: `field${prev.length + 1}`,
+        generatorId: 'chineseName',
+        params: {},
+        required: true,
+        nullRate: 0,
+        unique: false,
+      };
+      setSelectedIndex(prev.length);
+      return [...prev, newField];
+    });
+  }, []);
 
   // 更新字段
-  const handleUpdateField = useCallback(
-    (index: number, field: FieldConfig) => {
-      const newFields = [...fields];
+  const handleUpdateField = useCallback((index: number, field: FieldConfig) => {
+    setFields((prev) => {
+      const newFields = [...prev];
       newFields[index] = field;
-      setFields(newFields);
-    },
-    [fields],
-  );
+      return newFields;
+    });
+  }, []);
 
   // 删除字段
-  const handleRemoveField = useCallback(
-    (index: number) => {
-      const newFields = fields.filter((_, i) => i !== index);
-      setFields(newFields);
-      if (selectedIndex === index) {
-        setSelectedIndex(null);
-      } else if (selectedIndex !== null && selectedIndex > index) {
-        setSelectedIndex(selectedIndex - 1);
-      }
-    },
-    [fields, selectedIndex],
-  );
+  const handleRemoveField = useCallback((index: number) => {
+    setFields((prev) => prev.filter((_, i) => i !== index));
+    setSelectedIndex((prev) => {
+      if (prev === index) return null;
+      if (prev !== null && prev > index) return prev - 1;
+      return prev;
+    });
+  }, []);
 
   // 拖拽排序
-  const handleReorder = useCallback(
-    (oldIndex: number, newIndex: number) => {
-      const newFields = [...fields];
+  const handleReorder = useCallback((oldIndex: number, newIndex: number) => {
+    setFields((prev) => {
+      const newFields = [...prev];
       const [moved] = newFields.splice(oldIndex, 1);
       newFields.splice(newIndex, 0, moved);
-      setFields(newFields);
-      // 同步更新选中索引
-      if (selectedIndex === oldIndex) {
-        setSelectedIndex(newIndex);
-      } else if (selectedIndex !== null) {
-        if (oldIndex < selectedIndex && newIndex >= selectedIndex) {
-          setSelectedIndex(selectedIndex - 1);
-        } else if (oldIndex > selectedIndex && newIndex <= selectedIndex) {
-          setSelectedIndex(selectedIndex + 1);
-        }
+      return newFields;
+    });
+    setSelectedIndex((prev) => {
+      if (prev === oldIndex) return newIndex;
+      if (prev !== null) {
+        if (oldIndex < prev && newIndex >= prev) return prev - 1;
+        if (oldIndex > prev && newIndex <= prev) return prev + 1;
       }
-    },
-    [fields, selectedIndex],
-  );
+      return prev;
+    });
+  }, []);
 
   // 加载规则
   const handleLoadRule = useCallback(
@@ -293,6 +287,7 @@ export default function TestDataGeneratorPage() {
               <FieldEditor
                 field={selectedField}
                 onChange={(updatedField) => handleUpdateField(selectedIndex, updatedField)}
+                allFieldNames={fields.map((f) => f.name)}
               />
             )}
           </div>

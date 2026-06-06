@@ -138,8 +138,10 @@ export function deleteRule(id: string): boolean {
 
 /**
  * 复制规则
+ * @param id 规则 ID
+ * @param copySuffix 复制后缀，默认为中文「（副本）」，可通过 i18n 传入
  */
-export function duplicate(id: string): DataRule | null {
+export function duplicate(id: string, copySuffix = '（副本）'): DataRule | null {
   const rule = getById(id);
   if (!rule) {
     console.warn('[ruleStorage] 规则不存在:', id);
@@ -155,7 +157,7 @@ export function duplicate(id: string): DataRule | null {
   const newRule: DataRule = {
     ...rule,
     id: generateId(),
-    name: `${rule.name}（副本）`,
+    name: `${rule.name}${copySuffix}`,
     createdAt: now,
     updatedAt: now,
     useCount: 0,
