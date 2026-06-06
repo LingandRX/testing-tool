@@ -5,9 +5,13 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Plus, GripVertical, Trash2 } from 'lucide-react';
+import { Plus, GripVertical, Trash2, Save } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useI18n } from '@/utils/chromeI18n';
+import * as ruleStorage from '@/utils/ruleStorage';
 import {
   DndContext,
   closestCenter,
@@ -26,7 +30,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { FieldConfig } from '@/types/testDataGenerator';
+import type { FieldConfig, DataRule } from '@/types/testDataGenerator';
 import FieldItem from './FieldItem';
 
 /** 最大字段数量 */
@@ -46,6 +50,8 @@ interface FieldListProps {
   onAdd: () => void;
   onEdit: (index: number) => void;
   onReorder: (oldIndex: number, newIndex: number) => void;
+  editingRule?: DataRule | null;
+  onRuleSaved?: () => void;
 }
 
 /** 可排序的字段项 */
@@ -114,11 +120,17 @@ export default function FieldList({
   onAdd,
   onEdit,
   onReorder,
+  editingRule,
+  onRuleSaved,
 }: FieldListProps) {
   const { t } = useI18n('testDataGenerator');
   const [scrollTop, setScrollTop] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showConfirmOverwrite, setShowConfirmOverwrite] = useState(false);
+  const [ruleName, setRuleName] = useState('');
+  const [ruleDescription, setRuleDescription] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -205,22 +217,107 @@ export default function FieldList({
 
   const isMaxReached = fields.length >= MAX_FIELDS;
 
+  // 编辑模式下，保存时更新原规则
+  const handleUpdateRule = useCallback(() => {
+    if (!editingRule) return;
+
+    const updated = ruleStorage.update(editingRule.id, {
+      fields: fields,
+    });
+
+    if (updated) {
+      toast.success(t('testDataGenerator_ruleUpdated'));
+      onRuleSaved?.();
+    }
+  }, [editingRule, fields, t, onRuleSaved]);
+
+  // 新建规则或另存为
+  const handleSave = useCallback(
+    (overwrite = false) => {
+      if (!ruleName.trim()) return;
+
+      const trimmedName = ruleName.trim();
+
+      // 检查名称是否重复
+      if (!overwrite) {
+        const existingRule = ruleStorage.getByName(trimmedName);
+        if (existingRule) {
+          setShowConfirmOverwrite(true);
+          return;
+        }
+      }
+
+      const newRule = ruleStorage.save({
+        name: trimmedName,
+        description: ruleDescription.trim(),
+        fields: fields,
+      });
+
+      if (newRule) {
+        setShowSaveDialog(false);
+        setShowConfirmOverwrite(false);
+        setRuleName('');
+        setRuleDescription('');
+        toast.success(t('testDataGenerator_ruleSaved'));
+        onRuleSaved?.();
+      }
+    },
+    [ruleName, ruleDescription, fields, t, onRuleSaved],
+  );
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-foreground">
           {t('testDataGenerator_fields')} ({fields.length}/{MAX_FIELDS})
         </h3>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onAdd}
-          disabled={isMaxReached}
-          className="h-9 gap-1.5 px-3"
-        >
-          <Plus className="h-4 w-4" />
-          {t('testDataGenerator_addField')}
-        </Button>
+        <div className="flex items-center gap-2">
+          {editingRule ? (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleUpdateRule}
+                disabled={fields.length === 0}
+                className="h-8 gap-1.5 px-2.5"
+                title={`${t('testDataGenerator_editing')}: ${editingRule.name}`}
+              >
+                <Save className="h-3.5 w-3.5" />
+                {t('testDataGenerator_updateRule')}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSaveDialog(true)}
+                disabled={fields.length === 0}
+                className="h-8 px-2"
+              >
+                {t('testDataGenerator_saveAs')}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSaveDialog(true)}
+              disabled={fields.length === 0}
+              className="h-8 gap-1.5 px-2.5"
+            >
+              <Save className="h-3.5 w-3.5" />
+              {t('testDataGenerator_saveRule')}
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAdd}
+            disabled={isMaxReached}
+            className="h-8 gap-1.5 px-2.5"
+          >
+            <Plus className="h-4 w-4" />
+            {t('testDataGenerator_addField')}
+          </Button>
+        </div>
       </div>
 
       <div className="flex-1 min-h-0">
@@ -311,6 +408,59 @@ export default function FieldList({
           </DndContext>
         )}
       </div>
+
+      {/* 保存规则对话框 */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent
+          showCloseButton={false}
+          className="w-[calc(100vw-4rem)] max-w-[420px] p-0 pt-6 flex flex-col"
+        >
+          <div className="flex-1 overflow-y-auto px-6 pt-2 pb-4 space-y-4">
+            <Input
+              value={ruleName}
+              onChange={(e) => setRuleName(e.target.value)}
+              placeholder={t('testDataGenerator_ruleNamePlaceholder')}
+              className="h-9"
+            />
+            <Input
+              value={ruleDescription}
+              onChange={(e) => setRuleDescription(e.target.value)}
+              placeholder={t('testDataGenerator_ruleDescPlaceholder')}
+              className="h-9"
+            />
+          </div>
+          <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
+            <Button variant="ghost" size="sm" onClick={() => setShowSaveDialog(false)}>
+              {t('testDataGenerator_cancel')}
+            </Button>
+            <Button size="sm" onClick={() => handleSave()} disabled={!ruleName.trim()}>
+              {t('testDataGenerator_confirm')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 覆盖确认对话框 */}
+      <Dialog open={showConfirmOverwrite} onOpenChange={setShowConfirmOverwrite}>
+        <DialogContent
+          showCloseButton={false}
+          className="w-[calc(100vw-4rem)] max-w-[420px] p-0 pt-6 flex flex-col"
+        >
+          <div className="flex-1 overflow-y-auto px-6 pb-4">
+            <p className="text-sm text-muted-foreground">
+              {t('testDataGenerator_ruleNameDuplicate')}
+            </p>
+          </div>
+          <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
+            <Button variant="ghost" size="sm" onClick={() => setShowConfirmOverwrite(false)}>
+              {t('testDataGenerator_cancel')}
+            </Button>
+            <Button size="sm" onClick={() => handleSave(true)}>
+              {t('testDataGenerator_overwrite')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

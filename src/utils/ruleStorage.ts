@@ -34,6 +34,14 @@ export function getById(id: string): DataRule | undefined {
 }
 
 /**
+ * 根据名称获取规则
+ */
+export function getByName(name: string): DataRule | undefined {
+  const rules = getAll();
+  return rules.find((rule) => rule.name === name);
+}
+
+/**
  * 获取规则数量
  */
 export function getCount(): number {

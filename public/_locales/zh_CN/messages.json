@@ -1192,5 +1192,73 @@
   },
   "testDataGenerator_totalRows": {
     "message": "共 $ 条数据"
+  },
+  "testDataGenerator_ruleSaved": {
+    "message": "规则已保存",
+    "description": "Translation key: testDataGenerator_ruleSaved"
+  },
+  "testDataGenerator_ruleLoaded": {
+    "message": "已加载规则「{{name}}」",
+    "description": "Translation key: testDataGenerator_ruleLoaded"
+  },
+  "testDataGenerator_ruleDeleted": {
+    "message": "规则已删除",
+    "description": "Translation key: testDataGenerator_ruleDeleted"
+  },
+  "testDataGenerator_ruleDuplicated": {
+    "message": "规则已复制",
+    "description": "Translation key: testDataGenerator_ruleDuplicated"
+  },
+  "testDataGenerator_exportSuccess": {
+    "message": "规则已导出",
+    "description": "Translation key: testDataGenerator_exportSuccess"
+  },
+  "testDataGenerator_importSuccess": {
+    "message": "成功导入 {{count}} 条规则",
+    "description": "Translation key: testDataGenerator_importSuccess"
+  },
+  "testDataGenerator_importFailed": {
+    "message": "{{count}} 条规则导入失败",
+    "description": "Translation key: testDataGenerator_importFailed"
+  },
+  "testDataGenerator_confirmDeleteTitle": {
+    "message": "确认删除规则",
+    "description": "Translation key: testDataGenerator_confirmDeleteTitle"
+  },
+  "testDataGenerator_confirmDeleteDescription": {
+    "message": "确定要删除规则「{{name}}」吗？此操作不可撤销。",
+    "description": "Translation key: testDataGenerator_confirmDeleteDescription"
+  },
+  "testDataGenerator_ruleNameDuplicate": {
+    "message": "已存在同名规则，是否覆盖保存？",
+    "description": "Translation key: testDataGenerator_ruleNameDuplicate"
+  },
+  "testDataGenerator_overwrite": {
+    "message": "覆盖",
+    "description": "Translation key: testDataGenerator_overwrite"
+  },
+  "testDataGenerator_edit": {
+    "message": "编辑",
+    "description": "Translation key: testDataGenerator_edit"
+  },
+  "testDataGenerator_ruleUpdated": {
+    "message": "规则已更新",
+    "description": "Translation key: testDataGenerator_ruleUpdated"
+  },
+  "testDataGenerator_editing": {
+    "message": "编辑中",
+    "description": "Translation key: testDataGenerator_editing"
+  },
+  "testDataGenerator_editingRule": {
+    "message": "正在编辑规则「{{name}}」",
+    "description": "Translation key: testDataGenerator_editingRule"
+  },
+  "testDataGenerator_updateRule": {
+    "message": "更新规则",
+    "description": "Translation key: testDataGenerator_updateRule"
+  },
+  "testDataGenerator_saveAs": {
+    "message": "另存为",
+    "description": "Translation key: testDataGenerator_saveAs"
   }
 }
