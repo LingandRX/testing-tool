@@ -1067,6 +1067,14 @@
     "message": "生成成功",
     "description": "Translation key: testDataGenerator_success"
   },
+  "testDataGenerator_generateSuccess": {
+    "message": "生成完成",
+    "description": "Translation key: testDataGenerator_generateSuccess"
+  },
+  "testDataGenerator_records": {
+    "message": "条数据",
+    "description": "Translation key: testDataGenerator_records"
+  },
   "testDataGenerator_partialSuccess": {
     "message": "部分成功",
     "description": "Translation key: testDataGenerator_partialSuccess"
