@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useI18n } from '@/utils/chromeI18n';
 import type { GeneratorDefinition } from '@/types/testDataGenerator';
 
 interface GeneratorConfigProps {
@@ -21,12 +22,17 @@ interface GeneratorConfigProps {
 }
 
 export default function GeneratorConfig({ generator, params, onChange }: GeneratorConfigProps) {
+  const { t } = useI18n('testDataGenerator');
   const handleParamChange = (key: string, value: unknown) => {
     onChange({ ...params, [key]: value });
   };
 
   if (generator.params.length === 0) {
-    return <p className="text-sm text-muted-foreground py-2">此生成器无可配置参数</p>;
+    return (
+      <p className="text-sm text-muted-foreground py-2">
+        {t('testDataGenerator_noGeneratorParams')}
+      </p>
+    );
   }
 
   return (
@@ -64,7 +70,9 @@ export default function GeneratorConfig({ generator, params, onChange }: Generat
           {param.type === 'boolean' && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">
-                {params[param.key] !== false ? '启用' : '禁用'}
+                {params[param.key] !== false
+                  ? t('testDataGenerator_enabled')
+                  : t('testDataGenerator_disabled')}
               </span>
               <Switch
                 checked={params[param.key] !== false}
@@ -107,7 +115,7 @@ export default function GeneratorConfig({ generator, params, onChange }: Generat
                     .filter(Boolean),
                 )
               }
-              placeholder="用逗号分隔多个值"
+              placeholder={t('testDataGenerator_commaSeparated')}
               className="h-9"
             />
           )}

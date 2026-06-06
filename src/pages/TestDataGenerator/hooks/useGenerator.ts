@@ -51,7 +51,7 @@ export function useGenerator(): UseGeneratorReturn {
    */
   const getWorker = useCallback((): Worker => {
     if (workerRef.current) {
-      workerRef.current.terminate();
+      return workerRef.current;
     }
 
     const worker = new Worker(new URL('@/workers/generator.worker.ts', import.meta.url), {
@@ -82,8 +82,11 @@ export function useGenerator(): UseGeneratorReturn {
     worker.onerror = (err) => {
       console.error('[useGenerator] Worker 错误:', err);
       setIsGenerating(false);
-      setError('Worker 运行错误');
+      setError(err.message || 'Worker 运行错误');
       setProgress(null);
+      // Worker 出错后销毁，下次重新创建
+      workerRef.current?.terminate();
+      workerRef.current = null;
     };
 
     workerRef.current = worker;
