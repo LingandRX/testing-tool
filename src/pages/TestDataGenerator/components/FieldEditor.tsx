@@ -40,11 +40,11 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
   const handleNullRateChange = (nullRate: number) => {
     // 限制范围 0-100
     const clampedRate = Math.max(0, Math.min(100, nullRate));
-    // 设置为 100% 时自动设为必填
-    if (clampedRate === 100) {
+    // 空值率为 0 时自动设为必填
+    if (clampedRate === 0) {
       onChange({ ...field, nullRate: clampedRate, required: true });
     } else {
-      onChange({ ...field, nullRate: clampedRate });
+      onChange({ ...field, nullRate: clampedRate, required: false });
     }
   };
 
