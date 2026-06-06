@@ -9,13 +9,7 @@ import { cn } from '@/lib/utils';
 import { useGenerator } from './hooks/useGenerator';
 import { getGeneratorById } from '@/lib/generators';
 import type { FieldConfig, GenerateResult } from '@/types/testDataGenerator';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogDescription } from '@/components/ui/dialog';
 
 // 生成唯一 ID 的辅助函数
 function generateId(): string {
@@ -309,17 +303,18 @@ export default function TestDataGeneratorPage() {
 
       {/* 字段编辑弹窗 */}
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
-        <DialogContent className="w-[calc(100vw-2rem)] max-w-[360px] max-h-[calc(100vh-4rem)] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{t('testDataGenerator_fieldConfig')}</DialogTitle>
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-[360px] max-h-[calc(100vh-4rem)] overflow-hidden p-0">
+          <DialogHeader className="px-6 pt-6 pb-0">
             <DialogDescription>{t('testDataGenerator_selectFieldToEdit')}</DialogDescription>
           </DialogHeader>
-          {selectedField && selectedIndex !== null && (
-            <FieldEditor
-              field={selectedField}
-              onChange={(updatedField) => handleUpdateField(selectedIndex, updatedField)}
-            />
-          )}
+          <div className="overflow-y-auto max-h-[calc(100vh-8rem)] px-6 pb-6">
+            {selectedField && selectedIndex !== null && (
+              <FieldEditor
+                field={selectedField}
+                onChange={(updatedField) => handleUpdateField(selectedIndex, updatedField)}
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
