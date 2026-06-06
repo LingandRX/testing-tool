@@ -10,6 +10,7 @@ import { useGenerator } from './hooks/useGenerator';
 import { getGeneratorById } from '@/lib/generators';
 import type { FieldConfig, GenerateResult } from '@/types/testDataGenerator';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 // 生成唯一 ID 的辅助函数
 function generateId(): string {
@@ -47,6 +48,7 @@ export default function TestDataGeneratorPage() {
   // 实时预览（防抖）
   const [previewResult, setPreviewResult] = useState<GenerateResult | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastToastResultRef = useRef<GenerateResult | null>(null);
 
   // 配置变更时生成预览数据（防抖 300ms）
   useEffect(() => {
@@ -97,6 +99,16 @@ export default function TestDataGeneratorPage() {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
   }, [fields, count]);
+
+  // 生成完成时显示 toast 提示（避免重复触发）
+  useEffect(() => {
+    if (result?.success && result.stats && result !== lastToastResultRef.current) {
+      lastToastResultRef.current = result;
+      toast.success(t('testDataGenerator_generateSuccess'), {
+        description: `${result.stats.total} ${t('testDataGenerator_records')}`,
+      });
+    }
+  }, [result, t]);
 
   // 添加新字段
   const handleAddField = useCallback(() => {
@@ -267,7 +279,10 @@ export default function TestDataGeneratorPage() {
           {/* 右侧面板 - 数据预览和结果 */}
           <div className="lg:col-span-2 space-y-4">
             {/* 结果状态 */}
-            {(result || error) && (
+            {/* 仅在失败或有警告时显示结果面板 */}
+            {((result && !result.success) ||
+              (result?.warnings && result.warnings.length > 0) ||
+              error) && (
               <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
                 {error ? (
                   <div className="flex items-center gap-2 text-destructive">
