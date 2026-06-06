@@ -7,7 +7,6 @@
     "message": "清理",
     "description": "Translation key: buttons_clear"
   },
-
   "messages_copySuccess": {
     "message": "已复制到剪贴板",
     "description": "Translation key: messages_copySuccess"
@@ -896,7 +895,6 @@
     "message": "在标签页打开",
     "description": "Translation key: buttons_openInTab"
   },
-
   "common_errorBoundary_title": {
     "message": "糟糕，出了点问题",
     "description": "Translation key: errorBoundary_title"
@@ -920,5 +918,387 @@
   "common_pageErrorBoundary_description": {
     "message": "该页面在加载或渲染时遇到了内部脚本错误。您可以尝试重试，或者通过导航菜单切换到其他工具。",
     "description": "Translation key: pageErrorBoundary_description"
+  },
+  "testDataGenerator_title": {
+    "message": "测试数据生成器",
+    "description": "Translation key: testDataGenerator_title"
+  },
+  "testDataGenerator_description": {
+    "message": "自定义字段配置，批量生成测试数据",
+    "description": "Translation key: testDataGenerator_description"
+  },
+  "testDataGenerator_fields": {
+    "message": "字段",
+    "description": "Translation key: testDataGenerator_fields"
+  },
+  "testDataGenerator_addField": {
+    "message": "添加字段",
+    "description": "Translation key: testDataGenerator_addField"
+  },
+  "testDataGenerator_noFields": {
+    "message": "暂无字段",
+    "description": "Translation key: testDataGenerator_noFields"
+  },
+  "testDataGenerator_addFieldHint": {
+    "message": "点击上方按钮添加第一个字段",
+    "description": "Translation key: testDataGenerator_addFieldHint"
+  },
+  "testDataGenerator_unique": {
+    "message": "唯一",
+    "description": "Translation key: testDataGenerator_unique"
+  },
+  "testDataGenerator_fieldName": {
+    "message": "字段名称",
+    "description": "Translation key: testDataGenerator_fieldName"
+  },
+  "testDataGenerator_fieldNamePlaceholder": {
+    "message": "请输入字段名称",
+    "description": "Translation key: testDataGenerator_fieldNamePlaceholder"
+  },
+  "testDataGenerator_fieldDescription": {
+    "message": "字段描述",
+    "description": "Translation key: testDataGenerator_fieldDescription"
+  },
+  "testDataGenerator_fieldDescriptionPlaceholder": {
+    "message": "可选，添加字段说明",
+    "description": "Translation key: testDataGenerator_fieldDescriptionPlaceholder"
+  },
+  "testDataGenerator_required": {
+    "message": "必填",
+    "description": "Translation key: testDataGenerator_required"
+  },
+  "testDataGenerator_nullRate": {
+    "message": "空值率",
+    "description": "Translation key: testDataGenerator_nullRate"
+  },
+  "testDataGenerator_uniqueConstraint": {
+    "message": "唯一性约束",
+    "description": "Translation key: testDataGenerator_uniqueConstraint"
+  },
+  "testDataGenerator_generator": {
+    "message": "数据生成器",
+    "description": "Translation key: testDataGenerator_generator"
+  },
+  "testDataGenerator_generatorParams": {
+    "message": "生成器参数",
+    "description": "Translation key: testDataGenerator_generatorParams"
+  },
+  "testDataGenerator_searchGenerator": {
+    "message": "搜索生成器...",
+    "description": "Translation key: testDataGenerator_searchGenerator"
+  },
+  "testDataGenerator_searchResults": {
+    "message": "搜索结果",
+    "description": "Translation key: testDataGenerator_searchResults"
+  },
+  "testDataGenerator_fieldConfig": {
+    "message": "字段配置",
+    "description": "Translation key: testDataGenerator_fieldConfig"
+  },
+  "testDataGenerator_ruleManagement": {
+    "message": "规则管理",
+    "description": "Translation key: testDataGenerator_ruleManagement"
+  },
+  "testDataGenerator_selectFieldToEdit": {
+    "message": "选择左侧字段进行编辑",
+    "description": "Translation key: testDataGenerator_selectFieldToEdit"
+  },
+  "testDataGenerator_count": {
+    "message": "生成数量",
+    "description": "Translation key: testDataGenerator_count"
+  },
+  "testDataGenerator_format": {
+    "message": "数据格式",
+    "description": "Translation key: testDataGenerator_format"
+  },
+  "testDataGenerator_generate": {
+    "message": "生成数据",
+    "description": "Translation key: testDataGenerator_generate"
+  },
+  "testDataGenerator_cancel": {
+    "message": "取消",
+    "description": "Translation key: testDataGenerator_cancel"
+  },
+  "testDataGenerator_progress": {
+    "message": "已生成 {{current}} / {{total}} 条",
+    "description": "Translation key: testDataGenerator_progress"
+  },
+  "testDataGenerator_estimatedTime": {
+    "message": "预计剩余 {{time}} 秒",
+    "description": "Translation key: testDataGenerator_estimatedTime"
+  },
+  "testDataGenerator_dataPreview": {
+    "message": "数据预览",
+    "description": "Translation key: testDataGenerator_dataPreview"
+  },
+  "testDataGenerator_noData": {
+    "message": "暂无数据",
+    "description": "Translation key: testDataGenerator_noData"
+  },
+  "testDataGenerator_noDataHint": {
+    "message": "配置字段后点击「生成数据」按钮",
+    "description": "Translation key: testDataGenerator_noDataHint"
+  },
+  "testDataGenerator_sampleData": {
+    "message": "示例数据",
+    "description": "Translation key: testDataGenerator_sampleData"
+  },
+  "testDataGenerator_copied": {
+    "message": "已复制",
+    "description": "Translation key: testDataGenerator_copied"
+  },
+  "testDataGenerator_copy": {
+    "message": "复制",
+    "description": "Translation key: testDataGenerator_copy"
+  },
+  "testDataGenerator_pageInfo": {
+    "message": "第 {{current}} / {{total}} 页",
+    "description": "Translation key: testDataGenerator_pageInfo"
+  },
+  "testDataGenerator_prevPage": {
+    "message": "上一页",
+    "description": "Translation key: testDataGenerator_prevPage"
+  },
+  "testDataGenerator_nextPage": {
+    "message": "下一页",
+    "description": "Translation key: testDataGenerator_nextPage"
+  },
+  "testDataGenerator_success": {
+    "message": "生成成功",
+    "description": "Translation key: testDataGenerator_success"
+  },
+  "testDataGenerator_generateSuccess": {
+    "message": "生成完成",
+    "description": "Translation key: testDataGenerator_generateSuccess"
+  },
+  "testDataGenerator_records": {
+    "message": "条数据",
+    "description": "Translation key: testDataGenerator_records"
+  },
+  "testDataGenerator_partialSuccess": {
+    "message": "部分成功",
+    "description": "Translation key: testDataGenerator_partialSuccess"
+  },
+  "testDataGenerator_failed": {
+    "message": "生成失败",
+    "description": "Translation key: testDataGenerator_failed"
+  },
+  "testDataGenerator_totalCount": {
+    "message": "总条数",
+    "description": "Translation key: testDataGenerator_totalCount"
+  },
+  "testDataGenerator_successCount": {
+    "message": "成功",
+    "description": "Translation key: testDataGenerator_successCount"
+  },
+  "testDataGenerator_duration": {
+    "message": "耗时",
+    "description": "Translation key: testDataGenerator_duration"
+  },
+  "testDataGenerator_warnings": {
+    "message": "警告",
+    "description": "Translation key: testDataGenerator_warnings"
+  },
+  "testDataGenerator_moreWarnings": {
+    "message": "还有 {{count}} 条警告",
+    "description": "Translation key: testDataGenerator_moreWarnings"
+  },
+  "testDataGenerator_export": {
+    "message": "导出数据",
+    "description": "Translation key: testDataGenerator_export"
+  },
+  "testDataGenerator_copyJSON": {
+    "message": "复制 JSON",
+    "description": "Translation key: testDataGenerator_copyJSON"
+  },
+  "testDataGenerator_copyCSV": {
+    "message": "复制 CSV",
+    "description": "Translation key: testDataGenerator_copyCSV"
+  },
+  "testDataGenerator_downloadJSON": {
+    "message": "下载 JSON",
+    "description": "Translation key: testDataGenerator_downloadJSON"
+  },
+  "testDataGenerator_downloadCSV": {
+    "message": "下载 CSV",
+    "description": "Translation key: testDataGenerator_downloadCSV"
+  },
+  "testDataGenerator_saveRule": {
+    "message": "保存规则",
+    "description": "Translation key: testDataGenerator_saveRule"
+  },
+  "testDataGenerator_import": {
+    "message": "导入",
+    "description": "Translation key: testDataGenerator_import"
+  },
+  "testDataGenerator_exportRules": {
+    "message": "导出规则",
+    "description": "Translation key: testDataGenerator_exportRules"
+  },
+  "testDataGenerator_ruleCount": {
+    "message": "已保存 {{count}}/{{max}} 条",
+    "description": "Translation key: testDataGenerator_ruleCount"
+  },
+  "testDataGenerator_searchRules": {
+    "message": "搜索规则...",
+    "description": "Translation key: testDataGenerator_searchRules"
+  },
+  "testDataGenerator_saveNewRule": {
+    "message": "保存新规则",
+    "description": "Translation key: testDataGenerator_saveNewRule"
+  },
+  "testDataGenerator_ruleNamePlaceholder": {
+    "message": "规则名称",
+    "description": "Translation key: testDataGenerator_ruleNamePlaceholder"
+  },
+  "testDataGenerator_ruleDescPlaceholder": {
+    "message": "规则描述（可选）",
+    "description": "Translation key: testDataGenerator_ruleDescPlaceholder"
+  },
+  "testDataGenerator_confirm": {
+    "message": "确认",
+    "description": "Translation key: testDataGenerator_confirm"
+  },
+  "testDataGenerator_done": {
+    "message": "完成",
+    "description": "Translation key: testDataGenerator_done"
+  },
+  "testDataGenerator_noSearchResults": {
+    "message": "未找到匹配的规则",
+    "description": "Translation key: testDataGenerator_noSearchResults"
+  },
+  "testDataGenerator_noRules": {
+    "message": "暂无保存的规则",
+    "description": "Translation key: testDataGenerator_noRules"
+  },
+  "testDataGenerator_usedTimes": {
+    "message": "使用 {{count}} 次",
+    "description": "Translation key: testDataGenerator_usedTimes"
+  },
+  "testDataGenerator_load": {
+    "message": "加载",
+    "description": "Translation key: testDataGenerator_load"
+  },
+  "testDataGenerator_duplicate": {
+    "message": "复制",
+    "description": "Translation key: testDataGenerator_duplicate"
+  },
+  "testDataGenerator_delete": {
+    "message": "删除",
+    "description": "Translation key: testDataGenerator_delete"
+  },
+  "testDataGenerator_virtualMode": {
+    "message": "虚拟列表模式（共 $ 行）"
+  },
+  "testDataGenerator_totalRows": {
+    "message": "共 $ 条数据"
+  },
+  "testDataGenerator_ruleSaved": {
+    "message": "规则已保存",
+    "description": "Translation key: testDataGenerator_ruleSaved"
+  },
+  "testDataGenerator_ruleLoaded": {
+    "message": "已加载规则「{{name}}」",
+    "description": "Translation key: testDataGenerator_ruleLoaded"
+  },
+  "testDataGenerator_ruleDeleted": {
+    "message": "规则已删除",
+    "description": "Translation key: testDataGenerator_ruleDeleted"
+  },
+  "testDataGenerator_ruleDuplicated": {
+    "message": "规则已复制",
+    "description": "Translation key: testDataGenerator_ruleDuplicated"
+  },
+  "testDataGenerator_exportSuccess": {
+    "message": "规则已导出",
+    "description": "Translation key: testDataGenerator_exportSuccess"
+  },
+  "testDataGenerator_importSuccess": {
+    "message": "成功导入 {{count}} 条规则",
+    "description": "Translation key: testDataGenerator_importSuccess"
+  },
+  "testDataGenerator_importFailed": {
+    "message": "{{count}} 条规则导入失败",
+    "description": "Translation key: testDataGenerator_importFailed"
+  },
+  "testDataGenerator_confirmDeleteTitle": {
+    "message": "确认删除规则",
+    "description": "Translation key: testDataGenerator_confirmDeleteTitle"
+  },
+  "testDataGenerator_confirmDeleteDescription": {
+    "message": "确定要删除规则「{{name}}」吗？此操作不可撤销。",
+    "description": "Translation key: testDataGenerator_confirmDeleteDescription"
+  },
+  "testDataGenerator_ruleNameDuplicate": {
+    "message": "已存在同名规则，是否覆盖保存？",
+    "description": "Translation key: testDataGenerator_ruleNameDuplicate"
+  },
+  "testDataGenerator_overwrite": {
+    "message": "覆盖",
+    "description": "Translation key: testDataGenerator_overwrite"
+  },
+  "testDataGenerator_edit": {
+    "message": "编辑",
+    "description": "Translation key: testDataGenerator_edit"
+  },
+  "testDataGenerator_ruleUpdated": {
+    "message": "规则已更新",
+    "description": "Translation key: testDataGenerator_ruleUpdated"
+  },
+  "testDataGenerator_editing": {
+    "message": "编辑中",
+    "description": "Translation key: testDataGenerator_editing"
+  },
+  "testDataGenerator_editingRule": {
+    "message": "正在编辑规则「{{name}}」",
+    "description": "Translation key: testDataGenerator_editingRule"
+  },
+  "testDataGenerator_updateRule": {
+    "message": "更新规则",
+    "description": "Translation key: testDataGenerator_updateRule"
+  },
+  "testDataGenerator_saveAs": {
+    "message": "另存为",
+    "description": "Translation key: testDataGenerator_saveAs"
+  },
+  "testDataGenerator_noGeneratorParams": {
+    "message": "此生成器无可配置参数",
+    "description": "Translation key: testDataGenerator_noGeneratorParams"
+  },
+  "testDataGenerator_enabled": {
+    "message": "启用",
+    "description": "Translation key: testDataGenerator_enabled"
+  },
+  "testDataGenerator_disabled": {
+    "message": "禁用",
+    "description": "Translation key: testDataGenerator_disabled"
+  },
+  "testDataGenerator_commaSeparated": {
+    "message": "用逗号分隔多个值",
+    "description": "Translation key: testDataGenerator_commaSeparated"
+  },
+  "testDataGenerator_copySuccess": {
+    "message": "已复制到剪贴板",
+    "description": "Translation key: testDataGenerator_copySuccess"
+  },
+  "testDataGenerator_copyFailed": {
+    "message": "复制失败",
+    "description": "Translation key: testDataGenerator_copyFailed"
+  },
+  "testDataGenerator_fieldNameEmpty": {
+    "message": "字段名称不能为空",
+    "description": "Translation key: testDataGenerator_fieldNameEmpty"
+  },
+  "testDataGenerator_fieldNameDuplicate": {
+    "message": "字段名称已存在",
+    "description": "Translation key: testDataGenerator_fieldNameDuplicate"
+  },
+  "testDataGenerator_fieldNameInvalid": {
+    "message": "字段名称只能包含字母、数字和下划线",
+    "description": "Translation key: testDataGenerator_fieldNameInvalid"
+  },
+  "testDataGenerator_ruleCopySuffix": {
+    "message": "（副本）",
+    "description": "Translation key: testDataGenerator_ruleCopySuffix"
   }
 }
