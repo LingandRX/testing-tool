@@ -309,7 +309,7 @@ export default function TestDataGeneratorPage() {
 
       {/* 字段编辑弹窗 */}
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-[360px] max-h-[calc(100vh-4rem)] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t('testDataGenerator_fieldConfig')}</DialogTitle>
             <DialogDescription>{t('testDataGenerator_selectFieldToEdit')}</DialogDescription>
