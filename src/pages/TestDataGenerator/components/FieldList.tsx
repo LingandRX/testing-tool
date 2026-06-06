@@ -44,21 +44,18 @@ interface FieldListProps {
   onUpdate: (index: number, field: FieldConfig) => void;
   onRemove: (index: number) => void;
   onAdd: () => void;
-  onSelect: (index: number) => void;
-  selectedIndex: number | null;
+  onEdit: (index: number) => void;
   onReorder: (oldIndex: number, newIndex: number) => void;
 }
 
 /** 可排序的字段项 */
 function SortableFieldItem({
   field,
-  isSelected,
-  onSelect,
+  onEdit,
   onRemove,
 }: {
   field: FieldConfig;
-  isSelected: boolean;
-  onSelect: () => void;
+  onEdit: () => void;
   onRemove: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -78,10 +75,8 @@ function SortableFieldItem({
       ref={setNodeRef}
       style={style}
       className={`group relative rounded-lg border transition-all ${
-        isDragging ? 'border-primary shadow-lg' : ''
-      } ${
-        isSelected
-          ? 'border-primary bg-primary/8 shadow-sm ring-1 ring-primary/20'
+        isDragging
+          ? 'border-primary shadow-lg'
           : 'border-border hover:border-muted-foreground/30 hover:shadow-sm'
       }`}
     >
@@ -96,7 +91,7 @@ function SortableFieldItem({
         </button>
 
         <div className="flex-1 min-w-0">
-          <FieldItem field={field} onClick={onSelect} isSelected={isSelected} />
+          <FieldItem field={field} onClick={onEdit} />
         </div>
 
         <Button
@@ -117,8 +112,7 @@ export default function FieldList({
   onUpdate: _onUpdate,
   onRemove,
   onAdd,
-  onSelect,
-  selectedIndex,
+  onEdit,
   onReorder,
 }: FieldListProps) {
   const { t } = useI18n('testDataGenerator');
@@ -133,14 +127,6 @@ export default function FieldList({
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
-  );
-
-  // 点击已选中的字段时取消选中
-  const handleToggleSelect = useCallback(
-    (index: number) => {
-      onSelect(selectedIndex === index ? -1 : index);
-    },
-    [selectedIndex, onSelect],
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -230,7 +216,7 @@ export default function FieldList({
           size="sm"
           onClick={onAdd}
           disabled={isMaxReached}
-          className="h-8 gap-1.5"
+          className="h-9 gap-1.5 px-3"
         >
           <Plus className="h-4 w-4" />
           {t('testDataGenerator_addField')}
@@ -284,8 +270,7 @@ export default function FieldList({
                           >
                             <SortableFieldItem
                               field={field}
-                              isSelected={selectedIndex === realIndex}
-                              onSelect={() => handleToggleSelect(realIndex)}
+                              onEdit={() => onEdit(realIndex)}
                               onRemove={() => onRemove(realIndex)}
                             />
                           </div>
@@ -300,8 +285,7 @@ export default function FieldList({
                       <SortableFieldItem
                         key={field.id}
                         field={field}
-                        isSelected={selectedIndex === index}
-                        onSelect={() => handleToggleSelect(index)}
+                        onEdit={() => onEdit(index)}
                         onRemove={() => onRemove(index)}
                       />
                     ))}
@@ -317,7 +301,7 @@ export default function FieldList({
                       <GripVertical className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <FieldItem field={activeField} isSelected={false} onClick={() => {}} />
+                      <FieldItem field={activeField} onClick={() => {}} />
                     </div>
                     <div className="h-8 w-8 shrink-0" />
                   </div>

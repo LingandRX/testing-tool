@@ -11,20 +11,15 @@ import type { FieldConfig } from '@/types/testDataGenerator';
 interface FieldItemProps {
   field: FieldConfig;
   onClick: () => void;
-  isSelected: boolean;
 }
 
-export default function FieldItem({ field, onClick, isSelected }: FieldItemProps) {
+export default function FieldItem({ field, onClick }: FieldItemProps) {
   const { t } = useI18n('testDataGenerator');
   const generator = getGeneratorById(field.generatorId);
 
   return (
     <div
-      className={`flex-1 min-w-0 cursor-pointer rounded-md transition-all ${
-        isSelected
-          ? 'bg-primary/10 pl-2 border-l-2 border-l-primary'
-          : 'hover:bg-muted/50 border-l-2 border-l-transparent'
-      }`}
+      className="flex-1 min-w-0 cursor-pointer rounded-md transition-all hover:bg-muted/50"
       onClick={onClick}
     >
       <div
