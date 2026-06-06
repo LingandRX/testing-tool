@@ -15,7 +15,7 @@ function generateId(): string {
   return `field_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
-import FieldList from './components/FieldList';
+import FieldList, { MAX_FIELDS } from './components/FieldList';
 import FieldEditor from './components/FieldEditor';
 import GenerateOptions from './components/GenerateOptions';
 import GenerateButton from './components/GenerateButton';
@@ -98,6 +98,7 @@ export default function TestDataGeneratorPage() {
 
   // 添加新字段
   const handleAddField = useCallback(() => {
+    if (fields.length >= MAX_FIELDS) return;
     const newField: FieldConfig = {
       id: generateId(),
       name: `field${fields.length + 1}`,
@@ -178,12 +179,6 @@ export default function TestDataGeneratorPage() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
-        {/* 页面标题 */}
-        <div className="mb-6">
-          <h1 className="text-xl font-semibold text-foreground">{t('testDataGenerator_title')}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{t('testDataGenerator_description')}</p>
-        </div>
-
         {/* 主要内容区域 - 左右分栏 */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-start">
           {/* 左侧面板 - 字段配置 */}
