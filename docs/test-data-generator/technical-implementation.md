@@ -15,37 +15,54 @@
 ## 项目结构
 
 ```
-src/pages/TestDataGenerator/
-├── index.tsx                    # 主页面
-├── components/
-│   ├── FieldList.tsx            # 字段列表
-│   ├── FieldItem.tsx            # 单个字段项
-│   ├── FieldEditor.tsx          # 字段编辑器
-│   ├── GeneratorSelector.tsx    # 生成器选择器
-│   ├── GeneratorConfig.tsx      # 参数配置
-│   ├── DataPreview.tsx          # 数据预览
-│   ├── GenerateOptions.tsx      # 生成选项
-│   ├── GenerateButton.tsx       # 生成按钮
-│   ├── ExportPanel.tsx          # 导出面板
-│   └── RuleManager.tsx          # 规则管理
-├── generators/
-│   ├── index.ts                 # 生成器入口
-│   ├── personal.ts              # 个人信息生成器
-│   ├── business.ts              # 业务数据生成器
-│   ├── technical.ts             # 技术数据生成器
-│   └── basic.ts                 # 基础类型生成器
-├── storage/
-│   ├── ruleStorage.ts           # 规则存储
-│   └── index.ts                 # 存储入口
-├── worker/
-│   └── generator.worker.ts      # Web Worker
+src/
+├── pages/
+│   └── TestDataGenerator/
+│       ├── index.tsx                    # 主页面
+│       ├── components/                  # 页面专属组件
+│       │   ├── FieldList.tsx            # 字段列表
+│       │   ├── FieldItem.tsx            # 单个字段项
+│       │   ├── FieldEditor.tsx          # 字段编辑器
+│       │   ├── GeneratorSelector.tsx    # 生成器选择器
+│       │   ├── GeneratorConfig.tsx      # 参数配置
+│       │   ├── DataPreview.tsx          # 数据预览
+│       │   ├── GenerateOptions.tsx      # 生成选项
+│       │   ├── GenerateButton.tsx       # 生成按钮
+│       │   ├── ExportPanel.tsx          # 导出面板
+│       │   └── RuleManager.tsx          # 规则管理
+│       ├── hooks/                       # 页面专属钩子
+│       │   └── useGenerator.ts          # 数据生成钩子
+│       └── __tests__/                   # 测试文件
+│           └── TestDataGenerator.test.tsx
+├── lib/
+│   └── generators/                      # 生成器库（独立模块）
+│       ├── index.ts                     # 生成器入口
+│       ├── types.ts                     # 生成器类型定义
+│       ├── personal.ts                  # 个人信息生成器
+│       ├── business.ts                  # 业务数据生成器
+│       ├── technical.ts                 # 技术数据生成器
+│       └── basic.ts                     # 基础类型生成器
+├── workers/
+│   └── generator.worker.ts              # Web Worker
 ├── types/
-│   └── index.ts                 # 类型定义
+│   └── testDataGenerator.ts             # 类型定义
 └── utils/
-    ├── validator.ts             # 规则校验
-    ├── exporter.ts              # 数据导出
-    └── helpers.ts               # 工具函数
+    ├── ruleStorage.ts                   # 规则存储
+    ├── dataExporter.ts                  # 数据导出
+    └── validator.ts                     # 规则校验
 ```
+
+### 目录职责说明
+
+| 目录                                  | 职责       | 说明                       |
+| ------------------------------------- | ---------- | -------------------------- |
+| `pages/TestDataGenerator/`            | 页面模块   | 包含页面组件和页面专属逻辑 |
+| `pages/TestDataGenerator/components/` | 页面组件   | 仅属于该页面的 UI 组件     |
+| `pages/TestDataGenerator/hooks/`      | 页面钩子   | 仅属于该页面的自定义钩子   |
+| `lib/generators/`                     | 生成器库   | 独立的生成器模块，可复用   |
+| `workers/`                            | Web Worker | 后台任务处理               |
+| `types/`                              | 类型定义   | 全局共享的类型定义         |
+| `utils/`                              | 工具函数   | 全局共享的工具函数         |
 
 ---
 
@@ -54,6 +71,8 @@ src/pages/TestDataGenerator/
 ### 核心类型
 
 ```typescript
+// src/types/testDataGenerator.ts
+
 // 字段配置
 export interface FieldConfig {
   id: string;
@@ -73,7 +92,7 @@ export interface DataRule {
   fields: FieldConfig[];
   options: {
     total: number;
-    format: 'json' | 'csv' | 'sql' | 'typescript';
+    format: 'json' | 'csv';
     defaultEmptyRate: number; // 默认空值率（0-100），用于未设置 emptyRate 的选填字段
   };
   metadata: {
@@ -90,7 +109,6 @@ export interface GeneratorDefinition {
   label: string;
   description: string;
   category: 'personal' | 'business' | 'technical' | 'basic';
-  icon: string;
   params: GeneratorParam[];
   // 普通生成方法
   generate: (params: Record<string, any>) => any;
@@ -117,6 +135,7 @@ export interface GenerateResult {
     total: number;
     generated: number;
     failed: number;
+    failedFields?: string[]; // 生成失败的字段名列表
     duration: number;
   };
 }
@@ -129,7 +148,7 @@ export interface GenerateResult {
 ### 1. 生成器系统
 
 ```typescript
-// generators/index.ts
+// src/lib/generators/index.ts
 import { personalGenerators } from './personal';
 import { businessGenerators } from './business';
 import { technicalGenerators } from './technical';
@@ -146,12 +165,12 @@ export const generatorCategories = [
   {
     key: 'personal',
     label: '个人信息',
-    generators: ['chineseName', 'email', 'chinesePhone', 'idCard', 'chineseAddress'],
+    generators: ['chineseName', 'email', 'chinesePhone', 'idCard', 'chineseAddress', 'age'],
   },
   {
     key: 'business',
     label: '业务数据',
-    generators: ['orderId', 'price', 'date', 'status'],
+    generators: ['orderId', 'price', 'date', 'status', 'quantity', 'rating', 'discount', 'stock'],
   },
   {
     key: 'technical',
@@ -169,13 +188,12 @@ export const generatorCategories = [
 ### 2. 生成器实现
 
 ```typescript
-// generators/personal.ts
+// src/lib/generators/personal.ts
 export const personalGenerators = {
   chineseName: {
     name: 'chineseName',
     label: '中文姓名',
     description: '生成中文姓名，如张三、李四',
-    icon: '👤',
     params: [
       {
         name: 'surnamePool',
@@ -227,7 +245,6 @@ export const personalGenerators = {
     name: 'email',
     label: '邮箱地址',
     description: '生成邮箱地址',
-    icon: '📧',
     params: [
       {
         name: 'domains',
@@ -267,7 +284,6 @@ export const personalGenerators = {
     name: 'chinesePhone',
     label: '中国手机号',
     description: '生成11位中国手机号',
-    icon: '📱',
     params: [
       {
         name: 'prefix',
@@ -335,7 +351,6 @@ export const personalGenerators = {
     name: 'age',
     label: '年龄',
     description: '生成真实分布的年龄',
-    icon: '🎂',
     params: [
       {
         name: 'min',
@@ -394,13 +409,12 @@ export const personalGenerators = {
 ```
 
 ```typescript
-// generators/business.ts
+// src/lib/generators/business.ts
 export const businessGenerators = {
   price: {
     name: 'price',
     label: '价格',
     description: '生成真实的价格数据',
-    icon: '💰',
     params: [
       {
         name: 'min',
@@ -482,7 +496,6 @@ export const businessGenerators = {
     name: 'orderId',
     label: '订单号',
     description: '生成订单号',
-    icon: '📋',
     params: [
       {
         name: 'prefix',
@@ -520,7 +533,6 @@ export const businessGenerators = {
     name: 'date',
     label: '日期',
     description: '生成随机日期',
-    icon: '📅',
     params: [
       {
         name: 'start',
@@ -569,7 +581,6 @@ export const businessGenerators = {
     name: 'status',
     label: '状态',
     description: '生成随机状态',
-    icon: '🔄',
     params: [
       {
         name: 'options',
@@ -593,7 +604,6 @@ export const businessGenerators = {
     name: 'quantity',
     label: '数量',
     description: '生成真实分布的数量',
-    icon: '📦',
     params: [
       {
         name: 'min',
@@ -653,7 +663,6 @@ export const businessGenerators = {
     name: 'rating',
     label: '评分',
     description: '生成真实分布的评分',
-    icon: '⭐',
     params: [
       {
         name: 'min',
@@ -720,7 +729,6 @@ export const businessGenerators = {
     name: 'discount',
     label: '折扣',
     description: '生成真实分布的折扣',
-    icon: '🏷️',
     params: [
       {
         name: 'min',
@@ -780,7 +788,6 @@ export const businessGenerators = {
     name: 'stock',
     label: '库存',
     description: '生成真实分布的库存',
-    icon: '🏭',
     params: [
       {
         name: 'min',
@@ -985,33 +992,33 @@ function generatePsychologicalDiscount(min: number, max: number): number {
 ### 3. 数据生成引擎
 
 ```typescript
-// worker/generator.worker.ts
-import { generators } from '../generators';
+// src/workers/generator.worker.ts
+import { generators } from '@/lib/generators';
 
 self.onmessage = function (e) {
   const { rule, batchSize } = e.data;
-  const results = [];
 
-  for (let i = 0; i < rule.fields.length; i++) {
-    const field = rule.fields[i];
-    const generator = generators[field.generator];
-
-    if (!generator) {
-      self.postMessage({
-        type: 'error',
-        field: field.name,
-        error: `生成器 ${field.generator} 不存在`,
-      });
-      continue;
-    }
+  // 1. 验证所有字段的生成器是否存在
+  const invalidField = rule.fields.find((f) => !generators[f.generator]);
+  if (invalidField) {
+    self.postMessage({
+      type: 'error',
+      field: invalidField.name,
+      error: `生成器 ${invalidField.generator} 不存在`,
+    });
+    return;
   }
 
-  // 生成数据
-  const data = [];
+  // 2. 生成数据
+  const data: Record<string, any>[] = [];
   const usedValues: Record<string, Set<any>> = {};
 
   // 根据总数量决定策略
   const isLargeBatch = rule.options.total > 1000;
+
+  // 统计信息
+  let failedCount = 0;
+  const failedFields: string[] = [];
 
   for (let i = 0; i < rule.options.total; i++) {
     const record: Record<string, any> = {};
@@ -1019,17 +1026,19 @@ self.onmessage = function (e) {
     for (const field of rule.fields) {
       const generator = generators[field.generator];
 
-      // 判断是否需要生成数据
-      const shouldGenerate =
-        field.required || Math.random() * 100 >= (field.emptyRate ?? rule.options.defaultEmptyRate);
+      // 3. 判断是否需要生成数据
+      const emptyRate = field.emptyRate ?? rule.options.defaultEmptyRate;
+      const shouldGenerate = field.required || Math.random() * 100 >= emptyRate;
 
       if (!shouldGenerate) {
+        // 选填字段且触发空值
         record[field.name] = null;
         continue;
       }
 
       let value;
 
+      // 4. 根据条件选择生成策略
       if (field.unique && isLargeBatch) {
         // 策略1：大数据量 + 唯一性 → 索引生成（高性能）
         value = generator.generateAtIndex?.(field.params, i) ?? generator.generate(field.params);
@@ -1046,14 +1055,25 @@ self.onmessage = function (e) {
             value = undefined;
           }
         } while (value === undefined && retryCount < maxRetry);
+
+        // 5. 处理重试失败
+        if (retryCount >= maxRetry) {
+          failedCount++;
+          if (!failedFields.includes(field.name)) {
+            failedFields.push(field.name);
+          }
+          console.warn(`字段 "${field.name}" 重试 ${maxRetry} 次后仍无法生成唯一值`);
+        }
       } else {
         // 策略3：非唯一性 → 普通生成
         value = generator.generate(field.params);
       }
 
+      // 6. 记录生成的值
       if (value !== undefined) {
         record[field.name] = value;
 
+        // 记录唯一性字段的值
         if (field.unique) {
           if (!usedValues[field.name]) {
             usedValues[field.name] = new Set();
@@ -1061,13 +1081,14 @@ self.onmessage = function (e) {
           usedValues[field.name].add(value);
         }
       } else {
+        // 生成失败，设置为空值
         record[field.name] = null;
       }
     }
 
     data.push(record);
 
-    // 发送进度
+    // 7. 发送进度（每 batchSize 条发送一次）
     if (i % batchSize === 0) {
       self.postMessage({
         type: 'progress',
@@ -1077,9 +1098,16 @@ self.onmessage = function (e) {
     }
   }
 
+  // 8. 发送完成结果
   self.postMessage({
     type: 'complete',
     data,
+    stats: {
+      total: rule.options.total,
+      generated: data.length,
+      failed: failedCount,
+      failedFields,
+    },
   });
 };
 ```
@@ -1087,10 +1115,11 @@ self.onmessage = function (e) {
 ### 4. 规则存储
 
 ```typescript
-// storage/ruleStorage.ts
-import type { DataRule } from '../types';
+// src/utils/ruleStorage.ts
+import type { DataRule } from '@/types/testDataGenerator';
 
 const STORAGE_KEY = 'testDataGenerator_rules';
+const MAX_RULES = 20; // 最大规则数量限制
 
 export class RuleStorage {
   // 获取所有规则
@@ -1105,9 +1134,31 @@ export class RuleStorage {
     return rules.find((r) => r.id === id) || null;
   }
 
+  // 获取当前规则数量
+  getCount(): number {
+    return this.getAll().length;
+  }
+
+  // 检查是否达到最大数量限制
+  isMaxReached(): boolean {
+    return this.getCount() >= MAX_RULES;
+  }
+
   // 保存规则
-  save(rule: Omit<DataRule, 'id' | 'metadata'>): DataRule {
+  save(rule: Omit<DataRule, 'id' | 'metadata'>): {
+    success: boolean;
+    rule?: DataRule;
+    error?: string;
+  } {
     const rules = this.getAll();
+
+    // 检查数量限制
+    if (rules.length >= MAX_RULES) {
+      return {
+        success: false,
+        error: `已达到最大规则数量（${MAX_RULES}条），请删除一些规则后再保存`,
+      };
+    }
 
     const newRule: DataRule = {
       ...rule,
@@ -1122,7 +1173,7 @@ export class RuleStorage {
     rules.push(newRule);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
 
-    return newRule;
+    return { success: true, rule: newRule };
   }
 
   // 更新规则
@@ -1154,6 +1205,43 @@ export class RuleStorage {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
     return true;
+  }
+
+  // 复制规则
+  duplicate(id: string): { success: boolean; rule?: DataRule; error?: string } {
+    const rules = this.getAll();
+
+    // 检查数量限制
+    if (rules.length >= MAX_RULES) {
+      return {
+        success: false,
+        error: `已达到最大规则数量（${MAX_RULES}条），请删除一些规则后再复制`,
+      };
+    }
+
+    const source = rules.find((r) => r.id === id);
+    if (!source) {
+      return {
+        success: false,
+        error: '找不到要复制的规则',
+      };
+    }
+
+    const newRule: DataRule = {
+      ...source,
+      id: `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: `${source.name} (副本)`,
+      metadata: {
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        useCount: 0,
+      },
+    };
+
+    rules.push(newRule);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
+
+    return { success: true, rule: newRule };
   }
 
   // 记录使用
@@ -1214,9 +1302,23 @@ export class RuleStorage {
         return { success: 0, failed: 1, errors: ['无效的规则格式'] };
       }
 
+      // 检查导入后总数是否超过限制
+      const currentCount = this.getCount();
+      const importCount = data.rules.length;
+      if (currentCount + importCount > MAX_RULES) {
+        return {
+          success: 0,
+          failed: importCount,
+          errors: [
+            `导入失败：当前已有 ${currentCount} 条规则，最多只能保存 ${MAX_RULES} 条，无法导入 ${importCount} 条规则`,
+          ],
+        };
+      }
+
       let success = 0;
       let failed = 0;
       const errors: string[] = [];
+      const rules = this.getAll();
 
       for (const rule of data.rules) {
         try {
@@ -1224,7 +1326,7 @@ export class RuleStorage {
             throw new Error('规则格式不完整');
           }
 
-          const newRule = {
+          const newRule: DataRule = {
             ...rule,
             id: `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             metadata: {
@@ -1234,10 +1336,7 @@ export class RuleStorage {
             },
           };
 
-          const rules = this.getAll();
           rules.push(newRule);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
-
           success++;
         } catch (e: any) {
           failed++;
@@ -1245,10 +1344,20 @@ export class RuleStorage {
         }
       }
 
+      // 一次性保存所有导入的规则
+      if (success > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
+      }
+
       return { success, failed, errors };
     } catch (e) {
       return { success: 0, failed: 1, errors: ['JSON 解析失败'] };
     }
+  }
+
+  // 清空所有规则
+  clear(): void {
+    localStorage.removeItem(STORAGE_KEY);
   }
 
   // 验证规则格式
@@ -1269,8 +1378,14 @@ export const ruleStorage = new RuleStorage();
 ### 5. 数据导出
 
 ```typescript
-// utils/exporter.ts
-import type { DataRule } from '../types';
+// src/utils/dataExporter.ts
+import type { DataRule } from '@/types/testDataGenerator';
+
+export interface ExportFile {
+  filename: string;
+  content: string;
+  mimeType: string;
+}
 
 export class DataExporter {
   // 导出为 JSON
@@ -1297,53 +1412,93 @@ export class DataExporter {
     return str;
   }
 
-  // 导出为 SQL
-  static toSQL(data: any[], tableName: string = 'data'): string {
-    if (data.length === 0) return '';
-
-    const columns = Object.keys(data[0]);
-    const rows = data.map((row) => {
-      const values = columns.map((col) => {
-        const value = row[col];
-        if (typeof value === 'string') {
-          return `'${value.replace(/'/g, "\\'")}'`;
-        }
-        if (value === null || value === undefined) {
-          return 'NULL';
-        }
-        return String(value);
-      });
-      return `(${values.join(', ')})`;
-    });
-
-    return `INSERT INTO ${tableName} (${columns.join(', ')}) VALUES\n${rows.join(',\n')};`;
+  // 根据格式导出数据
+  static exportByFormat(data: any[], format: 'json' | 'csv'): string {
+    switch (format) {
+      case 'json':
+        return this.toJSON(data);
+      case 'csv':
+        return this.toCSV(data);
+      default:
+        return this.toJSON(data);
+    }
   }
 
-  // 导出为 TypeScript 类型
-  static toTypeScript(data: any[], interfaceName: string = 'Data'): string {
-    if (data.length === 0) return '';
+  // 批量导出多个规则（每个规则一个文件）
+  static toMultipleFiles(rules: DataRule[], format: 'json' | 'csv'): ExportFile[] {
+    return rules.map((rule) => {
+      const content = this.exportByFormat([rule], format);
 
-    const sample = data[0];
-    const fields = Object.entries(sample).map(([key, value]) => {
-      let type = 'any';
-      if (typeof value === 'string') type = 'string';
-      else if (typeof value === 'number') type = 'number';
-      else if (typeof value === 'boolean') type = 'boolean';
-      else if (Array.isArray(value)) type = 'any[]';
-
-      return `  ${key}: ${type};`;
+      return {
+        filename: `${rule.name}.${format}`,
+        content,
+        mimeType: this.getMimeType(format),
+      };
     });
-
-    return `interface ${interfaceName} {\n${fields.join('\n')}\n}\n\n// 示例数据\nconst data: ${interfaceName}[] = ${JSON.stringify(data, null, 2)};`;
   }
 
-  // 下载文件
+  // 合并导出多个规则（所有规则合并为一个文件）
+  static toSingleFile(rules: DataRule[], format: 'json' | 'csv'): ExportFile {
+    // 合并所有规则的字段配置
+    const mergedFields = rules.flatMap((rule) => rule.fields);
+
+    // 合并导出内容
+    const content = this.exportByFormat([mergedFields], format);
+
+    return {
+      filename: `merged_rules.${format}`,
+      content,
+      mimeType: this.getMimeType(format),
+    };
+  }
+
+  // 根据格式获取 MIME 类型
+  private static getMimeType(format: string): string {
+    const mimeTypes: Record<string, string> = {
+      json: 'application/json',
+      csv: 'text/csv',
+    };
+    return mimeTypes[format] || 'text/plain';
+  }
+
+  // 下载单个文件
   static download(content: string, filename: string, mimeType: string = 'text/plain'): void {
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // 批量下载多个文件
+  static downloadMultiple(files: ExportFile[]): void {
+    files.forEach((file) => {
+      this.download(file.content, file.filename, file.mimeType);
+    });
+  }
+
+  // 下载为 ZIP（需要引入 jszip 库）
+  static async downloadAsZip(
+    files: ExportFile[],
+    zipFilename: string = 'export.zip',
+  ): Promise<void> {
+    // 动态导入 jszip
+    const JSZip = (await import('jszip')).default;
+    const zip = new JSZip();
+
+    files.forEach((file) => {
+      zip.file(file.filename, file.content);
+    });
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(content);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = zipFilename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1359,9 +1514,9 @@ export class DataExporter {
 ### 创建 Worker
 
 ```typescript
-// hooks/useGenerator.ts
+// src/pages/TestDataGenerator/hooks/useGenerator.ts
 import { useRef, useState, useCallback } from 'react';
-import type { DataRule, GenerateResult } from '../types';
+import type { DataRule, GenerateResult } from '@/types/testDataGenerator';
 
 export function useGenerator() {
   const workerRef = useRef<Worker | null>(null);
@@ -1373,15 +1528,18 @@ export function useGenerator() {
     return new Promise((resolve, reject) => {
       setIsGenerating(true);
       setProgress(0);
+      setResult(null);
+
+      const startTime = Date.now();
 
       // 创建 Worker
-      workerRef.current = new Worker(new URL('../worker/generator.worker.ts', import.meta.url), {
+      workerRef.current = new Worker(new URL('@/workers/generator.worker.ts', import.meta.url), {
         type: 'module',
       });
 
       // 监听消息
       workerRef.current.onmessage = (e) => {
-        const { type, current, total, data, error } = e.data;
+        const { type, current, total, data, error, stats } = e.data;
 
         if (type === 'progress') {
           setProgress(Math.round((current / total) * 100));
@@ -1391,14 +1549,17 @@ export function useGenerator() {
           setIsGenerating(false);
           setProgress(100);
 
+          const duration = Date.now() - startTime;
+
           const result: GenerateResult = {
             success: true,
             data,
             stats: {
-              total: rule.options.total,
-              generated: data.length,
-              failed: 0,
-              duration: 0,
+              total: stats.total,
+              generated: stats.generated,
+              failed: stats.failed,
+              failedFields: stats.failedFields,
+              duration,
             },
           };
 
@@ -1410,6 +1571,12 @@ export function useGenerator() {
           setIsGenerating(false);
           reject(new Error(error));
         }
+      };
+
+      // 错误处理
+      workerRef.current.onerror = (e) => {
+        setIsGenerating(false);
+        reject(new Error(e.message || 'Worker 执行出错'));
       };
 
       // 发送任务
@@ -1425,6 +1592,7 @@ export function useGenerator() {
       workerRef.current.terminate();
       workerRef.current = null;
       setIsGenerating(false);
+      setProgress(0);
     }
   }, []);
 
@@ -1436,6 +1604,236 @@ export function useGenerator() {
     result,
   };
 }
+```
+
+### 错误处理
+
+```typescript
+// src/pages/TestDataGenerator/hooks/useErrorHandler.ts
+import { useCallback } from 'react';
+import type { GenerateResult } from '@/types/testDataGenerator';
+
+export interface ErrorHandlerOptions {
+  onSuccess?: (result: GenerateResult) => void;
+  onWarning?: (message: string, failedFields: string[]) => void;
+  onError?: (error: Error) => void;
+}
+
+export function useErrorHandler(options: ErrorHandlerOptions = {}) {
+  const handleGenerateResult = useCallback(
+    (result: GenerateResult) => {
+      // 1. 检查是否有失败字段
+      if (result.stats.failed > 0) {
+        const message = `有 ${result.stats.failed} 个字段生成失败：${result.stats.failedFields?.join('、')}`;
+        options.onWarning?.(message, result.stats.failedFields || []);
+      } else {
+        options.onSuccess?.(result);
+      }
+    },
+    [options],
+  );
+
+  const handleGenerateError = useCallback(
+    (error: Error) => {
+      options.onError?.(error);
+    },
+    [options],
+  );
+
+  return {
+    handleGenerateResult,
+    handleGenerateError,
+  };
+}
+```
+
+---
+
+## 错误提示机制
+
+### 错误类型分类
+
+| 错误类型        | 严重程度 | 触发场景                 | 提示方式      |
+| --------------- | -------- | ------------------------ | ------------- |
+| 生成器不存在    | 🔴 严重  | 字段配置了不存在的生成器 | toast.error   |
+| Worker 执行错误 | 🔴 严重  | Web Worker 内部异常      | toast.error   |
+| 重试达到上限    | 🟡 警告  | 唯一性字段无法生成唯一值 | toast.warning |
+| 部分字段失败    | 🟡 警告  | 生成完成但有字段失败     | 结果面板警告  |
+| 生成成功        | 🟢 成功  | 全部字段生成成功         | toast.success |
+
+### 提示方式实现
+
+项目使用 `sonner` 库作为 Toast 提示组件（已在项目中配置），导入方式：
+
+```typescript
+import { toast } from 'sonner';
+```
+
+```typescript
+// src/pages/TestDataGenerator/index.tsx
+import { useGenerator } from './hooks/useGenerator';
+import { useErrorHandler } from './hooks/useErrorHandler';
+import { toast } from 'sonner';
+
+export default function TestDataGenerator() {
+  const { generate, progress, isGenerating, result } = useGenerator();
+
+  const { handleGenerateResult, handleGenerateError } = useErrorHandler({
+    // 成功回调
+    onSuccess: (result) => {
+      toast.success(`成功生成 ${result.stats.generated} 条数据`);
+    },
+    // 警告回调（部分字段失败）
+    onWarning: (message, failedFields) => {
+      toast.warning(message);
+    },
+    // 错误回调（严重错误）
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleGenerate = async (rule: DataRule) => {
+    try {
+      const result = await generate(rule);
+      handleGenerateResult(result);
+    } catch (error) {
+      handleGenerateError(error as Error);
+    }
+  };
+
+  return (
+    <div>
+      {/* 生成按钮 */}
+      <GenerateButton
+        onClick={() => handleGenerate(currentRule)}
+        disabled={isGenerating}
+        loading={isGenerating}
+      />
+
+      {/* 进度条 */}
+      {isGenerating && <ProgressBar progress={progress} />}
+
+      {/* 结果面板（包含警告信息） */}
+      {result && <ResultPanel result={result} />}
+    </div>
+  );
+}
+```
+
+### 结果面板（含警告）
+
+```typescript
+// src/pages/TestDataGenerator/components/ResultPanel.tsx
+import type { GenerateResult } from '@/types/testDataGenerator';
+
+interface ResultPanelProps {
+  result: GenerateResult;
+}
+
+export function ResultPanel({ result }: ResultPanelProps) {
+  const { stats } = result;
+
+  return (
+    <div className="space-y-4">
+      {/* 成功信息 */}
+      <div className="p-4 bg-green-50 border border-green-200 rounded">
+        <h3 className="text-green-800 font-medium">生成完成</h3>
+        <p className="text-green-600">
+          成功生成 {stats.generated} 条数据，耗时 {stats.duration}ms
+        </p>
+      </div>
+
+      {/* 警告信息（有失败字段） */}
+      {stats.failed > 0 && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
+          <h3 className="text-yellow-800 font-medium">部分字段生成失败</h3>
+          <p className="text-yellow-600">
+            有 {stats.failed} 个字段无法生成唯一值：
+          </p>
+          <ul className="list-disc list-inside text-yellow-600 mt-2">
+            {stats.failedFields?.map((field) => (
+              <li key={field}>"{field}" - 重试 100 次后仍存在重复</li>
+            ))}
+          </ul>
+          <p className="text-yellow-500 text-sm mt-2">
+            这些字段的值已设置为空，您可以尝试减少生成数量或调整字段配置
+          </p>
+        </div>
+      )}
+
+      {/* 数据预览 */}
+      <div className="border rounded p-4">
+        <h3 className="font-medium mb-2">数据预览</h3>
+        <pre className="text-sm overflow-auto max-h-64">
+          {JSON.stringify(result.data.slice(0, 5), null, 2)}
+        </pre>
+      </div>
+    </div>
+  );
+}
+```
+
+### Toast 使用示例
+
+项目使用 `sonner` 库，已配置在 `src/components/ui/sonner.tsx` 中，使用方式：
+
+```typescript
+import { toast } from 'sonner';
+
+// 成功提示
+toast.success('操作成功');
+
+// 警告提示
+toast.warning('有部分数据生成失败');
+
+// 错误提示
+toast.error('生成失败：生成器不存在');
+```
+
+---
+
+## 错误处理流程图
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      错误处理流程                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  用户点击"生成"                                                 │
+│       ↓                                                         │
+│  ┌─────────────────┐                                            │
+│  │ Worker 执行生成 │                                            │
+│  └────────┬────────┘                                            │
+│           ↓                                                     │
+│  ┌─────────────────┐    是    ┌─────────────────┐              │
+│  │ 生成器不存在？  │ ───────→ │ toast.error     │              │
+│  └────────┬────────┘          └─────────────────┘              │
+│           │ 否                                                  │
+│           ↓                                                     │
+│  ┌─────────────────┐                                            │
+│  │ 循环生成数据    │                                            │
+│  └────────┬────────┘                                            │
+│           ↓                                                     │
+│  ┌─────────────────┐    是    ┌─────────────────┐              │
+│  │ 唯一性重试失败？│ ───────→ │ 记录失败字段    │              │
+│  └────────┬────────┘          └─────────────────┘              │
+│           │ 否                                                  │
+│           ↓                                                     │
+│  ┌─────────────────┐                                            │
+│  │ 发送完成结果    │                                            │
+│  └────────┬────────┘                                            │
+│           ↓                                                     │
+│  ┌─────────────────┐    有     ┌─────────────────┐             │
+│  │ failedFields？  │ ────────→ │ toast.warning   │             │
+│  └────────┬────────┘           │ 结果面板显示    │             │
+│           │ 无                 └─────────────────┘             │
+│           ↓                                                     │
+│  ┌─────────────────┐                                            │
+│  │ toast.success   │                                            │
+│  └─────────────────┘                                            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
