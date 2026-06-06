@@ -1,11 +1,27 @@
 /**
  * 字段列表组件
- * 展示所有字段配置，支持添加、删除、排序
+ * 展示所有字段配置，支持添加、删除、拖拽排序
  */
 
-import { Plus, GripVertical, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, GripVertical, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/utils/chromeI18n';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { FieldConfig } from '@/types/testDataGenerator';
 import FieldItem from './FieldItem';
 
@@ -16,32 +32,98 @@ interface FieldListProps {
   onAdd: () => void;
   onSelect: (index: number) => void;
   selectedIndex: number | null;
+  onReorder: (oldIndex: number, newIndex: number) => void;
+}
+
+/** 可排序的字段项 */
+function SortableFieldItem({
+  field,
+  isSelected,
+  onSelect,
+  onRemove,
+}: {
+  field: FieldConfig;
+  isSelected: boolean;
+  onSelect: () => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 0,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group relative rounded-lg border transition-colors ${
+        isDragging ? 'border-primary shadow-lg' : ''
+      } ${
+        isSelected
+          ? 'border-primary bg-primary/5'
+          : 'border-border hover:border-muted-foreground/30'
+      }`}
+    >
+      <div className="flex items-center gap-2 p-3">
+        {/* 拖拽手柄 */}
+        <button
+          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-muted/50 touch-none"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </button>
+
+        <FieldItem field={field} onClick={onSelect} isSelected={isSelected} />
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+          onClick={onRemove}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export default function FieldList({
   fields,
-  onUpdate,
+  onUpdate: _onUpdate,
   onRemove,
   onAdd,
   onSelect,
   selectedIndex,
+  onReorder,
 }: FieldListProps) {
   const { t } = useI18n('testDataGenerator');
 
-  const handleMoveUp = (index: number) => {
-    if (index === 0) return;
-    const newFields = [...fields];
-    [newFields[index - 1], newFields[index]] = [newFields[index], newFields[index - 1]];
-    onUpdate(index - 1, newFields[index - 1]);
-    onUpdate(index, newFields[index]);
-  };
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
-  const handleMoveDown = (index: number) => {
-    if (index === fields.length - 1) return;
-    const newFields = [...fields];
-    [newFields[index], newFields[index + 1]] = [newFields[index + 1], newFields[index]];
-    onUpdate(index, newFields[index]);
-    onUpdate(index + 1, newFields[index + 1]);
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = fields.findIndex((f) => f.id === active.id);
+    const newIndex = fields.findIndex((f) => f.id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      onReorder(oldIndex, newIndex);
+    }
   };
 
   return (
@@ -66,54 +148,23 @@ export default function FieldList({
             </p>
           </div>
         ) : (
-          fields.map((field, index) => (
-            <div
-              key={field.id}
-              className={`group relative rounded-lg border transition-colors ${
-                selectedIndex === index
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-muted-foreground/30'
-              }`}
-            >
-              <div className="flex items-center gap-2 p-3">
-                <div className="flex flex-col gap-0.5">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleMoveUp(index)}
-                    disabled={index === 0}
-                  >
-                    <ChevronUp className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleMoveDown(index)}
-                    disabled={index === fields.length - 1}
-                  >
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </div>
-
-                <FieldItem
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+              {fields.map((field, index) => (
+                <SortableFieldItem
+                  key={field.id}
                   field={field}
-                  onClick={() => onSelect(index)}
                   isSelected={selectedIndex === index}
+                  onSelect={() => onSelect(index)}
+                  onRemove={() => onRemove(index)}
                 />
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
-                  onClick={() => onRemove(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))
+              ))}
+            </SortableContext>
+          </DndContext>
         )}
       </div>
     </div>
