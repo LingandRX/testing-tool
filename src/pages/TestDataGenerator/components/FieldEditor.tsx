@@ -33,7 +33,8 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
     onChange({
       ...field,
       required,
-      nullRate: required ? 0 : field.nullRate,
+      // 切换为必填时清零，切换为非必填时默认 100%
+      nullRate: required ? 0 : 100,
     });
   };
 
