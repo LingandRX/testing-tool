@@ -64,6 +64,11 @@ export default function DataPreview({ fields }: DataPreviewProps) {
 
     const record: Record<string, unknown> = {};
     for (const field of fields) {
+      // 非必填字段预览显示 null
+      if (!field.required) {
+        record[field.name] = null;
+        continue;
+      }
       const generator = getGeneratorById(field.generatorId);
       if (generator) {
         record[field.name] = generator.generate(field.params);
