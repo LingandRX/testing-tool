@@ -5,13 +5,6 @@
 
 import { useI18n } from '@/utils/chromeI18n';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 interface GenerateOptionsProps {
   count: number;
@@ -22,7 +15,12 @@ interface GenerateOptionsProps {
   onDefaultNullRateChange: (rate: number) => void;
 }
 
-const COUNT_PRESETS = [10, 50, 100, 500, 1000, 5000, 10000];
+const COUNT_PRESETS = [50, 100, 1000, 5000, 10000];
+
+const FORMAT_OPTIONS = [
+  { value: 'json' as const, label: 'JSON' },
+  { value: 'csv' as const, label: 'CSV' },
+];
 
 export default function GenerateOptions({
   count,
@@ -76,15 +74,21 @@ export default function GenerateOptions({
         <label className="text-sm font-medium text-foreground">
           {t('testDataGenerator_format')}
         </label>
-        <Select value={format} onValueChange={(v) => onFormatChange(v as 'json' | 'csv')}>
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="json">JSON</SelectItem>
-            <SelectItem value="csv">CSV</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          {FORMAT_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => onFormatChange(option.value)}
+              className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                format === option.value
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 默认空值率 */}

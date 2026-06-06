@@ -971,18 +971,6 @@
     "message": "空值率",
     "description": "Translation key: testDataGenerator_nullRate"
   },
-  "testDataGenerator_nullRateLow": {
-    "message": "低 (5%)",
-    "description": "Translation key: testDataGenerator_nullRateLow"
-  },
-  "testDataGenerator_nullRateMedium": {
-    "message": "中 (20%)",
-    "description": "Translation key: testDataGenerator_nullRateMedium"
-  },
-  "testDataGenerator_nullRateHigh": {
-    "message": "高 (50%)",
-    "description": "Translation key: testDataGenerator_nullRateHigh"
-  },
   "testDataGenerator_uniqueConstraint": {
     "message": "唯一性约束",
     "description": "Translation key: testDataGenerator_uniqueConstraint"

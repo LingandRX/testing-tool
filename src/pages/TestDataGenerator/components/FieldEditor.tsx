@@ -38,7 +38,14 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
   };
 
   const handleNullRateChange = (nullRate: number) => {
-    onChange({ ...field, nullRate });
+    // 限制范围 0-100
+    const clampedRate = Math.max(0, Math.min(100, nullRate));
+    // 设置为 100% 时自动设为必填
+    if (clampedRate === 100) {
+      onChange({ ...field, nullRate: clampedRate, required: true });
+    } else {
+      onChange({ ...field, nullRate: clampedRate });
+    }
   };
 
   const handleUniqueChange = (unique: boolean) => {
@@ -63,9 +70,10 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
   };
 
   const nullRatePresets = [
-    { label: t('testDataGenerator_nullRateLow'), value: 5 },
-    { label: t('testDataGenerator_nullRateMedium'), value: 20 },
-    { label: t('testDataGenerator_nullRateHigh'), value: 50 },
+    { label: '5%', value: 5 },
+    { label: '20%', value: 20 },
+    { label: '50%', value: 50 },
+    { label: '75%', value: 75 },
   ];
 
   return (
@@ -129,7 +137,12 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
             <Input
               type="number"
               value={field.nullRate}
-              onChange={(e) => handleNullRateChange(Number(e.target.value))}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value >= 0 && value <= 100) {
+                  handleNullRateChange(value);
+                }
+              }}
               min={0}
               max={100}
               step={5}
