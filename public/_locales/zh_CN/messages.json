@@ -1260,5 +1260,45 @@
   "testDataGenerator_saveAs": {
     "message": "另存为",
     "description": "Translation key: testDataGenerator_saveAs"
+  },
+  "testDataGenerator_noGeneratorParams": {
+    "message": "此生成器无可配置参数",
+    "description": "Translation key: testDataGenerator_noGeneratorParams"
+  },
+  "testDataGenerator_enabled": {
+    "message": "启用",
+    "description": "Translation key: testDataGenerator_enabled"
+  },
+  "testDataGenerator_disabled": {
+    "message": "禁用",
+    "description": "Translation key: testDataGenerator_disabled"
+  },
+  "testDataGenerator_commaSeparated": {
+    "message": "用逗号分隔多个值",
+    "description": "Translation key: testDataGenerator_commaSeparated"
+  },
+  "testDataGenerator_copySuccess": {
+    "message": "已复制到剪贴板",
+    "description": "Translation key: testDataGenerator_copySuccess"
+  },
+  "testDataGenerator_copyFailed": {
+    "message": "复制失败",
+    "description": "Translation key: testDataGenerator_copyFailed"
+  },
+  "testDataGenerator_fieldNameEmpty": {
+    "message": "字段名称不能为空",
+    "description": "Translation key: testDataGenerator_fieldNameEmpty"
+  },
+  "testDataGenerator_fieldNameDuplicate": {
+    "message": "字段名称已存在",
+    "description": "Translation key: testDataGenerator_fieldNameDuplicate"
+  },
+  "testDataGenerator_fieldNameInvalid": {
+    "message": "字段名称只能包含字母、数字和下划线",
+    "description": "Translation key: testDataGenerator_fieldNameInvalid"
+  },
+  "testDataGenerator_ruleCopySuffix": {
+    "message": "（副本）",
+    "description": "Translation key: testDataGenerator_ruleCopySuffix"
   }
 }

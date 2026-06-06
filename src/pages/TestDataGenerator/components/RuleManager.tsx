@@ -80,7 +80,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
 
   const handleDuplicate = useCallback(
     (id: string) => {
-      const result = ruleStorage.duplicate(id);
+      const result = ruleStorage.duplicate(id, t('testDataGenerator_ruleCopySuffix'));
       if (result) {
         loadRules();
         toast.success(t('testDataGenerator_ruleDuplicated'));
