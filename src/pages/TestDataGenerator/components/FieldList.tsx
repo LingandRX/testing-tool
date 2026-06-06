@@ -4,7 +4,7 @@
  * 超过 5 条时启用虚拟列表滚动
  */
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Plus, GripVertical, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/utils/chromeI18n';
@@ -146,6 +146,37 @@ export default function FieldList({
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(String(event.active.id));
   };
+
+  // 拖拽时的滚轮滚动处理
+  useEffect(() => {
+    if (!activeId || !containerRef.current) return;
+
+    const container = containerRef.current;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // 滚动容器
+      const scrollAmount = e.deltaY * 0.5; // 降低滚动速度，更易控制
+      const newScrollTop = Math.max(
+        0,
+        Math.min(
+          container.scrollHeight - container.clientHeight,
+          container.scrollTop + scrollAmount,
+        ),
+      );
+      container.scrollTop = newScrollTop;
+      setScrollTop(newScrollTop);
+    };
+
+    // 添加事件监听，使用 passive: false 以允许 preventDefault
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, [activeId]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
