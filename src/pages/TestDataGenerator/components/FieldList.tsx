@@ -16,6 +16,8 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
+  DragOverlay,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -35,6 +37,7 @@ const VISIBLE_COUNT = 5;
 const ROW_HEIGHT = 60; // 卡片高度 52 + 间距 8
 const ROW_GAP = 8;
 const OVERSCAN = 2;
+const DRAG_OVERSCAN = 10; // 拖拽时增加的预加载范围
 
 interface FieldListProps {
   fields: FieldConfig[];
@@ -120,6 +123,7 @@ export default function FieldList({
 }: FieldListProps) {
   const { t } = useI18n('testDataGenerator');
   const [scrollTop, setScrollTop] = useState(0);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
@@ -139,8 +143,13 @@ export default function FieldList({
     [selectedIndex, onSelect],
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(String(event.active.id));
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
     if (!over || active.id === over.id) return;
 
     const oldIndex = fields.findIndex((f) => f.id === active.id);
@@ -165,13 +174,17 @@ export default function FieldList({
       ? { height: 'auto' as const, overflowY: 'visible' as const }
       : { height: fixedContainerHeight, overflowY: 'auto' as const };
 
-  // 虚拟列表：计算可见范围
-  const visibleStart = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
+  // 虚拟列表：计算可见范围（拖拽时扩展预加载范围）
+  const currentOverscan = activeId ? DRAG_OVERSCAN : OVERSCAN;
+  const visibleStart = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - currentOverscan);
   const visibleEnd = Math.min(
     fields.length,
-    Math.ceil((scrollTop + fixedContainerHeight) / ROW_HEIGHT) + OVERSCAN,
+    Math.ceil((scrollTop + fixedContainerHeight) / ROW_HEIGHT) + currentOverscan,
   );
   const visibleFields = isVirtual ? fields.slice(visibleStart, visibleEnd) : fields;
+
+  // 查找拖拽中的项目（用于 DragOverlay）
+  const activeField = activeId ? fields.find((f) => f.id === activeId) : null;
 
   const isMaxReached = fields.length >= MAX_FIELDS;
 
@@ -206,6 +219,7 @@ export default function FieldList({
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
@@ -264,6 +278,21 @@ export default function FieldList({
                 )}
               </div>
             </SortableContext>
+            <DragOverlay>
+              {activeField ? (
+                <div className="rounded-lg border border-primary bg-background shadow-lg opacity-90">
+                  <div className="flex items-center gap-2 h-full px-3 py-2">
+                    <div className="p-1">
+                      <GripVertical className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <FieldItem field={activeField} isSelected={false} onClick={() => {}} />
+                    </div>
+                    <div className="h-8 w-8 shrink-0" />
+                  </div>
+                </div>
+              ) : null}
+            </DragOverlay>
           </DndContext>
         )}
       </div>
