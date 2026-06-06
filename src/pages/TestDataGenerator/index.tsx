@@ -2,12 +2,13 @@
  * 测试数据生成器主页面
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Settings, Database, Tag } from 'lucide-react';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import { useGenerator } from './hooks/useGenerator';
-import type { FieldConfig } from '@/types/testDataGenerator';
+import { getGeneratorById } from '@/lib/generators';
+import type { FieldConfig, GenerateResult } from '@/types/testDataGenerator';
 
 // 生成唯一 ID 的辅助函数
 function generateId(): string {
@@ -40,6 +41,60 @@ export default function TestDataGeneratorPage() {
 
   // 当前标签页
   const [activeTab, setActiveTab] = useState<TabType>('fields');
+
+  // 实时预览（防抖）
+  const [previewResult, setPreviewResult] = useState<GenerateResult | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 配置变更时生成预览数据（防抖 300ms）
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // 无字段时不生成预览
+    if (fields.length === 0) {
+      debounceTimerRef.current = setTimeout(() => setPreviewResult(null), 0);
+      return () => {
+        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      };
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      try {
+        const previewData: Record<string, unknown>[] = [];
+        const sampleCount = Math.min(10, count);
+        for (let i = 0; i < sampleCount; i++) {
+          const record: Record<string, unknown> = {};
+          for (const field of fields) {
+            const generator = getGeneratorById(field.generatorId);
+            if (!generator) continue;
+            if (!field.required && Math.random() * 100 < field.nullRate) {
+              record[field.name] = null;
+              continue;
+            }
+            if (field.unique && generator.generateAtIndex) {
+              record[field.name] = generator.generateAtIndex(field.params, i);
+            } else {
+              record[field.name] = generator.generate(field.params);
+            }
+          }
+          previewData.push(record);
+        }
+        setPreviewResult({
+          success: true,
+          data: previewData,
+          stats: { total: sampleCount, success: sampleCount, failed: 0, duration: 0 },
+        });
+      } catch {
+        setPreviewResult(null);
+      }
+    }, 300);
+
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [fields, count]);
 
   // 添加新字段
   const handleAddField = useCallback(() => {
@@ -75,6 +130,27 @@ export default function TestDataGeneratorPage() {
         setSelectedIndex(null);
       } else if (selectedIndex !== null && selectedIndex > index) {
         setSelectedIndex(selectedIndex - 1);
+      }
+    },
+    [fields, selectedIndex],
+  );
+
+  // 拖拽排序
+  const handleReorder = useCallback(
+    (oldIndex: number, newIndex: number) => {
+      const newFields = [...fields];
+      const [moved] = newFields.splice(oldIndex, 1);
+      newFields.splice(newIndex, 0, moved);
+      setFields(newFields);
+      // 同步更新选中索引
+      if (selectedIndex === oldIndex) {
+        setSelectedIndex(newIndex);
+      } else if (selectedIndex !== null) {
+        if (oldIndex < selectedIndex && newIndex >= selectedIndex) {
+          setSelectedIndex(selectedIndex - 1);
+        } else if (oldIndex > selectedIndex && newIndex <= selectedIndex) {
+          setSelectedIndex(selectedIndex + 1);
+        }
       }
     },
     [fields, selectedIndex],
@@ -152,6 +228,7 @@ export default function TestDataGeneratorPage() {
                     onAdd={handleAddField}
                     onSelect={setSelectedIndex}
                     selectedIndex={selectedIndex}
+                    onReorder={handleReorder}
                   />
                 </div>
 
@@ -227,7 +304,7 @@ export default function TestDataGeneratorPage() {
                 {t('testDataGenerator_dataPreview')}
               </h3>
               <div className="h-[400px]">
-                <DataPreview result={result} />
+                <DataPreview result={result || previewResult} />
               </div>
             </div>
 
