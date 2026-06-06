@@ -10,6 +10,7 @@ import {
   GitCompareArrows,
   ArrowLeftRight,
   MousePointerClick,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
@@ -24,6 +25,7 @@ const JwtPage = lazy(() => import('@/pages/Jwt'));
 const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
 const Base64ConverterPage = lazy(() => import('@/pages/Base64Converter'));
 const RightClickRestorerPage = lazy(() => import('@/pages/RightClickRestorer'));
+const TestDataGeneratorPage = lazy(() => import('@/pages/TestDataGenerator'));
 
 export interface FeatureConfig {
   key: PageType;
@@ -153,6 +155,19 @@ export const FEATURES: FeatureConfig[] = [
       popup: RightClickRestorerPage,
       sidepanel: RightClickRestorerPage,
       tab: RightClickRestorerPage,
+    },
+  },
+  {
+    key: 'testDataGenerator',
+    labelKey: 'testDataGenerator_title',
+    descriptionKey: 'testDataGenerator_description',
+    themeColorKey: 'warning',
+    icon: FileSpreadsheet,
+    defaultVisible: true,
+    components: {
+      popup: TestDataGeneratorPage,
+      sidepanel: TestDataGeneratorPage,
+      tab: TestDataGeneratorPage,
     },
   },
 ];
