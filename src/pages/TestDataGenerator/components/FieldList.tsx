@@ -1,8 +1,10 @@
 /**
  * 字段列表组件
  * 展示所有字段配置，支持添加、删除、拖拽排序
+ * 超过 5 条时启用虚拟列表滚动
  */
 
+import { useState, useRef, useCallback } from 'react';
 import { Plus, GripVertical, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/utils/chromeI18n';
@@ -24,6 +26,15 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import type { FieldConfig } from '@/types/testDataGenerator';
 import FieldItem from './FieldItem';
+
+/** 最大字段数量 */
+export const MAX_FIELDS = 40;
+
+/** 虚拟列表配置 */
+const VISIBLE_COUNT = 5;
+const ROW_HEIGHT = 60; // 卡片高度 52 + 间距 8
+const ROW_GAP = 8;
+const OVERSCAN = 2;
 
 interface FieldListProps {
   fields: FieldConfig[];
@@ -56,6 +67,7 @@ function SortableFieldItem({
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 10 : 0,
+    height: ROW_HEIGHT - ROW_GAP, // 固定卡片高度 52px，与虚拟模式一致
   };
 
   return (
@@ -70,22 +82,24 @@ function SortableFieldItem({
           : 'border-border hover:border-muted-foreground/30'
       }`}
     >
-      <div className="flex items-center gap-2 p-3">
+      <div className="flex items-center gap-2 h-full px-3 py-2">
         {/* 拖拽手柄 */}
         <button
-          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-muted/50 touch-none"
+          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-muted/50 touch-none shrink-0"
           {...attributes}
           {...listeners}
         >
           <GripVertical className="h-4 w-4 text-muted-foreground" />
         </button>
 
-        <FieldItem field={field} onClick={onSelect} isSelected={isSelected} />
+        <div className="flex-1 min-w-0">
+          <FieldItem field={field} onClick={onSelect} isSelected={isSelected} />
+        </div>
 
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+          className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
           onClick={onRemove}
         >
           <Trash2 className="h-4 w-4" />
@@ -105,6 +119,8 @@ export default function FieldList({
   onReorder,
 }: FieldListProps) {
   const { t } = useI18n('testDataGenerator');
+  const [scrollTop, setScrollTop] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -126,19 +142,50 @@ export default function FieldList({
     }
   };
 
+  const handleScroll = useCallback(() => {
+    if (containerRef.current) {
+      setScrollTop(containerRef.current.scrollTop);
+    }
+  }, []);
+
+  const isVirtual = fields.length > VISIBLE_COUNT;
+  const totalHeight = fields.length * ROW_HEIGHT;
+  const fixedContainerHeight = VISIBLE_COUNT * ROW_HEIGHT;
+  // 少于 5 条时高度自适应，5 条及以上固定为 5 条的高度
+  const containerStyle =
+    fields.length < VISIBLE_COUNT
+      ? { height: 'auto' as const, overflowY: 'visible' as const }
+      : { height: fixedContainerHeight, overflowY: 'auto' as const };
+
+  // 虚拟列表：计算可见范围
+  const visibleStart = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
+  const visibleEnd = Math.min(
+    fields.length,
+    Math.ceil((scrollTop + fixedContainerHeight) / ROW_HEIGHT) + OVERSCAN,
+  );
+  const visibleFields = isVirtual ? fields.slice(visibleStart, visibleEnd) : fields;
+
+  const isMaxReached = fields.length >= MAX_FIELDS;
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-foreground">
-          {t('testDataGenerator_fields')} ({fields.length})
+          {t('testDataGenerator_fields')} ({fields.length}/{MAX_FIELDS})
         </h3>
-        <Button variant="outline" size="sm" onClick={onAdd} className="h-8 gap-1.5">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onAdd}
+          disabled={isMaxReached}
+          className="h-8 gap-1.5"
+        >
           <Plus className="h-4 w-4" />
           {t('testDataGenerator_addField')}
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+      <div className="flex-1 min-h-0">
         {fields.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <GripVertical className="h-10 w-10 text-muted-foreground/40 mb-3" />
@@ -154,15 +201,60 @@ export default function FieldList({
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-              {fields.map((field, index) => (
-                <SortableFieldItem
-                  key={field.id}
-                  field={field}
-                  isSelected={selectedIndex === index}
-                  onSelect={() => onSelect(index)}
-                  onRemove={() => onRemove(index)}
-                />
-              ))}
+              <div
+                ref={containerRef}
+                className="overflow-y-auto"
+                style={containerStyle}
+                onScroll={handleScroll}
+              >
+                {isVirtual ? (
+                  /* 虚拟滚动模式 */
+                  <div style={{ height: totalHeight, position: 'relative' }}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: visibleStart * ROW_HEIGHT,
+                        left: 0,
+                        right: 0,
+                      }}
+                    >
+                      {visibleFields.map((field, vi) => {
+                        const realIndex = fields.findIndex((f) => f.id === field.id);
+                        const isLast = visibleStart + vi === fields.length - 1;
+                        return (
+                          <div
+                            key={field.id}
+                            style={{
+                              height: ROW_HEIGHT,
+                              paddingBottom: isLast ? 0 : ROW_GAP,
+                            }}
+                          >
+                            <SortableFieldItem
+                              field={field}
+                              isSelected={selectedIndex === realIndex}
+                              onSelect={() => onSelect(realIndex)}
+                              onRemove={() => onRemove(realIndex)}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  /* 普通模式（≤5 条） */
+                  <div className="space-y-2">
+                    {fields.map((field, index) => (
+                      <SortableFieldItem
+                        key={field.id}
+                        field={field}
+                        isSelected={selectedIndex === index}
+                        onSelect={() => onSelect(index)}
+                        onRemove={() => onRemove(index)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </SortableContext>
           </DndContext>
         )}
