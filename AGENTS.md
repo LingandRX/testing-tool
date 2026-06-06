@@ -1,6 +1,6 @@
 # AGENTS.md
 
-WXT 浏览器扩展项目 (React 19 + TypeScript)。提供时间戳转换、存储清理、JWT 解析、JSON 工具、二维码、Base64、Markdown 等测试效率工具。
+WXT 浏览器扩展项目 (React 19 + TypeScript)。提供时间戳转换、存储清理、JWT 解析、JSON 工具、二维码、Base64、Markdown、测试数据生成器等测试效率工具。
 
 ## 核心命令
 
@@ -54,6 +54,7 @@ src/                   # 源代码根目录
   utils/                 # 工具函数与服务抽象
   types/                 # TypeScript 类型声明
   lib/                   # 通用工具函数（cn、utils）
+  workers/               # Web Worker（数据生成等耗时任务）
 public/                # 静态资源（图标、_locales 等）
 ```
 
@@ -75,6 +76,37 @@ src/pages/FeatureName/
 - 子组件可以独立调用 `useI18n` 等全局 Hook
 - 当 `index.tsx` 超过 150 行时，必须拆分为 UI + Hook 模式
 - 复杂页面可增加 `contexts/`、`hooks/`、`components/` 子目录
+
+### 测试数据生成器模块
+
+```
+src/pages/TestDataGenerator/
+├── index.tsx                    # 主页面（字段配置 + 标签页切换）
+├── hooks/useGenerator.ts        # Web Worker 管理 Hook（创建、复用、通信、销毁）
+└── components/
+    ├── FieldList.tsx            # 字段列表（虚拟滚动 + @dnd-kit 拖拽排序 + 规则保存）
+    ├── FieldItem.tsx            # 字段卡片展示
+    ├── FieldEditor.tsx          # 字段编辑器（名称校验、生成器选择、参数配置）
+    ├── GeneratorSelector.tsx    # 生成器选择器（分类 + 搜索）
+    ├── GeneratorConfig.tsx      # 生成器参数表单（动态渲染 string/number/boolean/select/array）
+    ├── GenerateOptions.tsx      # 生成选项（数量、格式）
+    ├── GenerateButton.tsx       # 生成按钮 + 进度条
+    ├── DataPreview.tsx          # 示例数据预览（JSON 语法高亮）
+    ├── ResultPanel.tsx          # 生成结果状态面板
+    ├── ExportPanel.tsx          # 导出面板（复制/下载 JSON/CSV）
+    └── RuleManager.tsx          # 规则管理（CRUD、搜索、导入/导出）
+
+src/utils/
+├── ruleStorage.ts               # 规则持久化存储（localStorage）
+├── dataExporter.ts              # 数据导出工具（JSON/CSV 转换、下载、剪贴板）
+└── generators/                  # 内置生成器定义（个人信息、企业、技术、基础类型）
+
+src/workers/
+└── generator.worker.ts          # 数据生成 Web Worker
+
+src/types/
+└── testDataGenerator.ts         # 类型定义（FieldConfig, DataRule, GeneratorDefinition 等）
+```
 
 ## 关键架构决策
 
@@ -148,7 +180,8 @@ src/pages/FeatureName/
 ## 关键外部库（非显而易见的）
 
 - `@webext-core/messaging` — 扩展消息通信
-- `@dnd-kit` — 拖拽排序（用于页面顺序管理）
+- `@dnd-kit` — 拖拽排序（用于页面顺序管理和字段列表排序）
 - `qrious` + `qr-scanner` — 二维码生成与解析
 - `dayjs` — 日期处理（时间戳转换）
 - `sonner` — Toast 通知（替代传统 snackbar）
+- Web Worker — 批量数据生成（`src/workers/generator.worker.ts`），避免阻塞 UI 线程
