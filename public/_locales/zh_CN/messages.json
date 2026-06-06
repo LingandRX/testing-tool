@@ -1011,10 +1011,6 @@
     "message": "数据格式",
     "description": "Translation key: testDataGenerator_format"
   },
-  "testDataGenerator_defaultNullRate": {
-    "message": "默认空值率",
-    "description": "Translation key: testDataGenerator_defaultNullRate"
-  },
   "testDataGenerator_generate": {
     "message": "生成数据",
     "description": "Translation key: testDataGenerator_generate"
@@ -1162,6 +1158,10 @@
   "testDataGenerator_confirm": {
     "message": "确认",
     "description": "Translation key: testDataGenerator_confirm"
+  },
+  "testDataGenerator_done": {
+    "message": "完成",
+    "description": "Translation key: testDataGenerator_done"
   },
   "testDataGenerator_noSearchResults": {
     "message": "未找到匹配的规则",

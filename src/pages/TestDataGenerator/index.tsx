@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useGenerator } from './hooks/useGenerator';
 import type { FieldConfig, GenerateResult } from '@/types/testDataGenerator';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 // 生成唯一 ID 的辅助函数
@@ -39,7 +40,6 @@ export default function TestDataGeneratorPage() {
   // 生成选项
   const [count, setCount] = useState(100);
   const [format, setFormat] = useState<'json' | 'csv'>('json');
-  const [defaultNullRate, setDefaultNullRate] = useState(10);
 
   // 当前标签页
   const [activeTab, setActiveTab] = useState<TabType>('fields');
@@ -206,8 +206,6 @@ export default function TestDataGeneratorPage() {
                 onCountChange={setCount}
                 format={format}
                 onFormatChange={setFormat}
-                defaultNullRate={defaultNullRate}
-                onDefaultNullRateChange={setDefaultNullRate}
               />
             </div>
 
@@ -264,14 +262,25 @@ export default function TestDataGeneratorPage() {
 
       {/* 字段编辑弹窗 */}
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
-        <DialogContent className="w-[calc(100vw-4rem)] max-w-[420px] max-h-[calc(100vh-4rem)] overflow-hidden p-0 pt-8">
-          <div className="overflow-y-auto max-h-[calc(100vh-6rem)] px-6 pb-6">
+        <DialogContent
+          showCloseButton={false}
+          className="w-[calc(100vw-4rem)] max-w-[420px] max-h-[calc(100vh-4rem)] p-0 pt-6 flex flex-col"
+        >
+          <div className="flex-1 overflow-y-auto px-6 pb-4">
             {selectedField && selectedIndex !== null && (
               <FieldEditor
                 field={selectedField}
                 onChange={(updatedField) => handleUpdateField(selectedIndex, updatedField)}
               />
             )}
+          </div>
+          <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
+            <Button variant="ghost" size="sm" onClick={() => setIsEditorOpen(false)}>
+              {t('testDataGenerator_cancel')}
+            </Button>
+            <Button size="sm" onClick={() => setIsEditorOpen(false)}>
+              {t('testDataGenerator_done')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
