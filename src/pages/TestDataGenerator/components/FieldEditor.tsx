@@ -1,0 +1,230 @@
+/**
+ * 字段编辑器组件
+ * 编辑单个字段的详细配置
+ */
+
+import { useState, useCallback } from 'react';
+import { useI18n } from '@/utils/chromeI18n';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { getGeneratorById } from '@/lib/generators';
+import type { FieldConfig } from '@/types/testDataGenerator';
+import GeneratorSelector from './GeneratorSelector';
+import GeneratorConfig from './GeneratorConfig';
+
+interface FieldEditorProps {
+  field: FieldConfig;
+  onChange: (field: FieldConfig) => void;
+  /** 所有字段名列表，用于检测重复 */
+  allFieldNames?: string[];
+}
+
+export default function FieldEditor({ field, onChange, allFieldNames = [] }: FieldEditorProps) {
+  const { t } = useI18n('testDataGenerator');
+  const generator = getGeneratorById(field.generatorId);
+  const [nameError, setNameError] = useState<string | null>(null);
+
+  const validateFieldName = useCallback(
+    (name: string): string | null => {
+      const trimmed = name.trim();
+      if (!trimmed) {
+        return t('testDataGenerator_fieldNameEmpty');
+      }
+      if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(trimmed)) {
+        return t('testDataGenerator_fieldNameInvalid');
+      }
+      const isDuplicate = allFieldNames.some(
+        (n, i) => n === trimmed && i !== allFieldNames.indexOf(field.name),
+      );
+      if (isDuplicate) {
+        return t('testDataGenerator_fieldNameDuplicate');
+      }
+      return null;
+    },
+    [allFieldNames, field.name, t],
+  );
+
+  const handleNameChange = (name: string) => {
+    onChange({ ...field, name });
+    // 实时校验
+    const error = validateFieldName(name);
+    setNameError(error);
+  };
+
+  const handleDescriptionChange = (description: string) => {
+    onChange({ ...field, description });
+  };
+
+  const handleRequiredChange = (required: boolean) => {
+    onChange({
+      ...field,
+      required,
+      // 切换为必填时清零，切换为非必填时默认 100%
+      nullRate: required ? 0 : 100,
+    });
+  };
+
+  const handleNullRateChange = (nullRate: number) => {
+    // 限制范围 0-100
+    const clampedRate = Math.max(0, Math.min(100, nullRate));
+    // 空值率为 0 时自动设为必填
+    if (clampedRate === 0) {
+      onChange({ ...field, nullRate: clampedRate, required: true });
+    } else {
+      onChange({ ...field, nullRate: clampedRate, required: false });
+    }
+  };
+
+  const handleUniqueChange = (unique: boolean) => {
+    onChange({ ...field, unique });
+  };
+
+  const handleGeneratorChange = (generatorId: string) => {
+    const generator = getGeneratorById(generatorId);
+    const defaultParams: Record<string, unknown> = {};
+    generator?.params.forEach((p) => {
+      defaultParams[p.key] = p.defaultValue;
+    });
+    onChange({
+      ...field,
+      generatorId,
+      params: defaultParams,
+    });
+  };
+
+  const handleParamsChange = (params: Record<string, unknown>) => {
+    onChange({ ...field, params });
+  };
+
+  const nullRatePresets = [
+    { label: '5%', value: 5 },
+    { label: '20%', value: 20 },
+    { label: '50%', value: 50 },
+    { label: '75%', value: 75 },
+  ];
+
+  return (
+    <div className="space-y-5">
+      {/* 基础配置 */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              {t('testDataGenerator_fieldName')}
+            </label>
+            <span className="text-xs text-muted-foreground">{field.name.length}/20</span>
+          </div>
+          <Input
+            value={field.name}
+            onChange={(e) => handleNameChange(e.target.value)}
+            placeholder={t('testDataGenerator_fieldNamePlaceholder')}
+            maxLength={20}
+            className={`h-9 ${nameError ? 'border-destructive' : ''}`}
+          />
+          {nameError && <p className="text-xs text-destructive mt-1">{nameError}</p>}
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              {t('testDataGenerator_fieldDescription')}
+            </label>
+            <span className="text-xs text-muted-foreground">
+              {(field.description || '').length}/50
+            </span>
+          </div>
+          <Input
+            value={field.description || ''}
+            onChange={(e) => handleDescriptionChange(e.target.value)}
+            placeholder={t('testDataGenerator_fieldDescriptionPlaceholder')}
+            maxLength={50}
+            className="h-9"
+          />
+        </div>
+      </div>
+
+      {/* 必填/选填配置 */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-foreground">
+            {t('testDataGenerator_required')}
+          </label>
+          <Switch checked={field.required} onCheckedChange={handleRequiredChange} />
+        </div>
+
+        {!field.required && (
+          <div className="space-y-2 pl-1">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                {t('testDataGenerator_nullRate')}
+              </span>
+              <Badge variant="secondary" className="text-xs">
+                {field.nullRate}%
+              </Badge>
+            </div>
+            <Input
+              type="number"
+              value={field.nullRate}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value >= 0 && value <= 100) {
+                  handleNullRateChange(value);
+                }
+              }}
+              min={0}
+              max={100}
+              step={5}
+              className="h-9 w-full"
+            />
+            <div className="flex gap-2">
+              {nullRatePresets.map((preset) => (
+                <button
+                  key={preset.value}
+                  onClick={() => handleNullRateChange(preset.value)}
+                  className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+                    field.nullRate === preset.value
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 唯一性约束 */}
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium text-foreground">
+          {t('testDataGenerator_uniqueConstraint')}
+        </label>
+        <Switch checked={field.unique} onCheckedChange={handleUniqueChange} />
+      </div>
+
+      {/* 生成器选择 */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-foreground">
+          {t('testDataGenerator_generator')}
+        </label>
+        <GeneratorSelector selectedId={field.generatorId} onChange={handleGeneratorChange} />
+      </div>
+
+      {/* 生成器参数配置 */}
+      {generator && (
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">
+            {t('testDataGenerator_generatorParams')}
+          </label>
+          <GeneratorConfig
+            generator={generator}
+            params={field.params}
+            onChange={handleParamsChange}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
