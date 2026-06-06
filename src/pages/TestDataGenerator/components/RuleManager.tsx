@@ -1,143 +1,227 @@
 /**
  * 规则管理器组件
- * 管理测试数据生成规则的保存、加载、删除等操作
+ * 管理测试数据生成规则的加载、删除等操作
  */
 
-import { useState } from 'react';
-import { Search, Save, Upload, Download, Trash2, Copy, Edit, Clock, Tag } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  Search,
+  Upload,
+  Download,
+  Trash2,
+  Copy,
+  Edit,
+  Clock,
+  Tag,
+  Loader2,
+  FolderOpen,
+} from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useI18n } from '@/utils/chromeI18n';
 import * as ruleStorage from '@/utils/ruleStorage';
 import type { DataRule, FieldConfig } from '@/types/testDataGenerator';
 
 interface RuleManagerProps {
-  currentFields: FieldConfig[];
   onLoad: (fields: FieldConfig[]) => void;
+  onEdit?: (rule: DataRule) => void;
+  onRulesChanged?: () => void;
 }
 
-export default function RuleManager({ currentFields, onLoad }: RuleManagerProps) {
-  const { t } = useI18n('testDataGenerator');
+export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleManagerProps) {
+  const { t, i18n } = useI18n('testDataGenerator');
   const [rules, setRules] = useState<DataRule[]>(() => ruleStorage.getAll());
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [ruleName, setRuleName] = useState('');
-  const [ruleDescription, setRuleDescription] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [ruleToDelete, setRuleToDelete] = useState<DataRule | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
-  const loadRules = () => {
+  const loadRules = useCallback(() => {
     setRules(ruleStorage.getAll());
-  };
+  }, []);
 
-  const filteredRules = searchQuery ? ruleStorage.search(searchQuery) : rules;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  const handleSave = () => {
-    if (!ruleName.trim()) return;
+  const filteredRules = useMemo(() => {
+    if (!debouncedSearchQuery) return rules;
+    const query = debouncedSearchQuery.toLowerCase();
+    return rules.filter(
+      (rule) =>
+        rule.name.toLowerCase().includes(query) || rule.description?.toLowerCase().includes(query),
+    );
+  }, [rules, debouncedSearchQuery]);
 
-    const newRule = ruleStorage.save({
-      name: ruleName.trim(),
-      description: ruleDescription.trim(),
-      fields: currentFields,
-    });
-
-    if (newRule) {
+  const handleLoad = useCallback(
+    (rule: DataRule) => {
+      onLoad(rule.fields);
+      ruleStorage.recordUse(rule.id);
       loadRules();
-      setShowSaveDialog(false);
-      setRuleName('');
-      setRuleDescription('');
+      toast.success(t('testDataGenerator_ruleLoaded', { name: rule.name }));
+    },
+    [onLoad, loadRules, t],
+  );
+
+  const handleDelete = useCallback(() => {
+    if (!ruleToDelete) return;
+    ruleStorage.deleteRule(ruleToDelete.id);
+    loadRules();
+    setRuleToDelete(null);
+    toast.success(t('testDataGenerator_ruleDeleted'));
+    onRulesChanged?.();
+  }, [ruleToDelete, loadRules, t, onRulesChanged]);
+
+  const handleDuplicate = useCallback(
+    (id: string) => {
+      const result = ruleStorage.duplicate(id);
+      if (result) {
+        loadRules();
+        toast.success(t('testDataGenerator_ruleDuplicated'));
+        onRulesChanged?.();
+      }
+    },
+    [loadRules, t, onRulesChanged],
+  );
+
+  const handleEdit = useCallback(
+    (rule: DataRule) => {
+      onEdit?.(rule);
+    },
+    [onEdit],
+  );
+
+  const handleExport = useCallback(() => {
+    try {
+      setIsExporting(true);
+      const json = ruleStorage.exportRules();
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      try {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'test-data-rules.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+      toast.success(t('testDataGenerator_exportSuccess'));
+    } catch (error) {
+      console.error('[RuleManager] 导出失败:', error);
+      toast.error(t('testDataGenerator_exportFailed'));
+    } finally {
+      setIsExporting(false);
     }
-  };
+  }, [t]);
 
-  const handleLoad = (rule: DataRule) => {
-    onLoad(rule.fields);
-    ruleStorage.recordUse(rule.id);
-    loadRules();
-  };
-
-  const handleDelete = (id: string) => {
-    ruleStorage.deleteRule(id);
-    loadRules();
-  };
-
-  const handleDuplicate = (id: string) => {
-    ruleStorage.duplicate(id);
-    loadRules();
-  };
-
-  const handleExport = () => {
-    const json = ruleStorage.exportRules();
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'test-data-rules.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImport = async () => {
+  const handleImport = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
     input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
+      try {
+        setIsImporting(true);
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
 
-      const text = await file.text();
-      const result = ruleStorage.importRules(text);
+        const text = await file.text();
+        const result = ruleStorage.importRules(text);
 
-      if (result.errors.length > 0) {
-        console.warn('[RuleManager] 导入警告:', result.errors);
+        if (result.success > 0) {
+          toast.success(t('testDataGenerator_importSuccess', { count: result.success }));
+        }
+
+        if (result.failed > 0) {
+          toast.error(t('testDataGenerator_importFailed', { count: result.failed }));
+          console.warn('[RuleManager] 导入警告:', result.errors);
+        }
+
+        loadRules();
+        onRulesChanged?.();
+      } catch (error) {
+        console.error('[RuleManager] 导入失败:', error);
+        toast.error(t('testDataGenerator_importFailed'));
+      } finally {
+        setIsImporting(false);
       }
-
-      loadRules();
     };
     input.click();
-  };
+  }, [loadRules, t, onRulesChanged]);
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString('zh-CN', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatDate = useCallback(
+    (timestamp: number) => {
+      return new Date(timestamp).toLocaleDateString(i18n.language || 'zh-CN', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    },
+    [i18n.language],
+  );
 
   return (
     <div className="space-y-4">
+      {/* 删除确认对话框 */}
+      <Dialog open={!!ruleToDelete} onOpenChange={() => setRuleToDelete(null)}>
+        <DialogContent
+          showCloseButton={false}
+          className="w-[calc(100vw-4rem)] max-w-[420px] p-0 pt-6 flex flex-col"
+        >
+          <div className="flex-1 overflow-y-auto px-6 pb-4">
+            <p className="text-sm text-muted-foreground">
+              {t('testDataGenerator_confirmDeleteDescription', { name: ruleToDelete?.name ?? '' })}
+            </p>
+          </div>
+          <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
+            <Button variant="ghost" size="sm" onClick={() => setRuleToDelete(null)}>
+              {t('testDataGenerator_cancel')}
+            </Button>
+            <Button variant="destructive" size="sm" onClick={handleDelete}>
+              {t('testDataGenerator_confirm')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* 工具栏 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowSaveDialog(true)}
-            disabled={currentFields.length === 0}
-            className="h-8 gap-1.5"
-          >
-            <Save className="h-4 w-4" />
-            {t('testDataGenerator_saveRule')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleImport} className="h-8 gap-1.5">
+      <div className="flex items-center gap-2 flex-wrap">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleImport}
+          disabled={isImporting}
+          className="h-8 gap-1.5"
+        >
+          {isImporting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
             <Upload className="h-4 w-4" />
-            {t('testDataGenerator_import')}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
-            disabled={rules.length === 0}
-            className="h-8 gap-1.5"
-          >
+          )}
+          {t('testDataGenerator_import')}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExport}
+          disabled={isExporting || rules.length === 0}
+          className="h-8 gap-1.5"
+        >
+          {isExporting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
             <Download className="h-4 w-4" />
-            {t('testDataGenerator_export')}
-          </Button>
-        </div>
-        <span className="text-xs text-muted-foreground">
-          {t('testDataGenerator_ruleCount', { count: rules.length, max: 20 })}
-        </span>
+          )}
+          {t('testDataGenerator_export')}
+        </Button>
       </div>
 
       {/* 搜索框 */}
@@ -145,40 +229,15 @@ export default function RuleManager({ currentFields, onLoad }: RuleManagerProps)
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value.slice(0, 20))}
           placeholder={t('testDataGenerator_searchRules')}
-          className="pl-9 h-9"
+          className="pl-9 pr-24 h-9"
+          maxLength={20}
         />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+          {t('testDataGenerator_ruleCount', { count: rules.length, max: 20 })}
+        </span>
       </div>
-
-      {/* 保存对话框 */}
-      {showSaveDialog && (
-        <div className="p-3 rounded-lg border bg-card space-y-3">
-          <h4 className="text-sm font-medium text-foreground">
-            {t('testDataGenerator_saveNewRule')}
-          </h4>
-          <Input
-            value={ruleName}
-            onChange={(e) => setRuleName(e.target.value)}
-            placeholder={t('testDataGenerator_ruleNamePlaceholder')}
-            className="h-9"
-          />
-          <Input
-            value={ruleDescription}
-            onChange={(e) => setRuleDescription(e.target.value)}
-            placeholder={t('testDataGenerator_ruleDescPlaceholder')}
-            className="h-9"
-          />
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setShowSaveDialog(false)}>
-              {t('testDataGenerator_cancel')}
-            </Button>
-            <Button size="sm" onClick={handleSave} disabled={!ruleName.trim()}>
-              {t('testDataGenerator_confirm')}
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* 规则列表 */}
       <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -186,7 +245,7 @@ export default function RuleManager({ currentFields, onLoad }: RuleManagerProps)
           <div className="text-center py-6">
             <Tag className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">
-              {searchQuery
+              {debouncedSearchQuery
                 ? t('testDataGenerator_noSearchResults')
                 : t('testDataGenerator_noRules')}
             </p>
@@ -226,6 +285,15 @@ export default function RuleManager({ currentFields, onLoad }: RuleManagerProps)
                   onClick={() => handleLoad(rule)}
                   title={t('testDataGenerator_load')}
                 >
+                  <FolderOpen className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => handleEdit(rule)}
+                  title={t('testDataGenerator_edit')}
+                >
                   <Edit className="h-3.5 w-3.5" />
                 </Button>
                 <Button
@@ -241,7 +309,7 @@ export default function RuleManager({ currentFields, onLoad }: RuleManagerProps)
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 text-destructive hover:text-destructive"
-                  onClick={() => handleDelete(rule.id)}
+                  onClick={() => setRuleToDelete(rule)}
                   title={t('testDataGenerator_delete')}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
