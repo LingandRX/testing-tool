@@ -1,173 +1,108 @@
 /**
  * 数据预览组件
- * 展示生成的数据，支持 JSON 和 CSV 格式切换
- * 大数据量使用虚拟列表优化性能
+ * 展示一条示例数据，展示数据结构
  */
 
-import { useState, useRef, useCallback, useMemo } from 'react';
-import { Copy, Check, FileJson, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useMemo } from 'react';
+import { FileJson, FileText } from 'lucide-react';
 import { useI18n } from '@/utils/chromeI18n';
-import { DataExporter } from '@/utils/dataExporter';
-import type { GenerateResult } from '@/types/testDataGenerator';
+import { getGeneratorById } from '@/lib/generators';
+import type { FieldConfig } from '@/types/testDataGenerator';
 
 interface DataPreviewProps {
-  result: GenerateResult | null;
+  fields: FieldConfig[];
 }
 
-type PreviewFormat = 'json' | 'csv';
+/** JSON 语法高亮渲染 */
+function JsonHighlight({ data }: { data: Record<string, unknown> }) {
+  const formatted = useMemo(() => {
+    const lines: { indent: string; key?: string; value: string; isLast: boolean }[] = [];
+    const entries = Object.entries(data);
 
-/** 虚拟列表配置 */
-const VIRTUAL_ROW_HEIGHT = 20;
-const VIRTUAL_OVERSCAN = 5;
+    entries.forEach(([key, value], index) => {
+      const isLast = index === entries.length - 1;
+      const formattedValue =
+        value === null ? 'null' : typeof value === 'string' ? `"${value}"` : String(value);
+      lines.push({ indent: '  ', key, value: formattedValue, isLast });
+    });
 
-export default function DataPreview({ result }: DataPreviewProps) {
-  const { t } = useI18n('testDataGenerator');
-  const [format, setFormat] = useState<PreviewFormat>('json');
-  const [copied, setCopied] = useState(false);
-  const [scrollTop, setScrollTop] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+    return lines;
+  }, [data]);
 
-  const data = result?.data;
-  const hasData = data && data.length > 0;
-
-  // 将数据转换为预渲染的行文本（避免每次滚动重复计算）
-  const rows = useMemo(() => {
-    if (!hasData) return [];
-    if (format === 'json') {
-      return data.map((item) => JSON.stringify(item));
-    }
-    // CSV 格式：先生成表头，再逐行
-    const headers = Array.from(new Set(data.flatMap((row) => Object.keys(row))));
-    const headerLine = headers.join(',');
-    const dataLines = data.map((row) =>
-      headers
-        .map((h) => {
-          const val = String(row[h] ?? '');
-          return val.includes(',') || val.includes('"') || val.includes('\n')
-            ? `"${val.replace(/"/g, '""')}"`
-            : val;
-        })
-        .join(','),
-    );
-    return [headerLine, ...dataLines];
-  }, [data, hasData, format]);
-
-  const totalRows = rows.length;
-  const isLargeDataset = totalRows > 100;
-  const containerHeight = 400;
-
-  // 虚拟列表：计算可见范围
-  const visibleStart = Math.max(0, Math.floor(scrollTop / VIRTUAL_ROW_HEIGHT) - VIRTUAL_OVERSCAN);
-  const visibleEnd = Math.min(
-    totalRows,
-    Math.ceil((scrollTop + containerHeight) / VIRTUAL_ROW_HEIGHT) + VIRTUAL_OVERSCAN,
+  return (
+    <pre className="text-sm font-mono leading-relaxed">
+      <span className="text-muted-foreground">{'{'}</span>
+      {formatted.map((line, i) => (
+        <div key={i} className="flex">
+          <span className="text-muted-foreground">{line.indent}</span>
+          <span className="text-blue-500 dark:text-blue-400">&quot;{line.key}&quot;</span>
+          <span className="text-muted-foreground">{': '}</span>
+          <span className={getValueColor(line.value)}>{line.value}</span>
+          {!line.isLast && <span className="text-muted-foreground">,</span>}
+        </div>
+      ))}
+      <span className="text-muted-foreground">{'}'}</span>
+    </pre>
   );
-  const visibleRows = rows.slice(visibleStart, visibleEnd);
-  const totalHeight = totalRows * VIRTUAL_ROW_HEIGHT;
+}
 
-  const handleScroll = useCallback(() => {
-    if (containerRef.current) {
-      setScrollTop(containerRef.current.scrollTop);
+/** 根据值类型返回颜色类名 */
+function getValueColor(value: string): string {
+  if (value === 'null') return 'text-muted-foreground';
+  if (value.startsWith('"')) return 'text-emerald-600 dark:text-emerald-400';
+  if (/^\d+$/.test(value)) return 'text-amber-600 dark:text-amber-400';
+  if (value === 'true' || value === 'false') return 'text-purple-600 dark:text-purple-400';
+  return 'text-foreground';
+}
+
+export default function DataPreview({ fields }: DataPreviewProps) {
+  const { t } = useI18n('testDataGenerator');
+
+  // 生成一条示例数据
+  const sampleData = useMemo(() => {
+    if (fields.length === 0) return null;
+
+    const record: Record<string, unknown> = {};
+    for (const field of fields) {
+      const generator = getGeneratorById(field.generatorId);
+      if (generator) {
+        record[field.name] = generator.generate(field.params);
+      } else {
+        record[field.name] = null;
+      }
     }
-  }, []);
+    return record;
+  }, [fields]);
 
-  const handleCopy = async () => {
-    if (!hasData) return;
-    const fullContent = format === 'json' ? DataExporter.toJSON(data) : DataExporter.toCSV(data);
-    const success = await DataExporter.copyToClipboard(fullContent);
-    if (success) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  if (!hasData) {
+  if (!sampleData) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <FileJson className="h-12 w-12 text-muted-foreground/40 mb-3" />
-        <p className="text-sm text-muted-foreground">{t('testDataGenerator_noData')}</p>
-        <p className="text-xs text-muted-foreground/70 mt-1">{t('testDataGenerator_noDataHint')}</p>
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <FileJson className="h-8 w-8 text-muted-foreground/30 mb-2" />
+        <p className="text-xs text-muted-foreground/50">{t('testDataGenerator_noDataHint')}</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col h-full">
-      {/* 工具栏 */}
+      {/* 示例标签 */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Button
-            variant={format === 'json' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setFormat('json')}
-            className="h-8 gap-1.5"
-          >
-            <FileJson className="h-4 w-4" />
-            JSON
-          </Button>
-          <Button
-            variant={format === 'csv' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setFormat('csv')}
-            className="h-8 gap-1.5"
-          >
-            <FileText className="h-4 w-4" />
-            CSV
-          </Button>
-          {isLargeDataset && (
-            <span className="text-xs text-muted-foreground ml-2">
-              {t('testDataGenerator_virtualMode', { count: totalRows })}
-            </span>
-          )}
-        </div>
-
-        <Button variant="ghost" size="sm" onClick={handleCopy} className="h-8 gap-1.5">
-          {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-          {copied ? t('testDataGenerator_copied') : t('testDataGenerator_copy')}
-        </Button>
-      </div>
-
-      {/* 虚拟列表预览 */}
-      <div
-        ref={containerRef}
-        className="flex-1 min-h-0 overflow-auto rounded-lg bg-muted/50"
-        onScroll={handleScroll}
-        style={{ height: containerHeight }}
-      >
-        {isLargeDataset ? (
-          /* 虚拟滚动模式 */
-          <div style={{ height: totalHeight, position: 'relative' }}>
-            <div
-              style={{
-                position: 'absolute',
-                top: visibleStart * VIRTUAL_ROW_HEIGHT,
-                left: 0,
-                right: 0,
-              }}
-            >
-              {visibleRows.map((row, i) => (
-                <div
-                  key={visibleStart + i}
-                  className="px-4 py-0.5 text-sm font-mono text-foreground whitespace-pre-wrap break-all hover:bg-muted/30"
-                  style={{ height: VIRTUAL_ROW_HEIGHT, lineHeight: `${VIRTUAL_ROW_HEIGHT}px` }}
-                >
-                  {row}
-                </div>
-              ))}
-            </div>
+          <div className="h-5 w-5 rounded bg-primary/10 flex items-center justify-center">
+            <FileText className="h-3 w-3 text-primary" />
           </div>
-        ) : (
-          /* 普通模式（小数据量） */
-          <pre className="p-4 text-sm font-mono text-foreground whitespace-pre-wrap break-all">
-            {rows.join('\n')}
-          </pre>
-        )}
+          <span className="text-xs font-medium text-muted-foreground">
+            {t('testDataGenerator_sampleData')}
+          </span>
+        </div>
+        <span className="text-[10px] text-muted-foreground/50 bg-muted px-1.5 py-0.5 rounded">
+          {Object.keys(sampleData).length} {t('testDataGenerator_fields')}
+        </span>
       </div>
 
-      {/* 数据统计 */}
-      <div className="mt-2 text-xs text-muted-foreground text-right">
-        {t('testDataGenerator_totalRows', { count: data.length })}
+      {/* 示例数据展示 */}
+      <div className="flex-1 min-h-0 overflow-auto rounded-lg bg-zinc-950 dark:bg-zinc-900 p-4">
+        <JsonHighlight data={sampleData} />
       </div>
     </div>
   );
