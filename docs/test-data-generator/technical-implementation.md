@@ -1481,28 +1481,15 @@ export class DataExporter {
     });
   }
 
-  // 下载为 ZIP（需要引入 jszip 库）
-  static async downloadAsZip(
-    files: ExportFile[],
-    zipFilename: string = 'export.zip',
-  ): Promise<void> {
-    // 动态导入 jszip
-    const JSZip = (await import('jszip')).default;
-    const zip = new JSZip();
-
-    files.forEach((file) => {
-      zip.file(file.filename, file.content);
-    });
-
-    const content = await zip.generateAsync({ type: 'blob' });
-    const url = URL.createObjectURL(content);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = zipFilename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  // 复制到剪贴板
+  static async copyToClipboard(content: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(content);
+      return true;
+    } catch (error) {
+      console.error('[DataExporter] 复制失败:', error);
+      return false;
+    }
   }
 }
 ```
@@ -1860,9 +1847,9 @@ toast.error('生成失败：生成器不存在');
 
 ### 4. 虚拟列表
 
-- 大数据预览使用虚拟列表
-- 只渲染可见区域
-- 减少 DOM 渲染
+- 大数据预览（>100 条）自动启用虚拟滚动
+- 行高固定 20px，仅渲染可见区域 ±5 行缓冲
+- 大幅减少 DOM 节点数量，优化滚动性能
 
 ---
 

@@ -7,7 +7,6 @@
     "message": "清理",
     "description": "Translation key: buttons_clear"
   },
-
   "messages_copySuccess": {
     "message": "已复制到剪贴板",
     "description": "Translation key: messages_copySuccess"
@@ -896,7 +895,6 @@
     "message": "在标签页打开",
     "description": "Translation key: buttons_openInTab"
   },
-
   "common_errorBoundary_title": {
     "message": "糟糕，出了点问题",
     "description": "Translation key: errorBoundary_title"
@@ -1188,5 +1186,11 @@
   "testDataGenerator_delete": {
     "message": "删除",
     "description": "Translation key: testDataGenerator_delete"
+  },
+  "testDataGenerator_virtualMode": {
+    "message": "虚拟列表模式（共 $ 行）"
+  },
+  "testDataGenerator_totalRows": {
+    "message": "共 $ 条数据"
   }
 }
