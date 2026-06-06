@@ -1016,7 +1016,7 @@
     "description": "Translation key: testDataGenerator_generate"
   },
   "testDataGenerator_cancel": {
-    "message": "取消生成",
+    "message": "取消",
     "description": "Translation key: testDataGenerator_cancel"
   },
   "testDataGenerator_progress": {

@@ -11,8 +11,6 @@ interface GenerateOptionsProps {
   onCountChange: (count: number) => void;
   format: 'json' | 'csv';
   onFormatChange: (format: 'json' | 'csv') => void;
-  defaultNullRate: number;
-  onDefaultNullRateChange: (rate: number) => void;
 }
 
 const COUNT_PRESETS = [50, 100, 1000, 5000, 10000];
@@ -27,8 +25,6 @@ export default function GenerateOptions({
   onCountChange,
   format,
   onFormatChange,
-  defaultNullRate,
-  onDefaultNullRateChange,
 }: GenerateOptionsProps) {
   const { t } = useI18n('testDataGenerator');
 
@@ -89,25 +85,6 @@ export default function GenerateOptions({
             </button>
           ))}
         </div>
-      </div>
-
-      {/* 默认空值率 */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-foreground">
-            {t('testDataGenerator_defaultNullRate')}
-          </label>
-          <span className="text-sm text-muted-foreground">{defaultNullRate}%</span>
-        </div>
-        <Input
-          type="number"
-          value={defaultNullRate}
-          onChange={(e) => onDefaultNullRateChange(Number(e.target.value))}
-          min={0}
-          max={50}
-          step={5}
-          className="h-9 w-full"
-        />
       </div>
     </div>
   );
