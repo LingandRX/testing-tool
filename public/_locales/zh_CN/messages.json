@@ -1043,6 +1043,10 @@
     "message": "配置字段后点击「生成数据」按钮",
     "description": "Translation key: testDataGenerator_noDataHint"
   },
+  "testDataGenerator_sampleData": {
+    "message": "示例数据",
+    "description": "Translation key: testDataGenerator_sampleData"
+  },
   "testDataGenerator_copied": {
     "message": "已复制",
     "description": "Translation key: testDataGenerator_copied"
