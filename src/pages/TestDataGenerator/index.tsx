@@ -9,6 +9,13 @@ import { cn } from '@/lib/utils';
 import { useGenerator } from './hooks/useGenerator';
 import { getGeneratorById } from '@/lib/generators';
 import type { FieldConfig, GenerateResult } from '@/types/testDataGenerator';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 // 生成唯一 ID 的辅助函数
 function generateId(): string {
@@ -33,6 +40,7 @@ export default function TestDataGeneratorPage() {
   // 字段配置
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   // 生成选项
   const [count, setCount] = useState(100);
@@ -176,6 +184,12 @@ export default function TestDataGeneratorPage() {
   // 获取选中的字段（-1 或 null 表示未选中）
   const selectedField = selectedIndex !== null && selectedIndex >= 0 ? fields[selectedIndex] : null;
 
+  // 打开字段编辑器
+  const handleOpenEditor = useCallback((index: number) => {
+    setSelectedIndex(index);
+    setIsEditorOpen(true);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
@@ -213,36 +227,16 @@ export default function TestDataGeneratorPage() {
 
             {/* 字段配置标签页 */}
             {activeTab === 'fields' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* 字段列表 */}
-                <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
-                  <FieldList
-                    fields={fields}
-                    onUpdate={handleUpdateField}
-                    onRemove={handleRemoveField}
-                    onAdd={handleAddField}
-                    onSelect={setSelectedIndex}
-                    selectedIndex={selectedIndex}
-                    onReorder={handleReorder}
-                  />
-                </div>
-
-                {/* 字段编辑器 */}
-                <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
-                  {selectedField ? (
-                    <FieldEditor
-                      field={selectedField}
-                      onChange={(updatedField) => handleUpdateField(selectedIndex!, updatedField)}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <Settings className="h-10 w-10 text-muted-foreground/40 mb-3" />
-                      <p className="text-sm text-muted-foreground">
-                        {t('testDataGenerator_selectFieldToEdit')}
-                      </p>
-                    </div>
-                  )}
-                </div>
+              <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
+                <FieldList
+                  fields={fields}
+                  onUpdate={handleUpdateField}
+                  onRemove={handleRemoveField}
+                  onAdd={handleAddField}
+                  onSelect={handleOpenEditor}
+                  selectedIndex={selectedIndex}
+                  onReorder={handleReorder}
+                />
               </div>
             )}
 
@@ -312,6 +306,22 @@ export default function TestDataGeneratorPage() {
           </div>
         </div>
       </div>
+
+      {/* 字段编辑弹窗 */}
+      <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('testDataGenerator_fieldConfig')}</DialogTitle>
+            <DialogDescription>{t('testDataGenerator_selectFieldToEdit')}</DialogDescription>
+          </DialogHeader>
+          {selectedField && selectedIndex !== null && (
+            <FieldEditor
+              field={selectedField}
+              onChange={(updatedField) => handleUpdateField(selectedIndex, updatedField)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
