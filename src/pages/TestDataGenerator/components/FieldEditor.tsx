@@ -73,9 +73,12 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
       {/* 基础配置 */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
-            {t('testDataGenerator_fieldName')}
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              {t('testDataGenerator_fieldName')}
+            </label>
+            <span className="text-xs text-muted-foreground">{field.name.length}/20</span>
+          </div>
           <Input
             value={field.name}
             onChange={(e) => handleNameChange(e.target.value)}
@@ -86,9 +89,14 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
-            {t('testDataGenerator_fieldDescription')}
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              {t('testDataGenerator_fieldDescription')}
+            </label>
+            <span className="text-xs text-muted-foreground">
+              {(field.description || '').length}/50
+            </span>
+          </div>
           <Input
             value={field.description || ''}
             onChange={(e) => handleDescriptionChange(e.target.value)}
@@ -132,7 +140,7 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
                 <button
                   key={preset.value}
                   onClick={() => handleNullRateChange(preset.value)}
-                  className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                  className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
                     field.nullRate === preset.value
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
