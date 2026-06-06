@@ -170,11 +170,11 @@ export default function FieldList({
       setScrollTop(newScrollTop);
     };
 
-    // 添加事件监听，使用 passive: false 以允许 preventDefault
-    container.addEventListener('wheel', handleWheel, { passive: false });
+    // 在 document 级别监听，使用 capture 阶段以优先处理
+    document.addEventListener('wheel', handleWheel, { capture: true, passive: false });
 
     return () => {
-      container.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('wheel', handleWheel, { capture: true });
     };
   }, [activeId]);
 
