@@ -27,14 +27,14 @@
 ### 规则模板
 
 ```typescript
-interface RuleTemplate {
+interface DataRule {
   id: string; // 唯一标识
   name: string; // 规则名称
   description?: string; // 规则描述
   fields: FieldConfig[]; // 字段配置
   options: {
     total: number; // 生成数量
-    format: 'json' | 'csv' | 'sql' | 'typescript';
+    format: 'json' | 'csv';
     defaultEmptyRate: number; // 默认空值率（0-100）
   };
   metadata: {
@@ -170,7 +170,7 @@ interface FieldConfig {
 **实现方式**:
 
 ```typescript
-search(keyword: string): RuleTemplate[] {
+search(keyword: string): DataRule[] {
   const rules = this.getAll();
   const lowerKeyword = keyword.toLowerCase();
 
@@ -408,13 +408,13 @@ class RuleStorage {
   private readonly STORAGE_KEY = 'testDataGenerator_rules';
 
   // 获取所有规则
-  getAll(): RuleTemplate[] {
+  getAll(): DataRule[] {
     const data = localStorage.getItem(this.STORAGE_KEY);
     return data ? JSON.parse(data) : [];
   }
 
   // 保存规则
-  save(rule: RuleTemplate): { success: boolean; message?: string } {
+  save(rule: DataRule): { success: boolean; message?: string } {
     const rules = this.getAll();
 
     // 规则数量限制：最多 20 条
@@ -432,7 +432,7 @@ class RuleStorage {
   }
 
   // 更新规则
-  update(id: string, updates: Partial<RuleTemplate>): void {
+  update(id: string, updates: Partial<DataRule>): void {
     const rules = this.getAll();
     const index = rules.findIndex((r) => r.id === id);
     if (index !== -1) {
