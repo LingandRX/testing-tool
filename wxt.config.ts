@@ -48,9 +48,7 @@ export default defineConfig({
     default_locale: 'zh_CN',
     permissions: [
       'storage',
-      'unlimitedStorage',
       'clipboardWrite',
-      'activeTab',
       'scripting',
       'tabs',
       'cookies',
