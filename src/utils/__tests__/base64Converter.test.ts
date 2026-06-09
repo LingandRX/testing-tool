@@ -7,7 +7,6 @@ import {
   isSupportedImageType,
   isSupportedImageExtension,
   extractMimeTypeFromDataUri,
-  formatFileSize,
   base64ToBytes,
   sniffMimeFromBytes,
   base64ToBlob,
@@ -182,26 +181,6 @@ describe('extractMimeTypeFromDataUri', () => {
 
   it('应该对无效的 data URI 返回默认类型', () => {
     expect(extractMimeTypeFromDataUri('invalid')).toBe('application/octet-stream');
-  });
-});
-
-describe('formatFileSize', () => {
-  it('应该格式化字节', () => {
-    expect(formatFileSize(0)).toBe('0 B');
-    expect(formatFileSize(512)).toBe('512 B');
-  });
-
-  it('应该格式化 KB', () => {
-    expect(formatFileSize(1024)).toBe('1.0 KB');
-    expect(formatFileSize(1536)).toBe('1.5 KB');
-  });
-
-  it('应该格式化 MB', () => {
-    expect(formatFileSize(1048576)).toBe('1.00 MB');
-  });
-
-  it('应该格式化 GB', () => {
-    expect(formatFileSize(1073741824)).toBe('1.00 GB');
   });
 });
 

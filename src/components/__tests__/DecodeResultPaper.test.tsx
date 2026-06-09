@@ -27,7 +27,7 @@ describe('DecodeResultPaper 组件', () => {
       expect(screen.getByText(/image\/png/)).toBeInTheDocument();
     });
 
-    it('应通过 formatFileSize 渲染文件大小', () => {
+    it('应通过 formatBytes 渲染文件大小', () => {
       render(<DecodeResultPaper {...{ ...defaultProps, blobSize: 1536 }} />);
       expect(screen.getByText(/1\.5 KB/)).toBeInTheDocument();
     });

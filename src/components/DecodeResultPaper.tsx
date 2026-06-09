@@ -9,7 +9,7 @@
  */
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { formatFileSize } from '@/utils/base64Converter';
+import { formatBytes } from '@/utils/format';
 import { useI18n } from '@/utils/chromeI18n';
 
 interface DecodeResultPaperProps {
@@ -54,7 +54,7 @@ export default function DecodeResultPaper({
           {t('inferredMimeType')}: {mimeType}
         </span>
         <span className="text-xs text-muted-foreground">
-          {t('decodedSize')}: {formatFileSize(blobSize)}
+          {t('decodedSize')}: {formatBytes(blobSize)}
         </span>
       </div>
 

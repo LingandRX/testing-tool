@@ -4,7 +4,8 @@ import { useI18n } from '@/utils/chromeI18n';
 import { CopyButton } from '@/components/CopyButton';
 import DecodeResultPaper from '@/components/DecodeResultPaper';
 import { Button } from '@/components/ui/button';
-import { downloadBlob, formatFileSize } from '@/utils/base64Converter';
+import { downloadBlob } from '@/utils/base64Converter';
+import { formatBytes } from '@/utils/format';
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConvertDirection } from '@/types/storage';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
@@ -122,7 +123,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   {info.name}
                 </span>
                 <span className="text-xs text-muted-foreground/80 font-mono tabular-nums">
-                  {formatFileSize(info.size)} · {info.type}
+                  {formatBytes(info.size)} · {info.type}
                 </span>
                 <span className="text-[11px] font-medium text-primary/80 mt-1">
                   {t('clickOrDropToReplace')}
@@ -190,14 +191,14 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   <span>
                     {t('originalSize')}:{' '}
                     <span className="font-semibold text-foreground/80">
-                      {formatFileSize(result.originalBytes)}
+                      {formatBytes(result.originalBytes)}
                     </span>
                   </span>
                   <span className="text-border/60">|</span>
                   <span>
                     {t('encodedSize')}:{' '}
                     <span className="font-semibold text-foreground/80">
-                      {formatFileSize(result.outputBytes)}
+                      {formatBytes(result.outputBytes)}
                     </span>
                   </span>
                 </div>
