@@ -1,4 +1,4 @@
-import type { DiffNode, DiffResult, DiffType } from './types';
+import type { DiffNode, DiffResult, DiffType } from '@/pages/JsonTools/types';
 
 const ROOT_PATH = '$';
 const SENTINEL = Symbol('missing');
