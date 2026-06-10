@@ -1,8 +1,8 @@
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { ZONES } from './constants';
 import type { ModeType, UnitType, ZoneType } from './constants';
-import LiveClock from './LiveClock';
-import ResultView from './ResultView';
+import LiveClock from './components/LiveClock';
+import ResultView from './components/ResultView';
 import { useTimestampConverter } from './useTimestampConverter';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
