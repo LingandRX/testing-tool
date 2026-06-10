@@ -9,6 +9,7 @@
  */
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { formatBytes } from '@/utils/format';
 import { useI18n } from '@/utils/chromeI18n';
 
@@ -63,12 +64,7 @@ export default function DecodeResultPaper({
         <label className="block text-xs font-medium text-muted-foreground mb-1">
           {t('decodedFileName')}
         </label>
-        <input
-          type="text"
-          value={fileName}
-          onChange={(e) => onFileNameChange(e.target.value)}
-          className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-        />
+        <Input value={fileName} onChange={(e) => onFileNameChange(e.target.value)} />
       </div>
 
       {/* 下载按钮 */}

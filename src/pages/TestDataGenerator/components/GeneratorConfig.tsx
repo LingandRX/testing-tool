@@ -4,6 +4,7 @@
  */
 
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
   Select,
@@ -39,10 +40,10 @@ export default function GeneratorConfig({ generator, params, onChange }: Generat
     <div className="space-y-4 p-3 rounded-lg bg-muted/30">
       {generator.params.map((param) => (
         <div key={param.key} className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
+          <Label className="text-sm font-medium text-foreground">
             {param.label}
             {param.required && <span className="text-destructive ml-1">*</span>}
-          </label>
+          </Label>
           {param.description && (
             <p className="text-xs text-muted-foreground">{param.description}</p>
           )}

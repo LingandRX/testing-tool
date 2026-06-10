@@ -6,6 +6,7 @@
 import { useState, useCallback } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { getGeneratorById } from '@/lib/generators';
@@ -110,9 +111,9 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-foreground">
+            <Label className="text-sm font-medium text-foreground">
               {t('testDataGenerator_fieldName')}
-            </label>
+            </Label>
             <span className="text-xs text-muted-foreground">{field.name.length}/20</span>
           </div>
           <Input
@@ -127,9 +128,9 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-foreground">
+            <Label className="text-sm font-medium text-foreground">
               {t('testDataGenerator_fieldDescription')}
-            </label>
+            </Label>
             <span className="text-xs text-muted-foreground">
               {(field.description || '').length}/50
             </span>
@@ -147,9 +148,9 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
       {/* 必填/选填配置 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-foreground">
+          <Label className="text-sm font-medium text-foreground">
             {t('testDataGenerator_required')}
-          </label>
+          </Label>
           <Switch checked={field.required} onCheckedChange={handleRequiredChange} />
         </div>
 
@@ -198,26 +199,26 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
 
       {/* 唯一性约束 */}
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-foreground">
+        <Label className="text-sm font-medium text-foreground">
           {t('testDataGenerator_uniqueConstraint')}
-        </label>
+        </Label>
         <Switch checked={field.unique} onCheckedChange={handleUniqueChange} />
       </div>
 
       {/* 生成器选择 */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
+        <Label className="text-sm font-medium text-foreground">
           {t('testDataGenerator_generator')}
-        </label>
+        </Label>
         <GeneratorSelector selectedId={field.generatorId} onChange={handleGeneratorChange} />
       </div>
 
       {/* 生成器参数配置 */}
       {generator && (
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
+          <Label className="text-sm font-medium text-foreground">
             {t('testDataGenerator_generatorParams')}
-          </label>
+          </Label>
           <GeneratorConfig
             generator={generator}
             params={field.params}
