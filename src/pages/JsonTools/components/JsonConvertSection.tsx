@@ -5,14 +5,7 @@ import { CopyButton } from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
 import { validateJson } from '@/utils/jsonFormatter';
 import { cn } from '@/lib/utils';
-
-export interface ConvertResult {
-  output: string;
-  originalBytes: number;
-  outputBytes: number;
-}
-
-export type ConvertFunction = (text: string) => ConvertResult;
+import type { ConvertFunction, ConvertResult } from '../types';
 
 interface JsonConvertSectionProps extends React.HTMLAttributes<HTMLDivElement> {
   translationPrefix: string;

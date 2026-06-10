@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { diffJson } from '../../pages/JsonTools/diffEngine';
+import { diffJson } from '../diffEngine';
 
 describe('diffJson', () => {
   it('should detect added property', () => {

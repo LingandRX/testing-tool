@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react'; // 用正统的矢量箭头平替原生的字符 '▾' '▸'
-import type { DiffNode, DiffType } from './types';
+import type { DiffNode, DiffType } from '../types';
 import { cn } from '@/lib/utils';
 
 export type TreeSide = 'left' | 'right';
