@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import TextInputArea from '@/components/TextInputArea';
-import ImageUploader from '@/components/ImageUploader';
+import ImageUploader from './ImageUploader';
 import { useI18n } from '@/utils/chromeI18n';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 import { Button } from '@/components/ui/button';

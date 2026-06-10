@@ -12,7 +12,7 @@ vi.mock('@/config/features', async (importOriginal) => {
 });
 
 // Mock 子组件
-vi.mock('../TextMode', () => ({
+vi.mock('../components/TextMode', () => ({
   default: ({ onSwitchToImageMode }: { onSwitchToImageMode?: () => void }) => (
     <div data-testid="text-mode">
       TextMode
@@ -21,7 +21,7 @@ vi.mock('../TextMode', () => ({
   ),
 }));
 
-vi.mock('../Base64ConverterSection', () => ({
+vi.mock('../components/Base64ConverterSection', () => ({
   default: ({ mode }: { mode: string }) => <div data-testid={`${mode}-mode`}>{mode}</div>,
 }));
 

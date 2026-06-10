@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import DecodeResultPaper from '@/components/DecodeResultPaper';
+import DecodeResultPaper from '../components/DecodeResultPaper';
 
 describe('DecodeResultPaper 组件', () => {
   const defaultProps = {

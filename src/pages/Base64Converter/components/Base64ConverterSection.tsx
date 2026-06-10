@@ -2,14 +2,14 @@ import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
 import { useI18n } from '@/utils/chromeI18n';
 import { CopyButton } from '@/components/CopyButton';
-import DecodeResultPaper from '@/components/DecodeResultPaper';
+import DecodeResultPaper from './DecodeResultPaper';
 import { Button } from '@/components/ui/button';
 import { downloadBlob } from '@/utils/base64Converter';
 import { formatBytes } from '@/utils/format';
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConvertDirection } from '@/types/storage';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
-import { useBase64Converter } from './useBase64Converter';
+import { useBase64Converter } from '../useBase64Converter';
 import { cn } from '@/lib/utils';
 
 const isValidDirection = (val: unknown): val is Base64ConvertDirection =>
