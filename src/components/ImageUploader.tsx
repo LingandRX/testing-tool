@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Image, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { useI18n } from '@/utils/chromeI18n';
 
 interface ImageUploaderProps {
@@ -125,7 +127,7 @@ const ImageUploader = ({
         className="hidden"
         id="qr-code-upload"
       />
-      <label htmlFor="qr-code-upload" className="cursor-pointer text-center w-full">
+      <Label htmlFor="qr-code-upload" className="cursor-pointer text-center w-full">
         {selectedFile ? (
           <div className="text-center w-full relative">
             <div className="relative inline-block">
@@ -134,17 +136,19 @@ const ImageUploader = ({
                 alt="QR Code Preview"
                 className="max-w-full max-h-40 rounded-lg object-contain"
               />
-              <button
+              <Button
                 type="button"
+                variant="destructive"
+                size="icon"
                 data-testid="ClearIcon"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleClearFile();
                 }}
-                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
               >
                 <X className="w-3 h-3" />
-              </button>
+              </Button>
             </div>
             <span className="block text-sm text-muted-foreground mt-2">{selectedFile.name}</span>
             <span className="block text-xs text-muted-foreground">{t('qrCode:clickToChange')}</span>
@@ -163,7 +167,7 @@ const ImageUploader = ({
             </span>
           </>
         )}
-      </label>
+      </Label>
     </div>
   );
 };
