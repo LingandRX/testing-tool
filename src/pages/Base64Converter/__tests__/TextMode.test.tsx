@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import TextMode from '../TextMode';
+import TextMode from '../components/TextMode';
 
 // Mock CopyButton
 vi.mock('@/components/CopyButton', () => ({

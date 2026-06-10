@@ -1,6 +1,6 @@
 import { Loader2, Pencil, QrCode } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
-import QrCodePreview from '@/components/QrCodePreview';
+import QrCodePreview from './QrCodePreview';
 import { useI18n } from '@/utils/chromeI18n';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 import { Button } from '@/components/ui/button';

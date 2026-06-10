@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import ImageUploader from '@/components/ImageUploader';
+import ImageUploader from '../components/ImageUploader';
 
 // 配置多端一致性常驻桩（WXT 规范）
 const storageOnChangedMock = { addListener: vi.fn(), removeListener: vi.fn() };
