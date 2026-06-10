@@ -1,6 +1,6 @@
 import React from 'react';
 import type { StorageCleanerOptions } from '@/types/storage';
-import type { StorageSizeInfo } from './useStorageCleaner';
+import type { StorageSizeInfo } from '../useStorageCleaner';
 import OptionItem from './OptionItem';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';

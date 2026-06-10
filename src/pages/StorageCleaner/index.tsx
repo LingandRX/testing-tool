@@ -1,11 +1,11 @@
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import StorageCleanerConfirm from './StorageCleanerConfirm';
+import StorageCleanerConfirm from './components/StorageCleanerConfirm';
 import { useStorageCleaner } from './useStorageCleaner';
-import StorageOptionsGrid from './StorageOptionsGrid';
-import AutoRefreshToggle from './AutoRefreshToggle';
-import ErrorDisplay from './ErrorDisplay';
-import CleaningResult from './CleaningResult';
+import StorageOptionsGrid from './components/StorageOptionsGrid';
+import AutoRefreshToggle from './components/AutoRefreshToggle';
+import ErrorDisplay from './components/ErrorDisplay';
+import CleaningResult from './components/CleaningResult';
 import { useI18n } from '@/utils/chromeI18n';
 
 export default function Index() {
