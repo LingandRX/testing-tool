@@ -2,7 +2,7 @@ import React from 'react';
 import { formatBytes } from '@/utils/format';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
-import type { StorageSizeInfo } from './useStorageCleaner';
+import type { StorageSizeInfo } from '../useStorageCleaner';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface OptionItemProps extends React.HTMLAttributes<HTMLDivElement> {
