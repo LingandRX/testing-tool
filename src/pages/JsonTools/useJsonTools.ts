@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import { useStorageState } from '@/utils/useStorageState';
-import { diffJson } from './diffEngine';
+import { diffJson } from '@/utils/diffEngine';
 import { jsonToYaml } from '@/utils/jsonToYaml';
 import { jsonToToml } from '@/utils/jsonToToml';
 import { minifyJson } from '@/utils/jsonFormatter';
 import { isValidPageMode, tryParse } from './constants';
 import type { JsonToolsPageMode } from '@/types/storage';
-import type { ConvertFunction } from './JsonConvertSection';
-import type { ViewMode } from './types';
+import type { ConvertFunction, ViewMode } from './types';
 
 export interface UseJsonToolsReturn {
   pageMode: JsonToolsPageMode;

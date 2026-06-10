@@ -2,7 +2,7 @@ import React from 'react';
 import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import JsonTree from './JsonTree';
-import type { DiffNode, DiffResult as DiffResultType, DiffType, ViewMode } from './types';
+import type { DiffNode, DiffResult as DiffResultType, DiffType, ViewMode } from '../types';
 
 export interface DiffResultProps extends React.HTMLAttributes<HTMLDivElement> {
   result: DiffResultType;

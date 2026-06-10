@@ -1,9 +1,9 @@
 import { useI18n } from '@/utils/chromeI18n';
-import JsonDiffInput from './JsonDiffInput';
-import DiffResult from './DiffResult';
-import DiffNavigator from './DiffNavigator';
-import JsonFormatSection from './JsonFormatSection';
-import JsonConvertSection from './JsonConvertSection';
+import JsonDiffInput from './components/JsonDiffInput';
+import DiffResult from './components/DiffResult';
+import DiffNavigator from './components/DiffNavigator';
+import JsonFormatSection from './components/JsonFormatSection';
+import JsonConvertSection from './components/JsonConvertSection';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { useJsonTools } from './useJsonTools';
 import type { JsonToolsPageMode } from '@/types/storage';

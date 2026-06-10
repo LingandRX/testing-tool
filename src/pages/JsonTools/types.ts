@@ -53,3 +53,13 @@ export interface DiffResult {
   /** 差异核心总计数（等价于 diffPaths.length），注入 tabular-nums 配合渲染 */
   diffCount: number;
 }
+
+/** JSON 转换结果 */
+export interface ConvertResult {
+  output: string;
+  originalBytes: number;
+  outputBytes: number;
+}
+
+/** JSON 转换函数类型 */
+export type ConvertFunction = (text: string) => ConvertResult;
