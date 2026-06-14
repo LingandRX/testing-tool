@@ -113,7 +113,7 @@ const ImageUploader = ({
           ? 'border-green-600 bg-green-50'
           : selectedFile
             ? 'border-green-600 bg-green-50/50'
-            : 'border-input bg-muted hover:border-green-600 hover:bg-green-500/10/50'
+            : 'border-input bg-muted hover:border-green-600 hover:bg-green-500/10'
       }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}

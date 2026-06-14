@@ -2,8 +2,6 @@
  * Base64 转换器工具函数
  */
 
-import { formatBytes } from './format';
-
 /** 最大文件大小限制（10 MB） */
 export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -210,17 +208,6 @@ export function fileToBase64(file: File): Promise<FileToBase64Result> {
 export function extractMimeTypeFromDataUri(dataUri: string): string {
   const match = dataUri.match(/^data:([^;,]+)[^,]*;base64,/);
   return match ? match[1] : 'application/octet-stream';
-}
-
-/**
- * 格式化文件大小显示
- *
- * @deprecated 直接使用 {@link formatBytes} 代替
- * @param bytes 字节数
- * @returns 格式化后的字符串
- */
-export function formatFileSize(bytes: number): string {
-  return formatBytes(bytes);
 }
 
 /**
