@@ -125,6 +125,20 @@ const webExtensionMock = {
     sendMessage: vi.fn().mockResolvedValue(undefined),
     create: vi.fn().mockResolvedValue({}),
     reload: vi.fn().mockResolvedValue(undefined),
+    onActivated: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
+    onUpdated: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
+  },
+  windows: {
+    onFocusChanged: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
   },
   runtime: {
     id: 'test-extension-id',

@@ -25,7 +25,8 @@ vi.mock('@/utils/storageCleaner', () => ({
 
 describe('StorageCleaner 页面', () => {
   it('应该渲染初始化加载状态', () => {
+    // storageCleaner:initializing 的中文文案为「正在读取站点数据...」
     render(<Index />);
-    expect(screen.getByText(/initializing/i)).toBeInTheDocument();
+    expect(screen.getByText(/正在读取站点数据/)).toBeInTheDocument();
   });
 });

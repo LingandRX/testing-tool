@@ -50,7 +50,7 @@ describe('contextMenu', () => {
       );
       expect(imageMenus).toHaveLength(1);
       expect(imageMenus[0].id).toBe('qrCode-image');
-      expect(imageMenus[0].title).toBe('🖼️ 解析图片二维码');
+      expect(imageMenus[0].title).toBe('解析图片二维码');
     });
   });
 
@@ -73,7 +73,7 @@ describe('contextMenu', () => {
 
       expect(chrome.contextMenus.create).toHaveBeenCalledWith({
         id: 'jwt',
-        title: '🔑 解析 JWT',
+        title: '解析 JWT',
         contexts: ['selection'],
         parentId: 'testing-tools-parent',
       });
