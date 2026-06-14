@@ -39,17 +39,20 @@ export function StorageCleanerConfirm({
           'w-[90%] max-w-[340px] p-6 gap-0 rounded-2xl overflow-hidden shadow-xl border border-border bg-card text-card-foreground',
         )}
       >
+        {/* 头部标题区域 */}
         <DialogHeader className="pt-1">
           <DialogTitle className="text-center text-lg font-bold tracking-tight text-foreground">
             {t('storageCleaner:confirmTitle')}
           </DialogTitle>
         </DialogHeader>
 
+        {/* 内容主体：限制最大宽度，防止内部元素在大分辨率下被横向拉得太松散 */}
         <div className="text-center py-4 flex flex-col items-center w-full max-w-[280px] mx-auto">
           <DialogDescription className="mb-4 text-xs font-medium text-muted-foreground/90 leading-relaxed">
             {t('storageCleaner:confirmDesc')}
           </DialogDescription>
 
+          {/* 待清理项目徽章群 */}
           <div className="flex flex-wrap gap-1.5 justify-center mb-5 w-full">
             {selectedOptions.map((label) => (
               <Badge
@@ -62,6 +65,7 @@ export function StorageCleanerConfirm({
             ))}
           </div>
 
+          {/* 风险警告横幅 */}
           <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-destructive/5 border border-dashed border-destructive/20 w-full max-w-[240px]">
             <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" />
             <span className="text-[11px] font-bold text-destructive leading-none tracking-tight">

@@ -26,11 +26,11 @@ vi.mock('@/config/features', async (importOriginal) => {
   };
 });
 
-vi.mock('@/components/QrCodePreview', () => ({
+vi.mock('../components/QrCodePreview', () => ({
   default: () => <div data-testid="qr-code-preview">QrCodePreview</div>,
 }));
 
-vi.mock('@/components/ImageUploader', () => ({
+vi.mock('../components/ImageUploader', () => ({
   default: () => <div data-testid="image-uploader">ImageUploader</div>,
 }));
 
