@@ -9,7 +9,7 @@ import type { DataRule, FieldConfig } from '@/types/testDataGenerator';
 const STORAGE_KEY = 'testDataGenerator_rules';
 
 /** 最大规则数量 */
-const MAX_RULES = 20;
+export const MAX_RULES = 20;
 
 /**
  * 获取所有规则

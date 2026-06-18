@@ -1,19 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import { base64ToText, textToBase64 } from '@/utils/base64Converter';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 
 const IMAGE_DATA_URI_PATTERN = /^\s*data:image\//i;
 
 const ERROR_MESSAGE_TO_I18N: Record<string, string> = {
-  'Invalid Base64 string': 'invalidBase64',
+  'Invalid Base64 string': '无效的 Base64 字符串',
   'Input appears to be binary data (e.g. an image). Please use the Image tab instead.':
-    'binaryDataDetected',
+    '检测到二进制数据（如图像），请使用图像选项卡',
 };
 
 export function useTextMode() {
-  const { t } = useI18n('base64Converter');
-
   const [input, setInput] = useState('');
   const [debouncedInput, setDebouncedInput] = useState('');
   const [direction, setDirection] = useState<'encode' | 'decode'>('encode');
@@ -50,17 +47,17 @@ export function useTextMode() {
       const i18nKey = ERROR_MESSAGE_TO_I18N[message];
       return {
         output: '',
-        error: i18nKey ? t(i18nKey) : message || t('conversionFailed'),
+        error: i18nKey || message || '转换失败',
       };
     }
-  }, [debouncedInput, direction, t]);
+  }, [debouncedInput, direction]);
 
   const output = conversionPipeline.output;
   const error = conversionPipeline.error;
 
   const placeholder =
-    direction === 'encode' ? t('textInputPlaceholder') : t('base64InputPlaceholder');
-  const outputLabel = direction === 'encode' ? t('base64Output') : t('textOutput');
+    direction === 'encode' ? '输入需要编码为 Base64 的文本...' : '输入需要解码的 Base64 字符串...';
+  const outputLabel = direction === 'encode' ? 'Base64 编码结果' : '解码文本结果';
 
   const showImageHint = useMemo(
     () => direction === 'decode' && IMAGE_DATA_URI_PATTERN.test(input),
@@ -90,6 +87,5 @@ export function useTextMode() {
     error,
     showImageHint,
     handleClear,
-    t,
   };
 }

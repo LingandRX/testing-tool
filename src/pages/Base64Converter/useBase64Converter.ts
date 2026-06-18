@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import type { FileToBase64Result } from '@/utils/base64Converter';
 import {
   base64ToBlob,
@@ -21,8 +20,6 @@ interface UseBase64ConverterProps {
 }
 
 export function useBase64Converter({ mode }: UseBase64ConverterProps) {
-  const { t } = useI18n('base64Converter');
-
   const [result, setResult] = useState<FileToBase64Result | null>(null);
   const [info, setInfo] = useState<FileInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +59,7 @@ export function useBase64Converter({ mode }: UseBase64ConverterProps) {
       setInfo(null);
 
       if (!isFileSizeValid(file.size)) {
-        setEncodeError(t('fileSizeExceeded', { max: `${MAX_FILE_SIZE / 1024 / 1024} MB` }));
+        setEncodeError(`文件大小超出限制（最大 ${MAX_FILE_SIZE / 1024 / 1024} MB）`);
         return;
       }
 
@@ -71,7 +68,7 @@ export function useBase64Converter({ mode }: UseBase64ConverterProps) {
         !isSupportedImageType(file.type) &&
         !isSupportedImageExtension(file.name)
       ) {
-        setEncodeError(t('unsupportedImageType'));
+        setEncodeError('不支持的图像格式');
         return;
       }
 
@@ -87,13 +84,13 @@ export function useBase64Converter({ mode }: UseBase64ConverterProps) {
         if (!cancelRef.current) setResult(res);
       } catch (e) {
         if (!cancelRef.current) {
-          setEncodeError(e instanceof Error ? e.message : t('conversionFailed'));
+          setEncodeError(e instanceof Error ? e.message : '转换失败');
         }
       } finally {
         if (!cancelRef.current) setIsLoading(false);
       }
     },
-    [mode, t],
+    [mode],
   );
 
   const safeFileSelect = useCallback(
@@ -116,10 +113,10 @@ export function useBase64Converter({ mode }: UseBase64ConverterProps) {
       const message = e instanceof Error ? e.message : '';
       return {
         decoded: null,
-        error: message === 'Invalid Base64 string' ? t('invalidBase64') : t('conversionFailed'),
+        error: message === 'Invalid Base64 string' ? 'Base64 字符串无效' : '转换失败',
       };
     }
-  }, [debouncedDecodeInput, t]);
+  }, [debouncedDecodeInput]);
 
   const decoded = decodePipeline.decoded;
   const decodeError = decodePipeline.error;

@@ -2,10 +2,8 @@ import TextInputArea from '@/components/TextInputArea';
 import { CopyButton } from '@/components/CopyButton';
 import JwtSection from './JwtSection';
 import { useJwt } from './useJwt';
-import { useI18n } from '@/utils/chromeI18n';
 
 export default function Index() {
-  const { t } = useI18n(['jwt', 'jsonFormat']);
   const { jwtInput, result, handleChange, handleClear } = useJwt();
 
   return (
@@ -14,7 +12,7 @@ export default function Index() {
         <TextInputArea
           minRows={5}
           maxRows={10}
-          placeholder={t('jwt_placeholder')}
+          placeholder={'在此粘贴 JWT 令牌 (Encoded JWT)...'}
           value={jwtInput}
           onChange={handleChange}
           allowCopy={true}
@@ -26,7 +24,7 @@ export default function Index() {
         {result && !result.error && (
           <div className="flex flex-col gap-4">
             <JwtSection
-              title={t('jwt:headerTitle')}
+              title={'HEADER: 算法 & 令牌类型'}
               content={result.header}
               colorClass="text-[#fb015b] dark:text-rose-400"
               borderClass="border-[#fb015b]/20 dark:border-rose-500/20"
@@ -34,7 +32,7 @@ export default function Index() {
             />
 
             <JwtSection
-              title={t('jwt:payloadTitle')}
+              title={'PAYLOAD: 数据'}
               content={result.payload}
               colorClass="text-[#a03aff] dark:text-purple-400"
               borderClass="border-[#a03aff]/20 dark:border-purple-500/20"
@@ -44,7 +42,7 @@ export default function Index() {
             <div className="p-4 rounded-xl border border-border bg-secondary/40 shadow-sm">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold tracking-wider text-muted-foreground/90 uppercase">
-                  {t('jwt:signatureTitle')}
+                  {'签名'}
                 </span>
                 <CopyButton
                   text={result.signature || ''}
@@ -52,7 +50,7 @@ export default function Index() {
                 />
               </div>
               <span className="block text-xs font-mono break-all text-foreground/80 bg-muted/30 dark:bg-muted/10 p-3 rounded-lg border border-border/50 leading-relaxed select-text">
-                {result.signature || t('jwt:noSignature')}
+                {result.signature || '无签名'}
               </span>
             </div>
           </div>
@@ -60,9 +58,7 @@ export default function Index() {
 
         {result?.error && (
           <div className="p-6 rounded-xl bg-muted/30 border border-dashed border-border text-center">
-            <p className="text-xs font-semibold text-muted-foreground/80">
-              {t('jsonFormat:invalidJson')}
-            </p>
+            <p className="text-xs font-semibold text-muted-foreground/80">{'无效的 JSON 格式'}</p>
           </div>
         )}
       </div>

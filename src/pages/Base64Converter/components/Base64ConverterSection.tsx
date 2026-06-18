@@ -1,6 +1,5 @@
 import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
-import { useI18n } from '@/utils/chromeI18n';
 import { CopyButton } from '@/components/CopyButton';
 import DecodeResultPaper from './DecodeResultPaper';
 import { Button } from '@/components/ui/button';
@@ -20,8 +19,6 @@ interface Base64ConverterSectionProps {
 }
 
 export default function Base64ConverterSection({ mode }: Base64ConverterSectionProps) {
-  const { t } = useI18n('base64Converter');
-
   const [direction, setDirection] = useStorageState(
     `base64Converter/${mode}Mode/direction`,
     'encode',
@@ -44,7 +41,6 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
     setCustomFileName,
     resetAll,
     safeFileSelect,
-    maxFileSizeStr,
   } = useBase64Converter({ mode });
 
   const handleDirectionChange = (next: Base64ConvertDirection) => {
@@ -63,8 +59,8 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
         <SwitchButtonGroup
           value={direction}
           options={[
-            { value: 'encode', label: t('encode') },
-            { value: 'decode', label: t('decode') },
+            { value: 'encode', label: '编码' },
+            { value: 'decode', label: '解码' },
           ]}
           onChange={handleDirectionChange}
           size="small"
@@ -126,7 +122,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   {formatBytes(info.size)} · {info.type}
                 </span>
                 <span className="text-[11px] font-medium text-primary/80 mt-1">
-                  {t('clickOrDropToReplace')}
+                  {'点击或拖拽以替换文件'}
                 </span>
               </div>
             ) : (
@@ -137,14 +133,14 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   <Upload className="w-8 h-8 text-muted-foreground/60" />
                 )}
                 <span className="text-xs font-bold text-foreground/80">
-                  {mode === 'image' ? t('clickOrDropToImage') : t('clickOrDropToFile')}
+                  {mode === 'image' ? '点击或拖拽图像到此处' : '点击或拖拽文件到此处'}
                 </span>
                 <span className="text-[10px] font-medium text-muted-foreground/60">
-                  {t('maxFileSize', { max: maxFileSizeStr })}
+                  {'最大文件大小：{{max}}'}
                 </span>
                 {mode === 'image' && (
                   <span className="text-[10px] font-medium text-muted-foreground/50">
-                    {t('supportedFormats')}
+                    {'支持 PNG、JPG、WEBP、GIF、BMP、SVG 等格式'}
                   </span>
                 )}
               </div>
@@ -161,17 +157,17 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
             <div className="p-4 rounded-2xl bg-card border border-border shadow-sm flex flex-col space-y-3">
               <div className="flex justify-between items-center select-none">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
-                  {t('base64Output')}
+                  {'Base64 编码结果'}
                 </span>
                 <div className="flex gap-2">
                   <CopyButton
                     text={result.rawBase64}
-                    tooltip={t('copyRaw')}
+                    tooltip={'复制纯 Base64'}
                     className="h-6 px-2 rounded-md border text-[10px] font-bold"
                   />
                   <CopyButton
                     text={result.output}
-                    tooltip={t('copyDataUri')}
+                    tooltip={'复制 Data URI'}
                     className="h-6 px-2 rounded-md border text-[10px] font-bold"
                   />
                 </div>
@@ -189,14 +185,14 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
               <div className="flex items-center justify-between font-mono text-[10px] text-muted-foreground/70 select-none pt-1">
                 <div className="flex gap-4 items-center tabular-nums">
                   <span>
-                    {t('originalSize')}:{' '}
+                    {'原始大小'}:{' '}
                     <span className="font-semibold text-foreground/80">
                       {formatBytes(result.originalBytes)}
                     </span>
                   </span>
                   <span className="text-border/60">|</span>
                   <span>
-                    {t('encodedSize')}:{' '}
+                    {'编码大小'}:{' '}
                     <span className="font-semibold text-foreground/80">
                       {formatBytes(result.outputBytes)}
                     </span>
@@ -209,7 +205,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   className="h-7 rounded-md text-muted-foreground hover:text-destructive text-[11px] gap-1 px-2"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  {t('clear')}
+                  {'清空'}
                 </Button>
               </div>
             </div>
@@ -218,7 +214,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
       ) : (
         <div className="flex flex-col space-y-4">
           <TextInputArea
-            placeholder={t('decodeBase64Placeholder')}
+            placeholder={'输入需要解码的 Base64 或 data URI...'}
             value={decodeInput}
             onChange={setDecodeInput}
             externalError={decodeError || undefined}
@@ -229,7 +225,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
           />
           {decoded && (
             <DecodeResultPaper
-              title={mode === 'image' ? t('decodedImageOutput') : t('decodedFileOutput')}
+              title={mode === 'image' ? '解码图像' : '解码文件'}
               mimeType={decoded.mimeType}
               blobSize={decoded.blob.size}
               fileName={decodedFileName}

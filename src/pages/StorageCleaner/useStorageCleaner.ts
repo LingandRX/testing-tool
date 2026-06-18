@@ -16,7 +16,6 @@ import {
   getSessionStorageSize,
   isRestrictedUrl,
 } from '@/utils/storageCleaner';
-import { useI18n } from '@/utils/chromeI18n';
 import { toast } from 'sonner';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
@@ -59,7 +58,6 @@ export interface UseStorageCleanerReturn {
 }
 
 export function useStorageCleaner(): UseStorageCleanerReturn {
-  const { t } = useI18n(['storageCleaner', 'common']);
   const [error, setError] = useState<string>('');
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
   const [options, setOptions] = useState<StorageCleanerOptions>(DEFAULT_OPTIONS);
@@ -93,11 +91,11 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       if (currentRequestId !== requestIdRef.current) return;
 
       if (!tab || !tab.url) {
-        setError(t('storageCleaner:errorNoTab'));
+        setError('无法获取当前标签页');
         return;
       }
       if (isRestrictedUrl(tab.url)) {
-        setError(t('storageCleaner:errorRestricted'));
+        setError('存储清理功能不支持此页面');
         return;
       }
 
@@ -135,7 +133,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
         setIsInitializing(false);
       }
     }
-  }, [t]);
+  }, []);
 
   const loadInfoRef = useRef(loadInfo);
   useEffect(() => {
@@ -177,10 +175,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     if (storageTimerRef.current) clearTimeout(storageTimerRef.current);
     storageTimerRef.current = setTimeout(async () => {
       await storageUtil
-        .set('storageCleaner/preferences', {
-          reloadAfterClean,
-          selectedTypes: options,
-        })
+        .set('storageCleaner/preferences', { reloadAfterClean, selectedTypes: options })
         .catch(console.error);
     }, 500);
   }, [options, reloadAfterClean, isInitializing]);
@@ -209,7 +204,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
 
     const tab = await getCurrentTab();
     if (!tab || !tab.id || !tab.url) {
-      toast.warning(t('storageCleaner:errorNoTab'));
+      toast.warning('无法获取当前标签页');
       return;
     }
 
@@ -219,18 +214,18 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       setResult(cleaningResult);
 
       if (reloadAfterClean && cleaningResult.overallSuccess) {
-        toast.success(t('storageCleaner:cleanSuccessReload'));
+        toast.success('清理成功，即将刷新页面');
         await chrome.tabs.reload(tab.id);
       } else {
         await loadInfo();
       }
     } catch (err) {
-      toast.error(`${t('storageCleaner:cleanError')}: ${String(err)}`);
+      toast.error(`清理失败: ${String(err)}`);
     } finally {
       setLoading(false);
       setShowConfirm(false);
     }
-  }, [options, reloadAfterClean, loadInfo, t]);
+  }, [options, reloadAfterClean, loadInfo]);
 
   const totalBytes = useMemo(() => {
     return Object.values(sizes).reduce((acc, s) => {

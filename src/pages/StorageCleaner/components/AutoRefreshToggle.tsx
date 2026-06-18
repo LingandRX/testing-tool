@@ -14,7 +14,6 @@
  */
 
 import React from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -43,8 +42,6 @@ export default function AutoRefreshToggle({
   className,
   ...props
 }: AutoRefreshToggleProps) {
-  const { t } = useI18n('storageCleaner');
-
   return (
     <div
       className={cn(
@@ -57,7 +54,7 @@ export default function AutoRefreshToggle({
         htmlFor="auto-refresh-switch"
         className="text-xs font-bold text-muted-foreground/90 cursor-pointer select-none tracking-wide uppercase"
       >
-        {t('storageCleaner:autoRefresh')}
+        {'清理后自动刷新页面'}
       </Label>
 
       <Switch id="auto-refresh-switch" checked={reloadAfterClean} onCheckedChange={onChange} />

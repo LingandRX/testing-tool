@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import { useStorageState } from '@/utils/useStorageState';
 import { diffJson } from '@/utils/diffEngine';
 import { jsonToYaml } from '@/utils/jsonToYaml';
@@ -34,7 +33,6 @@ export interface UseJsonToolsReturn {
 }
 
 export function useJsonTools(): UseJsonToolsReturn {
-  const { t } = useI18n(['jsonDiff', 'jsonFormat']);
   const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
 
   // Diff inputs
@@ -54,12 +52,12 @@ export function useJsonTools(): UseJsonToolsReturn {
 
   // Parse debounced inputs
   const parseState = useMemo(() => {
-    const invalidMsg = t('jsonDiff:invalidJson');
+    const invalidMsg = '无效的 JSON 格式';
     return {
       left: tryParse(debouncedLeft, invalidMsg),
       right: tryParse(debouncedRight, invalidMsg),
     };
-  }, [debouncedLeft, debouncedRight, t]);
+  }, [debouncedLeft, debouncedRight]);
 
   const leftError = parseState.left.error;
   const rightError = parseState.right.error;

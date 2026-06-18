@@ -4,7 +4,6 @@ import type { ModeType, UnitType, ZoneType } from './constants';
 import LiveClock from './components/LiveClock';
 import ResultView from './components/ResultView';
 import { useTimestampConverter } from './useTimestampConverter';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 import { Input } from '@/components/ui/input';
@@ -17,18 +16,16 @@ import {
 } from '@/components/ui/select';
 
 const MODE_OPTIONS: { value: ModeType; label: string }[] = [
-  { value: 'ts2dt', label: 'timestamp:tsToDate' },
-  { value: 'dt2ts', label: 'timestamp:dateToTs' },
+  { value: 'ts2dt', label: '时间戳转日期' },
+  { value: 'dt2ts', label: '日期转时间戳' },
 ];
 
 const UNIT_OPTIONS: { value: UnitType; label: string }[] = [
-  { value: 'ms', label: 'timestamp:unitMs' },
-  { value: 's', label: 'timestamp:unitS' },
+  { value: 'ms', label: '毫秒' },
+  { value: 's', label: '秒' },
 ];
 
 export default function Index() {
-  const { t } = useI18n('timestamp');
-
   const {
     mode,
     input,
@@ -53,7 +50,7 @@ export default function Index() {
             <div className="flex flex-col gap-4">
               <SwitchButtonGroup
                 value={mode}
-                options={MODE_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
+                options={MODE_OPTIONS}
                 onChange={setMode}
                 size="small"
               />
@@ -61,9 +58,7 @@ export default function Index() {
               <div className="flex flex-col gap-1.5">
                 <Input
                   type="text"
-                  placeholder={
-                    mode === 'ts2dt' ? t('timestamp:placeholderTs') : t('timestamp:placeholderDate')
-                  }
+                  placeholder={mode === 'ts2dt' ? '输入时间戳...' : 'YYYY-MM-DD HH:mm:ss'}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   className={cn(
@@ -78,7 +73,7 @@ export default function Index() {
               <div className="flex flex-col sm:flex-row items-stretch gap-3 w-full">
                 <SwitchButtonGroup
                   value={unit}
-                  options={UNIT_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
+                  options={UNIT_OPTIONS}
                   onChange={setUnit}
                   size="small"
                   className="sm:w-auto shrink-0"

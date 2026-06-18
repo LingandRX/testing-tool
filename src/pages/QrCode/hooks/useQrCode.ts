@@ -3,7 +3,6 @@ import QRious from 'qrious';
 import { toast } from 'sonner';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 import { useContextMenuData } from '@/utils/useContextMenuData';
-import { useI18n } from '@/utils/chromeI18n';
 import type { QrCodeContextValue } from '../contexts/QrCodeContext';
 import type { QrCodeGeneratorState, QrCodeMode, QrCodeParserState } from '../types';
 
@@ -78,8 +77,6 @@ function generateQrCodeDataUrl(text: string): string {
 }
 
 export function useQrCode(): QrCodeContextValue {
-  const { t } = useI18n('qrCode');
-
   const [mode, setMode] = useState<QrCodeMode>('generate');
 
   const [generatorState, setGeneratorState] = useState<QrCodeGeneratorState>({
@@ -112,40 +109,37 @@ export function useQrCode(): QrCodeContextValue {
   }, []);
 
   /** 自动检测URL并生成二维码 */
-  const autoGenerateIfUrl = useCallback(
-    (text: string) => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
+  const autoGenerateIfUrl = useCallback((text: string) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    if (!isUrl(text)) {
+      return;
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      setGeneratorState((prev) => ({ ...prev, generating: true, inputError: '' }));
+
+      const qrCodeDataUrl = generateQrCodeDataUrl(text);
+
+      if (qrCodeDataUrl) {
+        setGeneratorState((prev) => ({
+          ...prev,
+          step: 'preview',
+          savedText: text.trim(),
+          qrCodeDataUrl,
+          generating: false,
+        }));
+      } else {
+        setGeneratorState((prev) => ({
+          ...prev,
+          generating: false,
+          inputError: '生成二维码失败，请重试',
+        }));
       }
-
-      if (!isUrl(text)) {
-        return;
-      }
-
-      debounceTimerRef.current = setTimeout(() => {
-        setGeneratorState((prev) => ({ ...prev, generating: true, inputError: '' }));
-
-        const qrCodeDataUrl = generateQrCodeDataUrl(text);
-
-        if (qrCodeDataUrl) {
-          setGeneratorState((prev) => ({
-            ...prev,
-            step: 'preview',
-            savedText: text.trim(),
-            qrCodeDataUrl,
-            generating: false,
-          }));
-        } else {
-          setGeneratorState((prev) => ({
-            ...prev,
-            generating: false,
-            inputError: t('qrCode:generateError'),
-          }));
-        }
-      }, DEBOUNCE_DELAY);
-    },
-    [t],
-  );
+    }, DEBOUNCE_DELAY);
+  }, []);
 
   const setTextToEncode = useCallback(
     (text: string) => {
@@ -160,8 +154,8 @@ export function useQrCode(): QrCodeContextValue {
     const text = generatorState.textToEncode.trim();
 
     if (!text) {
-      setGeneratorState((prev) => ({ ...prev, inputError: t('qrCode:inputRequired') }));
-      toast.error(t('qrCode:inputRequired'));
+      setGeneratorState((prev) => ({ ...prev, inputError: '请输入内容' }));
+      toast.error('请输入内容');
       return;
     }
 
@@ -176,9 +170,9 @@ export function useQrCode(): QrCodeContextValue {
         setGeneratorState((prev) => ({
           ...prev,
           generating: false,
-          inputError: t('qrCode:generateError'),
+          inputError: '生成二维码失败，请重试',
         }));
-        toast.error(t('qrCode:generateError'));
+        toast.error('生成二维码失败，请重试');
         return;
       }
 
@@ -190,7 +184,7 @@ export function useQrCode(): QrCodeContextValue {
         generating: false,
       }));
     }, 0);
-  }, [generatorState.textToEncode, t]);
+  }, [generatorState.textToEncode]);
 
   /** 返回编辑态，保留上次输入内容 */
   const backToEdit = useCallback(() => {
@@ -207,46 +201,43 @@ export function useQrCode(): QrCodeContextValue {
   }, []);
 
   /** 从图片URL解析二维码 */
-  const parseQrCodeFromUrl = useCallback(
-    async (imageUrl: string) => {
-      try {
-        setParserState((prev) => ({
-          ...prev,
-          parsing: true,
-          parseError: '',
-          decodedResult: '',
-          previewUrl: imageUrl,
-          selectedFile: null,
-        }));
+  const parseQrCodeFromUrl = useCallback(async (imageUrl: string) => {
+    try {
+      setParserState((prev) => ({
+        ...prev,
+        parsing: true,
+        parseError: '',
+        decodedResult: '',
+        previewUrl: imageUrl,
+        selectedFile: null,
+      }));
 
-        // 从URL获取图片并转换为File对象
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        const file = new File([blob], 'qrcode-image.png', { type: blob.type });
+      // 从URL获取图片并转换为File对象
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], 'qrcode-image.png', { type: blob.type });
 
-        setParserState((prev) => ({ ...prev, selectedFile: file }));
+      setParserState((prev) => ({ ...prev, selectedFile: file }));
 
-        const result = await parseQrCodeFromFile(file);
+      const result = await parseQrCodeFromFile(file);
 
-        if (result.success && result.data) {
-          setParserState((prev) => ({ ...prev, decodedResult: result.data! }));
-          toast.success(t('qrCode:parseSuccess'));
-        } else {
-          const errorMsg = result.error || t('qrCode:noQrDetected');
-          setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-          toast.error(errorMsg);
-        }
-      } catch (error) {
-        console.error('解析图片二维码失败:', error);
-        const errorMsg = error instanceof Error ? error.message : t('qrCode:parseError');
+      if (result.success && result.data) {
+        setParserState((prev) => ({ ...prev, decodedResult: result.data! }));
+        toast.success('二维码解析成功');
+      } else {
+        const errorMsg = result.error || '未检测到二维码，请确保图片清晰且包含二维码';
         setParserState((prev) => ({ ...prev, parseError: errorMsg }));
         toast.error(errorMsg);
-      } finally {
-        setParserState((prev) => ({ ...prev, parsing: false }));
       }
-    },
-    [t],
-  );
+    } catch (error) {
+      console.error('解析图片二维码失败:', error);
+      const errorMsg = error instanceof Error ? error.message : '解析二维码失败，请重试';
+      setParserState((prev) => ({ ...prev, parseError: errorMsg }));
+      toast.error(errorMsg);
+    } finally {
+      setParserState((prev) => ({ ...prev, parsing: false }));
+    }
+  }, []);
 
   /** 右键菜单传入URL时，自动生成二维码或解析图片 */
   const handleContextMenuData = useCallback(
@@ -294,32 +285,29 @@ export function useQrCode(): QrCodeContextValue {
   useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
 
   // 反向活态解析二维码算法
-  const parseQrCode = useCallback(
-    async (file: File) => {
-      try {
-        setParserState((prev) => ({ ...prev, parsing: true, parseError: '', decodedResult: '' }));
+  const parseQrCode = useCallback(async (file: File) => {
+    try {
+      setParserState((prev) => ({ ...prev, parsing: true, parseError: '', decodedResult: '' }));
 
-        const result = await parseQrCodeFromFile(file);
+      const result = await parseQrCodeFromFile(file);
 
-        if (result.success && result.data) {
-          setParserState((prev) => ({ ...prev, decodedResult: result.data! }));
-          toast.success(t('qrCode:parseSuccess'));
-        } else {
-          const errorMsg = result.error || t('qrCode:noQrDetected');
-          setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-          toast.error(errorMsg);
-        }
-      } catch (error) {
-        console.error('解析二维码失败:', error);
-        const errorMsg = error instanceof Error ? error.message : t('qrCode:parseError');
+      if (result.success && result.data) {
+        setParserState((prev) => ({ ...prev, decodedResult: result.data! }));
+        toast.success('二维码解析成功');
+      } else {
+        const errorMsg = result.error || '未检测到二维码，请确保图片清晰且包含二维码';
         setParserState((prev) => ({ ...prev, parseError: errorMsg }));
         toast.error(errorMsg);
-      } finally {
-        setParserState((prev) => ({ ...prev, parsing: false }));
       }
-    },
-    [t],
-  );
+    } catch (error) {
+      console.error('解析二维码失败:', error);
+      const errorMsg = error instanceof Error ? error.message : '解析二维码失败，请重试';
+      setParserState((prev) => ({ ...prev, parseError: errorMsg }));
+      toast.error(errorMsg);
+    } finally {
+      setParserState((prev) => ({ ...prev, parsing: false }));
+    }
+  }, []);
 
   const downloadQrCode = useCallback(() => {
     if (!generatorState.qrCodeDataUrl) return;
@@ -328,8 +316,8 @@ export function useQrCode(): QrCodeContextValue {
     link.href = generatorState.qrCodeDataUrl;
     link.download = 'qrcode.png';
     link.click();
-    toast.success(t('qrCode:qrCodeDownloadSuccess'));
-  }, [generatorState.qrCodeDataUrl, t]);
+    toast.success('二维码下载成功');
+  }, [generatorState.qrCodeDataUrl]);
 
   const copyQrCode = useCallback(async () => {
     if (!generatorState.qrCodeDataUrl) return;
@@ -344,12 +332,12 @@ export function useQrCode(): QrCodeContextValue {
         }),
       ]);
 
-      toast.success(t('qrCode:qrCodeCopySuccess'));
+      toast.success('二维码已复制到剪贴板');
     } catch (error) {
       console.error('复制二维码失败:', error);
-      toast.error(t('qrCode:copyError'));
+      toast.error('复制失败，请重试');
     }
-  }, [generatorState.qrCodeDataUrl, t]);
+  }, [generatorState.qrCodeDataUrl]);
 
   const handleFileChange = useCallback(
     (file: File) => {

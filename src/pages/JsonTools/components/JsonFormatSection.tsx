@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import {
   formatJson,
   type JsonFormatOptions,
@@ -14,8 +13,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
 export default function JsonFormatSection() {
-  const { t } = useI18n('jsonFormat');
-
   const [input, setInput] = useState('');
   const [debouncedInput, setDebouncedInput] = useState('');
   const [indentSize, setIndentSize] = useState<number>(2);
@@ -66,7 +63,7 @@ export default function JsonFormatSection() {
           {/* 缩进配置区 */}
           <div className="flex gap-2 items-center shrink-0 select-none">
             <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
-              {t('jsonFormat:indentSize')}
+              {'缩进'}
             </span>
             <SwitchButtonGroup
               value={indentSize}
@@ -94,7 +91,7 @@ export default function JsonFormatSection() {
               htmlFor="sort-keys-checkbox"
               className="text-xs font-bold text-foreground/80 cursor-pointer tracking-tight group-hover:text-foreground"
             >
-              {t('jsonFormat:sortKeys')}
+              {'键名排序'}
             </Label>
           </div>
         </div>
@@ -102,7 +99,7 @@ export default function JsonFormatSection() {
 
       {/* 满血版输入终端 */}
       <TextInputArea
-        placeholder={t('jsonFormat:inputPlaceholder')}
+        placeholder={'输入需要格式化的 JSON...'}
         value={input}
         onChange={setInput}
         externalError={error || runtimeError || undefined}
@@ -120,19 +117,19 @@ export default function JsonFormatSection() {
           <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
             <div className="flex gap-4 items-center">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
-                {t('jsonFormat:outputLabel')}
+                {'格式化结果'}
               </span>
 
               <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
                 <span>
-                  {t('jsonFormat:originalSize')}:{' '}
+                  {'原始大小'}:{' '}
                   <span className="font-semibold text-foreground/80">
                     {formatBytes(result.originalBytes)}
                   </span>
                 </span>
                 <span className="text-border/60">|</span>
                 <span>
-                  {t('jsonFormat:formattedSize')}:{' '}
+                  {'格式化后大小'}:{' '}
                   <span className="font-semibold text-foreground/80">
                     {formatBytes(result.formattedBytes)}
                   </span>
@@ -154,7 +151,7 @@ export default function JsonFormatSection() {
         /* 空状态指示引导区 */
         <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
           <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
-            {error ? t('jsonFormat:fixErrorHint') : t('jsonFormat:emptyHint')}
+            {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : '输入 JSON 后点击格式化'}
           </p>
         </div>
       )}

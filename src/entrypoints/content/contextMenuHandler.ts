@@ -1,11 +1,10 @@
 import type { ContextMenuClickedPayload } from '@/utils/messages';
 import { MessageAction, onMessage } from '@/utils/messages';
 import { getTextStats } from '@/utils/textStatistics';
-import { getMessage } from '@/utils/chromeI18n';
 import { hidePopover, showTextStatsResult, showTimestampResult } from './uiPopover';
 
 function convertTimestamp(input: string): string {
-  const invalidText = getMessage('invalidTimestamp') || 'Invalid Timestamp';
+  const invalidText = '无效时间戳';
   const num = Number(input.trim());
 
   if (isNaN(num)) {

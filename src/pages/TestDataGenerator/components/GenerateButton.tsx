@@ -5,7 +5,6 @@
 
 import { Play, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useI18n } from '@/utils/chromeI18n';
 import type { GenerateProgress } from '@/types/testDataGenerator';
 
 interface GenerateButtonProps {
@@ -23,27 +22,20 @@ export default function GenerateButton({
   progress,
   disabled,
 }: GenerateButtonProps) {
-  const { t } = useI18n('testDataGenerator');
-
   return (
     <div className="space-y-3">
       {isGenerating ? (
         <>
           <Button variant="destructive" onClick={onCancel} className="w-full h-11 gap-2">
             <Square className="h-5 w-5" />
-            {t('testDataGenerator_cancel')}
+            {'取消'}
           </Button>
 
           {/* 进度条 */}
           {progress && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>
-                  {t('testDataGenerator_progress', {
-                    current: progress.generated.toLocaleString(),
-                    total: progress.total.toLocaleString(),
-                  })}
-                </span>
+                <span>{'已生成 {{current}} / {{total}} 条'}</span>
                 <span>{progress.progress}%</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -54,9 +46,7 @@ export default function GenerateButton({
               </div>
               {progress.estimatedTimeLeft !== undefined && (
                 <p className="text-xs text-muted-foreground text-center">
-                  {t('testDataGenerator_estimatedTime', {
-                    time: Math.ceil(progress.estimatedTimeLeft / 1000),
-                  })}
+                  {'预计剩余 {{time}} 秒'}
                 </p>
               )}
             </div>
@@ -65,7 +55,7 @@ export default function GenerateButton({
       ) : (
         <Button onClick={onClick} disabled={disabled} className="w-full h-11 gap-2">
           <Play className="h-5 w-5" />
-          {t('testDataGenerator_generate')}
+          {'生成数据'}
         </Button>
       )}
     </div>

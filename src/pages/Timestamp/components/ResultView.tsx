@@ -1,6 +1,5 @@
 import React from 'react';
 import { CopyButton } from '@/components/CopyButton';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 interface ResultViewProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -14,8 +13,6 @@ export default function ResultView({
   className,
   ...props
 }: ResultViewProps) {
-  const { t } = useI18n('timestamp');
-
   if (!result) {
     if (!showEmptyPlaceholder) return null;
     return (
@@ -26,7 +23,7 @@ export default function ResultView({
         )}
         {...props}
       >
-        {t('timestamp:resultEmpty')}
+        {'请输入并点击转换'}
       </div>
     );
   }
@@ -34,7 +31,7 @@ export default function ResultView({
   return (
     <div className={cn('flex flex-col w-full', className)} {...props}>
       <span className="block text-muted-foreground/90 mb-2.5 text-xs font-semibold tracking-wider uppercase">
-        {t('timestamp:resultLabel')}
+        {'转换结果'}
       </span>
 
       <div className="bg-card text-card-foreground border border-border p-4 sm:p-5 rounded-xl relative shadow-sm flex justify-between items-center gap-4 focus-within:ring-1 focus-within:ring-ring">
@@ -43,7 +40,7 @@ export default function ResultView({
         </span>
         <CopyButton
           text={result}
-          tooltip={t('timestamp:copyResultTooltip')}
+          tooltip={'复制结果'}
           className="h-8 w-8 rounded-md shrink-0 border"
         />
       </div>

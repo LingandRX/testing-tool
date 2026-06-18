@@ -3,7 +3,6 @@ import { Image, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useI18n } from '@/utils/chromeI18n';
 
 interface ImageUploaderProps {
   /** 选中的文件 */
@@ -31,7 +30,6 @@ const ImageUploader = ({
   dragging,
   onDraggingChange,
 }: ImageUploaderProps) => {
-  const { t } = useI18n('qrCode');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback(
@@ -47,8 +45,8 @@ const ImageUploader = ({
       URL.revokeObjectURL(previewUrl);
     }
     onClearFile();
-    toast.success(t('qrCode:imageCleared'));
-  }, [previewUrl, onClearFile, t]);
+    toast.success('图片已清除');
+  }, [previewUrl, onClearFile]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -88,10 +86,10 @@ const ImageUploader = ({
           if (file) {
             try {
               handleFileChange(file);
-              toast.success(t('qrCode:imagePasted'));
+              toast.success('图片粘贴成功，正在解析...');
             } catch (error) {
               console.error('处理粘贴图片失败:', error);
-              toast.error(t('qrCode:imagePasteError'));
+              toast.error('粘贴图片失败，请重试');
             }
           }
           break;
@@ -104,7 +102,7 @@ const ImageUploader = ({
     return () => {
       document.removeEventListener('paste', handlePaste);
     };
-  }, [handleFileChange, t]);
+  }, [handleFileChange]);
 
   return (
     <div
@@ -151,7 +149,7 @@ const ImageUploader = ({
               </Button>
             </div>
             <span className="block text-sm text-muted-foreground mt-2">{selectedFile.name}</span>
-            <span className="block text-xs text-muted-foreground">{t('qrCode:clickToChange')}</span>
+            <span className="block text-xs text-muted-foreground">{'点击更换图片'}</span>
           </div>
         ) : (
           <>
@@ -160,10 +158,10 @@ const ImageUploader = ({
               className="w-12 h-12 text-muted-foreground mx-auto mb-2"
             />
             <span className="block text-sm text-muted-foreground mb-1">
-              {t('qrCode:clickToUpload')}
+              {'点击、拖拽或粘贴上传二维码图片'}
             </span>
             <span className="block text-xs text-muted-foreground">
-              {t('qrCode:supportFormats')}
+              {'支持 PNG、JPG、WEBP、Base64 格式'}
             </span>
           </>
         )}

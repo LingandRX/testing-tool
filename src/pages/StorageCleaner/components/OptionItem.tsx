@@ -1,9 +1,17 @@
 import React from 'react';
 import { formatBytes } from '@/utils/format';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import type { StorageSizeInfo } from '../useStorageCleaner';
 import { Checkbox } from '@/components/ui/checkbox';
+
+const OPTION_LABELS: Record<string, string> = {
+  localStorage: 'Local Storage',
+  sessionStorage: 'Session Storage',
+  indexedDB: '站点存储',
+  cookies: 'Cookies',
+  cacheStorage: 'Cache Storage',
+  serviceWorkers: 'Service Workers',
+};
 
 interface OptionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   labelKey: string;
@@ -20,10 +28,9 @@ export default function OptionItem({
   className,
   ...props
 }: OptionItemProps) {
-  const { t } = useI18n('storageCleaner');
-
   const sizeValue = sizeInfo?.value;
   const isCount = sizeInfo?.displayType === 'count';
+  const label = OPTION_LABELS[labelKey] || labelKey;
 
   return (
     <div
@@ -44,7 +51,7 @@ export default function OptionItem({
             checked ? 'text-foreground' : 'text-foreground/75',
           )}
         >
-          {t(labelKey)}
+          {label}
         </span>
 
         {sizeValue !== undefined && sizeValue > 0 ? (
@@ -54,11 +61,11 @@ export default function OptionItem({
               checked ? 'text-primary/70' : 'text-muted-foreground/70',
             )}
           >
-            {isCount ? `${sizeValue} ${t('storageCleaner:countUnit')}` : formatBytes(sizeValue)}
+            {isCount ? `${sizeValue} 项` : formatBytes(sizeValue)}
           </span>
         ) : (
           <span className="block text-[10px] font-medium text-muted-foreground/50 mt-0.5 italic">
-            {t('storageCleaner:noData')}
+            {'无数据'}
           </span>
         )}
       </div>

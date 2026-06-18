@@ -6,11 +6,8 @@ import StorageOptionsGrid from './components/StorageOptionsGrid';
 import AutoRefreshToggle from './components/AutoRefreshToggle';
 import ErrorDisplay from './components/ErrorDisplay';
 import CleaningResult from './components/CleaningResult';
-import { useI18n } from '@/utils/chromeI18n';
 
 export default function Index() {
-  const { t } = useI18n('storageCleaner');
-
   const {
     error,
     isInitializing,
@@ -36,7 +33,7 @@ export default function Index() {
       <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full">
         <Loader2 className="h-6 w-6 text-muted-foreground/80" />
         <span className="text-xs text-muted-foreground mt-2 font-medium tracking-wide">
-          {t('storageCleaner:initializing')}
+          {'正在读取站点数据...'}
         </span>
       </div>
     );
@@ -75,10 +72,10 @@ export default function Index() {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t('storageCleaner:cleaning')}
+                {'正在清理...'}
               </>
             ) : (
-              t('storageCleaner:cleanNow')
+              '立即清理'
             )}
           </Button>
         </div>

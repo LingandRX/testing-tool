@@ -5,7 +5,6 @@ import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
 import { openExtensionPage } from '@/utils/chromeTabs';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 const SEARCH_HISTORY_LIMIT = 10;
@@ -14,7 +13,6 @@ const SEARCH_HISTORY_DISPLAY = 5;
 export default function TopBar() {
   const { currentPage, goBack, navigateTo } = useRouter();
   const { mode, setMode } = useThemeMode();
-  const { t } = useI18n(['common', 'features']);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -66,12 +64,9 @@ export default function TopBar() {
     if (!query) return [];
     return FEATURES.filter((f) => {
       if (f.key === 'dashboard') return false;
-      return (
-        t(f.labelKey).toLowerCase().includes(query) ||
-        t(f.descriptionKey).toLowerCase().includes(query)
-      );
+      return f.label.toLowerCase().includes(query) || f.description.toLowerCase().includes(query);
     });
-  }, [searchQuery, t]);
+  }, [searchQuery]);
 
   const displayedHistory = useMemo(() => {
     if (searchQuery.trim()) return [];
@@ -144,7 +139,7 @@ export default function TopBar() {
           <button
             type="button"
             onClick={goBack}
-            aria-label={t('common_buttons_back')}
+            aria-label={'返回'}
             className="flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -159,7 +154,7 @@ export default function TopBar() {
           <input
             ref={inputRef}
             type="text"
-            placeholder={t('common_buttons_search')}
+            placeholder={'搜索工具...'}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -168,7 +163,7 @@ export default function TopBar() {
             }}
             onFocus={() => setShowResults(true)}
             onKeyDown={handleKeyDown}
-            aria-label={t('common_buttons_search')}
+            aria-label={'搜索工具...'}
             className="w-full h-9 pl-9 pr-16 text-sm rounded-lg border border-border/60 bg-muted/40 transition-all placeholder:text-muted-foreground/50 focus:bg-background focus:outline-none focus:ring-1 focus:ring-ring focus:border-input"
           />
           {!searchQuery && (
@@ -183,7 +178,7 @@ export default function TopBar() {
                 setSearchQuery('');
                 setSelectedIndex(-1);
               }}
-              aria-label={t('common:buttons.clearSearch')}
+              aria-label={'清除搜索'}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
             >
               <X className="h-3 w-3" />
@@ -219,24 +214,22 @@ export default function TopBar() {
                         {feature.icon && <feature.icon className="h-4 w-4" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground truncate">
-                          {t(feature.labelKey)}
-                        </p>
+                        <p className="font-medium text-foreground truncate">{feature.label}</p>
                         <p className="text-xs text-muted-foreground truncate mt-0.5">
-                          {t(feature.descriptionKey)}
+                          {feature.description}
                         </p>
                       </div>
                     </li>
                   ))
                 ) : (
                   <li className="px-4 py-6 text-center text-sm text-muted-foreground">
-                    {t('common:buttons.noResults')}
+                    {'未找到相关工具'}
                   </li>
                 )
               ) : (
                 <>
                   <div className="px-3 py-1.5 text-[11px] font-semibold tracking-wider text-muted-foreground/60 uppercase">
-                    {t('common:buttons.recentSearch')}
+                    {'最近搜索'}
                   </div>
                   {displayedHistory.map((item, index) => (
                     <li
@@ -261,10 +254,10 @@ export default function TopBar() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-foreground truncate">
-                          {item.feature && t(item.feature.labelKey)}
+                          {item.feature?.label}
                         </p>
                         <p className="text-xs text-muted-foreground truncate mt-0.5">
-                          {item.feature && t(item.feature.descriptionKey)}
+                          {item.feature?.description}
                         </p>
                       </div>
                     </li>
@@ -278,10 +271,19 @@ export default function TopBar() {
 
       {/* 右侧：操作区 */}
       <div className="flex items-center gap-1 shrink-0">
-        <IconButton onClick={cycleThemeMode} title={t(`common:buttons.themeMode.${mode}`)}>
+        <IconButton
+          onClick={cycleThemeMode}
+          title={
+            mode === 'light'
+              ? '切换到深色模式'
+              : mode === 'dark'
+                ? '切换到系统模式'
+                : '切换到浅色模式'
+          }
+        >
           <ThemeIcon className="h-4 w-4" />
         </IconButton>
-        <IconButton onClick={handleOpenInTab} title={t('common:buttons.openInTab')}>
+        <IconButton onClick={handleOpenInTab} title={'在标签页打开'}>
           <ExternalLink className="h-4 w-4" />
         </IconButton>
       </div>
