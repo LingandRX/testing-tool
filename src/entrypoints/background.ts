@@ -65,8 +65,8 @@ export default defineBackground(() => {
     const tabId = sender?.tab?.id;
 
     if (!tabId) {
-      console.warn('[RightClickRestorer] Injection request missing tabId');
-      return { success: false, message: 'Missing tabId' };
+      console.warn('[RightClickRestorer] 注入请求缺少 tabId');
+      return { success: false, message: '缺少 tabId' };
     }
 
     try {
@@ -79,7 +79,7 @@ export default defineBackground(() => {
       return { success: true };
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      console.error('[RightClickRestorer] executeScript failed:', errorMsg);
+      console.error('[RightClickRestorer] 执行脚本失败:', errorMsg);
       return { success: false, message: errorMsg };
     }
   });

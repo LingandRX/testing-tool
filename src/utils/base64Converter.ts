@@ -165,12 +165,12 @@ export function isSupportedImageExtension(fileName: string): boolean {
 export function fileToBase64(file: File): Promise<FileToBase64Result> {
   return new Promise((resolve, reject) => {
     if (!file) {
-      reject(new Error('No file provided'));
+      reject(new Error('未提供文件'));
       return;
     }
 
     if (!isFileSizeValid(file.size)) {
-      reject(new Error(`File size exceeds the limit (${MAX_FILE_SIZE / 1024 / 1024} MB)`));
+      reject(new Error(`文件大小超出限制（最大 ${MAX_FILE_SIZE / 1024 / 1024} MB）`));
       return;
     }
 
@@ -192,7 +192,7 @@ export function fileToBase64(file: File): Promise<FileToBase64Result> {
     };
 
     reader.onerror = () => {
-      reject(new Error('Failed to read file'));
+      reject(new Error('读取文件失败'));
     };
 
     reader.readAsDataURL(file);
@@ -296,7 +296,7 @@ export function base64ToBlob(input: string): Base64ToBlobResult {
   const cleaned = prefixMatch ? trimmed.slice(prefixMatch[0].length) : trimmed;
 
   if (!isValidBase64(cleaned)) {
-    throw new Error('Invalid Base64 string');
+    throw new Error('无效的 Base64 字符串');
   }
 
   const bytes = base64ToBytes(cleaned);

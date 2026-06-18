@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { formatBytes } from '@/utils/format';
 
 interface DecodeResultPaperProps {
-  /** 标题文案，由调用方传入 i18n key 对应的值（如 decodedFileOutput / decodedImageOutput） */
+  /** 标题文案 */
   title: string;
   /** 解码后推断的 MIME 类型 */
   mimeType: string;
