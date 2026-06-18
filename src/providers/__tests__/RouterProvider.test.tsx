@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { browser } from 'wxt/browser';
 import { RouterProvider, useRouter } from '@/providers/RouterProvider';
 import { storageUtil } from '@/utils/chromeStorage';
 
@@ -222,6 +223,58 @@ describe('RouterProvider', () => {
     const pageOrder = screen.getByTestId('page-order').textContent!;
     expect(visiblePages).toBeDefined();
     expect(pageOrder).toBeDefined();
+  });
+
+  it('storage.onChanged 同步 visiblePages 时应合并缺失的新功能', async () => {
+    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: unknown) =>
+      Promise.resolve(defaultValue),
+    );
+
+    render(
+      <RouterProvider visiblePagesKey="app/popupVisiblePages" pageOrderKey="app/popupPageOrder">
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await waitFor(() => {
+      expect(browser.storage.onChanged.addListener).toHaveBeenCalled();
+    });
+
+    const storageChangeHandler = vi.mocked(browser.storage.onChanged.addListener).mock
+      .calls[0][0] as (changes: Record<string, { newValue?: unknown }>) => void;
+
+    const oldVisiblePages = [
+      'dashboard',
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonDiff',
+    ];
+    const oldPageOrder = [
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonDiff',
+    ];
+
+    await act(async () => {
+      storageChangeHandler({
+        'app/popupVisiblePages': { newValue: oldVisiblePages },
+        'app/popupPageOrder': { newValue: oldPageOrder },
+      });
+    });
+
+    await waitFor(() => {
+      const visiblePages = screen.getByTestId('visible-pages').textContent!;
+      const pageOrder = screen.getByTestId('page-order').textContent!;
+
+      expect(visiblePages.startsWith('dashboard,timestamp')).toBe(true);
+      expect(pageOrder.startsWith('timestamp,storageCleaner')).toBe(true);
+    });
   });
 
   it('组件卸载时不应设置 isLoaded 状态（竞态条件防护）', async () => {

@@ -27,7 +27,7 @@ const mockRouterValue = {
   isLoaded: true,
   navigateTo: vi.fn(),
   syncNavigation: vi.fn(),
-  goBack: vi.fn(),
+  goHome: vi.fn(),
   setVisiblePages: vi.fn(),
   setPageOrder: vi.fn(),
 };
@@ -54,7 +54,7 @@ describe('TopBar 组件', () => {
     it('不在 dashboard 时应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar />);
-      expect(screen.getByLabelText('返回')).toBeInTheDocument();
+      expect(screen.getByLabelText('返回首页')).toBeInTheDocument();
     });
 
     it('在 dashboard 上不应渲染返回按钮', () => {
@@ -65,12 +65,12 @@ describe('TopBar 组件', () => {
   });
 
   describe('交互测试', () => {
-    it('点击返回按钮时应调用 goBack', () => {
+    it('点击返回按钮时应调用 goHome', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<TopBar />);
 
-      fireEvent.click(screen.getByLabelText('返回'));
-      expect(mockRouterValue.goBack).toHaveBeenCalledTimes(1);
+      fireEvent.click(screen.getByLabelText('返回首页'));
+      expect(mockRouterValue.goHome).toHaveBeenCalledTimes(1);
     });
   });
 });
