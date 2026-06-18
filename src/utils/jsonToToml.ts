@@ -204,7 +204,7 @@ export function jsonToToml(text: string): JsonToTomlResult {
 
   // TOML 要求顶层是表
   if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('TOML requires the top-level value to be an object');
+    throw new Error('TOML 要求顶层值必须是一个对象');
   }
 
   const lines: string[] = [];
