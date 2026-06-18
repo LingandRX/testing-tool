@@ -1,12 +1,10 @@
 import { useRouter } from '@/providers/RouterProvider';
 import { getFeatureByKey } from '@/config/features';
 import type { PageType } from '@/types/storage';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 export default function Index() {
   const { navigateTo, visiblePages, pageOrder, recentlyUsedTools } = useRouter();
-  const { t } = useI18n(['features']);
 
   const visibleSet = new Set<string>(visiblePages);
 
@@ -28,7 +26,7 @@ export default function Index() {
       {showRecent && (
         <div className="flex flex-col gap-2">
           <h3 className="text-xs font-semibold text-muted-foreground/80 uppercase tracking-wider">
-            {t('dashboard_recentlyUsed')}
+            {'最近使用'}
           </h3>
           <div className="flex flex-wrap gap-2">
             {recentFeatures.map(({ key, feature }) => {
@@ -46,7 +44,7 @@ export default function Index() {
                   )}
                 >
                   <IconComponent className="h-3.5 w-3.5 text-muted-foreground/70" />
-                  {t(feature!.labelKey)}
+                  {feature!.label}
                 </button>
               );
             })}
@@ -57,7 +55,7 @@ export default function Index() {
       {/* 全部工具 — 紧凑 Grid */}
       <div className="flex flex-col gap-2">
         <h3 className="text-xs font-semibold text-muted-foreground/80 uppercase tracking-wider">
-          {t('dashboard_allTools')}
+          {'全部工具'}
         </h3>
         <div className={cn('grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2')}>
           {visibleFeatures.map(({ key, feature }) => {
@@ -82,7 +80,7 @@ export default function Index() {
                   )}
                 />
                 <span className="text-[11px] font-medium text-muted-foreground/80 group-hover:text-foreground leading-tight text-center truncate w-full transition-colors">
-                  {t(feature!.labelKey)}
+                  {feature!.label}
                 </span>
               </button>
             );

@@ -20,7 +20,6 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
     error,
     showImageHint,
     handleClear,
-    t,
   } = useTextMode();
 
   return (
@@ -29,8 +28,8 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
         <SwitchButtonGroup
           value={direction}
           options={[
-            { value: 'encode', label: t('encode') },
-            { value: 'decode', label: t('decode') },
+            { value: 'encode', label: '编码' },
+            { value: 'decode', label: '解码' },
           ]}
           onChange={handleDirectionChange}
           size="small"
@@ -52,7 +51,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
       {showImageHint && (
         <div className="flex items-center justify-between p-3.5 rounded-xl bg-primary/10 border border-primary/20">
           <span className="text-xs font-semibold text-primary tracking-tight">
-            {t('imageDataUriHint')}
+            检测到图片的 data URI，请使用「图像」选项卡进行解码。
           </span>
           <Button
             type="button"
@@ -61,7 +60,7 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
             onClick={onSwitchToImageMode}
             className="h-7 rounded-md text-xs font-bold text-primary hover:text-primary hover:bg-primary/20 dark:hover:bg-primary/10 px-2.5"
           >
-            {t('switchToImageMode')}
+            切换到图像模式
           </Button>
         </div>
       )}

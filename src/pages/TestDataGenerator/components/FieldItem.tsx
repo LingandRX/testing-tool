@@ -3,7 +3,6 @@
  * 展示单个字段的基本信息，适配固定高度卡片
  */
 
-import { useI18n } from '@/utils/chromeI18n';
 import { getGeneratorById } from '@/lib/generators';
 import { Badge } from '@/components/ui/badge';
 import type { FieldConfig } from '@/types/testDataGenerator';
@@ -14,7 +13,6 @@ interface FieldItemProps {
 }
 
 export default function FieldItem({ field, onClick }: FieldItemProps) {
-  const { t } = useI18n('testDataGenerator');
   const generator = getGeneratorById(field.generatorId);
 
   return (
@@ -43,7 +41,7 @@ export default function FieldItem({ field, onClick }: FieldItemProps) {
           )}
           {field.unique && (
             <Badge variant="outline" className="text-[10px] shrink-0 px-1 py-0 text-blue-500">
-              {t('testDataGenerator_unique')}
+              {'唯一'}
             </Badge>
           )}
         </div>

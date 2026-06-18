@@ -2,7 +2,6 @@ import React from 'react';
 import type { StorageCleanerOptions } from '@/types/storage';
 import type { StorageSizeInfo } from '../useStorageCleaner';
 import OptionItem from './OptionItem';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -26,8 +25,6 @@ export default function StorageOptionsGrid({
   className,
   ...props
 }: StorageOptionsGridProps) {
-  const { t } = useI18n('storageCleaner');
-
   const optionKeys: (keyof StorageCleanerOptions)[] = [
     'localStorage',
     'sessionStorage',
@@ -48,7 +45,7 @@ export default function StorageOptionsGrid({
           {optionKeys.map((key) => (
             <OptionItem
               key={key}
-              labelKey={`storageCleaner:options.${key}`}
+              labelKey={key}
               checked={options[key]}
               sizeInfo={sizes[key]}
               onChange={() => onOptionChange(key)}
@@ -62,7 +59,7 @@ export default function StorageOptionsGrid({
         className="border-t border-border flex justify-between items-center pl-3.5 pr-7 py-2.5 bg-muted/20 hover:bg-muted/40 cursor-pointer select-none transition-colors"
       >
         <Label className="text-xs font-bold text-muted-foreground/90 cursor-pointer tracking-wide uppercase">
-          {t('storageCleaner:selectAll')}
+          {'全选所有项'}
         </Label>
 
         <Checkbox

@@ -1,5 +1,4 @@
 import { AlertCircle } from 'lucide-react';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 interface ErrorDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -7,8 +6,6 @@ interface ErrorDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function ErrorDisplay({ error, className, ...props }: ErrorDisplayProps) {
-  const { t } = useI18n('storageCleaner');
-
   return (
     <div
       className={cn(
@@ -27,7 +24,7 @@ export default function ErrorDisplay({ error, className, ...props }: ErrorDispla
         </p>
 
         <p className="text-xs font-medium leading-relaxed text-muted-foreground/90 px-2">
-          {t('storageCleaner:errorStandardOnly')}
+          {'存储清理功能仅适用于标准网页'}
         </p>
       </div>
     </div>

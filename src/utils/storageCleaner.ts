@@ -20,6 +20,15 @@ const CLEAN_OPTION_KEYS: (keyof StorageCleanerOptions)[] = [
   'serviceWorkers',
 ];
 
+const OPTION_LABELS: Record<string, string> = {
+  localStorage: 'Local Storage',
+  sessionStorage: 'Session Storage',
+  indexedDB: '站点存储',
+  cookies: 'Cookies',
+  cacheStorage: 'Cache Storage',
+  serviceWorkers: 'Service Workers',
+};
+
 export async function getCurrentTab() {
   // For popup pages, we need to get the active tab from the browser window that triggered the popup.
   // We should ONLY care about the currently active tab in the last focused window.
@@ -362,22 +371,19 @@ export async function clearStorage(
   return result;
 }
 
-export function formatCleaningResult(
-  result: CleaningResult,
-  t: (key: string, options?: Record<string, unknown>) => string,
-): string {
+export function formatCleaningResult(result: CleaningResult): string {
   const parts: string[] = [];
 
   for (const key of CLEAN_OPTION_KEYS) {
     const r = result[key];
     if (r?.success && r.count > 0) {
-      parts.push(`${r.count} ${t(`storageCleaner:options.${key}`)}`);
+      parts.push(`${r.count} ${OPTION_LABELS[key] || key}`);
     }
   }
 
   if (parts.length === 0) {
-    return t('storageCleaner:noDataToClean');
+    return '该页面没有可清理的存储数据';
   }
 
-  return t('storageCleaner:cleanedSummary', { items: parts.join(', ') });
+  return `清理了 ${parts.join(', ')}`;
 }

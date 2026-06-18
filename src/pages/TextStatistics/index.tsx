@@ -1,18 +1,16 @@
 import TextInputArea from '@/components/TextInputArea';
 import { formatBytes } from '@/utils/format';
-import { useI18n } from '@/utils/chromeI18n';
 import { useTextStatistics } from './useTextStatistics';
 import { cn } from '@/lib/utils';
 
 export default function Index() {
-  const { t } = useI18n('textStatistics');
   const { text, stats, setText } = useTextStatistics();
 
   const statItems = [
-    { label: t('textStatistics:characters'), value: stats.characters },
-    { label: t('textStatistics:words'), value: stats.words },
-    { label: t('textStatistics:lines'), value: stats.lines },
-    { label: t('textStatistics:bytes'), value: formatBytes(stats.bytes) },
+    { label: '字符数', value: stats.characters },
+    { label: '单词数', value: stats.words },
+    { label: '行数', value: stats.lines },
+    { label: '字节大小', value: formatBytes(stats.bytes) },
   ];
 
   return (
@@ -20,7 +18,7 @@ export default function Index() {
       <TextInputArea
         value={text}
         onChange={setText}
-        placeholder={t('textStatistics:placeholder')}
+        placeholder={'在此输入或粘贴文本...'}
         minRows={10}
         maxRows={18}
         showClear={true}

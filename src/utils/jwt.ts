@@ -2,8 +2,6 @@
  * JWT 解析工具
  */
 
-import { getMessage } from '@/utils/chromeI18n';
-
 interface JwtHeader {
   alg: string;
   typ?: string;
@@ -43,7 +41,7 @@ export function decodeBase64Url(str: string): string {
   const pad = base64.length % 4;
   if (pad) {
     if (pad === 1) {
-      throw new Error(getMessage('jwt_errors_invalidBase64String'));
+      throw new Error('无效的 Base64URL 字符串');
     }
     base64 += new Array(5 - pad).join('=');
   }
@@ -58,10 +56,9 @@ export function decodeBase64Url(str: string): string {
     const decoder = new TextDecoder('utf-8');
     return decoder.decode(bytes);
   } catch (e) {
-    throw new Error(
-      getMessage('jwt_errors_failedToDecode') + (e instanceof Error ? e.message : String(e)),
-      { cause: e },
-    );
+    throw new Error('Base64 解码失败: ' + (e instanceof Error ? e.message : String(e)), {
+      cause: e,
+    });
   }
 }
 
@@ -78,7 +75,7 @@ export function parseJwt(token: string): JwtResult {
       payload: null,
       signature: '',
       raw: { header: '', payload: '', signature: '' },
-      error: getMessage('jwt_errors_invalidFormat'),
+      error: 'JWT 格式无效：应包含 3 个部分（header.payload.signature）',
     };
   }
 
@@ -98,8 +95,7 @@ export function parseJwt(token: string): JwtResult {
     const headerJson = decodeBase64Url(headerB64);
     result.header = JSON.parse(headerJson);
   } catch (e) {
-    result.error =
-      getMessage('jwt_errors_parseHeaderFailed') + (e instanceof Error ? e.message : String(e));
+    result.error = 'JWT Header 解析失败: ' + (e instanceof Error ? e.message : String(e));
     return result;
   }
 
@@ -107,8 +103,7 @@ export function parseJwt(token: string): JwtResult {
     const payloadJson = decodeBase64Url(payloadB64);
     result.payload = JSON.parse(payloadJson);
   } catch (e) {
-    result.error =
-      getMessage('jwt_errors_parsePayloadFailed') + (e instanceof Error ? e.message : String(e));
+    result.error = 'JWT Payload 解析失败: ' + (e instanceof Error ? e.message : String(e));
     return result;
   }
 

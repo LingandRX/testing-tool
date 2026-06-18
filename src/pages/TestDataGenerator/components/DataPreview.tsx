@@ -5,7 +5,6 @@
 
 import { useMemo } from 'react';
 import { FileJson, FileText } from 'lucide-react';
-import { useI18n } from '@/utils/chromeI18n';
 import { getGeneratorById } from '@/lib/generators';
 import type { FieldConfig } from '@/types/testDataGenerator';
 
@@ -56,8 +55,6 @@ function getValueColor(value: string): string {
 }
 
 export default function DataPreview({ fields }: DataPreviewProps) {
-  const { t } = useI18n('testDataGenerator');
-
   // 生成一条示例数据
   const sampleData = useMemo(() => {
     if (fields.length === 0) return null;
@@ -83,7 +80,7 @@ export default function DataPreview({ fields }: DataPreviewProps) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center">
         <FileJson className="h-8 w-8 text-muted-foreground/30 mb-2" />
-        <p className="text-xs text-muted-foreground/50">{t('testDataGenerator_noDataHint')}</p>
+        <p className="text-xs text-muted-foreground/50">{'配置字段后点击「生成数据」按钮'}</p>
       </div>
     );
   }
@@ -96,12 +93,10 @@ export default function DataPreview({ fields }: DataPreviewProps) {
           <div className="h-5 w-5 rounded bg-primary/10 flex items-center justify-center">
             <FileText className="h-3 w-3 text-primary" />
           </div>
-          <span className="text-xs font-medium text-muted-foreground">
-            {t('testDataGenerator_sampleData')}
-          </span>
+          <span className="text-xs font-medium text-muted-foreground">{'示例数据'}</span>
         </div>
         <span className="text-[10px] text-muted-foreground/50 bg-muted px-1.5 py-0.5 rounded">
-          {Object.keys(sampleData).length} {t('testDataGenerator_fields')}
+          {Object.keys(sampleData).length} {'字段'}
         </span>
       </div>
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 export interface DiffNavigatorProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -19,8 +18,6 @@ export default function DiffNavigator({
   className,
   ...props
 }: DiffNavigatorProps) {
-  const { t } = useI18n('jsonDiff');
-
   const isFirst = currentIndex <= 0;
   const isLast = currentIndex >= total - 1;
 
@@ -33,9 +30,7 @@ export default function DiffNavigator({
         )}
         {...props}
       >
-        <span className="text-xs font-semibold text-muted-foreground/90">
-          {t('jsonDiff:noDiffs')}
-        </span>
+        <span className="text-xs font-semibold text-muted-foreground/90">{'无差异'}</span>
       </div>
     );
   }
@@ -52,7 +47,7 @@ export default function DiffNavigator({
       <button
         type="button"
         disabled={isFirst}
-        aria-label={t('jsonDiff:previousDiff')}
+        aria-label={'上一个'}
         onClick={onPrev}
         className={cn(
           'p-1 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground',
@@ -72,7 +67,7 @@ export default function DiffNavigator({
       <button
         type="button"
         disabled={isLast}
-        aria-label={t('jsonDiff:nextDiff')}
+        aria-label={'下一个'}
         onClick={onNext}
         className={cn(
           'p-1 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground',

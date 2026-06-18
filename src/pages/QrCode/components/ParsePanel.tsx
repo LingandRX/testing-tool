@@ -3,14 +3,12 @@ import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import TextInputArea from '@/components/TextInputArea';
 import ImageUploader from './ImageUploader';
-import { useI18n } from '@/utils/chromeI18n';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 export default function ParsePanel() {
-  const { t } = useI18n('qrCode');
   const { parserState, setParserState, handleFileChange, handleClearFile } = useQrCodeContext();
 
   const hasFile = parserState.selectedFile !== null;
@@ -27,7 +25,7 @@ export default function ParsePanel() {
           const file = items[i].getAsFile();
           if (file) {
             handleFileChange(file);
-            toast.success(t('qrCode:imagePasted'));
+            toast.success('图片粘贴成功，正在解析...');
           }
           return;
         }
@@ -41,14 +39,14 @@ export default function ParsePanel() {
           const blob = await response.blob();
           const file = new File([blob], 'pasted-image.png', { type: blob.type });
           handleFileChange(file);
-          toast.success(t('qrCode:imagePasted'));
+          toast.success('图片粘贴成功，正在解析...');
         } catch (error) {
           console.error('处理 Base64 图片失败:', error);
-          toast.error(t('qrCode:imagePasteError'));
+          toast.error('粘贴图片失败，请重试');
         }
       }
     },
-    [handleFileChange, t],
+    [handleFileChange],
   );
 
   useEffect(() => {
@@ -82,11 +80,11 @@ export default function ParsePanel() {
       <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm p-3 mb-3">
         <div className="flex items-center justify-between mb-1.5">
           <Label className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider select-none pl-0.5">
-            {t('qrCode:uploadedImage')}
+            {'已上传图片'}
           </Label>
           <Button variant="ghost" size="sm" onClick={handleClearFile} className="h-6 px-2 text-xs">
             <RefreshCw className="w-3 h-3 mr-1" />
-            {t('qrCode:reuploadButton')}
+            {'重新上传'}
           </Button>
         </div>
         <div className="flex items-center gap-3 bg-muted/50 rounded-md p-2">
@@ -98,7 +96,7 @@ export default function ParsePanel() {
           <div className="flex-1 min-w-0">
             <p className="text-sm text-foreground truncate">{parserState.selectedFile?.name}</p>
             {parserState.parsing && (
-              <p className="text-xs text-primary animate-pulse mt-1">{t('qrCode:parsing')}</p>
+              <p className="text-xs text-primary animate-pulse mt-1">{'解析中...'}</p>
             )}
           </div>
         </div>
@@ -113,7 +111,7 @@ export default function ParsePanel() {
       >
         <div className="flex flex-col space-y-2.5">
           <Label className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider pl-0.5">
-            {t('qrCode:resultLabel')}
+            {'解析结果'}
           </Label>
 
           <TextInputArea
@@ -121,7 +119,7 @@ export default function ParsePanel() {
             readOnly={true}
             showClear={false}
             allowCopy={true}
-            placeholder={parserState.parsing ? '' : t('qrCode:resultPlaceholder')}
+            placeholder={parserState.parsing ? '' : '解析结果将显示在此处'}
             minRows={4}
             maxRows={8}
             externalError={parserState.parseError || undefined}

@@ -76,7 +76,7 @@ describe('TextMode', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Base64 字符串无效')).toBeInTheDocument();
+      expect(screen.getByText('无效的 Base64 字符串')).toBeInTheDocument();
     });
   });
 
@@ -118,7 +118,7 @@ describe('TextMode', () => {
       expect(screen.getByRole('button', { name: 'SGVsbG8=' })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'textInputArea.clear' }));
+    fireEvent.click(screen.getByRole('button', { name: '清空' }));
 
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: 'SGVsbG8=' })).not.toBeInTheDocument();
@@ -182,9 +182,7 @@ describe('TextMode', () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByText('输入似乎是二进制数据（如图片）。请切换到「图像」选项卡。'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('检测到二进制数据（如图像），请使用图像选项卡')).toBeInTheDocument();
     });
   });
 });
