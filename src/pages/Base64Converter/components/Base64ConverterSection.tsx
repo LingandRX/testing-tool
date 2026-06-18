@@ -41,6 +41,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
     setCustomFileName,
     resetAll,
     safeFileSelect,
+    maxFileSizeStr,
   } = useBase64Converter({ mode });
 
   const handleDirectionChange = (next: Base64ConvertDirection) => {
@@ -136,7 +137,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   {mode === 'image' ? '点击或拖拽图像到此处' : '点击或拖拽文件到此处'}
                 </span>
                 <span className="text-[10px] font-medium text-muted-foreground/60">
-                  {'最大文件大小：{{max}}'}
+                  {`最大文件大小：${maxFileSizeStr}`}
                 </span>
                 {mode === 'image' && (
                   <span className="text-[10px] font-medium text-muted-foreground/50">
