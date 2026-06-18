@@ -11,7 +11,7 @@ const SEARCH_HISTORY_LIMIT = 10;
 const SEARCH_HISTORY_DISPLAY = 5;
 
 export default function TopBar() {
-  const { currentPage, goBack, navigateTo } = useRouter();
+  const { currentPage, goHome, navigateTo } = useRouter();
   const { mode, setMode } = useThemeMode();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -138,8 +138,8 @@ export default function TopBar() {
         {!isDashboard && (
           <button
             type="button"
-            onClick={goBack}
-            aria-label={'返回'}
+            onClick={goHome}
+            aria-label={'返回首页'}
             className="flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
