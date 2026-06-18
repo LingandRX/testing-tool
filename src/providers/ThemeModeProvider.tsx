@@ -1,9 +1,27 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { browser } from 'wxt/browser';
 import { storageUtil } from '@/utils/chromeStorage';
+import {
+  applyResolvedThemeClass,
+  getThemeSyncSnapshot,
+  isValidThemeMode,
+  persistThemeModeSnapshot,
+  resolveThemeMode,
+  THEME_MODE_STORAGE_KEY,
+  type ResolvedThemeMode,
+  type ThemeMode,
+} from '@/utils/themeSnapshot';
 
-export type ThemeMode = 'light' | 'dark' | 'system';
-export type ResolvedThemeMode = 'light' | 'dark';
+export type { ResolvedThemeMode, ThemeMode };
 
 interface ThemeModeContextType {
   mode: ThemeMode;
@@ -13,112 +31,88 @@ interface ThemeModeContextType {
 
 const ThemeModeContext = createContext<ThemeModeContextType | null>(null);
 
-const THEME_MODE_KEY = 'app/themeMode' as const;
-const SNAPSHOT_KEY = 'snapshot/app/themeMode';
-
-const VALID_MODES: ThemeMode[] = ['light', 'dark', 'system'];
-const isValidMode = (v: unknown): v is ThemeMode => VALID_MODES.includes(v as ThemeMode);
-
-/**
- * 同步追溯 localStorage 级快照（首屏 0 闪烁核心防线）
- */
-const getSyncSnapshot = (): ThemeMode => {
-  try {
-    const raw = localStorage.getItem(SNAPSHOT_KEY);
-    if (!raw) return 'system';
-    const parsed = JSON.parse(raw) as unknown;
-    return isValidMode(parsed) ? parsed : 'system';
-  } catch {
-    return 'system';
-  }
-};
-
-/**
- * 实时嗅探系统底层操作系统的明暗色轴
- */
-const getSystemMode = (): ResolvedThemeMode => {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-};
-
 interface ThemeModeProviderProps {
   children: ReactNode;
 }
 
 export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
-  const [mode, setModeState] = useState<ThemeMode>(getSyncSnapshot);
-  const [resolvedMode, setResolvedMode] = useState<ResolvedThemeMode>(
-    mode === 'system' ? getSystemMode() : mode,
+  const [mode, setModeState] = useState<ThemeMode>(getThemeSyncSnapshot);
+  const [resolvedMode, setResolvedMode] = useState<ResolvedThemeMode>(() =>
+    resolveThemeMode(getThemeSyncSnapshot()),
   );
+  const modeRef = useRef(mode);
+  const hasUserSetMode = useRef(false);
+
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   const updateResolved = useCallback((nextMode: ThemeMode) => {
-    setResolvedMode(nextMode === 'system' ? getSystemMode() : nextMode);
+    setResolvedMode(resolveThemeMode(nextMode));
   }, []);
 
   const setMode = useCallback(
     (next: ThemeMode) => {
+      hasUserSetMode.current = true;
       setModeState(next);
       updateResolved(next);
+      applyResolvedThemeClass(resolveThemeMode(next));
 
-      void storageUtil.set(THEME_MODE_KEY, next).catch((err) => {
+      void storageUtil.set(THEME_MODE_STORAGE_KEY, next).catch((err) => {
         console.error('[Theme Storage Error] Failed to persistent theme state:', err);
       });
 
-      try {
-        localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(next));
-      } catch (err) {
-        console.error('[Theme Snapshot Error] LocalStorage quota exceeded:', err);
-      }
+      persistThemeModeSnapshot(next);
     },
     [updateResolved],
   );
 
-  // Sync theme from storage on mount
   useEffect(() => {
     let cancelled = false;
+
     storageUtil
-      .get(THEME_MODE_KEY, 'system')
+      .get(THEME_MODE_STORAGE_KEY, 'system')
       .then((saved) => {
-        if (cancelled) return;
-        if (isValidMode(saved)) {
-          setModeState(saved);
-          updateResolved(saved);
-        }
+        if (cancelled || hasUserSetMode.current) return;
+        if (!isValidThemeMode(saved)) return;
+
+        setModeState(saved);
+        updateResolved(saved);
+        persistThemeModeSnapshot(saved);
+        applyResolvedThemeClass(resolveThemeMode(saved));
       })
       .catch((err) => {
         console.error('[Theme Restore Thread Failed]', err);
       });
+
     return () => {
       cancelled = true;
     };
   }, [updateResolved]);
 
-  // Listen for system theme changes when in system mode
   useEffect(() => {
     if (mode !== 'system') return;
+
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e: MediaQueryListEvent) => {
-      setResolvedMode(e.matches ? 'dark' : 'light');
+    const handler = (event: MediaQueryListEvent) => {
+      setResolvedMode(event.matches ? 'dark' : 'light');
     };
+
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, [mode]);
 
-  // Sync theme across extension contexts (popup <-> sidepanel)
   useEffect(() => {
     const handleStorageChange = (changes: Record<string, { newValue?: unknown }>) => {
-      if (changes[THEME_MODE_KEY]) {
-        const next = changes[THEME_MODE_KEY].newValue;
-        if (isValidMode(next)) {
-          setModeState((currentMode) => {
-            if (next !== currentMode) {
-              updateResolved(next);
-              return next;
-            }
-            return currentMode;
-          });
-        }
-      }
+      if (!changes[THEME_MODE_STORAGE_KEY]) return;
+
+      const next = changes[THEME_MODE_STORAGE_KEY].newValue;
+      if (!isValidThemeMode(next) || next === modeRef.current) return;
+
+      setModeState(next);
+      updateResolved(next);
+      persistThemeModeSnapshot(next);
+      applyResolvedThemeClass(resolveThemeMode(next));
     };
 
     browser.storage.onChanged.addListener(handleStorageChange);
@@ -127,10 +121,8 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
     };
   }, [updateResolved]);
 
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.toggle('dark', resolvedMode === 'dark');
-    }
+  useLayoutEffect(() => {
+    applyResolvedThemeClass(resolvedMode);
   }, [resolvedMode]);
 
   return (
