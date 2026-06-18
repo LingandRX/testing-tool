@@ -35,7 +35,7 @@ export default function GenerateButton({
           {progress && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{'已生成 {{current}} / {{total}} 条'}</span>
+                <span>{`已生成 ${progress.generated} / ${progress.total} 条`}</span>
                 <span>{progress.progress}%</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -46,7 +46,7 @@ export default function GenerateButton({
               </div>
               {progress.estimatedTimeLeft !== undefined && (
                 <p className="text-xs text-muted-foreground text-center">
-                  {'预计剩余 {{time}} 秒'}
+                  {`预计剩余 ${progress.estimatedTimeLeft} 秒`}
                 </p>
               )}
             </div>
