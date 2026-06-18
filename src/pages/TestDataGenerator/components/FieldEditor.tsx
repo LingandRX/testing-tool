@@ -1,6 +1,5 @@
 /**
  * 字段编辑器组件
- * 编辑单个字段的详细配置
  */
 
 import { useState, useCallback } from 'react';
@@ -16,7 +15,6 @@ import GeneratorConfig from './GeneratorConfig';
 interface FieldEditorProps {
   field: FieldConfig;
   onChange: (field: FieldConfig) => void;
-  /** 所有字段名列表，用于检测重复 */
   allFieldNames?: string[];
 }
 
@@ -46,7 +44,6 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
 
   const handleNameChange = (name: string) => {
     onChange({ ...field, name });
-    // 实时校验
     const error = validateFieldName(name);
     setNameError(error);
   };
@@ -59,15 +56,12 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
     onChange({
       ...field,
       required,
-      // 切换为必填时清零，切换为非必填时默认 100%
       nullRate: required ? 0 : 100,
     });
   };
 
   const handleNullRateChange = (nullRate: number) => {
-    // 限制范围 0-100
     const clampedRate = Math.max(0, Math.min(100, nullRate));
-    // 空值率为 0 时自动设为必填
     if (clampedRate === 0) {
       onChange({ ...field, nullRate: clampedRate, required: true });
     } else {
@@ -105,7 +99,6 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
 
   return (
     <div className="space-y-5">
-      {/* 基础配置 */}
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -139,7 +132,6 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
         </div>
       </div>
 
-      {/* 必填/选填配置 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium text-foreground">{'必填'}</Label>
@@ -187,19 +179,16 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
         )}
       </div>
 
-      {/* 唯一性约束 */}
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium text-foreground">{'唯一性约束'}</Label>
         <Switch checked={field.unique} onCheckedChange={handleUniqueChange} />
       </div>
 
-      {/* 生成器选择 */}
       <div className="space-y-2">
         <Label className="text-sm font-medium text-foreground">{'数据生成器'}</Label>
         <GeneratorSelector selectedId={field.generatorId} onChange={handleGeneratorChange} />
       </div>
 
-      {/* 生成器参数配置 */}
       {generator && (
         <div className="space-y-2">
           <Label className="text-sm font-medium text-foreground">{'生成器参数'}</Label>

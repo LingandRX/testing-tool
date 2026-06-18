@@ -11,7 +11,7 @@ const isObject = (v: unknown): v is Record<string, unknown> =>
 const isArray = (v: unknown): v is unknown[] => Array.isArray(v);
 
 /**
- * 健壮的 JSONPath 生成器：支持针对包含点号、空格或特殊字符的键名进行括号转义拦截
+ * JSONPath 生成器
  */
 const buildPath = (parent: string, key: string, isArrayChild: boolean): string => {
   if (isArrayChild) {
@@ -47,7 +47,7 @@ const diffNode = (
       newValue: right,
       path,
       isLeaf: !isObject(right) && !isArray(right),
-      hasDiffInChildren: false, // 自身即是新增，子树无需向下检索
+      hasDiffInChildren: false,
     };
   }
 
@@ -61,7 +61,7 @@ const diffNode = (
       newValue: undefined,
       path,
       isLeaf: !isObject(left) && !isArray(left),
-      hasDiffInChildren: false, // 自身即是删除，子树无需向下检索
+      hasDiffInChildren: false,
     };
   }
 
@@ -70,7 +70,6 @@ const diffNode = (
   const leftArr = isArray(left);
   const rightArr = isArray(right);
 
-  // 分支 3：双对象深层递归 (容器状态)
   if (leftObj && rightObj) {
     const keySet = new Set<string>();
     const leftKeys = Object.keys(left);
@@ -97,11 +96,10 @@ const diffNode = (
       children,
       path,
       isLeaf: false,
-      hasDiffInChildren, // 完美注入预计算衍生状态
+      hasDiffInChildren,
     };
   }
 
-  // 分支 4：双数组深层按序递归 (容器状态)
   if (leftArr && rightArr) {
     const len = Math.max(left.length, right.length);
     const children: DiffNode[] = new Array(len);
@@ -124,11 +122,10 @@ const diffNode = (
       children,
       path,
       isLeaf: false,
-      hasDiffInChildren, // 完美注入预计算衍生状态
+      hasDiffInChildren,
     };
   }
 
-  // 分支 5：绝对类型安全防护大闸 (双基本基元比对)
   const leftIsContainer = leftObj || leftArr;
   const rightIsContainer = rightObj || rightArr;
 
@@ -160,7 +157,6 @@ const diffNode = (
     }
   }
 
-  // 类型完全发生突变错配，或者基本数值不相等
   diffPaths.push(path);
   return {
     key,
@@ -169,12 +165,12 @@ const diffNode = (
     newValue: right,
     path,
     isLeaf: !leftIsContainer && !rightIsContainer,
-    hasDiffInChildren: false, // 变动在自身，后代无子树变动
+    hasDiffInChildren: false,
   };
 };
 
 /**
- * 比较两个 JSON 值的差异，返回安全的差异树及高精度差异路径列表。
+ * 比较两个 JSON 值的差异
  */
 export const diffJson = (left: unknown, right: unknown): DiffResult => {
   const diffPaths: string[] = [];

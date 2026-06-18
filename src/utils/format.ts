@@ -2,7 +2,7 @@
  * 格式化字节大小为易读字符串
  *
  * @param bytes 字节数
- * @returns 格式化后的字符串，例如 "1.5 KB" 或 "100 B"
+ * @returns 格式化后的字符串
  */
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -17,7 +17,6 @@ export function formatBytes(bytes: number): string {
     unitIndex++;
   }
 
-  // KB uses 1 decimal, MB/GB/TB use 2 decimals
   const decimals = unitIndex === 0 ? 1 : 2;
 
   return `${size.toFixed(decimals)} ${units[unitIndex]}`;

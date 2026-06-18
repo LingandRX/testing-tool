@@ -6,10 +6,8 @@ import { useContextMenuData } from '@/utils/useContextMenuData';
 import type { QrCodeContextValue } from '../contexts/QrCodeContext';
 import type { QrCodeGeneratorState, QrCodeMode, QrCodeParserState } from '../types';
 
-/** 防抖延迟时间（毫秒） */
 const DEBOUNCE_DELAY = 500;
 
-/** 检测文本是否为URL格式 */
 function isUrl(text: string): boolean {
   const trimmed = text.trim();
   if (!trimmed) return false;
@@ -99,7 +97,6 @@ export function useQrCode(): QrCodeContextValue {
 
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 清除防抖定时器
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
@@ -108,7 +105,6 @@ export function useQrCode(): QrCodeContextValue {
     };
   }, []);
 
-  /** 自动检测URL并生成二维码 */
   const autoGenerateIfUrl = useCallback((text: string) => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -149,7 +145,6 @@ export function useQrCode(): QrCodeContextValue {
     [autoGenerateIfUrl],
   );
 
-  /** 手动触发生成二维码（用于非URL文本） */
   const confirmGenerate = useCallback(() => {
     const text = generatorState.textToEncode.trim();
 
@@ -159,10 +154,8 @@ export function useQrCode(): QrCodeContextValue {
       return;
     }
 
-    // 先设置 loading 状态，让 React 渲染加载动画
     setGeneratorState((prev) => ({ ...prev, generating: true, inputError: '' }));
 
-    // 延迟到下一帧生成，确保 loading 状态先被渲染显示
     setTimeout(() => {
       const qrCodeDataUrl = generateQrCodeDataUrl(text);
 
@@ -186,7 +179,6 @@ export function useQrCode(): QrCodeContextValue {
     }, 0);
   }, [generatorState.textToEncode]);
 
-  /** 返回编辑态，保留上次输入内容 */
   const backToEdit = useCallback(() => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -200,7 +192,6 @@ export function useQrCode(): QrCodeContextValue {
     }));
   }, []);
 
-  /** 从图片URL解析二维码 */
   const parseQrCodeFromUrl = useCallback(async (imageUrl: string) => {
     try {
       setParserState((prev) => ({
@@ -212,7 +203,6 @@ export function useQrCode(): QrCodeContextValue {
         selectedFile: null,
       }));
 
-      // 从URL获取图片并转换为File对象
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const file = new File([blob], 'qrcode-image.png', { type: blob.type });
@@ -239,35 +229,19 @@ export function useQrCode(): QrCodeContextValue {
     }
   }, []);
 
-  /** 右键菜单传入URL时，自动生成二维码或解析图片 */
   const handleContextMenuData = useCallback(
     (payload: string) => {
-      // 检测是否为图片URL，如果是则切换到解析模式
       if (isImageUrl(payload)) {
         setMode('parse');
         void parseQrCodeFromUrl(payload);
         return;
       }
 
-      // 非图片URL，生成二维码
       setMode('generate');
 
-      // 直接生成二维码，无需等待
       const qrCodeDataUrl = generateQrCodeDataUrl(payload);
 
-      if (qrCodeDataUrl) {
-        // 生成成功，直接跳转到预览态
-        setGeneratorState((prev) => ({
-          ...prev,
-          step: 'preview',
-          textToEncode: payload,
-          savedText: payload.trim(),
-          qrCodeDataUrl,
-          generating: false,
-          inputError: '',
-        }));
-      } else {
-        // 生成失败，停留在输入态，显示文本供用户编辑
+      if (!qrCodeDataUrl) {
         setGeneratorState((prev) => ({
           ...prev,
           step: 'input',
@@ -284,7 +258,6 @@ export function useQrCode(): QrCodeContextValue {
 
   useContextMenuData({ featureKey: 'qrCode', onData: handleContextMenuData });
 
-  // 反向活态解析二维码算法
   const parseQrCode = useCallback(async (file: File) => {
     try {
       setParserState((prev) => ({ ...prev, parsing: true, parseError: '', decodedResult: '' }));
@@ -354,7 +327,6 @@ export function useQrCode(): QrCodeContextValue {
         };
       });
 
-      // 触发解析安全的后台 Promise
       parseQrCode(file).catch((err) => {
         console.error('Parser standalone task thread exploded:', err);
       });
@@ -362,7 +334,6 @@ export function useQrCode(): QrCodeContextValue {
     [parseQrCode],
   );
 
-  // 清除解析受控文件
   const handleClearFile = useCallback(() => {
     setParserState((prev) => {
       if (prev.previewUrl) {
