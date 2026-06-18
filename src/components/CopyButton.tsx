@@ -4,7 +4,6 @@ import { copyTextToClipboard } from '@/utils/clipboard';
 import { cn } from '@/lib/utils';
 import { buttonVariants, type ButtonProps } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useI18n } from '@/utils/chromeI18n';
 
 interface CopyButtonProps extends Omit<ButtonProps, 'children' | 'onClick'> {
   text: string;
@@ -19,7 +18,6 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   className,
   ...props
 }) => {
-  const { t } = useI18n('common');
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -33,18 +31,18 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
     e.stopPropagation();
 
     if (!text) {
-      toast.error(t('messages.copyEmpty'));
+      toast.error('无内容可复制');
       return;
     }
 
     const success = await copyTextToClipboard(text);
     if (success) {
-      toast.success(t('messages.copySuccess'));
+      toast.success('已复制到剪贴板');
       setCopied(true);
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setCopied(false), 1500);
     } else {
-      toast.error(t('messages.copyError'));
+      toast.error('复制失败');
     }
   };
 
@@ -52,8 +50,8 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
     <button
       type="button"
       onClick={handleCopy}
-      title={tooltip ?? t('buttons.copy')}
-      aria-label={tooltip ?? t('buttons.copy')}
+      title={tooltip ?? '复制'}
+      aria-label={tooltip ?? '复制'}
       className={cn(
         buttonVariants({ variant, size }),
         copied &&

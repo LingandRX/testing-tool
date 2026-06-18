@@ -1,7 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getMessage } from '@/utils/chromeI18n';
 
 interface Props {
   children: ReactNode;
@@ -44,11 +43,9 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive mx-auto mb-4">
               <AlertCircle className="h-8 w-8" />
             </div>
-            <h2 className="text-xl font-extrabold text-destructive mb-2">
-              {getMessage('errorBoundary_title')}
-            </h2>
+            <h2 className="text-xl font-extrabold text-destructive mb-2">糟糕，出了点问题</h2>
             <p className="text-sm text-muted-foreground mb-6">
-              {getMessage('errorBoundary_description')}
+              应用遇到了一些意外错误。您可以尝试刷新页面或重置应用。
             </p>
             {this.state.error && (
               <div className="mb-6 p-4 rounded-lg bg-zinc-950 dark:bg-zinc-900 text-left max-h-[200px] overflow-auto border border-border/40">
@@ -63,7 +60,7 @@ class ErrorBoundary extends Component<Props, State> {
               className="rounded-lg font-bold shadow-sm"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
-              {getMessage('errorBoundary_refresh')}
+              刷新应用
             </Button>
           </div>
         </div>

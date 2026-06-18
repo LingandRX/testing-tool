@@ -1,7 +1,6 @@
 import { Loader2, Pencil, QrCode } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
 import QrCodePreview from './QrCodePreview';
-import { useI18n } from '@/utils/chromeI18n';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -11,7 +10,6 @@ import { cn } from '@/lib/utils';
 const TEXT_PREVIEW_MAX_LENGTH = 80;
 
 export default function GeneratePanel() {
-  const { t } = useI18n('qrCode');
   const {
     generatorState,
     setTextToEncode,
@@ -42,13 +40,13 @@ export default function GeneratePanel() {
         >
           <div className="flex flex-col space-y-2.5">
             <Label className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider select-none pl-0.5">
-              {t('qrCode:urlInputLabel')}
+              {'输入 URL 或文本'}
             </Label>
 
             <TextInputArea
               value={generatorState.textToEncode}
               onChange={setTextToEncode}
-              placeholder={t('qrCode:urlInputPlaceholder')}
+              placeholder={'请输入 URL 或文本内容，将自动生成二维码'}
               showCount={true}
               showClear={true}
               allowCopy={false}
@@ -66,12 +64,12 @@ export default function GeneratePanel() {
               {generatorState.generating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t('qrCode:generating')}
+                  {'生成中...'}
                 </>
               ) : (
                 <>
                   <QrCode className="w-4 h-4 mr-2" />
-                  {t('qrCode:generateButton')}
+                  {'生成二维码'}
                 </>
               )}
             </Button>
@@ -88,11 +86,11 @@ export default function GeneratePanel() {
       <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm p-3 mb-3">
         <div className="flex items-center justify-between mb-1.5">
           <Label className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider select-none pl-0.5">
-            {t('qrCode:textPreviewLabel')}
+            {'原始文本'}
           </Label>
           <Button variant="ghost" size="sm" onClick={backToEdit} className="h-6 px-2 text-xs">
             <Pencil className="w-3 h-3 mr-1" />
-            {t('qrCode:editButton')}
+            {'编辑'}
           </Button>
         </div>
         <div

@@ -2,7 +2,6 @@ import React from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import type { CleaningResult as CleaningResultType } from '@/types/storage';
 import { formatCleaningResult } from '@/utils/storageCleaner';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 interface CleaningResultProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -10,8 +9,6 @@ interface CleaningResultProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function CleaningResult({ result, className, ...props }: CleaningResultProps) {
-  const { t } = useI18n('storageCleaner');
-
   if (!result) return null;
 
   const isSuccess = result.overallSuccess;
@@ -33,9 +30,7 @@ export default function CleaningResult({ result, className, ...props }: Cleaning
         )}
 
         <span className="text-xs sm:text-sm font-semibold leading-relaxed break-all">
-          {isSuccess
-            ? formatCleaningResult(result, t)
-            : result.error || t('storageCleaner:partialFailure')}
+          {isSuccess ? formatCleaningResult(result) : result.error || '部分清理失败'}
         </span>
       </div>
     </div>

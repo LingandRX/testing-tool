@@ -1,11 +1,31 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import { formatBytes } from '@/utils/format';
 import { CopyButton } from '@/components/CopyButton';
 import TextInputArea from '@/components/TextInputArea';
 import { validateJson } from '@/utils/jsonFormatter';
 import { cn } from '@/lib/utils';
 import type { ConvertFunction, ConvertResult } from '../types';
+
+const CONVERT_LABELS: Record<
+  string,
+  { inputPlaceholder: string; outputLabel: string; emptyHint: string }
+> = {
+  yaml: {
+    inputPlaceholder: '输入需要转换的 JSON...',
+    outputLabel: 'YAML 结果',
+    emptyHint: '输入 JSON 后点击转换',
+  },
+  toml: {
+    inputPlaceholder: '输入需要转换的 JSON...',
+    outputLabel: 'TOML 结果',
+    emptyHint: '输入 JSON 后点击转换',
+  },
+  minify: {
+    inputPlaceholder: '输入需要压缩的 JSON...',
+    outputLabel: '压缩结果',
+    emptyHint: '输入 JSON 后点击压缩',
+  },
+};
 
 interface JsonConvertSectionProps extends React.HTMLAttributes<HTMLDivElement> {
   translationPrefix: string;
@@ -18,12 +38,11 @@ export default function JsonConvertSection({
   className,
   ...props
 }: JsonConvertSectionProps) {
-  const { t } = useI18n('jsonFormat');
-
   const [input, setInput] = useState('');
   const [debouncedInput, setDebouncedInput] = useState('');
 
   const pk = translationPrefix;
+  const labels = CONVERT_LABELS[pk] || CONVERT_LABELS.yaml;
 
   // Debounce input
   useEffect(() => {
@@ -65,7 +84,7 @@ export default function JsonConvertSection({
     <div className={cn('w-full flex flex-col gap-4', className)} {...props}>
       {/* 输入区 */}
       <TextInputArea
-        placeholder={t(`jsonFormat:${pk}InputPlaceholder`)}
+        placeholder={labels.inputPlaceholder}
         value={input}
         onChange={setInput}
         externalError={error || runtimeError || undefined}
@@ -82,19 +101,19 @@ export default function JsonConvertSection({
           <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
             <div className="flex gap-4 items-center">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
-                {t(`jsonFormat:${pk}OutputLabel`)}
+                {labels.outputLabel}
               </span>
 
               <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
                 <span>
-                  {t('jsonFormat:originalSize')}:{' '}
+                  {'原始大小'}:{' '}
                   <span className="font-semibold text-foreground/80">
                     {formatBytes(result.originalBytes)}
                   </span>
                 </span>
                 <span className="text-border/60">|</span>
                 <span>
-                  {t('jsonFormat:formattedSize')}:{' '}
+                  {'格式化后大小'}:{' '}
                   <span className="font-semibold text-foreground/80">
                     {formatBytes(result.outputBytes)}
                   </span>
@@ -115,7 +134,7 @@ export default function JsonConvertSection({
       ) : (
         <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
           <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
-            {error ? t('jsonFormat:fixErrorHint') : t(`jsonFormat:${pk}EmptyHint`)}
+            {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : labels.emptyHint}
           </p>
         </div>
       )}

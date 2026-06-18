@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useI18n } from '@/utils/chromeI18n';
 import * as ruleStorage from '@/utils/ruleStorage';
 import {
   DndContext,
@@ -123,7 +122,6 @@ export default function FieldList({
   editingRule,
   onRuleSaved,
 }: FieldListProps) {
-  const { t } = useI18n('testDataGenerator');
   const [scrollTop, setScrollTop] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -226,10 +224,10 @@ export default function FieldList({
     });
 
     if (updated) {
-      toast.success(t('testDataGenerator_ruleUpdated'));
+      toast.success('规则已更新');
       onRuleSaved?.();
     }
-  }, [editingRule, fields, t, onRuleSaved]);
+  }, [editingRule, fields, onRuleSaved]);
 
   // 新建规则或另存为
   const handleSave = useCallback(
@@ -258,18 +256,18 @@ export default function FieldList({
         setShowConfirmOverwrite(false);
         setRuleName('');
         setRuleDescription('');
-        toast.success(t('testDataGenerator_ruleSaved'));
+        toast.success('规则已保存');
         onRuleSaved?.();
       }
     },
-    [ruleName, ruleDescription, fields, t, onRuleSaved],
+    [ruleName, ruleDescription, fields, onRuleSaved],
   );
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-foreground">
-          {t('testDataGenerator_fields')} ({fields.length}/{MAX_FIELDS})
+          {'字段'} ({fields.length}/{MAX_FIELDS})
         </h3>
         <div className="flex items-center gap-2">
           {editingRule ? (
@@ -280,10 +278,10 @@ export default function FieldList({
                 onClick={handleUpdateRule}
                 disabled={fields.length === 0}
                 className="h-8 gap-1.5 px-2.5"
-                title={`${t('testDataGenerator_editing')}: ${editingRule.name}`}
+                title={`${'编辑中'}: ${editingRule.name}`}
               >
                 <Save className="h-3.5 w-3.5" />
-                {t('testDataGenerator_updateRule')}
+                {'更新规则'}
               </Button>
               <Button
                 variant="ghost"
@@ -292,7 +290,7 @@ export default function FieldList({
                 disabled={fields.length === 0}
                 className="h-8 px-2"
               >
-                {t('testDataGenerator_saveAs')}
+                {'另存为'}
               </Button>
             </>
           ) : (
@@ -304,7 +302,7 @@ export default function FieldList({
               className="h-8 gap-1.5 px-2.5"
             >
               <Save className="h-3.5 w-3.5" />
-              {t('testDataGenerator_saveRule')}
+              {'保存规则'}
             </Button>
           )}
           <Button
@@ -315,7 +313,7 @@ export default function FieldList({
             className="h-8 gap-1.5 px-2.5"
           >
             <Plus className="h-4 w-4" />
-            {t('testDataGenerator_addField')}
+            {'添加字段'}
           </Button>
         </div>
       </div>
@@ -324,10 +322,8 @@ export default function FieldList({
         {fields.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <GripVertical className="h-10 w-10 text-muted-foreground/40 mb-3" />
-            <p className="text-sm text-muted-foreground">{t('testDataGenerator_noFields')}</p>
-            <p className="text-xs text-muted-foreground/70 mt-1">
-              {t('testDataGenerator_addFieldHint')}
-            </p>
+            <p className="text-sm text-muted-foreground">{'暂无字段'}</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">{'点击上方按钮添加第一个字段'}</p>
           </div>
         ) : (
           <DndContext
@@ -419,22 +415,22 @@ export default function FieldList({
             <Input
               value={ruleName}
               onChange={(e) => setRuleName(e.target.value)}
-              placeholder={t('testDataGenerator_ruleNamePlaceholder')}
+              placeholder={'规则名称'}
               className="h-9"
             />
             <Input
               value={ruleDescription}
               onChange={(e) => setRuleDescription(e.target.value)}
-              placeholder={t('testDataGenerator_ruleDescPlaceholder')}
+              placeholder={'规则描述（可选）'}
               className="h-9"
             />
           </div>
           <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
             <Button variant="ghost" size="sm" onClick={() => setShowSaveDialog(false)}>
-              {t('testDataGenerator_cancel')}
+              {'取消'}
             </Button>
             <Button size="sm" onClick={() => handleSave()} disabled={!ruleName.trim()}>
-              {t('testDataGenerator_confirm')}
+              {'确认'}
             </Button>
           </div>
         </DialogContent>
@@ -447,16 +443,14 @@ export default function FieldList({
           className="w-[calc(100vw-4rem)] max-w-[420px] p-0 pt-6 flex flex-col"
         >
           <div className="flex-1 overflow-y-auto px-6 pb-4">
-            <p className="text-sm text-muted-foreground">
-              {t('testDataGenerator_ruleNameDuplicate')}
-            </p>
+            <p className="text-sm text-muted-foreground">{'已存在同名规则，是否覆盖保存？'}</p>
           </div>
           <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
             <Button variant="ghost" size="sm" onClick={() => setShowConfirmOverwrite(false)}>
-              {t('testDataGenerator_cancel')}
+              {'取消'}
             </Button>
             <Button size="sm" onClick={() => handleSave(true)}>
-              {t('testDataGenerator_overwrite')}
+              {'覆盖'}
             </Button>
           </div>
         </DialogContent>

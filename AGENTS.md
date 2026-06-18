@@ -55,7 +55,7 @@ src/pages/FeatureName/
 
 - 页面入口组件统一命名为 `Index`，通过 `export default function Index()` 导出
 - Hook 负责所有状态管理和业务逻辑，通过返回值暴露给页面
-- 子组件可以独立调用 `useI18n` 等全局 Hook
+- 子组件可以独立调用全局 Hook
 - 当 `index.tsx` 超过 150 行时，必须拆分为 UI + Hook 模式
 - 复杂页面可增加 `contexts/`、`hooks/`、`components/` 子目录
 
@@ -82,27 +82,21 @@ src/pages/FeatureName/
 - 全局变量: `vitest/globals` (describe, it, expect 等无需导入)
 - Setup 文件: `vitest.setup.ts` 自动 mock:
   - `chrome.*` / `browser.*` API (storage, tabs, runtime, cookies 等)
-  - `@/utils/chromeI18n` (从 `public/_locales/zh_CN/messages.json` 加载真实翻译)
   - `window.matchMedia`
 - 测试文件命名: `__tests__/*.test.{ts,tsx}` 或 `*.test.{ts,tsx}`
 - Mock 模式: 使用 `vi.mock()` 进行模块级 mock，避免在测试文件中重复 mock 代码
 - 测试工具: `@testing-library/react` + `@testing-library/user-event` 进行组件测试
-
-## i18n (chrome.i18n)
-
-详见 [i18n 开发指南](./.github/I18N.md)
 
 ## 新功能开发清单
 
 1. 在 `src/types/storage.d.ts` 添加 `PageType` 联合类型
 2. 在 `src/config/features.tsx` 的 `FEATURES` 数组添加配置（指定 key、翻译键、图标、三种渲染模式的组件）
 3. 在 `src/pages/` 创建页面组件 (懒加载)：
-   - `index.tsx` — UI 组件，使用 `useI18n` 获取翻译
+   - `index.tsx` — UI 组件
    - `use{FeatureName}.ts` — 业务逻辑 Hook
    - `constants.ts` — 常量（可选）
-4. 在 `public/_locales/zh/messages.json`（及 `en/messages.json`）添加翻译
-5. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`；如有不使用的权限，需移除
-6. 添加对应的单元测试
+4. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`；如有不使用的权限，需移除
+5. 添加对应的单元测试
 
 ## 代码规范
 

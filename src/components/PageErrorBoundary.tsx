@@ -1,7 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getMessage } from '@/utils/chromeI18n';
 
 interface Props {
   children: ReactNode;
@@ -46,11 +45,9 @@ class PageErrorBoundary extends Component<Props, State> {
               <AlertCircle className="h-6 w-6" />
             </div>
 
-            <h3 className="text-base font-semibold text-foreground mb-1.5">
-              {getMessage('pageErrorBoundary_title')}
-            </h3>
+            <h3 className="text-base font-semibold text-foreground mb-1.5">该功能运行异常</h3>
             <p className="text-xs text-muted-foreground mb-5">
-              {getMessage('pageErrorBoundary_description')}
+              该页面在加载或渲染时遇到了内部脚本错误。您可以尝试重试，或者通过导航菜单切换到其他工具。
             </p>
 
             {this.state.error && (
@@ -68,7 +65,7 @@ class PageErrorBoundary extends Component<Props, State> {
               className="font-medium shadow-sm"
             >
               <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-              {getMessage('errorBoundary_retry')}
+              重新尝试
             </Button>
           </div>
         </div>

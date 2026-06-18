@@ -1,6 +1,5 @@
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
-import { useI18n } from '@/utils/chromeI18n';
 import { QrCodeContext } from './contexts/QrCodeContext';
 import { useQrCode } from './hooks/useQrCode';
 import GeneratePanel from './components/GeneratePanel';
@@ -8,13 +7,12 @@ import ParsePanel from './components/ParsePanel';
 import type { QrCodeMode } from './types';
 
 export default function Index() {
-  const { t } = useI18n('qrCode');
   const qrCode = useQrCode();
 
   // 模式选项驱动骨架
   const modeOptions = [
-    { value: 'generate' as QrCodeMode, label: t('qrCode:urlToQr') },
-    { value: 'parse' as QrCodeMode, label: t('qrCode:qrToUrl') },
+    { value: 'generate' as QrCodeMode, label: '文本转二维码' },
+    { value: 'parse' as QrCodeMode, label: '二维码转文本' },
   ];
 
   return (

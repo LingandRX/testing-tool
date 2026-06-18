@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatBytes } from '@/utils/format';
-import { useI18n } from '@/utils/chromeI18n';
 
 interface DecodeResultPaperProps {
   /** 标题文案，由调用方传入 i18n key 对应的值（如 decodedFileOutput / decodedImageOutput） */
@@ -40,8 +39,6 @@ export default function DecodeResultPaper({
   onDownload,
   children,
 }: DecodeResultPaperProps) {
-  const { t } = useI18n('base64Converter');
-
   return (
     <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
       {/* 标题 */}
@@ -53,17 +50,17 @@ export default function DecodeResultPaper({
       {/* 文件信息 */}
       <div className="flex gap-4 mb-3">
         <span className="text-xs text-muted-foreground">
-          {t('inferredMimeType')}: {mimeType}
+          {'推断的 MIME 类型'}: {mimeType}
         </span>
         <span className="text-xs text-muted-foreground">
-          {t('decodedSize')}: {formatBytes(blobSize)}
+          {'解码大小'}: {formatBytes(blobSize)}
         </span>
       </div>
 
       {/* 文件名输入 */}
       <div className="mb-3">
         <Label className="block text-xs font-medium text-muted-foreground mb-1">
-          {t('decodedFileName')}
+          {'解码后文件名'}
         </Label>
         <Input value={fileName} onChange={(e) => onFileNameChange(e.target.value)} />
       </div>
@@ -76,7 +73,7 @@ export default function DecodeResultPaper({
         className="w-full rounded-lg font-bold"
       >
         <Download className="mr-2 h-4 w-4" />
-        {t('download')}
+        {'下载'}
       </Button>
     </div>
   );

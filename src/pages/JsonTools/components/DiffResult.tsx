@@ -1,5 +1,4 @@
 import React from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import JsonTree from './JsonTree';
 import type { DiffNode, DiffResult as DiffResultType, DiffType, ViewMode } from '../types';
@@ -17,8 +16,6 @@ export default function DiffResult({
   className,
   ...props
 }: DiffResultProps) {
-  const { t } = useI18n('jsonDiff');
-
   if (viewMode === 'sideBySide') {
     return (
       <div
@@ -26,11 +23,11 @@ export default function DiffResult({
         {...props}
       >
         <div className="flex-1 min-w-0">
-          <SectionLabel text={t('jsonDiff:leftLabel')} />
+          <SectionLabel text={'原始 JSON'} />
           <JsonTree node={result.root} side="left" activePath={activePath} />
         </div>
         <div className="flex-1 min-w-0">
-          <SectionLabel text={t('jsonDiff:rightLabel')} />
+          <SectionLabel text={'目标 JSON'} />
           <JsonTree node={result.root} side="right" activePath={activePath} />
         </div>
       </div>

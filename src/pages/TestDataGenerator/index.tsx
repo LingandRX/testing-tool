@@ -4,7 +4,6 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Settings, Database, Tag } from 'lucide-react';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 import { useGenerator } from './hooks/useGenerator';
 import type { FieldConfig, GenerateResult, DataRule } from '@/types/testDataGenerator';
@@ -29,7 +28,6 @@ import RuleManager from './components/RuleManager';
 type TabType = 'fields' | 'rules';
 
 export default function TestDataGeneratorPage() {
-  const { t } = useI18n('testDataGenerator');
   const { isGenerating, progress, result, error, generate, cancel, clearResult } = useGenerator();
 
   // 字段配置
@@ -52,11 +50,11 @@ export default function TestDataGeneratorPage() {
   useEffect(() => {
     if (result?.success && result.stats && result !== lastToastResultRef.current) {
       lastToastResultRef.current = result;
-      toast.success(t('testDataGenerator_generateSuccess'), {
-        description: `${result.stats.total} ${t('testDataGenerator_records')}`,
+      toast.success('生成完成', {
+        description: `${result.stats.total} ${'条数据'}`,
       });
     }
-  }, [result, t]);
+  }, [result]);
 
   // 添加新字段
   const handleAddField = useCallback(() => {
@@ -132,9 +130,9 @@ export default function TestDataGeneratorPage() {
       setEditingRule(rule);
       setActiveTab('fields');
       clearResult();
-      toast.success(t('testDataGenerator_editingRule', { name: rule.name }));
+      toast.success('正在编辑规则「{{name}}」');
     },
-    [clearResult, t],
+    [clearResult],
   );
 
   // 保存规则成功后清除编辑状态
@@ -176,7 +174,7 @@ export default function TestDataGeneratorPage() {
                 )}
               >
                 <Settings className="h-4 w-4" />
-                {t('testDataGenerator_fieldConfig')}
+                {'字段配置'}
               </button>
               <button
                 onClick={() => setActiveTab('rules')}
@@ -188,7 +186,7 @@ export default function TestDataGeneratorPage() {
                 )}
               >
                 <Tag className="h-4 w-4" />
-                {t('testDataGenerator_ruleManagement')}
+                {'规则管理'}
               </button>
             </div>
 
@@ -259,7 +257,7 @@ export default function TestDataGeneratorPage() {
             <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                 <Database className="h-4 w-4" />
-                {t('testDataGenerator_dataPreview')}
+                {'数据预览'}
               </h3>
               <div className="h-[280px]">
                 <DataPreview fields={fields} />
@@ -293,10 +291,10 @@ export default function TestDataGeneratorPage() {
           </div>
           <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
             <Button variant="ghost" size="sm" onClick={() => setIsEditorOpen(false)}>
-              {t('testDataGenerator_cancel')}
+              {'取消'}
             </Button>
             <Button size="sm" onClick={() => setIsEditorOpen(false)}>
-              {t('testDataGenerator_done')}
+              {'完成'}
             </Button>
           </div>
         </DialogContent>
