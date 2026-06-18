@@ -41,7 +41,7 @@ React.StrictMode
 导出：
 
 - `RouterProvider` 组件
-- `useRouter()` Hook — 获取 `currentPage`、`visiblePages`、`pageOrder`、`navigateTo`、`goBack` 等
+- `useRouter()` Hook — 获取 `currentPage`、`visiblePages`、`pageOrder`、`navigateTo`、`goHome` 等
 
 ## ThemeModeProvider.tsx
 

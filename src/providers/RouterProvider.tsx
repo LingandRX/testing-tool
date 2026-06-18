@@ -53,7 +53,7 @@ interface RouterContextType {
   recentlyUsedTools: PageType[];
   isLoaded: boolean;
   navigateTo: (page: PageType) => void;
-  goBack: () => void;
+  goHome: () => void;
   setVisiblePages: (pages: PageType[]) => void;
   setPageOrder: (pages: PageType[]) => void;
 }
@@ -274,13 +274,13 @@ export function RouterProvider({
       if (changes[visiblePagesKey as string]) {
         const newPages = changes[visiblePagesKey as string].newValue;
         if (isValidPageList(newPages)) {
-          setVisiblePages(newPages);
+          setVisiblePages(mergeWithDefaults(newPages, getDefaultVisibleFeatureKeys()));
         }
       }
       if (changes[pageOrderKey as string]) {
         const newOrder = changes[pageOrderKey as string].newValue;
         if (isValidPageList(newOrder)) {
-          setPageOrder(newOrder);
+          setPageOrder(mergeWithDefaults(newOrder, getDefaultPageOrder()));
         }
       }
       if (changes['app/recentlyUsedTools']) {
@@ -316,7 +316,7 @@ export function RouterProvider({
     });
   };
 
-  const goBack = () => {
+  const goHome = () => {
     setCurrentPage('dashboard');
   };
 
@@ -329,7 +329,7 @@ export function RouterProvider({
         recentlyUsedTools,
         isLoaded,
         navigateTo,
-        goBack,
+        goHome,
         setVisiblePages,
         setPageOrder,
       }}

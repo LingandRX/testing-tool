@@ -12,7 +12,7 @@ const mockRouterValue = {
   isLoaded: true,
   navigateTo: vi.fn(),
   syncNavigation: vi.fn(),
-  goBack: vi.fn(),
+  goHome: vi.fn(),
   setVisiblePages: vi.fn(),
   setPageOrder: vi.fn(),
 };
