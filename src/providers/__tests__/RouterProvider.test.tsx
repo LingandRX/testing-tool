@@ -277,6 +277,52 @@ describe('RouterProvider', () => {
     });
   });
 
+  it('localStorage 快照过期时，loadInitialData 完成前不应覆盖 chrome.storage', async () => {
+    const staleRoute = 'timestamp';
+    const correctRoute = 'jsonTools';
+    const defaultVisible = ['dashboard', 'timestamp', 'storageCleaner'];
+    const defaultOrder = ['timestamp', 'storageCleaner'];
+
+    localStorage.setItem('snapshot/app/currentRoute', JSON.stringify(staleRoute));
+    localStorage.setItem('snapshot/app/visiblePages', JSON.stringify(defaultVisible));
+    localStorage.setItem('snapshot/app/pageOrder', JSON.stringify(defaultOrder));
+
+    const storage = new Map<string, unknown>([
+      ['app/currentRoute', correctRoute],
+      ['app/visiblePages', defaultVisible],
+      ['app/pageOrder', defaultOrder],
+      ['app/recentlyUsedTools', []],
+    ]);
+
+    let resolveGet: () => void;
+    const getBlocked = new Promise<void>((resolve) => {
+      resolveGet = resolve;
+    });
+
+    (storageUtil.get as any).mockImplementation(async (key: string, defaultValue: unknown) => {
+      await getBlocked;
+      return storage.get(key) ?? defaultValue;
+    });
+    (storageUtil.set as any).mockImplementation(async (key: string, value: unknown) => {
+      storage.set(key, value);
+    });
+
+    render(
+      <RouterProvider>
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    expect(screen.getByTestId('current-page')).toHaveTextContent(staleRoute);
+    expect(storageUtil.set).not.toHaveBeenCalledWith('app/currentRoute', staleRoute);
+
+    resolveGet!();
+    await waitFor(() => {
+      expect(screen.getByTestId('current-page')).toHaveTextContent(correctRoute);
+      expect(storage.get('app/currentRoute')).toBe(correctRoute);
+    });
+  });
+
   it('组件卸载时不应设置 isLoaded 状态（竞态条件防护）', async () => {
     let resolveStorage: (value: unknown) => void;
     const storagePromise = new Promise((resolve) => {
