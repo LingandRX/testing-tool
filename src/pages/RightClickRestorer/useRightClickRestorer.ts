@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MessageAction, sendMessageToContent } from '@/utils/messages';
+import type { RestorerStatus } from './constants';
 
 const UNSUPPORTED_PROTOCOLS = new Set([
   'chrome:',
@@ -19,11 +20,15 @@ function isUnsupportedPage(url: string | undefined): boolean {
   }
 }
 
+function deriveStatus(isUnsupported: boolean, isUnlocked: boolean): RestorerStatus {
+  if (isUnsupported) return 'unsupported';
+  return isUnlocked ? 'unlocked' : 'locked';
+}
+
 export interface UseRightClickRestorerReturn {
   domain: string;
   isLoading: boolean;
-  isUnlocked: boolean;
-  isUnsupported: boolean;
+  status: RestorerStatus;
   unlock: () => Promise<void>;
 }
 
@@ -76,8 +81,7 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
   return {
     domain,
     isLoading,
-    isUnlocked,
-    isUnsupported,
+    status: deriveStatus(isUnsupported, isUnlocked),
     unlock,
   };
 }

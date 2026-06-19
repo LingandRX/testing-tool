@@ -26,8 +26,7 @@ describe('useRightClickRestorer', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.domain).toBe('example.com');
-    expect(result.current.isUnlocked).toBe(false);
-    expect(result.current.isUnsupported).toBe(false);
+    expect(result.current.status).toBe('locked');
     expect(sendMessageToContent).toHaveBeenCalledWith('queryRightClickStatus');
   });
 
@@ -39,8 +38,7 @@ describe('useRightClickRestorer', () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.isUnsupported).toBe(true);
-    expect(result.current.isUnlocked).toBe(false);
+    expect(result.current.status).toBe('unsupported');
     expect(sendMessageToContent).not.toHaveBeenCalled();
   });
 
@@ -56,7 +54,7 @@ describe('useRightClickRestorer', () => {
       await result.current.unlock();
     });
 
-    expect(result.current.isUnlocked).toBe(true);
+    expect(result.current.status).toBe('unlocked');
     expect(sendMessageToContent).toHaveBeenLastCalledWith('restoreRightClick');
   });
 
@@ -72,7 +70,7 @@ describe('useRightClickRestorer', () => {
       await result.current.unlock();
     });
 
-    expect(result.current.isUnlocked).toBe(false);
+    expect(result.current.status).toBe('unsupported');
     expect(sendMessageToContent).not.toHaveBeenCalled();
   });
 
@@ -87,6 +85,6 @@ describe('useRightClickRestorer', () => {
       await result.current.unlock();
     });
 
-    expect(result.current.isUnlocked).toBe(false);
+    expect(result.current.status).toBe('locked');
   });
 });
