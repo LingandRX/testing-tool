@@ -1,0 +1,191 @@
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useRouter } from '@/providers/RouterProvider';
+import { useThemeMode } from '@/providers/ThemeModeProvider';
+import { type FeatureConfig, FEATURES } from '@/config/features';
+import { storageUtil } from '@/utils/chromeStorage';
+import { openExtensionPage } from '@/utils/chromeTabs';
+import { SEARCH_HISTORY_DISPLAY, SEARCH_HISTORY_LIMIT } from './constants';
+
+export interface HistoryItem {
+  key: string;
+  feature?: FeatureConfig;
+}
+
+export interface UseTopBarReturn {
+  searchQuery: string;
+  showResults: boolean;
+  searchResults: FeatureConfig[];
+  displayedHistory: HistoryItem[];
+  selectedIndex: number;
+  isDashboard: boolean;
+  ThemeIcon: typeof Sun;
+  themeTitle: string;
+  containerRef: RefObject<HTMLDivElement | null>;
+  inputRef: RefObject<HTMLInputElement | null>;
+  setSearchQuery: (value: string) => void;
+  setShowResults: (value: boolean) => void;
+  setSelectedIndex: (value: number | ((prev: number) => number)) => void;
+  handleSelectFeature: (feature: FeatureConfig) => void;
+  handleKeyDown: (e: React.KeyboardEvent) => void;
+  cycleThemeMode: () => void;
+  handleOpenInTab: () => Promise<void>;
+  goHome: () => void;
+  clearSearch: () => void;
+}
+
+export function useTopBar(): UseTopBarReturn {
+  const { currentPage, goHome, navigateTo } = useRouter();
+  const { mode, setMode } = useThemeMode();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showResults, setShowResults] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleOpenInTab = async () => {
+    await openExtensionPage('popup.html', { mode: 'tab' });
+    window.close();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+        setShowResults(true);
+      }
+    };
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    storageUtil
+      .get('app/searchHistory', [])
+      .then((history) => {
+        if (cancelled || !history) return;
+        setSearchHistory(history);
+      })
+      .catch((err) => console.error('加载搜索历史失败:', err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const searchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return [];
+    return FEATURES.filter((f) => {
+      if (f.key === 'dashboard') return false;
+      return f.label.toLowerCase().includes(query) || f.description.toLowerCase().includes(query);
+    });
+  }, [searchQuery]);
+
+  const displayedHistory = useMemo(() => {
+    if (searchQuery.trim()) return [];
+    return searchHistory
+      .slice(0, SEARCH_HISTORY_DISPLAY)
+      .map((key) => ({ key, feature: FEATURES.find((f) => f.key === key) }))
+      .filter((item) => item.feature && item.feature.key !== 'dashboard');
+  }, [searchHistory, searchQuery]);
+
+  const saveToHistory = async (featureKey: string) => {
+    if (!featureKey.trim()) return;
+    const nextHistory = [featureKey, ...searchHistory.filter((h) => h !== featureKey)].slice(
+      0,
+      SEARCH_HISTORY_LIMIT,
+    );
+    setSearchHistory(nextHistory);
+    await storageUtil.set('app/searchHistory', nextHistory).catch((err) => console.error(err));
+  };
+
+  const handleSelectFeature = (feature: FeatureConfig) => {
+    navigateTo(feature.key);
+    saveToHistory(feature.key);
+    setSearchQuery('');
+    setShowResults(false);
+  };
+
+  const cycleThemeMode = () => {
+    const nextMap = { light: 'dark', dark: 'system', system: 'light' } as const;
+    setMode(nextMap[mode]);
+  };
+
+  const ThemeIcon = mode === 'light' ? Sun : mode === 'dark' ? Moon : Monitor;
+
+  const themeTitle =
+    mode === 'light' ? '切换到深色模式' : mode === 'dark' ? '切换到系统模式' : '切换到浅色模式';
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    const totalItems = searchQuery.trim() ? searchResults.length : displayedHistory.length;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev < totalItems - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < totalItems) {
+        if (searchQuery.trim()) {
+          handleSelectFeature(searchResults[selectedIndex]);
+        } else {
+          const selected = displayedHistory[selectedIndex];
+          if (selected?.feature) {
+            handleSelectFeature(selected.feature);
+          }
+        }
+      } else if (searchQuery.trim() && searchResults.length > 0) {
+        handleSelectFeature(searchResults[0]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowResults(false);
+      inputRef.current?.blur();
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSelectedIndex(-1);
+  };
+
+  return {
+    searchQuery,
+    showResults,
+    searchResults,
+    displayedHistory,
+    selectedIndex,
+    isDashboard: currentPage === 'dashboard',
+    ThemeIcon,
+    themeTitle,
+    containerRef,
+    inputRef,
+    setSearchQuery,
+    setShowResults,
+    setSelectedIndex,
+    handleSelectFeature,
+    handleKeyDown,
+    cycleThemeMode,
+    handleOpenInTab,
+    goHome,
+    clearSearch,
+  };
+}

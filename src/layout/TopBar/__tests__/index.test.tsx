@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { PageType } from '@/types/storage';
 import React from 'react';
-import TopBar from '@/components/TopBar';
+import TopBar from '@/layout/TopBar';
 import { RouterProvider } from '@/providers/RouterProvider';
 import { ThemeModeProvider } from '@/providers/ThemeModeProvider';
 
@@ -60,7 +60,7 @@ describe('TopBar 组件', () => {
     it('在 dashboard 上不应渲染返回按钮', () => {
       mockRouterValue.currentPage = 'dashboard';
       renderWithProvider(<TopBar />);
-      expect(screen.queryByLabelText('返回')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('返回首页')).not.toBeInTheDocument();
     });
   });
 

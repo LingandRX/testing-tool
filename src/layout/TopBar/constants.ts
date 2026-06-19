@@ -1,0 +1,2 @@
+export const SEARCH_HISTORY_LIMIT = 10;
+export const SEARCH_HISTORY_DISPLAY = 5;
