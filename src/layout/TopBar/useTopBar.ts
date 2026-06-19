@@ -3,20 +3,15 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 import { useRouter } from '@/providers/RouterProvider';
 import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { type FeatureConfig, FEATURES } from '@/config/features';
-import { storageUtil } from '@/utils/chromeStorage';
+import { useStorageState } from '@/utils/useStorageState';
 import { openExtensionPage } from '@/utils/chromeTabs';
-import { SEARCH_HISTORY_DISPLAY, SEARCH_HISTORY_LIMIT } from './constants';
-
-export interface HistoryItem {
-  key: string;
-  feature?: FeatureConfig;
-}
+import { isSearchHistory, SEARCH_HISTORY_DISPLAY, SEARCH_HISTORY_LIMIT } from './constants';
 
 export interface UseTopBarReturn {
   searchQuery: string;
   showResults: boolean;
   searchResults: FeatureConfig[];
-  displayedHistory: HistoryItem[];
+  recentFeatures: FeatureConfig[];
   selectedIndex: number;
   isDashboard: boolean;
   ThemeIcon: typeof Sun;
@@ -40,7 +35,11 @@ export function useTopBar(): UseTopBarReturn {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [searchHistory, setSearchHistory] = useStorageState(
+    'app/searchHistory',
+    [],
+    isSearchHistory,
+  );
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,22 +72,6 @@ export function useTopBar(): UseTopBarReturn {
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    storageUtil
-      .get('app/searchHistory', [])
-      .then((history) => {
-        if (cancelled || !history) return;
-        setSearchHistory(history);
-      })
-      .catch((err) => console.error('加载搜索历史失败:', err));
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const searchResults = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return [];
@@ -102,18 +85,15 @@ export function useTopBar(): UseTopBarReturn {
     if (searchQuery.trim()) return [];
     return searchHistory
       .slice(0, SEARCH_HISTORY_DISPLAY)
-      .map((key) => ({ key, feature: FEATURES.find((f) => f.key === key) }))
-      .filter((item) => item.feature && item.feature.key !== 'dashboard');
+      .map((key) => FEATURES.find((f) => f.key === key))
+      .filter((feature): feature is FeatureConfig => !!feature && feature.key !== 'dashboard');
   }, [searchHistory, searchQuery]);
 
-  const saveToHistory = async (featureKey: string) => {
+  const saveToHistory = (featureKey: string) => {
     if (!featureKey.trim()) return;
-    const nextHistory = [featureKey, ...searchHistory.filter((h) => h !== featureKey)].slice(
-      0,
-      SEARCH_HISTORY_LIMIT,
+    setSearchHistory((prev) =>
+      [featureKey, ...prev.filter((h) => h !== featureKey)].slice(0, SEARCH_HISTORY_LIMIT),
     );
-    setSearchHistory(nextHistory);
-    await storageUtil.set('app/searchHistory', nextHistory).catch((err) => console.error(err));
   };
 
   const handleSelectFeature = (feature: FeatureConfig) => {
@@ -149,8 +129,8 @@ export function useTopBar(): UseTopBarReturn {
           handleSelectFeature(searchResults[selectedIndex]);
         } else {
           const selected = displayedHistory[selectedIndex];
-          if (selected?.feature) {
-            handleSelectFeature(selected.feature);
+          if (selected) {
+            handleSelectFeature(selected);
           }
         }
       } else if (searchQuery.trim() && searchResults.length > 0) {
@@ -171,7 +151,7 @@ export function useTopBar(): UseTopBarReturn {
     searchQuery,
     showResults,
     searchResults,
-    displayedHistory,
+    recentFeatures: displayedHistory,
     selectedIndex,
     isDashboard: currentPage === 'dashboard',
     ThemeIcon,
