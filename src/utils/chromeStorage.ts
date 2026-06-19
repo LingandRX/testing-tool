@@ -1,12 +1,12 @@
 import { StorageSchema } from '@/types/storage';
 
 class StorageUtils {
-  async get<K extends keyof StorageSchema>(key: K): Promise<StorageSchema[K]>;
-
   async get<K extends keyof StorageSchema>(
     key: K,
-    defaultValue?: StorageSchema[K],
-  ): Promise<StorageSchema[K] | undefined>;
+    defaultValue: StorageSchema[K],
+  ): Promise<StorageSchema[K]>;
+
+  async get<K extends keyof StorageSchema>(key: K): Promise<StorageSchema[K] | undefined>;
 
   /**
    * 获取值
@@ -19,7 +19,10 @@ class StorageUtils {
     defaultValue?: StorageSchema[K],
   ): Promise<StorageSchema[K] | undefined> {
     const result = await chrome.storage.local.get([key]);
-    return (result[key] ?? defaultValue) as StorageSchema[K] | undefined;
+    if (defaultValue !== undefined) {
+      return (result[key] ?? defaultValue) as StorageSchema[K];
+    }
+    return result[key] as StorageSchema[K] | undefined;
   }
 
   /**

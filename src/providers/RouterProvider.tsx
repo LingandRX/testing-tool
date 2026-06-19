@@ -193,7 +193,7 @@ export function RouterProvider({
 
         // Check storage for pending context menu data
         storageUtil
-          .get('contextMenu/pendingData', undefined)
+          .get('contextMenu/pendingData')
           .then((pendingData) => {
             if (
               pendingData &&
