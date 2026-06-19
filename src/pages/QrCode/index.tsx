@@ -9,7 +9,6 @@ import type { QrCodeMode } from './types';
 export default function Index() {
   const qrCode = useQrCode();
 
-  // 模式选项驱动骨架
   const modeOptions = [
     { value: 'generate' as QrCodeMode, label: '文本转二维码' },
     { value: 'parse' as QrCodeMode, label: '二维码转文本' },

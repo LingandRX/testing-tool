@@ -316,7 +316,7 @@ describe('base64ToBlob', () => {
   });
 
   it('应该对非法 Base64 抛出 Invalid Base64 string', () => {
-    expect(() => base64ToBlob('这不是 base64!')).toThrow('Invalid Base64 string');
+    expect(() => base64ToBlob('这不是 base64!')).toThrow('无效的 Base64 字符串');
   });
 
   it('应该返回原始 Base64（已去除 data URI 前缀）', () => {
