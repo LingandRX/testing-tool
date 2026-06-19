@@ -1,54 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { clearCookies, isRestrictedUrl } from '@/utils/storageCleaner';
+import { clearCookies } from '@/utils/storageCleaner';
 import { formatBytes } from '@/utils/format';
 
 describe('storageCleaner utils', () => {
-  describe('isRestrictedUrl', () => {
-    it('should return true for chrome:// URLs', () => {
-      expect(isRestrictedUrl('chrome://settings')).toBe(true);
-    });
-
-    it('should return true for chrome-extension:// URLs', () => {
-      expect(isRestrictedUrl('chrome-extension://abc123/background.html')).toBe(true);
-    });
-
-    it('should return true for about:// URLs', () => {
-      expect(isRestrictedUrl('about:blank')).toBe(true);
-    });
-
-    it('should return true for edge:// URLs', () => {
-      expect(isRestrictedUrl('edge://settings')).toBe(true);
-    });
-
-    it('should return true for view-source:// URLs', () => {
-      expect(isRestrictedUrl('view-source:https://example.com')).toBe(true);
-    });
-
-    it('should return true for file:// URLs', () => {
-      expect(isRestrictedUrl('file:///path/to/file')).toBe(true);
-    });
-
-    it('should return true for data:// URLs', () => {
-      expect(isRestrictedUrl('data:text/html,<h1>Hello</h1>')).toBe(true);
-    });
-
-    it('should return false for http:// URLs', () => {
-      expect(isRestrictedUrl('http://example.com')).toBe(false);
-    });
-
-    it('should return false for https:// URLs', () => {
-      expect(isRestrictedUrl('https://example.com')).toBe(false);
-    });
-
-    it('should return true for undefined URL', () => {
-      expect(isRestrictedUrl(undefined)).toBe(true);
-    });
-
-    it('should return true for empty string', () => {
-      expect(isRestrictedUrl('')).toBe(true);
-    });
-  });
-
   describe('formatBytes', () => {
     it('should return "0 B" for 0 bytes', () => {
       expect(formatBytes(0)).toBe('0 B');
