@@ -7,6 +7,7 @@ import {
 } from '@/utils/jsonFormatter';
 import { formatBytes } from '@/utils/format';
 import { CopyButton } from '@/components/CopyButton';
+import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import TextInputArea from '@/components/TextInputArea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -148,12 +149,9 @@ export default function JsonFormatSection() {
           </div>
         </div>
       ) : (
-        /* 空状态指示引导区 */
-        <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
-          <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
-            {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : '输入 JSON 后点击格式化'}
-          </p>
-        </div>
+        <EmptyPlaceholder>
+          {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : '输入 JSON 后点击格式化'}
+        </EmptyPlaceholder>
       )}
     </div>
   );

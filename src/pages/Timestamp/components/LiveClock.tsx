@@ -5,6 +5,7 @@ import { CopyButton } from '@/components/CopyButton';
 import type { UnitType } from '../constants';
 import { msToUnit } from '../constants';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface LiveClockProps extends React.HTMLAttributes<HTMLDivElement> {
   unit: UnitType;
@@ -40,17 +41,19 @@ export default function LiveClock({ unit, onUseNow, className, ...props }: LiveC
         {text}
       </span>
 
-      <button
+      <Button
         type="button"
         onClick={() => {
           onUseNow(rawTime);
           toast.success('已使用当前时间戳');
         }}
         title={'填充到下方'}
-        className="flex h-7 w-7 items-center justify-center rounded-md border border-input bg-background text-muted-foreground shadow-sm hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7 text-muted-foreground hover:text-foreground"
       >
         <Clock className="w-3.5 h-3.5" />
-      </button>
+      </Button>
 
       <CopyButton text={text} tooltip={'复制时间戳'} className="h-7 w-7 rounded-md border" />
     </div>

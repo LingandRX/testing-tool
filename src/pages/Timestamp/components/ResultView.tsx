@@ -1,5 +1,6 @@
 import React from 'react';
 import { CopyButton } from '@/components/CopyButton';
+import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import { cn } from '@/lib/utils';
 
 interface ResultViewProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -16,15 +17,13 @@ export default function ResultView({
   if (!result) {
     if (!showEmptyPlaceholder) return null;
     return (
-      <div
-        className={cn(
-          'flex-1 flex items-center justify-center text-sm font-medium border border-dashed border-border/60 rounded-xl py-12 px-4 text-center text-muted-foreground bg-muted/20 min-h-[320px]',
-          className,
-        )}
+      <EmptyPlaceholder
+        className={cn('flex-1 min-h-[320px]', className)}
+        messageClassName="text-sm font-medium text-muted-foreground max-w-none"
         {...props}
       >
         {'请输入并点击转换'}
-      </div>
+      </EmptyPlaceholder>
     );
   }
 
@@ -41,7 +40,9 @@ export default function ResultView({
         <CopyButton
           text={result}
           tooltip={'复制结果'}
-          className="h-8 w-8 rounded-md shrink-0 border"
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:text-foreground"
         />
       </div>
     </div>

@@ -1,5 +1,6 @@
 import TextInputArea from '@/components/TextInputArea';
 import { CopyButton } from '@/components/CopyButton';
+import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import JwtSection from './JwtSection';
 import { useJwt } from './useJwt';
 
@@ -57,9 +58,7 @@ export default function Index() {
         )}
 
         {result?.error && (
-          <div className="p-6 rounded-xl bg-muted/30 border border-dashed border-border text-center">
-            <p className="text-xs font-semibold text-muted-foreground/80">{'无效的 JSON 格式'}</p>
-          </div>
+          <EmptyPlaceholder className="p-6 min-h-0">{'无效的 JSON 格式'}</EmptyPlaceholder>
         )}
       </div>
     </div>

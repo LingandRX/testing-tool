@@ -8,6 +8,7 @@
 | ----------------------- | ------------------------------------------------------------------------------ |
 | `RouterContainer.tsx`   | 路由容器，根据当前路由动态渲染对应页面组件，集成错误边界和骨架屏               |
 | `SwitchButtonGroup.tsx` | 通用切换按钮组，支持 `small/medium/large` 三种尺寸，用于页面子模式切换         |
+| `EmptyPlaceholder.tsx`  | 虚线边框空状态占位，统一工具页「暂无结果」提示样式                             |
 | `TextInputArea.tsx`     | 增强文本输入区域，支持校验规则、工具栏操作、字符计数、清空                     |
 | `CopyButton.tsx`        | 一键复制按钮，支持复制成功状态动画，封装 `copyTextToClipboard` 和 `toast` 反馈 |
 | `ImageUploader.tsx`     | 图片上传组件，支持拖拽上传、文件选择和预览                                     |
