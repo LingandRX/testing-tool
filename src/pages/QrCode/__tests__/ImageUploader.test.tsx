@@ -23,7 +23,6 @@ vi.mock('sonner', () => ({
 describe('ImageUploader 组件', () => {
   const mockOnFileChange = vi.fn();
   const mockOnClearFile = vi.fn();
-  const mockOnPreviewUrlChange = vi.fn();
   const mockOnDraggingChange = vi.fn();
 
   const defaultProps = {
@@ -31,7 +30,6 @@ describe('ImageUploader 组件', () => {
     onFileChange: mockOnFileChange,
     onClearFile: mockOnClearFile,
     previewUrl: '',
-    onPreviewUrlChange: mockOnPreviewUrlChange,
     dragging: false,
     onDraggingChange: mockOnDraggingChange,
   };
@@ -95,7 +93,7 @@ describe('ImageUploader 组件', () => {
   });
 
   describe('文件选择交互', () => {
-    it('选择文件时应调用 onFileChange 和 onPreviewUrlChange', async () => {
+    it('选择文件时应调用 onFileChange', async () => {
       render(<ImageUploader {...defaultProps} />);
       const input = document.getElementById('qr-code-upload') as HTMLInputElement;
       const mockFile = new File(['test'], 'test.png', { type: 'image/png' });
@@ -105,8 +103,7 @@ describe('ImageUploader 组件', () => {
       });
 
       expect(mockOnFileChange).toHaveBeenCalledWith(mockFile);
-      expect(mockCreateObjectURL).toHaveBeenCalledWith(mockFile);
-      expect(mockOnPreviewUrlChange).toHaveBeenCalledWith('blob:test-url');
+      expect(mockOnFileChange).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -127,7 +124,7 @@ describe('ImageUploader 组件', () => {
       expect(mockOnDraggingChange).toHaveBeenCalledWith(false);
     });
 
-    it('放置文件时应调用 onFileChange 和 onPreviewUrlChange', () => {
+    it('放置文件时应调用 onFileChange', () => {
       const { container } = render(<ImageUploader {...defaultProps} />);
       const dropzone = container.firstChild as HTMLElement;
       const mockFile = new File(['test'], 'test.png', { type: 'image/png' });
@@ -146,6 +143,7 @@ describe('ImageUploader 组件', () => {
 
       expect(mockOnDraggingChange).toHaveBeenCalledWith(false);
       expect(mockOnFileChange).toHaveBeenCalledWith(mockFile);
+      expect(mockOnFileChange).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -165,20 +163,12 @@ describe('ImageUploader 组件', () => {
   });
 
   describe('粘贴功能', () => {
-    it('监听粘贴事件', () => {
+    it('不应注册 document 粘贴事件监听（由 ParsePanel 统一处理）', () => {
       const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
       render(<ImageUploader {...defaultProps} />);
 
-      expect(addEventListenerSpy).toHaveBeenCalledWith('paste', expect.any(Function));
-    });
-
-    it('组件卸载时应移除粘贴事件监听', () => {
-      const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
-      const { unmount } = render(<ImageUploader {...defaultProps} />);
-
-      unmount();
-
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('paste', expect.any(Function));
+      const pasteListeners = addEventListenerSpy.mock.calls.filter(([event]) => event === 'paste');
+      expect(pasteListeners).toHaveLength(0);
     });
   });
 
