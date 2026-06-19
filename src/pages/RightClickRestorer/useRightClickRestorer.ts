@@ -1,24 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MessageAction, sendMessageToContent } from '@/utils/messages';
+import { isUnsupportedPageUrl } from '@/utils/restrictedUrls';
 import type { RestorerStatus } from './constants';
-
-const UNSUPPORTED_PROTOCOLS = new Set([
-  'chrome:',
-  'chrome-extension:',
-  'about:',
-  'edge:',
-  'brave:',
-]);
-
-function isUnsupportedPage(url: string | undefined): boolean {
-  if (!url) return true;
-  try {
-    const protocol = new URL(url).protocol;
-    return UNSUPPORTED_PROTOCOLS.has(protocol);
-  } catch {
-    return true;
-  }
-}
 
 function deriveStatus(isUnsupported: boolean, isUnlocked: boolean): RestorerStatus {
   if (isUnsupported) return 'unsupported';
@@ -46,7 +29,7 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
 
         setDomain(url ? new URL(url).hostname : '');
 
-        if (isUnsupportedPage(url)) {
+        if (isUnsupportedPageUrl(url)) {
           setIsUnsupported(true);
           return;
         }

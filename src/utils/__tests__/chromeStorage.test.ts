@@ -77,15 +77,15 @@ describe('chromeStorage', () => {
 
   describe('get 类型签名', () => {
     it('无默认值时应推断为可选返回类型', () => {
-      const getWithoutDefault = () => storageUtil.get('app/theme');
-      expectTypeOf<ReturnType<typeof getWithoutDefault>>().toEqualTypeOf<
+      const _getWithoutDefault = () => storageUtil.get('app/theme');
+      expectTypeOf<ReturnType<typeof _getWithoutDefault>>().toEqualTypeOf<
         Promise<string | undefined>
       >();
     });
 
     it('有默认值时应推断为确定返回类型', () => {
-      const getWithDefault = () => storageUtil.get('app/theme', 'light');
-      expectTypeOf<ReturnType<typeof getWithDefault>>().toEqualTypeOf<Promise<string>>();
+      const _getWithDefault = () => storageUtil.get('app/theme', 'light');
+      expectTypeOf<ReturnType<typeof _getWithDefault>>().toEqualTypeOf<Promise<string>>();
     });
   });
 
