@@ -119,7 +119,7 @@ export const FEATURES: FeatureConfig[] = [
     },
   },
   {
-    key: 'jsonDiff',
+    key: 'jsonTools',
     label: 'JSON 工具',
     description: '差异比较、格式化、YAML/TOML 转换及压缩',
     themeColorKey: 'primary',
