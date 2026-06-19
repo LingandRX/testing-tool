@@ -65,7 +65,6 @@ export default function ParsePanel() {
           onFileChange={handleFileChange}
           onClearFile={handleClearFile}
           previewUrl={parserState.previewUrl}
-          onPreviewUrlChange={(url) => setParserState((prev) => ({ ...prev, previewUrl: url }))}
           dragging={parserState.dragging}
           onDraggingChange={(dragging) => setParserState((prev) => ({ ...prev, dragging }))}
         />

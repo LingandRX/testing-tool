@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Image, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -13,8 +13,6 @@ interface ImageUploaderProps {
   onClearFile: () => void;
   /** 文件预览 URL */
   previewUrl: string;
-  /** 预览 URL 变更回调 */
-  onPreviewUrlChange: (url: string) => void;
   /** 是否正在拖拽 */
   dragging: boolean;
   /** 拖拽状态变更回调 */
@@ -26,7 +24,6 @@ const ImageUploader = ({
   onFileChange,
   onClearFile,
   previewUrl,
-  onPreviewUrlChange,
   dragging,
   onDraggingChange,
 }: ImageUploaderProps) => {
@@ -35,9 +32,8 @@ const ImageUploader = ({
   const handleFileChange = useCallback(
     (file: File) => {
       onFileChange(file);
-      onPreviewUrlChange(URL.createObjectURL(file));
     },
-    [onFileChange, onPreviewUrlChange],
+    [onFileChange],
   );
 
   const handleClearFile = useCallback(() => {
@@ -71,38 +67,6 @@ const ImageUploader = ({
       handleFileChange(droppedFile);
     }
   };
-
-  // 监听粘贴事件
-  useEffect(() => {
-    const handlePaste = async (e: ClipboardEvent) => {
-      const items = e.clipboardData?.items;
-      if (!items) return;
-
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.startsWith('image/')) {
-          e.preventDefault();
-
-          const file = items[i].getAsFile();
-          if (file) {
-            try {
-              handleFileChange(file);
-              toast.success('图片粘贴成功，正在解析...');
-            } catch (error) {
-              console.error('处理粘贴图片失败:', error);
-              toast.error('粘贴图片失败，请重试');
-            }
-          }
-          break;
-        }
-      }
-    };
-
-    document.addEventListener('paste', handlePaste);
-
-    return () => {
-      document.removeEventListener('paste', handlePaste);
-    };
-  }, [handleFileChange]);
 
   return (
     <div
