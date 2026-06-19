@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export interface SwitchOption<T extends string | number = string> {
@@ -45,21 +46,20 @@ export default function SwitchButtonGroup<T extends string | number = string>({
       {...props}
     >
       {options.map((option) => (
-        <button
+        <Button
           key={option.value}
           type="button"
+          variant="ghost"
           onClick={() => onChange(option.value)}
           className={cn(
-            'flex-1 inline-flex items-center justify-center font-medium whitespace-nowrap transition-all',
-            'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2',
-            'disabled:pointer-events-none disabled:opacity-50',
+            'flex-1 transition-all',
             SIZE_CLASSES[size],
             value === option.value ? SELECTED_CLASSES : UNSELECTED_CLASSES,
             buttonClassName,
           )}
         >
           {option.label}
-        </button>
+        </Button>
       ))}
     </div>
   );
