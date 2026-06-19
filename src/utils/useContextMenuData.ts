@@ -26,7 +26,7 @@ export function useContextMenuData({ featureKey, onData }: UseContextMenuDataOpt
   useEffect(() => {
     const checkAndConsumeData = async () => {
       try {
-        const data = await storageUtil.get(STORAGE_KEY, undefined);
+        const data = await storageUtil.get(STORAGE_KEY);
 
         if (!data) return;
 
@@ -55,7 +55,7 @@ export function useContextMenuData({ featureKey, onData }: UseContextMenuDataOpt
         if (newData && newData.featureKey === featureKey) {
           void (async () => {
             try {
-              const data = await storageUtil.get(STORAGE_KEY, undefined);
+              const data = await storageUtil.get(STORAGE_KEY);
               if (!data) return;
               if (data.featureKey !== featureKey) return;
               if (Date.now() - data.timestamp > CONTEXT_MENU_DATA_EXPIRY_MS) {
