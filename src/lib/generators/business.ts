@@ -434,7 +434,7 @@ function skewedRandom(min: number, max: number): number {
     v = 0;
   while (u === 0) u = Math.random();
   while (v === 0) v = Math.random();
-  const x = Math.pow(u, 1 / alpha) / Math.pow(u, 1 / alpha) + Math.pow(v, 1 / beta);
+  const x = Math.pow(u, 1 / alpha) / (Math.pow(u, 1 / alpha) + Math.pow(v, 1 / beta));
   return min + x * (max - min);
 }
 
