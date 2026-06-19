@@ -12,7 +12,6 @@ vi.mock('@/utils/chromeStorage', () => ({
 
 vi.mock('@/utils/storageCleaner', () => ({
   getCurrentTab: vi.fn().mockResolvedValue({ id: 1, url: 'https://example.com' }),
-  isRestrictedUrl: vi.fn().mockReturnValue(false),
   getCookieSize: vi.fn().mockResolvedValue(0),
   getLocalStorageSize: vi.fn().mockResolvedValue(0),
   getSessionStorageSize: vi.fn().mockResolvedValue(0),

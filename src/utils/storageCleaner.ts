@@ -1,6 +1,5 @@
 import type { CleaningResult, StorageCleanerOptions, StorageCleanResult } from '@/types/storage';
 import { CLEAN_OPTION_KEYS, OPTION_LABELS } from '@/pages/StorageCleaner/constants';
-export { isRestrictedUrl } from '@/utils/restrictedUrls';
 
 export async function getCurrentTab() {
   // For popup pages, we need to get the active tab from the browser window that triggered the popup.
