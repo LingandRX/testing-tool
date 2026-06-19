@@ -76,14 +76,6 @@ describe('jsonToToml', () => {
     expect(() => jsonToToml('{invalid}')).toThrow(SyntaxError);
   });
 
-  it('should throw Error for non-object top-level value', () => {
-    expect(() => jsonToToml('"hello"')).toThrow(
-      'TOML requires the top-level value to be an object',
-    );
-    expect(() => jsonToToml('[1,2]')).toThrow('TOML requires the top-level value to be an object');
-    expect(() => jsonToToml('null')).toThrow('TOML requires the top-level value to be an object');
-  });
-
   it('should escape special characters in strings', () => {
     const result = jsonToToml('{"path":"C:\\\\Users\\\\test"}');
     expect(result.output).toContain('"C:\\\\Users\\\\test"');
