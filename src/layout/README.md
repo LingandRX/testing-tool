@@ -14,9 +14,13 @@
 
 ```
 layout/TopBar/
-├── index.tsx       # 布局 UI
-├── useTopBar.ts    # 业务逻辑 Hook
-├── constants.ts    # 常量
+├── index.tsx              # 布局入口
+├── useTopBar.ts           # 业务逻辑 Hook
+├── constants.ts           # 常量
+├── SearchInput.tsx        # 搜索输入框
+├── SearchDropdown.tsx     # 搜索结果/历史下拉面板
+├── SearchResultItem.tsx   # 单条搜索结果项
+├── TopBarActions.tsx      # 右侧操作按钮组
 └── __tests__/
     └── index.test.tsx
 ```
