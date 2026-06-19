@@ -130,7 +130,7 @@ export default function TestDataGeneratorPage() {
       setEditingRule(rule);
       setActiveTab('fields');
       clearResult();
-      toast.success('正在编辑规则「{{name}}」');
+      toast.success(`正在编辑规则「${rule.name}」`);
     },
     [clearResult],
   );
