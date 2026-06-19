@@ -178,6 +178,18 @@ describe('RuleManager', () => {
     vi.restoreAllMocks();
   });
 
+  it('should call onEdit when edit button clicked', async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    mockedRuleStorage.getAll.mockReturnValue([mockRule]);
+
+    render(<RuleManager {...defaultProps} onEdit={onEdit} />);
+
+    await user.click(screen.getByTitle('编辑'));
+
+    expect(onEdit).toHaveBeenCalledWith(mockRule);
+  });
+
   it('should show saved rule count', () => {
     mockedRuleStorage.getAll.mockReturnValue([mockRule]);
 
