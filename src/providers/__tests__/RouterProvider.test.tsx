@@ -156,7 +156,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
     const oldPageOrder = [
       'timestamp',
@@ -164,7 +164,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
 
     (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) => {
@@ -196,7 +196,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
     const oldPageOrder = [
       'timestamp',
@@ -204,7 +204,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
     localStorage.setItem('snapshot/app/visiblePages', JSON.stringify(oldVisiblePages));
     localStorage.setItem('snapshot/app/pageOrder', JSON.stringify(oldPageOrder));
@@ -250,7 +250,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
     const oldPageOrder = [
       'timestamp',
@@ -258,7 +258,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
 
     await act(async () => {
