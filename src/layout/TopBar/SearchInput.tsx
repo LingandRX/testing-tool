@@ -2,6 +2,7 @@ import { type RefObject } from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { getSearchShortcutLabel } from './constants';
 
 interface SearchInputProps {
   inputRef: RefObject<HTMLInputElement | null>;
@@ -36,7 +37,7 @@ export default function SearchInput({
       />
       {!searchQuery && (
         <kbd className="pointer-events-none absolute right-3 top-1/2 hidden h-5 -translate-y-1/2 items-center gap-0.5 rounded border border-border/60 bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground/60 sm:inline-flex">
-          ⌘K
+          {getSearchShortcutLabel()}
         </kbd>
       )}
       {searchQuery && (
