@@ -14,8 +14,8 @@ import {
   getOriginStorageEstimate,
   getServiceWorkerCount,
   getSessionStorageSize,
-  isRestrictedUrl,
 } from '@/utils/storageCleaner';
+import { isRestrictedUrl } from '@/utils/restrictedUrls';
 import { toast } from 'sonner';
 
 const DEFAULT_OPTIONS: StorageCleanerOptions = {
