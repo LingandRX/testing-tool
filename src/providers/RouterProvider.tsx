@@ -16,6 +16,7 @@ import {
   getDefaultVisibleFeatureKeys,
 } from '@/config/features';
 import { CONTEXT_MENU_DATA_EXPIRY_MS, saveContextMenuData } from '@/utils/useContextMenuData';
+import { getSyncSnapshot } from '@/utils/syncSnapshot';
 
 const MAX_RECENTLY_USED = 3;
 
@@ -68,28 +69,6 @@ interface RouterProviderProps {
   visiblePagesKey?: keyof StorageSchema;
   pageOrderKey?: keyof StorageSchema;
 }
-
-/**
- * 同步从 localStorage 获取存储快照（首屏 0 闪烁核心防线）
- */
-const getSyncSnapshot = <T,>(
-  key: string,
-  defaultValue: T,
-  validator?: (val: unknown) => val is T,
-): T => {
-  try {
-    const val = localStorage.getItem(`snapshot/${key}`);
-    if (!val) return defaultValue;
-    const parsed = JSON.parse(val) as unknown;
-    if (validator) {
-      return validator(parsed) ? parsed : defaultValue;
-    }
-    return (parsed as T) ?? defaultValue;
-  } catch (error) {
-    console.error('[Router Snapshot Error] Failed to read sync cache:', error);
-    return defaultValue;
-  }
-};
 
 export function RouterProvider({
   children,

@@ -1,27 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
+import { getSyncSnapshot } from '@/utils/syncSnapshot';
 import type { StorageSchema } from '@/types/storage';
-
-/**
- * 从 localStorage 获取同步快照（用于消除异步加载产生的首屏闪烁）
- */
-const getSyncSnapshot = <T>(
-  key: string,
-  defaultValue: T,
-  validator?: (val: unknown) => val is T,
-): T => {
-  try {
-    const val = localStorage.getItem(`snapshot/${key}`);
-    if (!val) return defaultValue;
-    const parsed = JSON.parse(val) as unknown;
-    if (validator) {
-      return validator(parsed) ? parsed : defaultValue;
-    }
-    return (parsed as T) ?? defaultValue;
-  } catch {
-    return defaultValue;
-  }
-};
 
 export const useStorageState = <K extends keyof StorageSchema>(
   key: K,

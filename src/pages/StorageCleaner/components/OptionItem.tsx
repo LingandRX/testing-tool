@@ -2,16 +2,8 @@ import React from 'react';
 import { formatBytes } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { StorageSizeInfo } from '../useStorageCleaner';
+import { OPTION_LABELS } from '../constants';
 import { Checkbox } from '@/components/ui/checkbox';
-
-const OPTION_LABELS: Record<string, string> = {
-  localStorage: 'Local Storage',
-  sessionStorage: 'Session Storage',
-  indexedDB: '站点存储',
-  cookies: 'Cookies',
-  cacheStorage: 'Cache Storage',
-  serviceWorkers: 'Service Workers',
-};
 
 interface OptionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   labelKey: string;
@@ -30,7 +22,8 @@ export default function OptionItem({
 }: OptionItemProps) {
   const sizeValue = sizeInfo?.value;
   const isCount = sizeInfo?.displayType === 'count';
-  const label = OPTION_LABELS[labelKey] || labelKey;
+  const label =
+    labelKey in OPTION_LABELS ? OPTION_LABELS[labelKey as keyof typeof OPTION_LABELS] : labelKey;
 
   return (
     <div

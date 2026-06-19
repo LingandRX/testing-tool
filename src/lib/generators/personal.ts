@@ -4,6 +4,7 @@
  */
 
 import type { GeneratorDefinition } from '@/types/testDataGenerator';
+import { randomInt, randomPick } from './random';
 
 // 中文姓氏
 const SURNAMES = [
@@ -161,20 +162,6 @@ const CITIES: Record<string, string[]> = {
   江苏省: ['南京市', '苏州市', '无锡市', '常州市'],
   四川省: ['成都市', '绵阳市', '德阳市', '宜宾市'],
 };
-
-/**
- * 生成随机整数
- */
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * 从数组中随机选择
- */
-function randomPick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
 
 /**
  * 中文姓名生成器

@@ -10,6 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
 import type { StorageCleanerOptions } from '@/types/storage';
+import { OPTION_LABELS } from '../constants';
 import { cn } from '@/lib/utils';
 
 export interface StorageCleanerConfirmProps {
@@ -19,15 +20,6 @@ export interface StorageCleanerConfirmProps {
   options: StorageCleanerOptions;
 }
 
-const OPTION_LABELS: Record<string, string> = {
-  localStorage: 'Local Storage',
-  sessionStorage: 'Session Storage',
-  indexedDB: '站点存储',
-  cookies: 'Cookies',
-  cacheStorage: 'Cache Storage',
-  serviceWorkers: 'Service Workers',
-};
-
 export function StorageCleanerConfirm({
   open,
   onClose,
@@ -36,7 +28,9 @@ export function StorageCleanerConfirm({
 }: StorageCleanerConfirmProps) {
   const selectedOptions = Object.entries(options)
     .filter(([_, value]) => value)
-    .map(([key, _]) => OPTION_LABELS[key] || key);
+    .map(([key]) =>
+      key in OPTION_LABELS ? OPTION_LABELS[key as keyof typeof OPTION_LABELS] : key,
+    );
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
