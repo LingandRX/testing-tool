@@ -5,11 +5,10 @@ import {
   type JsonFormatResult,
   validateJson,
 } from '@/utils/jsonFormatter';
-import { formatBytes } from '@/utils/format';
-import { CopyButton } from '@/components/CopyButton';
 import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import TextInputArea from '@/components/TextInputArea';
+import JsonResultPanel from './JsonResultPanel';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
@@ -113,41 +112,12 @@ export default function JsonFormatSection() {
 
       {/* 格式化结果流面板展示 */}
       {result && result.formatted ? (
-        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
-          {/* 结果栏头部 */}
-          <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
-            <div className="flex gap-4 items-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
-                {'格式化结果'}
-              </span>
-
-              <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
-                <span>
-                  {'原始大小'}:{' '}
-                  <span className="font-semibold text-foreground/80">
-                    {formatBytes(result.originalBytes)}
-                  </span>
-                </span>
-                <span className="text-border/60">|</span>
-                <span>
-                  {'格式化后大小'}:{' '}
-                  <span className="font-semibold text-foreground/80">
-                    {formatBytes(result.formattedBytes)}
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            <CopyButton
-              text={result.formatted}
-              className="h-6 w-6 rounded-md border text-muted-foreground"
-            />
-          </div>
-
-          <div className="p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all max-h-[420px] overflow-y-auto leading-relaxed select-text">
-            {result.formatted}
-          </div>
-        </div>
+        <JsonResultPanel
+          title="格式化结果"
+          content={result.formatted}
+          originalBytes={result.originalBytes}
+          outputBytes={result.formattedBytes}
+        />
       ) : (
         <EmptyPlaceholder>
           {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : '输入 JSON 后点击格式化'}

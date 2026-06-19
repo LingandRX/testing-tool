@@ -1,33 +1,6 @@
 import type { CleaningResult, StorageCleanerOptions, StorageCleanResult } from '@/types/storage';
-
-const RESTRICTED_PROTOCOLS = [
-  'chrome:',
-  'chrome-extension:',
-  'about:',
-  'edge:',
-  'view-source:',
-  'file:',
-  'data:',
-] as const;
-
-/** 清理选项的 key 列表（用于遍历结果） */
-const CLEAN_OPTION_KEYS: (keyof StorageCleanerOptions)[] = [
-  'localStorage',
-  'sessionStorage',
-  'indexedDB',
-  'cookies',
-  'cacheStorage',
-  'serviceWorkers',
-];
-
-const OPTION_LABELS: Record<string, string> = {
-  localStorage: 'Local Storage',
-  sessionStorage: 'Session Storage',
-  indexedDB: '站点存储',
-  cookies: 'Cookies',
-  cacheStorage: 'Cache Storage',
-  serviceWorkers: 'Service Workers',
-};
+import { CLEAN_OPTION_KEYS, OPTION_LABELS } from '@/pages/StorageCleaner/constants';
+export { isRestrictedUrl } from '@/utils/restrictedUrls';
 
 export async function getCurrentTab() {
   // For popup pages, we need to get the active tab from the browser window that triggered the popup.
@@ -50,11 +23,6 @@ export async function getCurrentTab() {
   });
 
   return fallbackTab;
-}
-
-export function isRestrictedUrl(url?: string): boolean {
-  if (!url) return true;
-  return RESTRICTED_PROTOCOLS.some((p) => url.startsWith(p));
 }
 
 export async function getCookieSize(url: string): Promise<number> {

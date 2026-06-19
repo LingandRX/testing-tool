@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { formatBytes } from '@/utils/format';
-import { CopyButton } from '@/components/CopyButton';
 import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import TextInputArea from '@/components/TextInputArea';
+import JsonResultPanel from './JsonResultPanel';
 import { validateJson } from '@/utils/jsonFormatter';
 import { cn } from '@/lib/utils';
 import type { ConvertFunction, ConvertResult } from '../types';
@@ -98,40 +97,13 @@ export default function JsonConvertSection({
 
       {/* Result display */}
       {result && result.output ? (
-        <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
-          <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
-            <div className="flex gap-4 items-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
-                {labels.outputLabel}
-              </span>
-
-              <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
-                <span>
-                  {'原始大小'}:{' '}
-                  <span className="font-semibold text-foreground/80">
-                    {formatBytes(result.originalBytes)}
-                  </span>
-                </span>
-                <span className="text-border/60">|</span>
-                <span>
-                  {'格式化后大小'}:{' '}
-                  <span className="font-semibold text-foreground/80">
-                    {formatBytes(result.outputBytes)}
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            <CopyButton
-              text={result.output}
-              className="h-6 w-6 rounded-md border text-muted-foreground"
-            />
-          </div>
-
-          <div className="p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all max-h-[380px] overflow-y-auto leading-relaxed select-text">
-            {result.output}
-          </div>
-        </div>
+        <JsonResultPanel
+          title={labels.outputLabel}
+          content={result.output}
+          originalBytes={result.originalBytes}
+          outputBytes={result.outputBytes}
+          maxHeight="380px"
+        />
       ) : (
         <EmptyPlaceholder>
           {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : labels.emptyHint}

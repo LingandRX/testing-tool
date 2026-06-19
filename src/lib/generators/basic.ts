@@ -4,20 +4,7 @@
  */
 
 import type { GeneratorDefinition } from '@/types/testDataGenerator';
-
-/**
- * 生成随机整数
- */
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * 从数组中随机选择
- */
-function randomPick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+import { randomInt, randomPick } from './random';
 
 /**
  * 随机整数生成器
