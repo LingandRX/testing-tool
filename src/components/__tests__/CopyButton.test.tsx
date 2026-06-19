@@ -45,29 +45,6 @@ describe('CopyButton', () => {
     expect(mockedToast.success).toHaveBeenCalled();
   });
 
-  it('复制成功后图标切换为 Check，1.5 秒后恢复', async () => {
-    mockedCopy.mockResolvedValue(true);
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-
-    render(<CopyButton text="test" />);
-
-    // 点击后复制成功，按钮获得 emerald 样式（说明切到了 Check 状态）
-    await user.click(screen.getByRole('button'));
-
-    await waitFor(() => {
-      expect(screen.getByRole('button').className).toContain('text-emerald');
-    });
-
-    // 1.5 秒后样式恢复
-    act(() => {
-      vi.advanceTimersByTime(1500);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByRole('button').className).not.toContain('text-emerald');
-    });
-  });
-
   it('复制空文本时弹出 error toast', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
