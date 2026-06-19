@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { formatBytes } from '@/utils/format';
 import { CopyButton } from '@/components/CopyButton';
+import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import TextInputArea from '@/components/TextInputArea';
 import { validateJson } from '@/utils/jsonFormatter';
 import { cn } from '@/lib/utils';
@@ -132,11 +133,9 @@ export default function JsonConvertSection({
           </div>
         </div>
       ) : (
-        <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[120px] select-none">
-          <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[240px] leading-relaxed">
-            {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : labels.emptyHint}
-          </p>
-        </div>
+        <EmptyPlaceholder>
+          {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : labels.emptyHint}
+        </EmptyPlaceholder>
       )}
     </div>
   );

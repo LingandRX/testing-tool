@@ -1,5 +1,6 @@
 import React from 'react';
 import { Copy, Download } from 'lucide-react';
+import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -26,17 +27,13 @@ const QrCodePreview = ({
   // 空状态下的虚线骨架屏
   if (!qrCodeDataUrl) {
     return (
-      <div
-        className={cn(
-          'flex flex-col justify-center items-center min-h-[200px] border border-dashed border-input rounded-xl p-4 bg-muted/40',
-          className,
-        )}
+      <EmptyPlaceholder
+        className={cn('min-h-[200px] p-4', className)}
+        messageClassName="text-sm text-muted-foreground max-w-none"
         {...props}
       >
-        <p className="text-sm text-muted-foreground text-center">
-          {placeholderText || '二维码将显示在这里'}
-        </p>
-      </div>
+        {placeholderText || '二维码将显示在这里'}
+      </EmptyPlaceholder>
     );
   }
 
