@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { parseQrCodeFromFile } from '@/utils/qrCodeParser';
 import QrScanner from 'qr-scanner';
 
-// Mock qr-scanner
 vi.mock('qr-scanner', () => ({
   default: {
     scanImage: vi.fn(),

@@ -8,7 +8,6 @@ interface QrCodeParseResult {
 
 /**
  * 从文件中解析二维码
- * 使用 qr-scanner 替代 jsqr 以减小体积并提高性能
  */
 export async function parseQrCodeFromFile(file: File): Promise<QrCodeParseResult> {
   try {
