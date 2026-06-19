@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner'; // 推荐使用 shadcn 的默认 Toast
 import { CopyButton } from '@/components/CopyButton';
+import { Button } from './ui/button';
 
 export type ValidateRule = {
   validator: (value: string) => boolean;
@@ -273,14 +274,16 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
                 <CopyButton text={value} tooltip={'复制内容'} size="sm" className="h-7 w-7 p-1" />
               )}
               {showClear && value && !disabled && !readOnly && (
-                <button
+                <Button
                   type="button"
                   onClick={handleClear}
                   aria-label={'清空'}
-                  className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </Button>
               )}
             </div>
           </div>
