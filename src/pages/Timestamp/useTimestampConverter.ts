@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import dayjs from '@/utils/dayjs';
 import type { UnitType, ZoneType, ModeType } from './constants';
-import { DATE_FORMAT, msToUnit, dayjsFromTimestamp } from './constants';
+import { DATE_FORMAT, INPUT_PLACEHOLDERS, msToUnit, dayjsFromTimestamp } from './constants';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 
 export interface UseTimestampConverterReturn {
@@ -11,6 +11,7 @@ export interface UseTimestampConverterReturn {
   zone: ZoneType;
   result: string;
   error: string;
+  inputPlaceholder: string;
 
   setMode: (mode: ModeType) => void;
   setInput: (value: string) => void;
@@ -100,6 +101,7 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
     zone,
     result,
     error,
+    inputPlaceholder: INPUT_PLACEHOLDERS[mode],
     setMode: handleSetMode,
     setInput,
     setUnit,
