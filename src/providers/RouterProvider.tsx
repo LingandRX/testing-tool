@@ -104,12 +104,7 @@ export function RouterProvider({
     getSyncSnapshot('app/recentlyUsedTools', [], isValidPageList),
   );
 
-  const [isLoaded, setIsLoaded] = useState(() => {
-    const snapshotKey = localStorage.getItem(`snapshot/${syncKey as string}`);
-    const snapshotVisible = localStorage.getItem(`snapshot/${visiblePagesKey as string}`);
-    const snapshotOrder = localStorage.getItem(`snapshot/${pageOrderKey as string}`);
-    return !!(snapshotKey && snapshotVisible && snapshotOrder);
-  });
+  const [isLoaded, setIsLoaded] = useState(false);
 
   /**
    * 从异步存储中安全溯源初始数据
