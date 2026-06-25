@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { browser } from 'wxt/browser';
 import { storageUtil } from '@/utils/chromeStorage';
 import type {
   CleaningResult,
@@ -31,6 +32,36 @@ const DEFAULT_PREFERENCES: StorageCleanerPreferences = {
   reloadAfterClean: true,
   selectedTypes: DEFAULT_OPTIONS,
 };
+
+const RELOAD_COMPLETE_TIMEOUT_MS = 10_000;
+
+async function reloadTabAndWaitForComplete(tabId: number): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    function cleanup() {
+      clearTimeout(timeoutId);
+      browser.tabs.onUpdated.removeListener(handleUpdated);
+    }
+
+    function finish() {
+      cleanup();
+      resolve();
+    }
+
+    function handleUpdated(updatedTabId: number, changeInfo: { status?: string }) {
+      if (updatedTabId === tabId && changeInfo.status === 'complete') {
+        finish();
+      }
+    }
+
+    const timeoutId = setTimeout(finish, RELOAD_COMPLETE_TIMEOUT_MS);
+    browser.tabs.onUpdated.addListener(handleUpdated);
+
+    browser.tabs.reload(tabId).catch((err) => {
+      cleanup();
+      reject(err);
+    });
+  });
+}
 
 export interface StorageSizeInfo {
   value: number;
@@ -128,6 +159,11 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
         cacheStorage: { value: cacheCount, displayType: 'count' },
         serviceWorkers: { value: swCount, displayType: 'count' },
       });
+    } catch (err) {
+      console.error('Failed to load storage cleaner info:', err);
+      if (currentRequestId === requestIdRef.current) {
+        setError('读取数据失败');
+      }
     } finally {
       if (currentRequestId === requestIdRef.current) {
         setIsInitializing(false);
@@ -158,14 +194,14 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       }
     };
 
-    chrome.tabs.onActivated.addListener(handleTabChange);
-    chrome.tabs.onUpdated.addListener(handleTabUpdated);
-    chrome.windows.onFocusChanged.addListener(handleTabChange);
+    browser.tabs.onActivated.addListener(handleTabChange);
+    browser.tabs.onUpdated.addListener(handleTabUpdated);
+    browser.windows.onFocusChanged.addListener(handleTabChange);
 
     return () => {
-      chrome.tabs.onActivated.removeListener(handleTabChange);
-      chrome.tabs.onUpdated.removeListener(handleTabUpdated);
-      chrome.windows.onFocusChanged.removeListener(handleTabChange);
+      browser.tabs.onActivated.removeListener(handleTabChange);
+      browser.tabs.onUpdated.removeListener(handleTabUpdated);
+      browser.windows.onFocusChanged.removeListener(handleTabChange);
     };
   }, [debouncedLoadInfo]);
 
@@ -174,9 +210,15 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
 
     if (storageTimerRef.current) clearTimeout(storageTimerRef.current);
     storageTimerRef.current = setTimeout(async () => {
-      await storageUtil
-        .set('storageCleaner/preferences', { reloadAfterClean, selectedTypes: options })
-        .catch(console.error);
+      try {
+        await storageUtil.set('storageCleaner/preferences', {
+          reloadAfterClean,
+          selectedTypes: options,
+        });
+      } catch (err) {
+        console.error('Failed to save storage cleaner preferences:', err);
+        toast.warning('偏好保存失败，本次设置可能不会保留');
+      }
     }, 500);
   }, [options, reloadAfterClean, isInitializing]);
 
@@ -203,19 +245,27 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     if (loadingRef.current) return;
 
     const tab = await getCurrentTab();
-    if (!tab || !tab.id || !tab.url) {
+    if (!tab || tab.id === undefined || !tab.url) {
       toast.warning('无法获取当前标签页');
       return;
     }
 
+    if (isRestrictedUrl(tab.url)) {
+      toast.warning('存储清理功能不支持此页面');
+      setShowConfirm(false);
+      return;
+    }
+
     setLoading(true);
+    setShowConfirm(false);
     try {
       const cleaningResult = await clearStorage(tab.id, tab.url, options);
       setResult(cleaningResult);
 
       if (reloadAfterClean && cleaningResult.overallSuccess) {
         toast.success('清理成功，即将刷新页面');
-        await chrome.tabs.reload(tab.id);
+        await reloadTabAndWaitForComplete(tab.id);
+        await loadInfo();
       } else {
         await loadInfo();
       }

@@ -1,39 +1,61 @@
-import { describe, expect, it } from 'vitest';
-import { clearCookies } from '@/utils/storageCleaner';
-import { formatBytes } from '@/utils/format';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  clearAllIndexedDBs,
+  INDEXED_DB_CLEAR_STORE_TIMEOUT_MS,
+  INDEXED_DB_DELETE_FALLBACK_DELAY_MS,
+  INDEXED_DB_DELETE_TIMEOUT_MS,
+} from '@/utils/indexedDbCleaner';
+import { clearCookies, clearStorage } from '@/utils/storageCleaner';
+import type { StorageCleanerOptions } from '@/types/storage';
+
+const indexedDBClearOptions: StorageCleanerOptions = {
+  localStorage: false,
+  sessionStorage: false,
+  indexedDB: true,
+  cookies: false,
+  cacheStorage: false,
+  serviceWorkers: false,
+};
+
+function mockExecuteScriptEval() {
+  (chrome.scripting.executeScript as any).mockImplementationOnce(
+    async ({ func, args }: { func: (...a: unknown[]) => unknown; args?: unknown[] }) => {
+      if (func === clearAllIndexedDBs) {
+        const deleteTimeoutMs = (args?.[0] as number | undefined) ?? INDEXED_DB_DELETE_TIMEOUT_MS;
+        const clearStoreTimeoutMs =
+          (args?.[1] as number | undefined) ?? INDEXED_DB_CLEAR_STORE_TIMEOUT_MS;
+        const fallbackDelayMs =
+          (args?.[2] as number | undefined) ?? INDEXED_DB_DELETE_FALLBACK_DELAY_MS;
+        return [
+          {
+            result: await clearAllIndexedDBs(deleteTimeoutMs, clearStoreTimeoutMs, fallbackDelayMs),
+          },
+        ];
+      }
+      const isolatedFunc = (0, eval)(`(${func.toString()})`) as (
+        ...a: unknown[]
+      ) => Promise<unknown>;
+      return [{ result: await isolatedFunc(...(args ?? [])) }];
+    },
+  );
+}
+
+function mockIndexedDBForEmptyDatabases() {
+  Object.defineProperty(globalThis, 'indexedDB', {
+    configurable: true,
+    value: {
+      databases: vi.fn().mockResolvedValue([]),
+    },
+  });
+}
 
 describe('storageCleaner utils', () => {
-  describe('formatBytes', () => {
-    it('should return "0 B" for 0 bytes', () => {
-      expect(formatBytes(0)).toBe('0 B');
-    });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    it('should format bytes correctly', () => {
-      expect(formatBytes(500)).toBe('500 B');
-    });
-
-    it('should format kilobytes correctly', () => {
-      expect(formatBytes(1024)).toBe('1.0 KB');
-      expect(formatBytes(1536)).toBe('1.5 KB');
-      expect(formatBytes(2048)).toBe('2.0 KB');
-    });
-
-    it('should format megabytes correctly', () => {
-      expect(formatBytes(1048576)).toBe('1.00 MB');
-      expect(formatBytes(1572864)).toBe('1.50 MB');
-      expect(formatBytes(5242880)).toBe('5.00 MB');
-    });
-
-    it('should format gigabytes correctly', () => {
-      expect(formatBytes(1073741824)).toBe('1.00 GB');
-      expect(formatBytes(2147483648)).toBe('2.00 GB');
-    });
-
-    it('should handle edge cases', () => {
-      expect(formatBytes(1)).toBe('1 B');
-      expect(formatBytes(1023)).toBe('1023 B');
-      expect(formatBytes(1025)).toBe('1.0 KB');
-    });
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('clearCookies', () => {
@@ -83,6 +105,109 @@ describe('storageCleaner utils', () => {
       const result = await clearCookies('https://example.com');
 
       expect(result).toEqual({ success: false, error: 'Error: Permission denied' });
+    });
+  });
+
+  describe('clearStorage', () => {
+    it('should report script injection failures instead of treating fallback values as success', async () => {
+      (chrome.scripting.executeScript as any).mockRejectedValueOnce(
+        new Error('Cannot access this page'),
+      );
+
+      const result = await clearStorage(1, 'https://example.com', {
+        localStorage: true,
+        sessionStorage: false,
+        indexedDB: false,
+        cookies: false,
+        cacheStorage: false,
+        serviceWorkers: false,
+      });
+
+      expect(result.overallSuccess).toBe(false);
+      expect(result.localStorage).toEqual({
+        success: false,
+        error: 'Error: Cannot access this page',
+      });
+    });
+
+    it('should wire IndexedDB cleanup through executeScript with clearAllIndexedDBs', async () => {
+      mockIndexedDBForEmptyDatabases();
+      mockExecuteScriptEval();
+
+      const result = await clearStorage(1, 'https://example.com', indexedDBClearOptions);
+
+      expect(chrome.scripting.executeScript).toHaveBeenCalledWith(
+        expect.objectContaining({
+          func: clearAllIndexedDBs,
+          args: [
+            INDEXED_DB_DELETE_TIMEOUT_MS,
+            INDEXED_DB_CLEAR_STORE_TIMEOUT_MS,
+            INDEXED_DB_DELETE_FALLBACK_DELAY_MS,
+          ],
+        }),
+      );
+      expect(result.overallSuccess).toBe(true);
+      expect(result.indexedDB).toEqual({ success: true, count: 0 });
+    });
+
+    it('should aggregate selected storage failures into overallSuccess', async () => {
+      (chrome.scripting.executeScript as any).mockResolvedValueOnce([{ result: { count: 1 } }]);
+      (chrome.cookies.getAll as any).mockRejectedValueOnce(new Error('Cookie denied'));
+
+      const result = await clearStorage(1, 'https://example.com', {
+        localStorage: true,
+        sessionStorage: false,
+        indexedDB: false,
+        cookies: true,
+        cacheStorage: false,
+        serviceWorkers: false,
+      });
+
+      expect(result.overallSuccess).toBe(false);
+      expect(result.localStorage).toEqual({ success: true, count: 1 });
+      expect(result.cookies).toEqual({ success: false, error: 'Error: Cookie denied' });
+      expect(result.error).toBe('Cookies: Error: Cookie denied');
+    });
+
+    it('should join multiple storage failure messages in result.error', async () => {
+      (chrome.scripting.executeScript as any).mockRejectedValueOnce(new Error('Script denied'));
+      (chrome.cookies.getAll as any).mockRejectedValueOnce(new Error('Cookie denied'));
+
+      const result = await clearStorage(1, 'https://example.com', {
+        localStorage: true,
+        sessionStorage: false,
+        indexedDB: false,
+        cookies: true,
+        cacheStorage: false,
+        serviceWorkers: false,
+      });
+
+      expect(result.overallSuccess).toBe(false);
+      expect(result.localStorage).toEqual({ success: false, error: 'Error: Script denied' });
+      expect(result.cookies).toEqual({ success: false, error: 'Error: Cookie denied' });
+      expect(result.error).toBe(
+        'Local Storage: Error: Script denied\nCookies: Error: Cookie denied',
+      );
+    });
+
+    it('should preserve partial IndexedDB count when runCleanScript receives errors', async () => {
+      (chrome.scripting.executeScript as any).mockImplementationOnce(async () => [
+        {
+          result: {
+            count: 2,
+            errors: ['删除 IndexedDB 失败（db-c），请刷新后重试'],
+          },
+        },
+      ]);
+
+      const result = await clearStorage(1, 'https://example.com', indexedDBClearOptions);
+
+      expect(result.overallSuccess).toBe(false);
+      expect(result.indexedDB).toEqual({
+        success: false,
+        count: 2,
+        error: '（已成功清理 2 个数据库，但部分失败）\n删除 IndexedDB 失败（db-c），请刷新后重试',
+      });
     });
   });
 });
