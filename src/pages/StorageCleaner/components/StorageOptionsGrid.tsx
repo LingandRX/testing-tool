@@ -5,6 +5,7 @@ import OptionItem from './OptionItem';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { CLEAN_OPTION_KEYS } from '../constants';
 
 interface StorageOptionsGridProps extends React.HTMLAttributes<HTMLDivElement> {
   options: StorageCleanerOptions;
@@ -25,15 +26,6 @@ export default function StorageOptionsGrid({
   className,
   ...props
 }: StorageOptionsGridProps) {
-  const optionKeys: (keyof StorageCleanerOptions)[] = [
-    'localStorage',
-    'sessionStorage',
-    'indexedDB',
-    'cookies',
-    'cacheStorage',
-    'serviceWorkers',
-  ];
-
   const handleToggleAll = () => {
     onSelectAll(!allSelected);
   };
@@ -42,7 +34,7 @@ export default function StorageOptionsGrid({
     <div className={cn('w-full overflow-hidden', className)} {...props}>
       <div className="px-3.5 pt-3.5 pb-2">
         <div className="grid grid-cols-2 gap-2 items-stretch">
-          {optionKeys.map((key) => (
+          {CLEAN_OPTION_KEYS.map((key) => (
             <OptionItem
               key={key}
               labelKey={key}

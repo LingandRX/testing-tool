@@ -12,7 +12,7 @@ export const CLEAN_OPTION_KEYS = [
 export const OPTION_LABELS: Record<(typeof CLEAN_OPTION_KEYS)[number], string> = {
   localStorage: 'Local Storage',
   sessionStorage: 'Session Storage',
-  indexedDB: '站点存储',
+  indexedDB: 'IndexedDB',
   cookies: 'Cookies',
   cacheStorage: 'Cache Storage',
   serviceWorkers: 'Service Workers',

@@ -183,6 +183,8 @@ export type StorageCleanResult =
       success: false;
       /** 错误信息 */
       error: string;
+      /** 部分成功时的已清理数量（如 IndexedDB 多库场景） */
+      count?: number;
     };
 
 /**
