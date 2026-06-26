@@ -1,23 +1,6 @@
 # AGENTS.md
 
-WXT 浏览器扩展项目 (React 19 + TypeScript)。为开发者和测试人员提供浏览器内效率工具集。
-
-## 功能列表
-
-功能定义见 `src/config/features.tsx`，`PageType` 见 `src/types/storage.d.ts`。
-
-| key                  | 页面目录                   | 说明                                        |
-| -------------------- | -------------------------- | ------------------------------------------- |
-| `dashboard`          | `pages/Dashboard`          | 仪表盘首页，工具导航与最近使用              |
-| `timestamp`          | `pages/Timestamp`          | Unix 时间戳转换与格式化                     |
-| `storageCleaner`     | `pages/StorageCleaner`     | 清理 Cookies、本地存储、IndexedDB、Cache 等 |
-| `qrCode`             | `pages/QrCode`             | 二维码生成与解析                            |
-| `textStatistics`     | `pages/TextStatistics`     | 文本字符、单词、行数、字节统计              |
-| `jwt`                | `pages/Jwt`                | JWT 解码与查看                              |
-| `jsonTools`          | `pages/JsonTools`          | JSON 差异比较、格式化、YAML/TOML 转换与压缩 |
-| `base64Converter`    | `pages/Base64Converter`    | 文本、文件、图像 Base64 编解码              |
-| `rightClickRestorer` | `pages/RightClickRestorer` | 恢复被网站禁用的右键菜单                    |
-| `testDataGenerator`  | `pages/TestDataGenerator`  | 自定义规则批量生成测试数据                  |
+WXT 浏览器扩展项目 (React 19 + TypeScript)。提供时间戳转换、存储清理、JWT 解析、JSON 工具、二维码、Base64、测试数据生成器等测试效率工具。
 
 ## 核心命令
 
@@ -110,6 +93,38 @@ src/pages/FeatureName/
 - 当 `index.tsx` 超过 150 行时，必须拆分为 UI + Hook 模式
 - 复杂页面可增加 `contexts/`、`hooks/`、`components/` 子目录
 
+### 测试数据生成器模块
+
+```
+src/pages/TestDataGenerator/
+├── index.tsx                    # 主页面（字段配置 + 标签页切换）
+├── hooks/useGenerator.ts        # Web Worker 管理 Hook（创建、复用、通信、销毁）
+└── components/
+    ├── FieldList.tsx            # 字段列表（虚拟滚动 + @dnd-kit 拖拽排序 + 规则保存）
+    ├── FieldItem.tsx            # 字段卡片展示
+    ├── FieldEditor.tsx          # 字段编辑器（名称校验、生成器选择、参数配置）
+    ├── GeneratorSelector.tsx    # 生成器选择器（分类 + 搜索）
+    ├── GeneratorConfig.tsx      # 生成器参数表单（动态渲染 string/number/boolean/select/array）
+    ├── GenerateOptions.tsx      # 生成选项（数量、格式）
+    ├── GenerateButton.tsx       # 生成按钮 + 进度条
+    ├── DataPreview.tsx          # 示例数据预览（JSON 语法高亮）
+    ├── ResultPanel.tsx          # 生成结果状态面板
+    ├── ExportPanel.tsx          # 导出面板（复制/下载 JSON/CSV）
+    └── RuleManager.tsx          # 规则管理（CRUD、搜索、导入/导出）
+
+src/utils/
+├── ruleStorage.ts               # 规则持久化存储（localStorage）
+└── dataExporter.ts              # 数据导出工具（JSON/CSV 转换、下载、剪贴板）
+
+src/lib/generators/              # 内置生成器定义（个人信息、企业、技术、基础类型）
+
+src/workers/
+└── generator.worker.ts          # 数据生成 Web Worker
+
+src/types/
+└── testDataGenerator.ts         # 类型定义（FieldConfig, DataRule, GeneratorDefinition 等）
+```
+
 ## 关键架构决策
 
 **路由**: 不使用 React Router。通过 `src/config/features.tsx` 的 `FEATURES` 数组管理，`RouterProvider` 根据 `PageType`
@@ -131,10 +146,39 @@ src/pages/FeatureName/
 - 全局变量: `vitest/globals` (describe, it, expect 等无需导入)
 - Setup 文件: `vitest.setup.ts` 自动 mock:
   - `chrome.*` / `browser.*` API (storage, tabs, runtime, cookies 等)
+  - `@/utils/chromeI18n` (从 `public/_locales/zh_CN/messages.json` 加载真实翻译)
   - `window.matchMedia`
 - 测试文件命名: `__tests__/*.test.{ts,tsx}` 或 `*.test.{ts,tsx}`
 - Mock 模式: 使用 `vi.mock()` 进行模块级 mock，避免在测试文件中重复 mock 代码
 - 测试工具: `@testing-library/react` + `@testing-library/user-event` 进行组件测试
+
+## i18n (chrome.i18n)
+
+项目使用 Chrome 扩展标准的 `chrome.i18n` API 进行本地化，通过 `src/utils/chromeI18n.ts` 提供类型安全的 React Hook 包装。
+
+- **翻译文件**: `public/_locales/zh_CN/messages.json`（Chrome 扩展标准格式）
+- **默认语言**: `zh_CN`（在 `wxt.config.ts` 的 `manifest.default_locale` 中配置）
+- **使用方式**: `import { useI18n } from '@/utils/chromeI18n'`
+- **翻译键格式**:
+  - 直接 key: `t('dashboard_title')` → 查找 `dashboard_title`
+  - 命名空间格式（兼容旧用法）: `t('common:buttons.search')` → 查找 `common_buttons_search`
+  - 带命名空间参数: `useI18n(['common', 'features'])`，会自动尝试 `common_key`、`features_key`
+- **占位符支持**: `t('router_notFoundDescription', { entryPointType: 'popup' })`
+- **Hook 返回值**: `{ t, i18n: { language, changeLanguage }, isLoaded }`
+- **回退策略**: 当翻译 key 未命中时，返回 key 本身（开发模式下在控制台记录 warning）
+- **限制**: `chrome.i18n` 无法动态切换语言，语言跟随浏览器设置，切换后需刷新页面
+
+## 新功能开发清单
+
+1. 在 `src/types/storage.d.ts` 添加 `PageType` 联合类型
+2. 在 `src/config/features.tsx` 的 `FEATURES` 数组添加配置（指定 key、翻译键、图标、三种渲染模式的组件）
+3. 在 `src/pages/` 创建页面组件 (懒加载)：
+   - `index.tsx` — UI 组件，使用 `useI18n` 获取翻译
+   - `useFeatureName.ts` — 业务逻辑 Hook
+   - `constants.ts` — 常量（可选）
+4. 在 `public/_locales/zh_CN/messages.json` 添加翻译
+5. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
+6. 添加对应的单元测试
 
 ## 代码规范
 
