@@ -1,6 +1,6 @@
 # AGENTS.md
 
-WXT 浏览器扩展项目 (React 19 + TypeScript)。提供时间戳转换、存储清理、JWT 解析、JSON 工具、二维码、Base64、Markdown、测试数据生成器等测试效率工具。
+WXT 浏览器扩展项目 (React 19 + TypeScript)。提供时间戳转换、存储清理、JWT 解析、JSON 工具、二维码、Base64、测试数据生成器等测试效率工具。
 
 ## 核心命令
 
@@ -98,8 +98,9 @@ src/pages/TestDataGenerator/
 
 src/utils/
 ├── ruleStorage.ts               # 规则持久化存储（localStorage）
-├── dataExporter.ts              # 数据导出工具（JSON/CSV 转换、下载、剪贴板）
-└── generators/                  # 内置生成器定义（个人信息、企业、技术、基础类型）
+└── dataExporter.ts              # 数据导出工具（JSON/CSV 转换、下载、剪贴板）
+
+src/lib/generators/              # 内置生成器定义（个人信息、企业、技术、基础类型）
 
 src/workers/
 └── generator.worker.ts          # 数据生成 Web Worker
@@ -132,7 +133,7 @@ src/types/
 - 全局变量: `vitest/globals` (describe, it, expect 等无需导入)
 - Setup 文件: `vitest.setup.ts` 自动 mock:
   - `chrome.*` / `browser.*` API (storage, tabs, runtime, cookies 等)
-  - `@/utils/chromeI18n` (从 `public/_locales/zh/messages.json` 加载真实翻译)
+  - `@/utils/chromeI18n` (从 `public/_locales/zh_CN/messages.json` 加载真实翻译)
   - `window.matchMedia`
 - 测试文件命名: `__tests__/*.test.{ts,tsx}` 或 `*.test.{ts,tsx}`
 - Mock 模式: 使用 `vi.mock()` 进行模块级 mock，避免在测试文件中重复 mock 代码
@@ -142,8 +143,8 @@ src/types/
 
 项目使用 Chrome 扩展标准的 `chrome.i18n` API 进行本地化，通过 `src/utils/chromeI18n.ts` 提供类型安全的 React Hook 包装。
 
-- **翻译文件**: `public/_locales/{zh,en}/messages.json`（Chrome 扩展标准格式）
-- **默认语言**: `zh`（在 `wxt.config.ts` 的 `manifest.default_locale` 中配置）
+- **翻译文件**: `public/_locales/zh_CN/messages.json`（Chrome 扩展标准格式）
+- **默认语言**: `zh_CN`（在 `wxt.config.ts` 的 `manifest.default_locale` 中配置）
 - **使用方式**: `import { useI18n } from '@/utils/chromeI18n'`
 - **翻译键格式**:
   - 直接 key: `t('dashboard_title')` → 查找 `dashboard_title`
@@ -162,7 +163,7 @@ src/types/
    - `index.tsx` — UI 组件，使用 `useI18n` 获取翻译
    - `useFeatureName.ts` — 业务逻辑 Hook
    - `constants.ts` — 常量（可选）
-4. 在 `public/_locales/zh/messages.json`（及 `en/messages.json`）添加翻译
+4. 在 `public/_locales/zh_CN/messages.json` 添加翻译
 5. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
 6. 添加对应的单元测试
 
