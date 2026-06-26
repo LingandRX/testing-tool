@@ -1,6 +1,6 @@
 # Copilot 指令
 
-基于 WXT 框架的浏览器扩展项目（React 19 + TypeScript），为开发者和测试人员提供效率工具：时间戳转换、存储清理、JWT 解析、JSON 工具、二维码、Base64、Markdown 等。
+基于 WXT 框架的浏览器扩展项目（React 19 + TypeScript），为开发者和测试人员提供效率工具：时间戳转换、存储清理、JWT 解析、JSON 工具、二维码、Base64、测试数据生成器等。
 
 ## 核心命令
 
@@ -74,10 +74,10 @@ pages/FeatureName/
 1. 在 `types/storage.d.ts` 的 `PageType` 联合类型中添加新成员
 2. 在 `config/features.tsx` 的 `FEATURES` 数组中添加配置（key、翻译键、图标、三种渲染模式组件）
 3. 在 `pages/` 目录创建页面组件（懒加载）：
-   - `index.tsx` — 使用 `useLazyTranslation` 的 UI 组件
+   - `index.tsx` — 使用 `useI18n` 的 UI 组件
    - `useFeatureName.ts` — 业务逻辑 Hook
    - `constants.ts` — 常量（可选）
-4. 在 `i18n/locales/{zh,en}/features.json` 添加翻译（复杂功能可新建独立 JSON 文件）
+4. 在 `public/_locales/zh_CN/messages.json` 添加 Chrome i18n 翻译
 5. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
 6. 添加对应的单元测试
 
@@ -102,7 +102,7 @@ pages/FeatureName/
 
 ### 代码分割
 
-`wxt.config.ts` 通过 `manualChunksForHtmlOnly()` 自动分组 vendor 依赖（vendor-react、vendor-i18n、vendor-qr、vendor-dnd），无需手动配置。
+`wxt.config.ts` 通过 `manualChunksForHtmlOnly()` 自动分组 vendor 依赖（vendor-react、vendor-qr、vendor-dnd），无需手动配置。
 
 ### 代码风格
 
@@ -118,8 +118,7 @@ pages/FeatureName/
 - 全局变量：`vitest/globals`（describe、it、expect 等无需导入）
 - Setup 文件：`vitest.setup.ts` 自动 mock 以下内容：
   - `chrome.*` / `browser.*` API（storage、tabs、runtime、cookies 等）
-  - `react-i18next`（返回 key 作为翻译）
-  - `@/utils/useLazyTranslation`（返回 `ns:key` 格式）
+  - `@/utils/chromeI18n`（从 `public/_locales/zh_CN/messages.json` 加载真实翻译）
   - `window.matchMedia`
 - 测试文件命名：`__tests__/*.test.{ts,tsx}` 或 `*.test.{ts,tsx}`
 - 使用 `vi.mock()` 进行模块级 mock；避免重复 mock `vitest.setup.ts` 中已有的内容
@@ -127,12 +126,12 @@ pages/FeatureName/
 
 ### 国际化（i18n）
 
-- 命名空间：`common`（默认）、`features`
-- 翻译键格式：`namespace:key`（如 `features:timestamp.title`）
-- 语言：`zh`（默认）、`en`
-- 翻译文件：`i18n/locales/{zh,en}/{common,features}.json` + 各功能独立 JSON 文件
-- 使用 `useLazyTranslation` Hook 加载功能专属翻译
-- 回退策略：缺失的翻译键回退到 `zh`，若仍缺失则返回占位格式 `namespace:key`
+- 使用 Chrome 扩展标准 `chrome.i18n`
+- 默认语言目录：`public/_locales/zh_CN/messages.json`
+- 使用方式：`import { useI18n } from '@/utils/chromeI18n'`
+- 翻译键格式：直接 key（如 `timestamp_title`）；兼容 `namespace:key.path` 并转换为下划线
+- 回退策略：缺失翻译返回 key 本身，并在开发模式下记录 warning
+- 限制：`chrome.i18n` 跟随浏览器语言，不能在运行时动态切换语言
 
 ### WXT 生成文件
 

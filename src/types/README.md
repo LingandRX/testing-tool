@@ -10,12 +10,10 @@
 
 **页面类型：**
 
-- `PageType` — 所有页面类型的联合类型（`dashboard` | `timestamp` | `storageCleaner` | ...）
+- `PageType` — 所有页面类型的联合类型（含 `dashboard`、`timestamp`、`storageCleaner`、`testDataGenerator` 等）
 - `JsonToolsPageMode` — JSON 工具子模式（`diff` | `format` | `yaml` | `toml` | `minify`）
 - `Base64ConverterPageMode` — Base64 子模式（`text` | `file` | `image`）
 - `Base64ConvertDirection` — 编解码方向（`encode` | `decode`）
-- `MarkdownToHtmlPreviewMode` — Markdown 预览模式（`split` | `preview` | `html`）
-- `HtmlToMarkdownPreviewMode` — HTML 预览模式（`split` | `preview` | `markdown`）
 
 **存储 Schema：**
 
@@ -33,6 +31,16 @@
 ### qrious.d.ts
 
 `qrious` 库的类型声明，定义 QR 码生成选项和 `QRious` 类。
+
+### testDataGenerator.ts
+
+测试数据生成器共享类型，包含：
+
+- `FieldConfig` — 字段配置（字段名、生成器、参数、必填、空值率、唯一性）
+- `DataRule` — 可保存/导入/导出的字段规则
+- `GeneratorDefinition` / `GeneratorParam` — 内置生成器定义和参数 Schema
+- `GenerateResult` / `GenerateProgress` / `WorkerMessage` — Worker 生成结果、进度和消息协议
+- `ExportFile` — JSON/CSV 导出文件描述
 
 ## 修改 StorageSchema 的注意事项
 
