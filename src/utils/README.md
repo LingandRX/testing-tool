@@ -4,27 +4,27 @@
 
 ## 工具函数
 
-| 文件                 | 用途                                                                                                |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| `chromeStorage.ts`   | Chrome Storage API 封装：类型安全的 `StorageUtils` 类，提供 `get/set/remove` 方法                   |
-| `chromeTabs.ts`      | Chrome Tabs API 封装：获取活动标签页、获取域名、在新标签页打开扩展页面                              |
-| `clipboard.ts`       | 剪贴板操作：`copyTextToClipboard`（文本）、`copyImageToClipboard`（图片）                           |
-| `messages.ts`        | 扩展消息通信：基于 `@webext-core/messaging`，定义 `MessageAction` 枚举和 `ProtocolMap` 类型安全映射 |
-| `contextMenu.ts`     | 右键菜单配置与操作：定义菜单项、创建菜单、解析点击事件、ID→PageType 映射                            |
-| `base64Converter.ts` | Base64 编解码：文本↔Base64、文件↔Base64、图片预览，定义文件大小限制和图像 MIME 类型                 |
-| `jwt.ts`             | JWT 解析：Base64URL 解码、解析 Header/Payload/Signature、JSON 格式化输出                            |
-| `jsonFormatter.ts`   | JSON 格式化/压缩：支持缩进、按键排序、minify                                                        |
-| `jsonToYaml.ts`      | JSON→YAML 转换                                                                                      |
-| `jsonToToml.ts`      | JSON→TOML 转换                                                                                      |
-| `qrCodeParser.ts`    | 二维码解析：基于 `qr-scanner` 库从文件中解析二维码                                                  |
-| `storageCleaner.ts`  | 存储清理：获取当前标签页、检测受限 URL、计算 Cookie/Storage 大小、清理操作                          |
-| `textStatistics.ts`  | 文本统计：使用 `Intl.Segmenter` 计算字符数/单词数/行数/字节大小                                     |
-| `format.ts`          | 通用格式化：`formatBytes` 将字节转为可读字符串（B/KB/MB/GB/TB）                                     |
-| `dayjs.ts`           | Day.js 初始化：扩展 UTC、Timezone、RelativeTime 插件，加载中文本地化                                |
-| `chromeI18n.ts`      | Chrome `chrome.i18n` 包装：提供 `getMessage` 和兼容 React 使用的 `useI18n` Hook                     |
-| `ruleStorage.ts`     | 测试数据生成器规则存储：基于 `localStorage` 的 CRUD、搜索、导入/导出和数量限制                      |
-| `dataExporter.ts`    | 测试数据导出：JSON/CSV 转换、文件下载和复制到剪贴板                                                 |
-| `rightClickInjection.ts` | 右键恢复注入脚本：在页面上下文恢复 contextmenu/copy/paste 等事件默认行为                        |
+| 文件                     | 用途                                                                                                |
+| ------------------------ | --------------------------------------------------------------------------------------------------- |
+| `chromeStorage.ts`       | Chrome Storage API 封装：类型安全的 `StorageUtils` 类，提供 `get/set/remove` 方法                   |
+| `chromeTabs.ts`          | Chrome Tabs API 封装：获取活动标签页、获取域名、在新标签页打开扩展页面                              |
+| `clipboard.ts`           | 剪贴板操作：`copyTextToClipboard`（文本）、`copyImageToClipboard`（图片）                           |
+| `messages.ts`            | 扩展消息通信：基于 `@webext-core/messaging`，定义 `MessageAction` 枚举和 `ProtocolMap` 类型安全映射 |
+| `contextMenu.ts`         | 右键菜单配置与操作：定义菜单项、创建菜单、解析点击事件、ID→PageType 映射                            |
+| `base64Converter.ts`     | Base64 编解码：文本↔Base64、文件↔Base64、图片预览，定义文件大小限制和图像 MIME 类型                 |
+| `jwt.ts`                 | JWT 解析：Base64URL 解码、解析 Header/Payload/Signature、JSON 格式化输出                            |
+| `jsonFormatter.ts`       | JSON 格式化/压缩：支持缩进、按键排序、minify                                                        |
+| `jsonToYaml.ts`          | JSON→YAML 转换                                                                                      |
+| `jsonToToml.ts`          | JSON→TOML 转换                                                                                      |
+| `qrCodeParser.ts`        | 二维码解析：基于 `qr-scanner` 库从文件中解析二维码                                                  |
+| `storageCleaner.ts`      | 存储清理：获取当前标签页、检测受限 URL、计算 Cookie/Storage 大小、清理操作                          |
+| `textStatistics.ts`      | 文本统计：使用 `Intl.Segmenter` 计算字符数/单词数/行数/字节大小                                     |
+| `format.ts`              | 通用格式化：`formatBytes` 将字节转为可读字符串（B/KB/MB/GB/TB）                                     |
+| `dayjs.ts`               | Day.js 初始化：扩展 UTC、Timezone、RelativeTime 插件，加载中文本地化                                |
+| `chromeI18n.ts`          | Chrome `chrome.i18n` 包装：提供 `getMessage` 和兼容 React 使用的 `useI18n` Hook                     |
+| `ruleStorage.ts`         | 测试数据生成器规则存储：基于 `localStorage` 的 CRUD、搜索、导入/导出和数量限制                      |
+| `dataExporter.ts`        | 测试数据导出：JSON/CSV 转换、文件下载和复制到剪贴板                                                 |
+| `rightClickInjection.ts` | 右键恢复注入脚本：在页面上下文恢复 contextmenu/copy/paste 等事件默认行为                            |
 
 ## 自定义 Hooks
 

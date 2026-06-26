@@ -126,14 +126,14 @@ Base64 编解码工具，支持文本/文件/图片三种模式。
 
 测试数据生成器，支持可视化字段配置、规则复用、Web Worker 批量生成和 JSON/CSV 导出。
 
-| 文件/目录                    | 用途                                               |
-| ---------------------------- | -------------------------------------------------- |
-| `index.tsx`                  | 主页面，管理字段配置、规则标签页和生成结果         |
-| `hooks/useGenerator.ts`      | Worker 生命周期与消息通信，暴露生成/取消/清理操作  |
-| `components/FieldList.tsx`   | 字段列表、拖拽排序、虚拟滚动和规则保存入口         |
-| `components/FieldEditor.tsx` | 字段名称、生成器、参数、必填/空值率/唯一性配置     |
-| `components/RuleManager.tsx` | 规则搜索、加载、编辑、复制、删除、导入和导出       |
-| `components/ExportPanel.tsx` | 生成结果复制和 JSON/CSV 下载                       |
+| 文件/目录                    | 用途                                              |
+| ---------------------------- | ------------------------------------------------- |
+| `index.tsx`                  | 主页面，管理字段配置、规则标签页和生成结果        |
+| `hooks/useGenerator.ts`      | Worker 生命周期与消息通信，暴露生成/取消/清理操作 |
+| `components/FieldList.tsx`   | 字段列表、拖拽排序、虚拟滚动和规则保存入口        |
+| `components/FieldEditor.tsx` | 字段名称、生成器、参数、必填/空值率/唯一性配置    |
+| `components/RuleManager.tsx` | 规则搜索、加载、编辑、复制、删除、导入和导出      |
+| `components/ExportPanel.tsx` | 生成结果复制和 JSON/CSV 下载                      |
 
 约束与注意事项：
 
