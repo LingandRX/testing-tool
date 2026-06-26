@@ -15,6 +15,7 @@ export default function Index() {
     sizes,
     reloadAfterClean,
     loading,
+    isRefreshingSizes,
     result,
     showConfirm,
     setShowConfirm,
@@ -26,7 +27,7 @@ export default function Index() {
     handleClean,
   } = useStorageCleaner();
 
-  const isButtonDisabled = !(someSelected || allSelected) || loading;
+  const isButtonDisabled = !(someSelected || allSelected) || loading || isRefreshingSizes;
 
   if (isInitializing) {
     return (

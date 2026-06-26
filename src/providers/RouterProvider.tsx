@@ -105,6 +105,8 @@ export function RouterProvider({
   );
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const hasUserNavigatedRef = useRef(false);
+  const canPersistRef = useRef(false);
 
   /**
    * 从异步存储中安全溯源初始数据
@@ -119,7 +121,7 @@ export function RouterProvider({
       const savedPageOrder = await storageUtil.get(pageOrderKey, getDefaultPageOrder());
       const savedRecentTools = await storageUtil.get('app/recentlyUsedTools', []);
 
-      if (isValidPage(savedRoute) && syncRoute) {
+      if (isValidPage(savedRoute) && syncRoute && !hasUserNavigatedRef.current) {
         setCurrentPage(savedRoute);
       }
       if (isValidPageList(savedVisiblePages)) {
@@ -131,9 +133,11 @@ export function RouterProvider({
       if (isValidPageList(savedRecentTools)) {
         setRecentlyUsedTools(savedRecentTools);
       }
-      setIsLoaded(true);
+      canPersistRef.current = true;
     } catch (error) {
       console.error('[Router Init Error] Core data fetch failed:', error);
+    } finally {
+      setIsLoaded(true);
     }
   }, [defaultRoute, syncKey, syncRoute, visiblePagesKey, pageOrderKey]);
 
@@ -187,7 +191,7 @@ export function RouterProvider({
   }, [loadInitialData]);
 
   useEffect(() => {
-    if (isLoaded && syncRoute) {
+    if (isLoaded && canPersistRef.current && syncRoute) {
       void storageUtil.set(syncKey, currentPage as PageType).catch(console.error);
       try {
         localStorage.setItem(`snapshot/${syncKey}`, JSON.stringify(currentPage));
@@ -198,7 +202,7 @@ export function RouterProvider({
   }, [currentPage, isLoaded, syncRoute, syncKey]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && canPersistRef.current) {
       void storageUtil.set(visiblePagesKey, visiblePages).catch(console.error);
       try {
         localStorage.setItem(`snapshot/${visiblePagesKey}`, JSON.stringify(visiblePages));
@@ -209,7 +213,7 @@ export function RouterProvider({
   }, [visiblePages, isLoaded, visiblePagesKey]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && canPersistRef.current) {
       void storageUtil.set(pageOrderKey, pageOrder).catch(console.error);
       try {
         localStorage.setItem(`snapshot/${pageOrderKey}`, JSON.stringify(pageOrder));
@@ -220,7 +224,7 @@ export function RouterProvider({
   }, [pageOrder, isLoaded, pageOrderKey]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && canPersistRef.current) {
       void storageUtil.set('app/recentlyUsedTools', recentlyUsedTools).catch(console.error);
       try {
         localStorage.setItem('snapshot/app/recentlyUsedTools', JSON.stringify(recentlyUsedTools));
@@ -283,6 +287,8 @@ export function RouterProvider({
   }, [syncRoute, syncKey, visiblePagesKey, pageOrderKey]);
 
   const navigateTo = (page: PageType) => {
+    hasUserNavigatedRef.current = true;
+    canPersistRef.current = true;
     setCurrentPage(page);
     setRecentlyUsedTools((prev) => {
       const filtered = prev.filter((p) => p !== page);
@@ -291,6 +297,8 @@ export function RouterProvider({
   };
 
   const goHome = () => {
+    hasUserNavigatedRef.current = true;
+    canPersistRef.current = true;
     setCurrentPage('dashboard');
   };
 

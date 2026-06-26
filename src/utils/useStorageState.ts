@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
 import { getSyncSnapshot } from '@/utils/syncSnapshot';
 import type { StorageSchema } from '@/types/storage';
@@ -8,11 +15,18 @@ export const useStorageState = <K extends keyof StorageSchema>(
   defaultValue: StorageSchema[K],
   validator?: (val: unknown) => val is StorageSchema[K],
 ) => {
-  const [value, setValue] = useState<StorageSchema[K]>(() =>
+  const [value, setValueInternal] = useState<StorageSchema[K]>(() =>
     getSyncSnapshot(key as string, defaultValue, validator),
   );
   const [isInitialized, setIsInitialized] = useState(false);
   const hasLoadedFromStorage = useRef(false);
+  const loadSucceededRef = useRef(false);
+  const userModifiedRef = useRef(false);
+
+  const setValue = useCallback<Dispatch<SetStateAction<StorageSchema[K]>>>((next) => {
+    userModifiedRef.current = true;
+    setValueInternal(next);
+  }, []);
 
   // Only load from storage once on mount
   useEffect(() => {
@@ -24,15 +38,17 @@ export const useStorageState = <K extends keyof StorageSchema>(
       try {
         const savedValue = await storageUtil.get(key, defaultValue);
         if (cancelled) return;
+        loadSucceededRef.current = true;
         if (savedValue !== undefined) {
           if (validator) {
-            setValue(validator(savedValue) ? savedValue : defaultValue);
+            setValueInternal(validator(savedValue) ? savedValue : defaultValue);
           } else {
-            setValue(savedValue);
+            setValueInternal(savedValue);
           }
         }
       } catch (error) {
         console.error(`加载状态失败 (${key}):`, error);
+        loadSucceededRef.current = false;
       } finally {
         if (!cancelled) {
           setIsInitialized(true);
@@ -51,6 +67,7 @@ export const useStorageState = <K extends keyof StorageSchema>(
   // Save to storage and localStorage snapshot when value changes (after initial load)
   useEffect(() => {
     if (!isInitialized) return;
+    if (!loadSucceededRef.current && !userModifiedRef.current) return;
 
     const saveState = async () => {
       try {
