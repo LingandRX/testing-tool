@@ -103,4 +103,31 @@ describe('StorageCleaner 页面', () => {
       expect(screen.getByRole('button', { name: /立即清理/ })).not.toBeDisabled();
     });
   });
+
+  it('展示的数据与当前标签页不一致时不应执行清理', async () => {
+    let currentTabId = 1;
+    vi.mocked(getCurrentTab).mockImplementation(
+      async () =>
+        ({
+          id: currentTabId,
+          url: currentTabId === 1 ? 'https://a.example.com' : 'https://b.example.com',
+        }) as any,
+    );
+
+    render(<Index />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /立即清理/ })).not.toBeDisabled();
+    });
+
+    currentTabId = 2;
+
+    fireEvent.click(screen.getByRole('button', { name: /立即清理/ }));
+    fireEvent.click(screen.getByRole('button', { name: /确认清理/ }));
+
+    await waitFor(() => {
+      expect(clearStorage).not.toHaveBeenCalled();
+      expect(toast.warning).toHaveBeenCalledWith('当前标签页已切换，请等待数据刷新后再清理');
+    });
+  });
 });

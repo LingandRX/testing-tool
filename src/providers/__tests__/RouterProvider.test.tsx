@@ -323,6 +323,51 @@ describe('RouterProvider', () => {
     });
   });
 
+  it('初始化失败时仍应解除加载状态以便渲染页面', async () => {
+    (storageUtil.get as any).mockRejectedValue(new Error('Storage unavailable'));
+
+    render(
+      <RouterProvider>
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
+    });
+    expect(storageUtil.set).not.toHaveBeenCalled();
+  });
+
+  it('用户在 loadInitialData 完成前导航时不应被存储路由覆盖', async () => {
+    let resolveGet: () => void;
+    const getBlocked = new Promise<void>((resolve) => {
+      resolveGet = resolve;
+    });
+
+    (storageUtil.get as any).mockImplementation(async (key: string, defaultValue: unknown) => {
+      await getBlocked;
+      if (key === 'app/currentRoute') return 'dashboard';
+      return defaultValue;
+    });
+
+    render(
+      <RouterProvider>
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('navigate-btn'));
+    });
+    expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
+
+    resolveGet!();
+    await waitFor(() => {
+      expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
+      expect(storageUtil.set).toHaveBeenCalledWith('app/currentRoute', 'timestamp');
+    });
+  });
+
   it('组件卸载时不应设置 isLoaded 状态（竞态条件防护）', async () => {
     let resolveStorage: (value: unknown) => void;
     const storagePromise = new Promise((resolve) => {
