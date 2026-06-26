@@ -1,4 +1,5 @@
 import { defineExtensionMessaging } from '@webext-core/messaging';
+import { getCurrentTab } from '@/utils/chromeTabs';
 
 export enum MessageAction {
   SIDE_PANEL_STATE_CHANGED = 'sidePanelStateChanged',
@@ -38,7 +39,7 @@ export async function sendMessageToContent<K extends keyof ProtocolMap>(
     : [data: Parameters<ProtocolMap[K]>[0]]
 ): Promise<ReturnType<ProtocolMap[K]>> {
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tab = await getCurrentTab();
     if (!tab?.id) {
       console.warn(`[Messaging] 无法获取当前标签页，无法发送动作: ${action}`);
       return { success: false, message: '无法获取当前标签页' } as ReturnType<ProtocolMap[K]>;

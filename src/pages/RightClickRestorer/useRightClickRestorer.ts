@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getCurrentTab } from '@/utils/chromeTabs';
 import { MessageAction, sendMessageToContent } from '@/utils/messages';
 import { isUnsupportedPageUrl } from '@/utils/restrictedUrls';
 import type { RestorerStatus } from './constants';
@@ -24,7 +25,7 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
   useEffect(() => {
     const load = async () => {
       try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const tab = await getCurrentTab();
         const url = tab?.url;
 
         setDomain(url ? new URL(url).hostname : '');

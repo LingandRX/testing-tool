@@ -11,29 +11,6 @@ import { browser } from 'wxt/browser';
 
 type CleanScriptResult = IndexedDBCleanResult;
 
-export async function getCurrentTab() {
-  // For popup pages, we need to get the active tab from the browser window that triggered the popup.
-  // We should ONLY care about the currently active tab in the last focused window.
-  // If it's a restricted URL, we return it anyway and let the caller handle the error display.
-
-  const [tab] = await browser.tabs.query({
-    active: true,
-    lastFocusedWindow: true,
-  });
-
-  if (tab) {
-    return tab;
-  }
-
-  // Fallback for cases where lastFocusedWindow might not work as expected (e.g. certain sidepanel scenarios)
-  const [fallbackTab] = await browser.tabs.query({
-    active: true,
-    currentWindow: true,
-  });
-
-  return fallbackTab;
-}
-
 export async function getCookieSize(url: string): Promise<number> {
   try {
     const cookies = await browser.cookies.getAll({ url });

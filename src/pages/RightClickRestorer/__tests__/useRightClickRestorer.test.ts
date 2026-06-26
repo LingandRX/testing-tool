@@ -1,8 +1,11 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useRightClickRestorer } from '../useRightClickRestorer';
 import { sendMessageToContent } from '@/utils/messages';
+import { getCurrentTab } from '@/utils/chromeTabs';
 
-const mockTabsQuery = vi.fn();
+vi.mock('@/utils/chromeTabs', () => ({
+  getCurrentTab: vi.fn(),
+}));
 
 vi.mock('@/utils/messages', () => ({
   MessageAction: {
@@ -14,8 +17,9 @@ vi.mock('@/utils/messages', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockTabsQuery.mockResolvedValue([{ url: 'https://example.com/path' }]);
-  chrome.tabs.query = mockTabsQuery;
+  vi.mocked(getCurrentTab).mockResolvedValue({
+    url: 'https://example.com/path',
+  } as chrome.tabs.Tab);
   vi.mocked(sendMessageToContent).mockResolvedValue({ success: true, restored: false });
 });
 
@@ -31,8 +35,7 @@ describe('useRightClickRestorer', () => {
   });
 
   it('should mark internal pages as unsupported', async () => {
-    mockTabsQuery.mockResolvedValue([{ url: 'chrome://newtab/' }]);
-    chrome.tabs.query = mockTabsQuery;
+    vi.mocked(getCurrentTab).mockResolvedValue({ url: 'chrome://newtab/' } as chrome.tabs.Tab);
 
     const { result } = renderHook(() => useRightClickRestorer());
 
@@ -59,8 +62,7 @@ describe('useRightClickRestorer', () => {
   });
 
   it('should not unlock unsupported pages', async () => {
-    mockTabsQuery.mockResolvedValue([{ url: 'chrome://settings/' }]);
-    chrome.tabs.query = mockTabsQuery;
+    vi.mocked(getCurrentTab).mockResolvedValue({ url: 'chrome://settings/' } as chrome.tabs.Tab);
 
     const { result } = renderHook(() => useRightClickRestorer());
 

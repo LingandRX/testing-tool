@@ -1,6 +1,30 @@
+import { browser } from 'wxt/browser';
+
 /**
  * Chrome 标签页相关工具函数
  */
+
+/**
+ * 获取用户当前正在浏览的标签页。
+ * popup 中 `currentWindow` 指向弹窗自身，需优先使用 `lastFocusedWindow`。
+ */
+export async function getCurrentTab() {
+  const [tab] = await browser.tabs.query({
+    active: true,
+    lastFocusedWindow: true,
+  });
+
+  if (tab) {
+    return tab;
+  }
+
+  const [fallbackTab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+
+  return fallbackTab;
+}
 
 /**
  * 在新标签页中打开扩展页面

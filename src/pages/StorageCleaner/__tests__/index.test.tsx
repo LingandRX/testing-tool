@@ -2,7 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { browser } from 'wxt/browser';
 import Index from '../index';
-import { clearStorage, getCookieSize, getCurrentTab } from '@/utils/storageCleaner';
+import { clearStorage, getCookieSize } from '@/utils/storageCleaner';
+import { getCurrentTab } from '@/utils/chromeTabs';
 import { toast } from 'sonner';
 
 // Mock the chrome APIs
@@ -13,8 +14,11 @@ vi.mock('@/utils/chromeStorage', () => ({
   },
 }));
 
-vi.mock('@/utils/storageCleaner', () => ({
+vi.mock('@/utils/chromeTabs', () => ({
   getCurrentTab: vi.fn().mockResolvedValue({ id: 1, url: 'https://example.com' }),
+}));
+
+vi.mock('@/utils/storageCleaner', () => ({
   getCookieSize: vi.fn().mockResolvedValue(0),
   getLocalStorageSize: vi.fn().mockResolvedValue(0),
   getSessionStorageSize: vi.fn().mockResolvedValue(0),

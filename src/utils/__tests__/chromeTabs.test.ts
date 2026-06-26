@@ -1,7 +1,37 @@
 import { describe, expect, it, vi } from 'vitest';
-import { openExtensionPage } from '@/utils/chromeTabs';
+import { getCurrentTab, openExtensionPage } from '@/utils/chromeTabs';
 
 describe('chromeTabs', () => {
+  describe('getCurrentTab', () => {
+    it('应优先使用 lastFocusedWindow 查询当前标签页', async () => {
+      const mockTab = { id: 1, url: 'https://example.com' };
+      (browser.tabs.query as ReturnType<typeof vi.fn>).mockResolvedValueOnce([mockTab]);
+
+      const tab = await getCurrentTab();
+
+      expect(tab).toEqual(mockTab);
+      expect(browser.tabs.query).toHaveBeenCalledWith({
+        active: true,
+        lastFocusedWindow: true,
+      });
+    });
+
+    it('当 lastFocusedWindow 无结果时应回退到 currentWindow', async () => {
+      const fallbackTab = { id: 2, url: 'https://fallback.com' };
+      (browser.tabs.query as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([fallbackTab]);
+
+      const tab = await getCurrentTab();
+
+      expect(tab).toEqual(fallbackTab);
+      expect(browser.tabs.query).toHaveBeenLastCalledWith({
+        active: true,
+        currentWindow: true,
+      });
+    });
+  });
+
   describe('openExtensionPage', () => {
     it('应该在新标签页中打开扩展页面', async () => {
       await openExtensionPage('popup.html');

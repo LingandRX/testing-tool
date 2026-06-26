@@ -10,12 +10,12 @@ import {
   clearStorage,
   getCacheStorageSize,
   getCookieSize,
-  getCurrentTab,
   getLocalStorageSize,
   getOriginStorageEstimate,
   getServiceWorkerCount,
   getSessionStorageSize,
 } from '@/utils/storageCleaner';
+import { getCurrentTab } from '@/utils/chromeTabs';
 import { isRestrictedUrl } from '@/utils/restrictedUrls';
 import { toast } from 'sonner';
 
