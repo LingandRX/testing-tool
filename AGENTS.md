@@ -1,6 +1,23 @@
 # AGENTS.md
 
-WXT 浏览器扩展项目 (React 19 + TypeScript)。提供时间戳转换、存储清理、JWT 解析、JSON 工具、二维码、Base64、Markdown、测试数据生成器等测试效率工具。
+WXT 浏览器扩展项目 (React 19 + TypeScript)。为开发者和测试人员提供浏览器内效率工具集。
+
+## 功能列表
+
+功能定义见 `src/config/features.tsx`，`PageType` 见 `src/types/storage.d.ts`。
+
+| key                  | 页面目录                   | 说明                                        |
+| -------------------- | -------------------------- | ------------------------------------------- |
+| `dashboard`          | `pages/Dashboard`          | 仪表盘首页，工具导航与最近使用              |
+| `timestamp`          | `pages/Timestamp`          | Unix 时间戳转换与格式化                     |
+| `storageCleaner`     | `pages/StorageCleaner`     | 清理 Cookies、本地存储、IndexedDB、Cache 等 |
+| `qrCode`             | `pages/QrCode`             | 二维码生成与解析                            |
+| `textStatistics`     | `pages/TextStatistics`     | 文本字符、单词、行数、字节统计              |
+| `jwt`                | `pages/Jwt`                | JWT 解码与查看                              |
+| `jsonTools`          | `pages/JsonTools`          | JSON 差异比较、格式化、YAML/TOML 转换与压缩 |
+| `base64Converter`    | `pages/Base64Converter`    | 文本、文件、图像 Base64 编解码              |
+| `rightClickRestorer` | `pages/RightClickRestorer` | 恢复被网站禁用的右键菜单                    |
+| `testDataGenerator`  | `pages/TestDataGenerator`  | 自定义规则批量生成测试数据                  |
 
 ## 核心命令
 
@@ -16,29 +33,63 @@ npm run typecheck        # tsc --noEmit
 npm run test             # vitest run (单次执行)
 npm run test:watch       # vitest 监视模式
 npm run test:coverage    # 带覆盖率的测试
+npx vitest run path/to/file.test.ts   # 运行单个测试文件
+npx wxt prepare          # 重新生成 .wxt/ 类型声明（npm install 时 postinstall 会自动执行）
 ```
+
+修改 `package.json` 或首次克隆仓库后需执行 `npm install`，会自动触发 `postinstall` → `wxt prepare`。
 
 ## 验证流程
 
-详见 [CI 配置](./.github/CI.md)
+详见 [CI 配置](./.github/CI.md)。本地与 CI 的检查层次如下。
+
+### Pre-commit（`.husky/pre-commit`）
+
+1. 后台运行 `tsc --noEmit`（不阻塞提交，结果输出到 stderr）
+2. 前台运行 `lint-staged`：
+   - 代码文件 (`*.{ts,tsx,js,jsx,mjs}`)：`eslint --fix --max-warnings=0`，再 `prettier --write`
+   - 其他文件 (`*.{json,css,scss,md}`)：`prettier --write`
+
+### Pre-push（`.husky/pre-push`）
+
+1. 全项目 `tsc --noEmit`（阻塞推送）
+2. 对本次推送相对 upstream（或 `origin/main`）变更的 `*.{ts,tsx,js,jsx,mjs}` 文件运行 `eslint --max-warnings=0`
+
+### CI（GitHub Actions）
+
+1. `setup` — 安装依赖
+2. 并行 `lint`、`typecheck`（含 `wxt prepare`）、`test`
+3. `build` — Chrome + Firefox 矩阵构建（仅当步骤 2 全部通过）
 
 ## 项目结构
 
 ```
-src/                   # 源代码根目录
-  config/features.tsx    # 功能定义（路由 + 元数据的单一事实来源）
-  entrypoints/           # 扩展入口点 (popup/, sidepanel/, background.ts, content.ts)
-  pages/                 # 功能页面组件 (懒加载)
-  components/            # 可复用 UI 组件
-  components/ui/         # shadcn/ui 基础组件 (button, dialog, select 等)
-  providers/             # React Context (Router, Theme 等)
-  hooks/                 # 自定义 React Hooks
-  utils/                 # 工具函数与服务抽象
-  types/                 # TypeScript 类型声明
-  lib/                   # 通用工具函数（cn、utils）
-  workers/               # Web Worker（数据生成等耗时任务）
-public/                # 静态资源（图标、_locales 等）
+src/                     # 源代码根目录
+  config/features.tsx      # 功能定义（路由 + 元数据的单一事实来源）
+  entrypoints/             # 扩展入口点 (popup/, sidepanel/, background.ts, content.ts)
+  layout/                  # 应用壳层布局（TopBar 导航、搜索、主题切换）
+  pages/                   # 功能页面组件 (懒加载)
+  components/              # 可复用 UI 组件
+  components/ui/           # shadcn/ui 基础组件 (button, dialog, select 等)
+  providers/               # React Context (Router, Theme 等)
+  hooks/                   # 自定义 React Hooks
+  utils/                   # 工具函数与服务抽象
+  types/                   # TypeScript 类型声明
+  lib/                     # 通用工具函数（cn、utils）及数据生成器定义
+  workers/                 # Web Worker（数据生成等耗时任务）
+spec/                    # 功能规格、修复方案与验收标准（见 spec/README.md）
+public/                  # 静态资源（图标、_locales 等）
+.wxt/                    # wxt prepare 自动生成，含类型声明与扩展 tsconfig（勿手动编辑）
+.output/                 # 生产构建输出目录
 ```
+
+### layout/
+
+应用壳层，与 popup / sidepanel / tab 入口绑定。当前含 `TopBar/`（搜索、主题切换、返回导航、「在标签页打开」），遵循与 `pages/` 相同的 UI + Hook 模式。详见 [layout/README.md](./src/layout/README.md)。
+
+### spec/
+
+功能规格与验收标准文档，重大改动前优先查阅。索引见 [spec/README.md](./spec/README.md)。
 
 ### 页面组件模式
 
@@ -62,7 +113,7 @@ src/pages/FeatureName/
 ## 关键架构决策
 
 **路由**: 不使用 React Router。通过 `src/config/features.tsx` 的 `FEATURES` 数组管理，`RouterProvider` 根据 `PageType`
-渲染对应组件。支持三种渲染模式：popup（弹窗）、sidepanel（侧边栏）和 browser-tab（浏览器新标签页，通过 `open_in_tab` 打开）。
+渲染对应组件。支持三种渲染模式：popup（弹窗）、sidepanel（侧边栏）和 tab（浏览器新标签页，TopBar「在标签页打开」调用 `openExtensionPage('popup.html', { mode: 'tab' })`，由 `getEntryPointType()` 根据 URL 参数 `mode=tab` 识别）。
 每种模式有独立的路由和可见页面配置（`app/popupRoute`、`app/sidepanelRoute`、`app/tabRoute` 等）。
 
 **存储**: 所有 Chrome Storage 键必须在 `src/types/storage.d.ts` 的 `StorageSchema` 中定义，键名使用 kebab-case 格式（如 `app/currentRoute`）。
@@ -70,11 +121,9 @@ src/pages/FeatureName/
 
 **通信**: 使用 `@webext-core/messaging`，协议定义在 `src/utils/messages.ts`。
 
-**路径别名**: `@/` 映射到项目根目录 (已在 tsconfig 和 vitest.config 中配置)。
+**路径别名**: `@/` 映射到 `src/` 目录（已在 `.wxt/tsconfig.json` 和 `vitest.config.ts` 中配置）。项目根目录使用 `@@/`。
 
 **浏览器兼容**: 优先使用 `wxt/browser` 导出的 `browser` 对象，而非原生 `chrome` API。
-
-**代码分割**: `wxt.config.ts` 通过 `manualChunksForHtmlOnly()` 自动分组依赖（vendor-react、vendor-qr、vendor-dnd 等），无需手动配置。
 
 ## 测试环境
 
@@ -87,17 +136,6 @@ src/pages/FeatureName/
 - Mock 模式: 使用 `vi.mock()` 进行模块级 mock，避免在测试文件中重复 mock 代码
 - 测试工具: `@testing-library/react` + `@testing-library/user-event` 进行组件测试
 
-## 新功能开发清单
-
-1. 在 `src/types/storage.d.ts` 添加 `PageType` 联合类型
-2. 在 `src/config/features.tsx` 的 `FEATURES` 数组添加配置（指定 key、翻译键、图标、三种渲染模式的组件）
-3. 在 `src/pages/` 创建页面组件 (懒加载)：
-   - `index.tsx` — UI 组件
-   - `use{FeatureName}.ts` — 业务逻辑 Hook
-   - `constants.ts` — 常量（可选）
-4. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`；如有不使用的权限，需移除
-5. 添加对应的单元测试
-
 ## 代码规范
 
 - 禁止使用 `any` (测试文件除外)
@@ -105,10 +143,9 @@ src/pages/FeatureName/
 - 样式: 使用 Tailwind CSS + shadcn/ui (通过 `className` 和 `cn()` 工具)
 - UI 组件: 优先使用 `src/components/ui/` 下的 shadcn/ui 组件 (button, dialog, select 等)
 - 图标: 使用 `lucide-react` 图标库
-- 格式: Prettier (`.prettierrc`: 100 字符宽, 单引号, 尾逗号 all, LF 换行)
-- ESLint 使用 `typescript-eslint` 的 `projectService: true`（无需手动维护 project 路径）
-- **Git Commit**: 必须使用中文描述，遵循 Conventional Commits 规范（如 `fix(组件名): 描述`、`feat(功能名): 描述`）
-- **测试维护**: 新增/编辑已有功能/组件时，需要针对相关的测试进行更新
+- 格式: Prettier [配置](./.prettierrc)
+- ESLint 使用 `typescript-eslint` 的 `projectService: true`
+- Git Commit: 使用中文描述，遵循 [Conventional Commits 规范](https://www.conventionalcommits.org/zh-hans/v1.0.0/)
 
 ## 关键外部库（非显而易见的）
 
@@ -116,4 +153,4 @@ src/pages/FeatureName/
 - `@dnd-kit` — 拖拽排序（用于页面顺序管理和字段列表排序）
 - `qrious` + `qr-scanner` — 二维码生成与解析
 - `dayjs` — 日期处理（时间戳转换）
-- `sonner` — Toast 通知（替代传统 snackbar）
+- `sonner` — Toast 通知
