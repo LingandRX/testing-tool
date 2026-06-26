@@ -19,7 +19,7 @@
 - `defaultVisible`：默认是否可见
 - `components`：三种渲染模式的懒加载组件（`popup`、`sidepanel`、`tab`）
 
-## 已注册功能（11 个）
+## 已注册功能（10 个）
 
 | key                  | 图标              | 说明              |
 | -------------------- | ----------------- | ----------------- |
@@ -31,9 +31,8 @@
 | `jwt`                | Key               | JWT 解析工具      |
 | `jsonDiff`           | GitCompareArrows  | JSON 差异比较工具 |
 | `base64Converter`    | ArrowLeftRight    | Base64 转换器     |
-| `markdownToHtml`     | Code              | Markdown 转 HTML  |
-| `htmlToMarkdown`     | File              | HTML 转 Markdown  |
 | `rightClickRestorer` | MousePointerClick | 右键菜单恢复工具  |
+| `testDataGenerator`  | FileSpreadsheet   | 测试数据生成器    |
 
 ## 导出函数
 

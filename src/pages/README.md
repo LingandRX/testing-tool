@@ -113,14 +113,6 @@ Base64 编解码工具，支持文本/文件/图片三种模式。
 | `TextMode.tsx`               | 文本模式              |
 | `Base64ConverterSection.tsx` | 文件/图片通用转换区域 |
 
-### MarkdownToHtml/
-
-Markdown 转 HTML 工具，支持分栏/预览/源码三种视图模式。
-
-### HtmlToMarkdown/
-
-HTML 转 Markdown 工具，支持分栏/预览/Markdown 三种视图模式。
-
 ### RightClickRestorer/
 
 右键菜单恢复工具，解除网站对右键的限制。
@@ -130,11 +122,32 @@ HTML 转 Markdown 工具，支持分栏/预览/Markdown 三种视图模式。
 | `index.tsx`                | 页面 UI       |
 | `useRightClickRestorer.ts` | 业务逻辑 Hook |
 
+### TestDataGenerator/
+
+测试数据生成器，支持可视化字段配置、规则复用、Web Worker 批量生成和 JSON/CSV 导出。
+
+| 文件/目录                    | 用途                                               |
+| ---------------------------- | -------------------------------------------------- |
+| `index.tsx`                  | 主页面，管理字段配置、规则标签页和生成结果         |
+| `hooks/useGenerator.ts`      | Worker 生命周期与消息通信，暴露生成/取消/清理操作  |
+| `components/FieldList.tsx`   | 字段列表、拖拽排序、虚拟滚动和规则保存入口         |
+| `components/FieldEditor.tsx` | 字段名称、生成器、参数、必填/空值率/唯一性配置     |
+| `components/RuleManager.tsx` | 规则搜索、加载、编辑、复制、删除、导入和导出       |
+| `components/ExportPanel.tsx` | 生成结果复制和 JSON/CSV 下载                       |
+
+约束与注意事项：
+
+- 字段数量最多 40 个（`FieldList.MAX_FIELDS`）。
+- 生成数量为 1 ~ 100,000，预设值包含 50、100、1,000、5,000、10,000。
+- 大批量生成通过 `src/workers/generator.worker.ts` 执行，避免阻塞 UI；Worker 每 1,000 条或结束时回传进度。
+- 规则通过 `src/utils/ruleStorage.ts` 存入 `localStorage`，最多保存 20 条规则。
+- 内置生成器位于 `src/lib/generators/`，按个人信息、业务数据、技术数据、基础类型分类。
+
 ## 新增页面
 
 1. 在 `types/storage.d.ts` 添加 `PageType` 联合类型成员
 2. 在 `config/features.tsx` 的 `FEATURES` 数组添加配置
 3. 在 `pages/` 创建页面目录（遵循上述结构）
-4. 在 `i18n/locales/{zh,en}/features.json` 添加翻译
+4. 在 `public/_locales/zh_CN/messages.json` 添加 Chrome i18n 翻译
 5. 如需新权限，更新 `wxt.config.ts`
 6. 添加对应的单元测试
