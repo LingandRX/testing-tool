@@ -75,6 +75,7 @@ export interface UseStorageCleanerReturn {
   sizes: Record<string, StorageSizeInfo>;
   reloadAfterClean: boolean;
   loading: boolean;
+  isRefreshingSizes: boolean;
   result: CleaningResult | null;
   showConfirm: boolean;
   setShowConfirm: (show: boolean) => void;
@@ -95,10 +96,12 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   const [sizes, setSizes] = useState<Record<string, StorageSizeInfo>>({});
   const [reloadAfterClean, setReloadAfterClean] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isRefreshingSizes, setIsRefreshingSizes] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
   const requestIdRef = useRef<number>(0);
+  const boundTabRef = useRef<{ id: number; url: string } | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const storageTimerRef = useRef<NodeJS.Timeout | null>(null);
   const loadingRef = useRef(loading);
@@ -117,6 +120,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   // 核心数据拉取链条
   const loadInfo = useCallback(async () => {
     const currentRequestId = ++requestIdRef.current;
+    setIsRefreshingSizes(true);
     try {
       const tab = await getCurrentTab();
       if (currentRequestId !== requestIdRef.current) return;
@@ -159,6 +163,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
         cacheStorage: { value: cacheCount, displayType: 'count' },
         serviceWorkers: { value: swCount, displayType: 'count' },
       });
+      boundTabRef.current = { id: tabId, url };
     } catch (err) {
       console.error('Failed to load storage cleaner info:', err);
       if (currentRequestId === requestIdRef.current) {
@@ -167,6 +172,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     } finally {
       if (currentRequestId === requestIdRef.current) {
         setIsInitializing(false);
+        setIsRefreshingSizes(false);
       }
     }
   }, []);
@@ -256,6 +262,13 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       return;
     }
 
+    const boundTab = boundTabRef.current;
+    if (!boundTab || boundTab.id !== tab.id) {
+      toast.warning('当前标签页已切换，请等待数据刷新后再清理');
+      setShowConfirm(false);
+      return;
+    }
+
     setLoading(true);
     setShowConfirm(false);
     try {
@@ -297,6 +310,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     sizes,
     reloadAfterClean,
     loading,
+    isRefreshingSizes,
     result,
     showConfirm,
     setShowConfirm,
