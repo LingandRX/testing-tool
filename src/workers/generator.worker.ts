@@ -6,10 +6,13 @@
 import { getGeneratorById } from '@/lib/generators';
 import type {
   FieldConfig,
-  WorkerMessage,
+  WorkerRequestMessage,
   GenerateResult,
   GenerateProgress,
 } from '@/types/testDataGenerator';
+
+/** 每生成 N 行让出一次事件循环，以便处理 cancel 消息 */
+const YIELD_EVERY = 100;
 
 // 生成结果缓存
 let generatedData: Record<string, unknown>[] = [];
@@ -18,7 +21,7 @@ let isCancelled = false;
 /**
  * Worker 消息处理器
  */
-self.onmessage = async (e: MessageEvent<WorkerMessage>) => {
+self.onmessage = async (e: MessageEvent<WorkerRequestMessage>) => {
   const data = e.data;
   const { type } = data;
 
@@ -37,11 +40,12 @@ self.onmessage = async (e: MessageEvent<WorkerMessage>) => {
  * 处理开始生成消息
  */
 async function handleStart(payload: {
+  generationId: number;
   fields: FieldConfig[];
   count: number;
   csvMode: boolean;
 }): Promise<void> {
-  const { fields, count } = payload;
+  const { generationId, fields, count } = payload;
   generatedData = [];
 
   try {
@@ -51,6 +55,7 @@ async function handleStart(payload: {
       if (!generator) {
         self.postMessage({
           type: 'error',
+          generationId,
           payload: { error: `生成器 "${field.generatorId}" 不存在` },
         });
         return;
@@ -65,6 +70,7 @@ async function handleStart(payload: {
       if (isCancelled) {
         self.postMessage({
           type: 'complete',
+          generationId,
           payload: {
             success: false,
             error: '生成已取消',
@@ -136,7 +142,23 @@ async function handleStart(payload: {
           total: count,
           estimatedTimeLeft: Math.round(((Date.now() - startTime) / (i + 1)) * (count - i - 1)),
         };
-        self.postMessage({ type: 'progress', payload: progress });
+        self.postMessage({ type: 'progress', generationId, payload: progress });
+      }
+
+      // 定期让出事件循环，使 cancel 消息能被处理
+      if ((i + 1) % YIELD_EVERY === 0) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        if (isCancelled) {
+          self.postMessage({
+            type: 'complete',
+            generationId,
+            payload: {
+              success: false,
+              error: '生成已取消',
+            },
+          });
+          return;
+        }
       }
     }
 
@@ -155,10 +177,11 @@ async function handleStart(payload: {
       },
     };
 
-    self.postMessage({ type: 'complete', payload: result });
+    self.postMessage({ type: 'complete', generationId, payload: result });
   } catch (error) {
     self.postMessage({
       type: 'error',
+      generationId,
       payload: { error: `生成失败: ${error}` },
     });
   }
