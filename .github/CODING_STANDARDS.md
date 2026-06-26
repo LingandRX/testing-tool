@@ -285,8 +285,7 @@ import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
 // 5. i18n
-import { useTranslation } from 'react-i18next';
-import { normalizeLanguage, SUPPORTED_LANGUAGES } from '@/i18n';
+import { useI18n } from '@/utils/chromeI18n';
 // 6. 本地组件
 import TextMode from './TextMode';
 import { ZONES } from './constants';
@@ -295,7 +294,7 @@ import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { Button } from '@/components/ui/button';
 // 8. 工具函数 / Hook
 import { cn } from '@/lib/utils';
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+import { useStorageState } from '@/utils/useStorageState';
 // 9. 类型
 import type { PageType, StorageSchema } from '@/types/storage';
 ```
@@ -401,22 +400,22 @@ className={cn(
 
 ## 5. 错误处理
 
-### 5.1 工具函数：结果对象模式
+### 5.1 工具函数：可恢复错误返回可判断结果
 
-工具函数**不抛异常**，返回包含 `hasError` 和 `error` 字段的结果对象：
+可恢复的解析/校验错误应返回可判断的结果，避免工具层直接弹 Toast。确需保留底层异常的函数
+（如 `formatJson` / `minifyJson`）必须在页面 Hook 或 UI 层捕获并转换为用户提示：
 
 ```typescript
-// ✅ 结果对象模式
-export function markdownToHtml(markdown: string): MarkdownToHtmlResult {
+// ✅ 可恢复校验返回错误消息，调用方据此展示 UI
+export function validateJson(text: string): string | null {
+  if (!text.trim()) {
+    return null;
+  }
   try {
-    ...
-    return { html, originalLength, htmlLength, hasError: false };
-  } catch (error) {
-    return {
-      html: '', ...
-      hasError: true,
-      error: error instanceof Error ? error.message : 'Markdown 解析失败',
-    };
+    JSON.parse(text.trim());
+    return null;
+  } catch (e) {
+    return e instanceof SyntaxError ? e.message : 'Invalid JSON';
   }
 }
 ```
@@ -658,7 +657,7 @@ export function useTimestampConverter(): UseTimestampConverterReturn { ... }
 
 ```
 src/utils/useStorageState.ts          — Chrome Storage 状态持久化
-src/utils/useLazyTranslation.ts       — i18n 懒加载
+src/utils/chromeI18n.ts               — chrome.i18n wrapper 与 useI18n
 src/utils/useContextMenuData.ts       — 右键菜单数据
 src/utils/useDebounce.ts              — 防抖
 src/pages/Timestamp/useTimestampConverter.ts    — 页面级 Hook
@@ -671,43 +670,48 @@ src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
 
 ### 9.1 翻译键格式
 
-- 命名空间：`common`（默认）、`features`
-- 翻译键格式：`namespace:key`（如 `features:timestamp.title`）
-- 语言：`zh`（默认）、`en`
+- 使用 Chrome 扩展标准的 `chrome.i18n`，通过 `src/utils/chromeI18n.ts` 暴露 `useI18n`
+- 翻译 key 存放在 `public/_locales/zh_CN/messages.json`
+- 直接 key：`t('dashboard_title')` → 查找 `dashboard_title`
+- 命名空间兼容写法：`t('common:buttons.search')` → 查找 `common_buttons_search`
+- 命名空间参数：`useI18n(['common', 'features'])` 会尝试 `common_key`、`features_key`
 
 ### 9.2 翻译文件结构
 
 ```
-i18n/locales/{zh,en}/common.json           — 全局通用翻译
-i18n/locales/{zh,en}/features.json         — 功能模块标题和描述
-i18n/locales/{zh,en}/{功能名}.json         — 各功能独立翻译
+public/_locales/zh_CN/messages.json        — Chrome 扩展默认语言包
+wxt.config.ts                              — manifest.default_locale = 'zh_CN'
 ```
 
 ### 9.3 使用方式
 
 ```typescript
-// ✅ 页面组件 — 使用 useLazyTranslation
-import { useLazyTranslation } from '@/utils/useLazyTranslation';
+// ✅ 页面组件 / 子组件 — 使用 useI18n
+import { useI18n } from '@/utils/chromeI18n';
 
 export default function Index() {
-  const { t } = useLazyTranslation('timestamp');
-  return <h1>{t('timestamp:title')}</h1>;
+  const { t } = useI18n('timestamp');
+  return <h1>{t('timestamp_title')}</h1>;
 }
 
-// ✅ 全局组件 — 使用 useTranslation
-import { useTranslation } from 'react-i18next';
-
-export function TopBar() {
-  const { t } = useTranslation(['common', 'features']);
-  return <span>{t('common:settings')}</span>;
+// ✅ 带占位符
+export function NotFoundMessage() {
+  const { t } = useI18n('router');
+  return <p>{t('router_notFoundDescription', { entryPointType: 'popup' })}</p>;
 }
 ```
 
 ### 9.4 添加新翻译
 
-1. 在 `i18n/locales/{zh,en}/features.json` 添加功能标题和描述
-2. 创建 `i18n/locales/{zh,en}/{功能名}.json` 添加功能专属翻译
-3. 在 `utils/useLazyTranslation.ts` 的 `localeModules` 中注册新命名空间
+1. 在 `public/_locales/zh_CN/messages.json` 添加 Chrome 扩展格式的消息：
+   ```json
+   {
+     "feature_title": { "message": "功能标题" },
+     "feature_description": { "message": "功能描述" }
+   }
+   ```
+2. key 使用下划线分隔，避免点号；`useI18n` 会把 `namespace:key.path` 兼容转换为下划线
+3. `chrome.i18n` 不支持运行时动态切换语言，浏览器语言变化后需要刷新扩展页面
 
 ---
 
@@ -1083,7 +1087,7 @@ export default function Index() {
 4. ✅ 业务逻辑提取到 `useXxx.ts` Hook（index.tsx 不超过 150 行）
 5. ✅ 需要持久化的 UI 状态使用 `useStorageState`
 6. ✅ 常量 ≥3 个时提取到 `constants.ts`
-7. ✅ 在 `i18n/locales/{zh,en}/` 添加翻译
+7. ✅ 在 `public/_locales/zh_CN/messages.json` 添加翻译
 8. ✅ 创建 `__tests__/index.test.tsx` 测试文件
 9. ✅ 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
 10. ✅ 运行 `npm run lint && npm run typecheck && npm run test` 全部通过
@@ -1103,8 +1107,8 @@ export default function Index() {
 | `src/hooks/`         | 自定义 React Hooks                                           |
 | `src/utils/`         | 工具函数与服务抽象                                           |
 | `src/types/`         | TypeScript 类型声明                                          |
-| `src/lib/`           | 通用工具函数（cn、utils）                                    |
-| `public/`            | 静态资源                                                     |
+| `src/lib/`           | 通用工具函数与生成器库（cn、utils、generators）              |
+| `public/`            | 静态资源与 Chrome `_locales` 语言包                          |
 
 ---
 
