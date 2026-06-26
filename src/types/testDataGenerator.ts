@@ -156,19 +156,29 @@ export interface GenerateProgress {
 }
 
 /**
- * Worker 消息类型
+ * Worker 请求消息类型
  */
-export type WorkerMessage =
+export type WorkerRequestMessage =
   | { type: 'start'; payload: WorkerStartPayload }
-  | { type: 'progress'; payload: GenerateProgress }
-  | { type: 'complete'; payload: GenerateResult }
-  | { type: 'error'; payload: { error: string } }
   | { type: 'cancel' };
+
+/**
+ * Worker 响应消息类型
+ */
+export type WorkerResponseMessage =
+  | { type: 'progress'; generationId: number; payload: GenerateProgress }
+  | { type: 'complete'; generationId: number; payload: GenerateResult }
+  | { type: 'error'; generationId: number; payload: { error: string } };
+
+/** @deprecated 使用 WorkerRequestMessage | WorkerResponseMessage */
+export type WorkerMessage = WorkerRequestMessage | WorkerResponseMessage;
 
 /**
  * Worker 启动参数
  */
 export interface WorkerStartPayload {
+  /** 生成任务 ID，用于忽略过期 Worker 响应 */
+  generationId: number;
   /** 字段配置列表 */
   fields: FieldConfig[];
   /** 生成数量 */
