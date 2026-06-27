@@ -93,16 +93,7 @@ export function useBase64Converter({ mode }: UseBase64ConverterProps) {
     [mode],
   );
 
-  const safeFileSelect = useCallback(
-    (file: File) => {
-      handleFileSelect(file).catch((err) => {
-        console.error(`Base64 [${mode}] pipeline crash:`, err);
-      });
-    },
-    [handleFileSelect, mode],
-  );
-
-  const decodePipeline = useMemo(() => {
+  const decodeResult = useMemo(() => {
     const cleanedInput = debouncedDecodeInput.replace(/^data:image\/[a-z+]+;base64,/i, '').trim();
     if (!cleanedInput) return { decoded: null, error: null };
 
@@ -118,8 +109,8 @@ export function useBase64Converter({ mode }: UseBase64ConverterProps) {
     }
   }, [debouncedDecodeInput]);
 
-  const decoded = decodePipeline.decoded;
-  const decodeError = decodePipeline.error;
+  const decoded = decodeResult.decoded;
+  const decodeError = decodeResult.error;
 
   const decodedFileName = useMemo(() => {
     if (customFileName) return customFileName;
@@ -144,7 +135,7 @@ export function useBase64Converter({ mode }: UseBase64ConverterProps) {
     decodedFileName,
     setCustomFileName,
     resetAll,
-    safeFileSelect,
+    handleFileSelect,
     maxFileSizeStr,
   };
 }

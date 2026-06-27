@@ -41,14 +41,11 @@ export default defineBackground(() => {
     try {
       await browser.action.openPopup();
     } catch (err) {
-      console.warn(
-        '[Context Menu] 自动打开 popup 失败，请手动点击扩展图标，暂存数据已安全保留:',
-        err,
-      );
+      console.warn('[Context Menu] 自动打开 popup 失败，请手动点击扩展图标，数据已暂存:', err);
     }
   });
 
-  // 监听扩展图标点击事件，安全激活侧边栏
+  // 扩展图标点击时打开侧边栏
   browser.action.onClicked.addListener(async (tab) => {
     if (tab.id) {
       try {

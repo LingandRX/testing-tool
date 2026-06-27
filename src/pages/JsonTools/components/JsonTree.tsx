@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react'; // 用正统的矢量箭头平替原生的字符 '▾' '▸'
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { DiffNode, DiffType } from '../types';
 import { cn } from '@/lib/utils';
 
@@ -82,14 +82,12 @@ const NodeRow = React.memo(
           ? false
           : onActivePath || depth < defaultExpandDepth;
 
-    // 当激活路径精准定位到本行时，平滑滚动至容器中心
     useEffect(() => {
       if (activePath === node.path) {
         rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, [activePath, node.path]);
 
-    // 占位空行分支：必须加 h-[22px] 锁定绝对等高，防止两侧文本高度塌陷发生高低错位
     if (!shouldRenderOnSide(node.type, side)) {
       return (
         <div
@@ -124,7 +122,6 @@ const NodeRow = React.memo(
 
       return (
         <div ref={rowRef} className="w-full flex flex-col">
-          {/* 大容器开端行 */}
           <div
             onClick={() => setOverride(expanded ? 'closed' : 'open')}
             className={cn(
@@ -135,7 +132,6 @@ const NodeRow = React.memo(
             )}
             style={indentStyle}
           >
-            {/* 折叠小箭头：升级为精巧的 Lucide SVG 矢量微动效 */}
             <span className="w-3.5 h-3.5 flex items-center justify-center text-muted-foreground/80 shrink-0">
               {expanded ? (
                 <ChevronDown className="h-3 w-3" />
@@ -164,7 +160,6 @@ const NodeRow = React.memo(
             )}
           </div>
 
-          {/* 容器子节点递归区 */}
           {expanded && (
             <div className={indentClass}>
               {node.children.map((child, idx) => (
@@ -181,7 +176,6 @@ const NodeRow = React.memo(
             </div>
           )}
 
-          {/* 大容器收尾行 */}
           {expanded && (
             <div
               className="text-muted-foreground/80 font-mono text-xs py-0.5 h-[22px] leading-relaxed"
@@ -195,7 +189,6 @@ const NodeRow = React.memo(
       );
     }
 
-    // 叶子数据行分支
     return (
       <div
         ref={rowRef}
@@ -207,7 +200,7 @@ const NodeRow = React.memo(
         )}
         style={indentStyle}
       >
-        <span className="w-3.5 shrink-0" /> {/* 与上方的折叠键轴线严格对齐 */}
+        <span className="w-3.5 shrink-0" />
         {!isRoot && (
           <span className="text-foreground/90 font-bold tracking-tight">{node.key}:</span>
         )}
@@ -231,7 +224,6 @@ export default function JsonTree({
   ...props
 }: JsonTreeProps) {
   return (
-    /* 最外层承载器：统一收拢至标准的 bg-card 与等宽 tabular-nums 控制轴 */
     <div
       className={cn(
         'rounded-xl border border-border bg-card text-card-foreground font-mono text-xs shadow-sm overflow-x-auto min-h-[200px] max-h-[520px] overflow-y-auto p-2.5 tabular-nums select-text',

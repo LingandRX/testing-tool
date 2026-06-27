@@ -8,9 +8,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { MODE_OPTIONS, UNIT_OPTIONS, ZONES, type ZoneType } from '../constants';
+import {
+  CARD_CLASS,
+  INPUT_PLACEHOLDERS,
+  MODE_OPTIONS,
+  UNIT_OPTIONS,
+  ZONES,
+  type ZoneType,
+} from '../constants';
 import type { UseTimestampConverterReturn } from '../useTimestampConverter';
-import ToolCard from './ToolCard';
 
 type ConverterFormProps = Omit<UseTimestampConverterReturn, 'result' | 'handleUseNow'>;
 
@@ -20,20 +26,19 @@ export default function ConverterForm({
   unit,
   zone,
   error,
-  inputPlaceholder,
   setMode,
   setInput,
   setUnit,
   setZone,
 }: ConverterFormProps) {
   return (
-    <ToolCard className="gap-4">
+    <div className={cn(CARD_CLASS, 'gap-4')}>
       <SwitchButtonGroup value={mode} options={MODE_OPTIONS} onChange={setMode} size="small" />
 
       <div className="flex flex-col gap-1.5">
         <Input
           type="text"
-          placeholder={inputPlaceholder}
+          placeholder={INPUT_PLACEHOLDERS[mode]}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className={cn(
@@ -71,6 +76,6 @@ export default function ConverterForm({
           </SelectContent>
         </Select>
       </div>
-    </ToolCard>
+    </div>
   );
 }

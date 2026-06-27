@@ -117,7 +117,6 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     };
   }, []);
 
-  // 核心数据拉取链条
   const loadInfo = useCallback(async () => {
     const currentRequestId = ++requestIdRef.current;
     setIsRefreshingSizes(true);
@@ -189,7 +188,6 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     }, 300);
   }, []);
 
-  // 监听浏览器标签行为
   useEffect(() => {
     loadInfoRef.current().catch(console.error);
 
@@ -216,15 +214,12 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
 
     if (storageTimerRef.current) clearTimeout(storageTimerRef.current);
     storageTimerRef.current = setTimeout(async () => {
-      try {
-        await storageUtil.set('storageCleaner/preferences', {
+      await storageUtil
+        .set('storageCleaner/preferences', {
           reloadAfterClean,
           selectedTypes: options,
-        });
-      } catch (err) {
-        console.error('Failed to save storage cleaner preferences:', err);
-        toast.warning('偏好保存失败，本次设置可能不会保留');
-      }
+        })
+        .catch(console.error);
     }, 500);
   }, [options, reloadAfterClean, isInitializing]);
 
@@ -251,7 +246,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     if (loadingRef.current) return;
 
     const tab = await getCurrentTab();
-    if (!tab || tab.id === undefined || !tab.url) {
+    if (!tab || !tab.id || !tab.url) {
       toast.warning('无法获取当前标签页');
       return;
     }
@@ -286,7 +281,6 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       toast.error(`清理失败: ${String(err)}`);
     } finally {
       setLoading(false);
-      setShowConfirm(false);
     }
   }, [options, reloadAfterClean, loadInfo]);
 

@@ -4,7 +4,7 @@ import { useContextMenuData } from '@/utils/useContextMenuData';
 
 const IMAGE_DATA_URI_PATTERN = /^\s*data:image\//i;
 
-const ERROR_MESSAGE_TO_I18N: Record<string, string> = {
+const ERROR_MESSAGES: Record<string, string> = {
   'Invalid Base64 string': '无效的 Base64 字符串',
   'Input appears to be binary data (e.g. an image). Please use the Image tab instead.':
     '检测到二进制数据（如图像），请使用图像选项卡',
@@ -30,7 +30,7 @@ export function useTextMode() {
 
   useContextMenuData({ featureKey: 'base64Converter', onData: handleContextMenuData });
 
-  const conversionPipeline = useMemo(() => {
+  const conversion = useMemo(() => {
     const trimmed = debouncedInput.trim();
     if (!trimmed) return { output: '', error: null };
 
@@ -38,31 +38,26 @@ export function useTextMode() {
       if (direction === 'encode') {
         const result = textToBase64(debouncedInput);
         return { output: result.output, error: null };
-      } else {
-        const decoded = base64ToText(trimmed);
-        return { output: decoded, error: null };
       }
+      const decoded = base64ToText(trimmed);
+      return { output: decoded, error: null };
     } catch (e) {
       const message = e instanceof Error ? e.message : '';
-      const i18nKey = ERROR_MESSAGE_TO_I18N[message];
       return {
         output: '',
-        error: i18nKey || message || '转换失败',
+        error: ERROR_MESSAGES[message] || message || '转换失败',
       };
     }
   }, [debouncedInput, direction]);
 
-  const output = conversionPipeline.output;
-  const error = conversionPipeline.error;
+  const output = conversion.output;
+  const error = conversion.error;
 
   const placeholder =
     direction === 'encode' ? '输入需要编码为 Base64 的文本...' : '输入需要解码的 Base64 字符串...';
   const outputLabel = direction === 'encode' ? 'Base64 编码结果' : '解码文本结果';
 
-  const showImageHint = useMemo(
-    () => direction === 'decode' && IMAGE_DATA_URI_PATTERN.test(input),
-    [direction, input],
-  );
+  const showImageHint = direction === 'decode' && IMAGE_DATA_URI_PATTERN.test(input);
 
   const handleDirectionChange = (value: 'encode' | 'decode') => {
     if (value === direction) return;

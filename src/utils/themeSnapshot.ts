@@ -35,7 +35,7 @@ export const persistThemeModeSnapshot = (mode: ThemeMode): void => {
   try {
     localStorage.setItem(THEME_MODE_SNAPSHOT_KEY, JSON.stringify(mode));
   } catch (error) {
-    console.error('[Theme Snapshot Error] LocalStorage quota exceeded:', error);
+    console.error('保存主题快照失败:', error);
   }
 };
 

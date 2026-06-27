@@ -9,18 +9,17 @@ import { isSearchHistory, SEARCH_HISTORY_DISPLAY, SEARCH_HISTORY_LIMIT } from '.
 
 export interface UseTopBarReturn {
   searchQuery: string;
-  showResults: boolean;
   searchResults: FeatureConfig[];
   recentFeatures: FeatureConfig[];
   selectedIndex: number;
   isDashboard: boolean;
   ThemeIcon: typeof Sun;
   themeTitle: string;
+  showDropdown: boolean;
   containerRef: RefObject<HTMLDivElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
-  setSearchQuery: (value: string) => void;
-  setShowResults: (value: boolean) => void;
-  setSelectedIndex: (value: number | ((prev: number) => number)) => void;
+  handleSearchQueryChange: (value: string) => void;
+  handleSearchFocus: () => void;
   handleSelectFeature: (feature: FeatureConfig) => void;
   handleKeyDown: (e: React.KeyboardEvent) => void;
   cycleThemeMode: () => void;
@@ -90,7 +89,6 @@ export function useTopBar(): UseTopBarReturn {
   }, [searchHistory, searchQuery]);
 
   const saveToHistory = (featureKey: string) => {
-    if (!featureKey.trim()) return;
     setSearchHistory((prev) =>
       [featureKey, ...prev.filter((h) => h !== featureKey)].slice(0, SEARCH_HISTORY_LIMIT),
     );
@@ -124,18 +122,14 @@ export function useTopBar(): UseTopBarReturn {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (selectedIndex >= 0 && selectedIndex < totalItems) {
-        if (searchQuery.trim()) {
-          handleSelectFeature(searchResults[selectedIndex]);
-        } else {
-          const selected = displayedHistory[selectedIndex];
-          if (selected) {
-            handleSelectFeature(selected);
-          }
-        }
-      } else if (searchQuery.trim() && searchResults.length > 0) {
-        handleSelectFeature(searchResults[0]);
-      }
+      const items = searchQuery.trim() ? searchResults : displayedHistory;
+      const feature =
+        selectedIndex >= 0 && selectedIndex < totalItems
+          ? items[selectedIndex]
+          : searchQuery.trim() && searchResults.length > 0
+            ? searchResults[0]
+            : undefined;
+      if (feature) handleSelectFeature(feature);
     } else if (e.key === 'Escape') {
       setShowResults(false);
       inputRef.current?.blur();
@@ -147,20 +141,30 @@ export function useTopBar(): UseTopBarReturn {
     setSelectedIndex(-1);
   };
 
+  const handleSearchQueryChange = (value: string) => {
+    setSearchQuery(value);
+    setShowResults(true);
+    setSelectedIndex(-1);
+  };
+
+  const handleSearchFocus = () => setShowResults(true);
+
+  const showDropdown =
+    showResults && (searchQuery.trim().length > 0 || displayedHistory.length > 0);
+
   return {
     searchQuery,
-    showResults,
     searchResults,
     recentFeatures: displayedHistory,
     selectedIndex,
+    showDropdown,
     isDashboard: currentPage === 'dashboard',
     ThemeIcon,
     themeTitle,
     containerRef,
     inputRef,
-    setSearchQuery,
-    setShowResults,
-    setSelectedIndex,
+    handleSearchQueryChange,
+    handleSearchFocus,
     handleSelectFeature,
     handleKeyDown,
     cycleThemeMode,

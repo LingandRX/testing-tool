@@ -59,7 +59,7 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
       applyResolvedThemeClass(resolveThemeMode(next));
 
       void storageUtil.set(THEME_MODE_STORAGE_KEY, next).catch((err) => {
-        console.error('[Theme Storage Error] Failed to persistent theme state:', err);
+        console.error('[Theme Storage Error] Failed to persist theme mode:', err);
       });
 
       persistThemeModeSnapshot(next);
@@ -82,7 +82,7 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
         applyResolvedThemeClass(resolveThemeMode(saved));
       })
       .catch((err) => {
-        console.error('[Theme Restore Thread Failed]', err);
+        console.error('[Theme Restore Error]', err);
       });
 
     return () => {
@@ -135,9 +135,7 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
 export function useThemeMode(): ThemeModeContextType {
   const ctx = useContext(ThemeModeContext);
   if (!ctx) {
-    throw new Error(
-      'useThemeMode must be used within a valid ThemeModeProvider sandboxed container',
-    );
+    throw new Error('useThemeMode must be used within ThemeModeProvider');
   }
   return ctx;
 }

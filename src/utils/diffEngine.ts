@@ -1,4 +1,4 @@
-import type { DiffNode, DiffResult, DiffType } from '@/pages/JsonTools/types';
+import type { DiffNode, DiffResult } from '@/pages/JsonTools/types';
 
 const ROOT_PATH = '$';
 const SENTINEL = Symbol('missing');
@@ -37,7 +37,6 @@ const diffNode = (
   path: string,
   diffPaths: string[],
 ): DiffNode => {
-  // 分支 1：节点增加行为拦截 (叶子节点状态)
   if (left === SENTINEL && right !== SENTINEL) {
     diffPaths.push(path);
     return {
@@ -51,7 +50,6 @@ const diffNode = (
     };
   }
 
-  // 分支 2：节点删除行为拦截 (叶子节点状态)
   if (right === SENTINEL && left !== SENTINEL) {
     diffPaths.push(path);
     return {
@@ -181,5 +179,3 @@ export const diffJson = (left: unknown, right: unknown): DiffResult => {
     diffCount: diffPaths.length,
   };
 };
-
-export type { DiffNode, DiffResult, DiffType };

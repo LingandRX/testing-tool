@@ -30,7 +30,7 @@ export default function DiffNavigator({
         )}
         {...props}
       >
-        <span className="text-xs font-semibold text-muted-foreground/90">{'无差异'}</span>
+        <span className="text-xs font-semibold text-muted-foreground/90">无差异</span>
       </div>
     );
   }
@@ -43,11 +43,10 @@ export default function DiffNavigator({
       )}
       {...props}
     >
-      {/* 上一处差异按钮 */}
       <button
         type="button"
         disabled={isFirst}
-        aria-label={'上一个'}
+        aria-label="上一个"
         onClick={onPrev}
         className={cn(
           'p-1 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground',
@@ -63,11 +62,10 @@ export default function DiffNavigator({
         {total}
       </span>
 
-      {/* 下一处差异按钮 */}
       <button
         type="button"
         disabled={isLast}
-        aria-label={'下一个'}
+        aria-label="下一个"
         onClick={onNext}
         className={cn(
           'p-1 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground',

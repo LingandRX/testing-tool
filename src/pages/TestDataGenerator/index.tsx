@@ -1,21 +1,10 @@
-/**
- * 测试数据生成器主页面
- */
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Settings, Database, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useGenerator } from './hooks/useGenerator';
-import type { FieldConfig, GenerateResult, DataRule } from '@/types/testDataGenerator';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-
-// 生成唯一 ID 的辅助函数
-function generateId(): string {
-  return `field_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-}
-
+import { useGenerator } from './hooks/useGenerator';
 import FieldList, { MAX_FIELDS } from './components/FieldList';
 import FieldEditor from './components/FieldEditor';
 import GenerateOptions from './components/GenerateOptions';
@@ -24,39 +13,38 @@ import DataPreview from './components/DataPreview';
 import ResultPanel from './components/ResultPanel';
 import ExportPanel from './components/ExportPanel';
 import RuleManager from './components/RuleManager';
+import type { FieldConfig, GenerateResult, DataRule } from '@/types/testDataGenerator';
+
+function generateId(): string {
+  return `field_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
 
 type TabType = 'fields' | 'rules';
 
 export default function TestDataGeneratorPage() {
   const { isGenerating, progress, result, error, generate, cancel, clearResult } = useGenerator();
 
-  // 字段配置
   const [fields, setFields] = useState<FieldConfig[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<DataRule | null>(null);
 
-  // 生成选项
   const [count, setCount] = useState(100);
   const [format, setFormat] = useState<'json' | 'csv'>('json');
 
-  // 当前标签页
   const [activeTab, setActiveTab] = useState<TabType>('fields');
 
-  // 生成完成时显示 toast 提示（避免重复触发）
   const lastToastResultRef = useRef<GenerateResult | null>(null);
 
-  // 生成完成时显示 toast 提示（避免重复触发）
   useEffect(() => {
     if (result?.success && result.stats && result !== lastToastResultRef.current) {
       lastToastResultRef.current = result;
       toast.success('生成完成', {
-        description: `${result.stats.total} ${'条数据'}`,
+        description: `${result.stats.total} 条数据`,
       });
     }
   }, [result]);
 
-  // 添加新字段
   const handleAddField = useCallback(() => {
     setFields((prev) => {
       if (prev.length >= MAX_FIELDS) return prev;
@@ -74,7 +62,6 @@ export default function TestDataGeneratorPage() {
     });
   }, []);
 
-  // 更新字段
   const handleUpdateField = useCallback((index: number, field: FieldConfig) => {
     setFields((prev) => {
       const newFields = [...prev];
@@ -83,7 +70,6 @@ export default function TestDataGeneratorPage() {
     });
   }, []);
 
-  // 删除字段
   const handleRemoveField = useCallback((index: number) => {
     setFields((prev) => prev.filter((_, i) => i !== index));
     setSelectedIndex((prev) => {
@@ -93,7 +79,6 @@ export default function TestDataGeneratorPage() {
     });
   }, []);
 
-  // 拖拽排序
   const handleReorder = useCallback((oldIndex: number, newIndex: number) => {
     setFields((prev) => {
       const newFields = [...prev];
@@ -111,7 +96,6 @@ export default function TestDataGeneratorPage() {
     });
   }, []);
 
-  // 加载规则
   const handleLoadRule = useCallback(
     (loadedFields: FieldConfig[]) => {
       setFields(loadedFields);
@@ -122,7 +106,6 @@ export default function TestDataGeneratorPage() {
     [clearResult],
   );
 
-  // 编辑规则
   const handleEditRule = useCallback(
     (rule: DataRule) => {
       setFields(rule.fields);
@@ -135,21 +118,17 @@ export default function TestDataGeneratorPage() {
     [clearResult],
   );
 
-  // 保存规则成功后清除编辑状态
   const handleRuleSaved = useCallback(() => {
     setEditingRule(null);
   }, []);
 
-  // 开始生成
   const handleGenerate = useCallback(() => {
     if (fields.length === 0) return;
     generate(fields, count, format === 'csv');
   }, [fields, count, format, generate]);
 
-  // 获取选中的字段（-1 或 null 表示未选中）
   const selectedField = selectedIndex !== null && selectedIndex >= 0 ? fields[selectedIndex] : null;
 
-  // 打开字段编辑器
   const handleOpenEditor = useCallback((index: number) => {
     setSelectedIndex(index);
     setIsEditorOpen(true);
@@ -158,11 +137,8 @@ export default function TestDataGeneratorPage() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
-        {/* 主要内容区域 - 左右分栏 */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-start">
-          {/* 左侧面板 - 字段配置 */}
           <div className="lg:col-span-3 space-y-4">
-            {/* 标签页切换 */}
             <div className="flex gap-1 p-1 bg-muted rounded-lg">
               <button
                 onClick={() => setActiveTab('fields')}
@@ -174,7 +150,7 @@ export default function TestDataGeneratorPage() {
                 )}
               >
                 <Settings className="h-4 w-4" />
-                {'字段配置'}
+                字段配置
               </button>
               <button
                 onClick={() => setActiveTab('rules')}
@@ -186,11 +162,10 @@ export default function TestDataGeneratorPage() {
                 )}
               >
                 <Tag className="h-4 w-4" />
-                {'规则管理'}
+                规则管理
               </button>
             </div>
 
-            {/* 字段配置标签页 */}
             {activeTab === 'fields' && (
               <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
                 <FieldList
@@ -206,14 +181,12 @@ export default function TestDataGeneratorPage() {
               </div>
             )}
 
-            {/* 规则管理标签页 */}
             {activeTab === 'rules' && (
               <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
                 <RuleManager onLoad={handleLoadRule} onEdit={handleEditRule} />
               </div>
             )}
 
-            {/* 生成选项 */}
             <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
               <GenerateOptions
                 count={count}
@@ -223,7 +196,6 @@ export default function TestDataGeneratorPage() {
               />
             </div>
 
-            {/* 生成按钮 */}
             <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
               <GenerateButton
                 onClick={handleGenerate}
@@ -235,10 +207,7 @@ export default function TestDataGeneratorPage() {
             </div>
           </div>
 
-          {/* 右侧面板 - 数据预览和结果 */}
           <div className="lg:col-span-2 space-y-4">
-            {/* 结果状态 */}
-            {/* 仅在失败或有警告时显示结果面板 */}
             {((result && !result.success) ||
               (result?.warnings && result.warnings.length > 0) ||
               error) && (
@@ -253,18 +222,16 @@ export default function TestDataGeneratorPage() {
               </div>
             )}
 
-            {/* 数据预览 */}
             <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                 <Database className="h-4 w-4" />
-                {'数据预览'}
+                数据预览
               </h3>
               <div className="h-[280px]">
                 <DataPreview fields={fields} />
               </div>
             </div>
 
-            {/* 导出面板 */}
             {result?.data && result.data.length > 0 && (
               <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
                 <ExportPanel result={result} />
@@ -274,7 +241,6 @@ export default function TestDataGeneratorPage() {
         </div>
       </div>
 
-      {/* 字段编辑弹窗 */}
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
         <DialogContent
           showCloseButton={false}
@@ -291,10 +257,10 @@ export default function TestDataGeneratorPage() {
           </div>
           <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
             <Button variant="ghost" size="sm" onClick={() => setIsEditorOpen(false)}>
-              {'取消'}
+              取消
             </Button>
             <Button size="sm" onClick={() => setIsEditorOpen(false)}>
-              {'完成'}
+              完成
             </Button>
           </div>
         </DialogContent>

@@ -18,7 +18,6 @@ export default function JsonFormatSection() {
   const [indentSize, setIndentSize] = useState<number>(2);
   const [sortKeys, setSortKeys] = useState(false);
 
-  // Debounce input
   useEffect(() => {
     const handle = setTimeout(() => {
       setDebouncedInput(input);
@@ -30,40 +29,31 @@ export default function JsonFormatSection() {
     return validateJson(debouncedInput);
   }, [debouncedInput]);
 
-  // Real-time formatting pipeline
-  const formattedPipeline = useMemo(() => {
+  const { result, runtimeError } = useMemo((): {
+    result: JsonFormatResult | null;
+    runtimeError: string | null;
+  } => {
     const trimmed = debouncedInput.trim();
-    if (!trimmed || error) return null;
+    if (!trimmed || error) return { result: null, runtimeError: null };
 
     try {
       const options: JsonFormatOptions = { indentSize, sortKeys };
-      return formatJson(debouncedInput, options);
+      return { result: formatJson(debouncedInput, options), runtimeError: null };
     } catch (e) {
       return {
-        isRuntimeError: true,
-        errorMessage: e instanceof SyntaxError ? e.message : String(e),
+        result: null,
+        runtimeError: e instanceof SyntaxError ? e.message : String(e),
       };
     }
   }, [debouncedInput, error, indentSize, sortKeys]);
 
-  const runtimeError =
-    formattedPipeline && 'isRuntimeError' in formattedPipeline
-      ? formattedPipeline.errorMessage
-      : null;
-  const result =
-    formattedPipeline && !('isRuntimeError' in formattedPipeline)
-      ? (formattedPipeline as JsonFormatResult)
-      : null;
-
   return (
     <div className="w-full flex flex-col gap-4">
-      {/* 工具控制栏 */}
       <div className="flex h-10 items-center justify-between px-1.5 bg-secondary/40 rounded-xl border border-border/60">
         <div className="flex gap-4 items-center w-full">
-          {/* 缩进配置区 */}
           <div className="flex gap-2 items-center shrink-0 select-none">
             <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
-              {'缩进'}
+              缩进
             </span>
             <SwitchButtonGroup
               value={indentSize}
@@ -75,7 +65,6 @@ export default function JsonFormatSection() {
 
           <div className="h-4 w-px bg-border/60" />
 
-          {/* 键名排序区 */}
           <div
             onClick={() => setSortKeys(!sortKeys)}
             className="flex items-center gap-2 cursor-pointer select-none group py-1"
@@ -91,15 +80,14 @@ export default function JsonFormatSection() {
               htmlFor="sort-keys-checkbox"
               className="text-xs font-bold text-foreground/80 cursor-pointer tracking-tight group-hover:text-foreground"
             >
-              {'键名排序'}
+              键名排序
             </Label>
           </div>
         </div>
       </div>
 
-      {/* 满血版输入终端 */}
       <TextInputArea
-        placeholder={'输入需要格式化的 JSON...'}
+        placeholder="输入需要格式化的 JSON..."
         value={input}
         onChange={setInput}
         externalError={error || runtimeError || undefined}
@@ -110,8 +98,7 @@ export default function JsonFormatSection() {
         onClear={() => setInput('')}
       />
 
-      {/* 格式化结果流面板展示 */}
-      {result && result.formatted ? (
+      {result?.formatted ? (
         <JsonResultPanel
           title="格式化结果"
           content={result.formatted}

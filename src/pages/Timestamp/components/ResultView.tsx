@@ -14,15 +14,16 @@ export default function ResultView({
   className,
   ...props
 }: ResultViewProps) {
+  if (!result && !showEmptyPlaceholder) return null;
+
   if (!result) {
-    if (!showEmptyPlaceholder) return null;
     return (
       <EmptyPlaceholder
         className={cn('flex-1 min-h-[320px]', className)}
         messageClassName="text-sm font-medium text-muted-foreground max-w-none"
         {...props}
       >
-        {'请输入并点击转换'}
+        请输入并点击转换
       </EmptyPlaceholder>
     );
   }
@@ -30,7 +31,7 @@ export default function ResultView({
   return (
     <div className={cn('flex flex-col w-full', className)} {...props}>
       <span className="block text-muted-foreground/90 mb-2.5 text-xs font-semibold tracking-wider uppercase">
-        {'转换结果'}
+        转换结果
       </span>
 
       <div className="bg-card text-card-foreground border border-border p-4 sm:p-5 rounded-xl relative shadow-sm flex justify-between items-center gap-4 focus-within:ring-1 focus-within:ring-ring">
@@ -39,7 +40,7 @@ export default function ResultView({
         </span>
         <CopyButton
           text={result}
-          tooltip={'复制结果'}
+          tooltip="复制结果"
           variant="ghost"
           size="icon"
           className="h-7 w-7 text-muted-foreground hover:text-foreground"

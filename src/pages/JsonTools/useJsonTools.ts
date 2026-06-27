@@ -11,7 +11,6 @@ import type { ConvertFunction, ViewMode } from './types';
 export interface UseJsonToolsReturn {
   pageMode: JsonToolsPageMode;
   setPageMode: (mode: JsonToolsPageMode) => void;
-  // Diff mode state
   leftInput: string;
   rightInput: string;
   setLeftInput: (val: string) => void;
@@ -26,7 +25,6 @@ export interface UseJsonToolsReturn {
   handlePrev: () => void;
   handleNext: () => void;
   activePath: string | undefined;
-  // Convert functions
   yamlConvert: ConvertFunction;
   tomlConvert: ConvertFunction;
   minifyConvert: ConvertFunction;
@@ -35,13 +33,11 @@ export interface UseJsonToolsReturn {
 export function useJsonTools(): UseJsonToolsReturn {
   const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
 
-  // Diff inputs
   const [leftInput, setLeftInput] = useState('');
   const [rightInput, setRightInput] = useState('');
   const [debouncedLeft, setDebouncedLeft] = useState('');
   const [debouncedRight, setDebouncedRight] = useState('');
 
-  // Debounce
   useEffect(() => {
     const handle = setTimeout(() => {
       setDebouncedLeft(leftInput);
@@ -50,7 +46,6 @@ export function useJsonTools(): UseJsonToolsReturn {
     return () => clearTimeout(handle);
   }, [leftInput, rightInput]);
 
-  // Parse debounced inputs
   const parseState = useMemo(() => {
     const invalidMsg = '无效的 JSON 格式';
     return {
@@ -65,7 +60,6 @@ export function useJsonTools(): UseJsonToolsReturn {
   const [viewMode, setViewMode] = useState<ViewMode>('sideBySide');
   const [currentDiffIndex, setCurrentDiffIndex] = useState(0);
 
-  // Real-time diff computation
   const diffResult = useMemo(() => {
     const { left, right } = parseState;
     if (left.error || right.error || debouncedLeft.trim() === '' || debouncedRight.trim() === '') {
@@ -88,7 +82,6 @@ export function useJsonTools(): UseJsonToolsReturn {
 
   const activePath = diffResult && total > 0 ? diffResult.diffPaths[currentDiffIndex] : undefined;
 
-  // Convert functions
   const yamlConvert: ConvertFunction = useCallback((text: string) => {
     const r = jsonToYaml(text);
     return { output: r.output, originalBytes: r.originalBytes, outputBytes: r.outputBytes };

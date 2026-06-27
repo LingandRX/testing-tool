@@ -12,32 +12,26 @@ function isUrl(text: string): boolean {
   const trimmed = text.trim();
   if (!trimmed) return false;
 
-  // 检查是否以 http:// 或 https:// 开头
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return true;
   }
 
-  // 检查是否为域名格式（包含.且不以特殊字符开头）
   const domainPattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+([/:].*)?$/;
   return domainPattern.test(trimmed);
 }
 
-/** 检测URL是否为图片格式 */
 function isImageUrl(url: string): boolean {
   const trimmedUrl = url.trim().toLowerCase();
 
-  // 检查是否为 data:image 格式
   if (trimmedUrl.startsWith('data:image/')) {
     return true;
   }
 
-  // 检查是否包含图片扩展名
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.ico'];
   if (imageExtensions.some((ext) => trimmedUrl.includes(ext))) {
     return true;
   }
 
-  // 检查URL路径中是否包含图片相关关键词
   const imageKeywords = ['/image/', '/img/', '/photo/', '/pic/', '/upload/'];
   if (imageKeywords.some((keyword) => trimmedUrl.includes(keyword))) {
     return true;
@@ -46,7 +40,6 @@ function isImageUrl(url: string): boolean {
   return false;
 }
 
-/** 生成二维码的核心逻辑 */
 function generateQrCodeDataUrl(text: string): string {
   const trimmedText = text.trim();
   if (!trimmedText) return '';
@@ -241,7 +234,17 @@ export function useQrCode(): QrCodeContextValue {
 
       const qrCodeDataUrl = generateQrCodeDataUrl(payload);
 
-      if (!qrCodeDataUrl) {
+      if (qrCodeDataUrl) {
+        setGeneratorState((prev) => ({
+          ...prev,
+          step: 'preview',
+          textToEncode: payload,
+          savedText: payload.trim(),
+          qrCodeDataUrl,
+          generating: false,
+          inputError: '',
+        }));
+      } else {
         setGeneratorState((prev) => ({
           ...prev,
           step: 'input',
@@ -328,7 +331,7 @@ export function useQrCode(): QrCodeContextValue {
       });
 
       parseQrCode(file).catch((err) => {
-        console.error('Parser standalone task thread exploded:', err);
+        console.error('解析二维码失败:', err);
       });
     },
     [parseQrCode],

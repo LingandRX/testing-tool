@@ -23,11 +23,11 @@ export default function DiffResult({
         {...props}
       >
         <div className="flex-1 min-w-0">
-          <SectionLabel text={'原始 JSON'} />
+          <SectionLabel text="原始 JSON" />
           <JsonTree node={result.root} side="left" activePath={activePath} />
         </div>
         <div className="flex-1 min-w-0">
-          <SectionLabel text={'目标 JSON'} />
+          <SectionLabel text="目标 JSON" />
           <JsonTree node={result.root} side="right" activePath={activePath} />
         </div>
       </div>
@@ -133,7 +133,6 @@ const UnifiedView = ({ node, depth, activePath }: UnifiedViewProps) => {
     );
   }
 
-  // 容器节点整块渲染处理
   if (node.type === 'added') {
     return (
       <UnifiedRow

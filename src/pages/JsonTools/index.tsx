@@ -66,16 +66,16 @@ export default function Index() {
 
           <div className="flex flex-col md:flex-row gap-4 w-full items-stretch">
             <JsonDiffInput
-              label={'原始 JSON'}
-              placeholder={'输入原始 JSON...'}
+              label="原始 JSON"
+              placeholder="输入原始 JSON..."
               value={leftInput}
               onChange={setLeftInput}
               error={leftError}
               minRows={9}
             />
             <JsonDiffInput
-              label={'目标 JSON'}
-              placeholder={'输入目标 JSON...'}
+              label="目标 JSON"
+              placeholder="输入目标 JSON..."
               value={rightInput}
               onChange={setRightInput}
               error={rightError}
@@ -106,11 +106,11 @@ export default function Index() {
       ) : pageMode === 'format' ? (
         <JsonFormatSection />
       ) : pageMode === 'yaml' ? (
-        <JsonConvertSection translationPrefix="yaml" convertFunction={yamlConvert} />
+        <JsonConvertSection mode="yaml" convertFunction={yamlConvert} />
       ) : pageMode === 'toml' ? (
-        <JsonConvertSection translationPrefix="toml" convertFunction={tomlConvert} />
+        <JsonConvertSection mode="toml" convertFunction={tomlConvert} />
       ) : (
-        <JsonConvertSection translationPrefix="minify" convertFunction={minifyConvert} />
+        <JsonConvertSection mode="minify" convertFunction={minifyConvert} />
       )}
     </div>
   );

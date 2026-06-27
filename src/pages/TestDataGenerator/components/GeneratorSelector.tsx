@@ -30,18 +30,16 @@ export default function GeneratorSelector({ selectedId, onChange }: GeneratorSel
 
   return (
     <div className="space-y-3">
-      {/* 搜索框 */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={'搜索生成器...'}
+          placeholder="搜索生成器..."
           className="pl-9 h-9"
         />
       </div>
 
-      {/* 分类标签 */}
       {!searchQuery && (
         <div className="flex flex-wrap gap-2">
           {generatorCategories.map((category) => {
@@ -64,7 +62,6 @@ export default function GeneratorSelector({ selectedId, onChange }: GeneratorSel
         </div>
       )}
 
-      {/* 生成器列表 */}
       <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
         {generators.map((generator) => (
           <button

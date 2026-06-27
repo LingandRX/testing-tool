@@ -51,7 +51,7 @@ export default function StorageOptionsGrid({
         className="border-t border-border flex justify-between items-center pl-3.5 pr-7 py-2.5 bg-muted/20 hover:bg-muted/40 cursor-pointer select-none transition-colors"
       >
         <Label className="text-xs font-bold text-muted-foreground/90 cursor-pointer tracking-wide uppercase">
-          {'全选所有项'}
+          全选所有项
         </Label>
 
         <Checkbox

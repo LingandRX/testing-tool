@@ -1,4 +1,3 @@
-import React from 'react';
 import { type FeatureConfig } from '@/config/features';
 import { cn } from '@/lib/utils';
 
@@ -8,7 +7,7 @@ interface SearchResultItemProps {
   onSelect: (feature: FeatureConfig) => void;
 }
 
-const SearchResultItem = React.memo(({ feature, selected, onSelect }: SearchResultItemProps) => {
+export default function SearchResultItem({ feature, selected, onSelect }: SearchResultItemProps) {
   return (
     <li
       role="option"
@@ -28,7 +27,4 @@ const SearchResultItem = React.memo(({ feature, selected, onSelect }: SearchResu
       </div>
     </li>
   );
-});
-SearchResultItem.displayName = 'SearchResultItem';
-
-export default SearchResultItem;
+}

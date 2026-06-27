@@ -3,11 +3,6 @@ import { MessageAction, sendMessageToContent } from '@/utils/messages';
 import { isUnsupportedPageUrl } from '@/utils/restrictedUrls';
 import type { RestorerStatus } from './constants';
 
-function deriveStatus(isUnsupported: boolean, isUnlocked: boolean): RestorerStatus {
-  if (isUnsupported) return 'unsupported';
-  return isUnlocked ? 'unlocked' : 'locked';
-}
-
 export interface UseRightClickRestorerReturn {
   domain: string;
   isLoading: boolean;
@@ -16,10 +11,9 @@ export interface UseRightClickRestorerReturn {
 }
 
 export function useRightClickRestorer(): UseRightClickRestorerReturn {
-  const [domain, setDomain] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
-  const [isUnsupported, setIsUnsupported] = useState<boolean>(false);
+  const [domain, setDomain] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState<RestorerStatus>('locked');
 
   useEffect(() => {
     const load = async () => {
@@ -30,13 +24,13 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
         setDomain(url ? new URL(url).hostname : '');
 
         if (isUnsupportedPageUrl(url)) {
-          setIsUnsupported(true);
+          setStatus('unsupported');
           return;
         }
 
         const response = await sendMessageToContent(MessageAction.QUERY_RIGHT_CLICK_STATUS);
         if (response?.success) {
-          setIsUnlocked(response.restored);
+          setStatus(response.restored ? 'unlocked' : 'locked');
         }
       } catch (err) {
         console.error('[RightClickRestorer] Failed to load state:', err);
@@ -49,12 +43,12 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
   }, []);
 
   async function unlock() {
-    if (isUnsupported) return;
+    if (status === 'unsupported') return;
 
     try {
       const response = await sendMessageToContent(MessageAction.RESTORE_RIGHT_CLICK);
       if (response?.success) {
-        setIsUnlocked(response.restored);
+        setStatus(response.restored ? 'unlocked' : 'locked');
       }
     } catch (err) {
       console.error('[RightClickRestorer] Failed to unlock:', err);
@@ -64,7 +58,7 @@ export function useRightClickRestorer(): UseRightClickRestorerReturn {
   return {
     domain,
     isLoading,
-    status: deriveStatus(isUnsupported, isUnlocked),
+    status,
     unlock,
   };
 }

@@ -1,14 +1,6 @@
-/**
- * 业务数据生成器
- * 包含：订单号、价格、日期、状态、数量、评分、折扣、库存
- */
-
 import type { GeneratorDefinition } from '@/types/testDataGenerator';
 import { randomInt, randomPick } from './random';
 
-/**
- * 格式化日期
- */
 function formatDate(date: Date, format: string): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -26,9 +18,6 @@ function formatDate(date: Date, format: string): string {
     .replace('ss', seconds);
 }
 
-/**
- * 订单号生成器
- */
 export const orderId: GeneratorDefinition = {
   id: 'orderId',
   name: '订单号',
@@ -68,9 +57,6 @@ export const orderId: GeneratorDefinition = {
   },
 };
 
-/**
- * 价格生成器
- */
 export const price: GeneratorDefinition = {
   id: 'price',
   name: '价格',
@@ -142,9 +128,6 @@ export const price: GeneratorDefinition = {
   },
 };
 
-/**
- * 生成心理定价（如 9.99, 19.9, 99）
- */
 function generatePsychologicalPrice(min: number, max: number): number {
   const patterns = [
     () => {
@@ -167,9 +150,6 @@ function generatePsychologicalPrice(min: number, max: number): number {
   return price;
 }
 
-/**
- * 生成真实分布价格（对数正态分布）
- */
 function generateRealisticPrice(min: number, max: number): number {
   const mean = (Math.log(min) + Math.log(max)) / 2;
   const stdDev = (Math.log(max) - Math.log(min)) / 4;
@@ -182,9 +162,6 @@ function generateRealisticPrice(min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-/**
- * 日期生成器
- */
 export const date: GeneratorDefinition = {
   id: 'date',
   name: '日期',
@@ -235,9 +212,6 @@ export const date: GeneratorDefinition = {
   },
 };
 
-/**
- * 状态生成器
- */
 export const status: GeneratorDefinition = {
   id: 'status',
   name: '状态',
@@ -290,9 +264,6 @@ export const status: GeneratorDefinition = {
   },
 };
 
-/**
- * 数量生成器
- */
 export const quantity: GeneratorDefinition = {
   id: 'quantity',
   name: '数量',
@@ -339,9 +310,6 @@ export const quantity: GeneratorDefinition = {
   },
 };
 
-/**
- * 泊松分布随机数
- */
 function poissonRandom(lambda: number): number {
   const L = Math.exp(-lambda);
   let k = 0;
@@ -353,9 +321,6 @@ function poissonRandom(lambda: number): number {
   return k - 1;
 }
 
-/**
- * 评分生成器
- */
 export const rating: GeneratorDefinition = {
   id: 'rating',
   name: '评分',
@@ -410,9 +375,6 @@ export const rating: GeneratorDefinition = {
   },
 };
 
-/**
- * 偏向高分的随机数（模拟真实评分分布）
- */
 function skewedRandom(min: number, max: number): number {
   // 使用 Beta 分布模拟评分偏向
   const alpha = 3;
@@ -425,9 +387,6 @@ function skewedRandom(min: number, max: number): number {
   return min + x * (max - min);
 }
 
-/**
- * 折扣生成器
- */
 export const discount: GeneratorDefinition = {
   id: 'discount',
   name: '折扣',
@@ -479,9 +438,6 @@ export const discount: GeneratorDefinition = {
   },
 };
 
-/**
- * 生成心理折扣（如 5%, 10%, 20%, 30%）
- */
 function generatePsychologicalDiscount(min: number, max: number): number {
   const psychologicalDiscounts = [5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80];
   const validDiscounts = psychologicalDiscounts.filter((d) => d >= min && d <= max);
@@ -491,9 +447,6 @@ function generatePsychologicalDiscount(min: number, max: number): number {
   return randomInt(min, max);
 }
 
-/**
- * 库存生成器
- */
 export const stock: GeneratorDefinition = {
   id: 'stock',
   name: '库存',
