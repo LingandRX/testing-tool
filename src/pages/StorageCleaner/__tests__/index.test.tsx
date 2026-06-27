@@ -126,7 +126,34 @@ describe('StorageCleaner 页面', () => {
 
     await waitFor(() => {
       expect(clearStorage).not.toHaveBeenCalled();
-      expect(toast.warning).toHaveBeenCalledWith('当前标签页已切换，请等待数据刷新后再清理');
+      expect(toast.warning).toHaveBeenCalledWith('当前页面已变更，请等待数据刷新后再清理');
+    });
+  });
+
+  it('同一标签页 URL 变更后、数据刷新完成前不应执行清理', async () => {
+    let currentUrl = 'https://a.example.com';
+    vi.mocked(getCurrentTab).mockImplementation(
+      async () =>
+        ({
+          id: 1,
+          url: currentUrl,
+        }) as any,
+    );
+
+    render(<Index />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /立即清理/ })).not.toBeDisabled();
+    });
+
+    currentUrl = 'https://b.example.com';
+
+    fireEvent.click(screen.getByRole('button', { name: /立即清理/ }));
+    fireEvent.click(screen.getByRole('button', { name: /确认清理/ }));
+
+    await waitFor(() => {
+      expect(clearStorage).not.toHaveBeenCalled();
+      expect(toast.warning).toHaveBeenCalledWith('当前页面已变更，请等待数据刷新后再清理');
     });
   });
 });
