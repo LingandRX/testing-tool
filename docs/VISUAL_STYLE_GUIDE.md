@@ -724,17 +724,14 @@ src/
 ```tsx
 // src/pages/NewTool/index.tsx
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
 
 export default function Index() {
-  const { t } = useI18n('newTool');
-
   return (
-    <div className="p-4 w-full flex flex-col space-y-4 min-h-[500px] select-none">
+    <div className="p-4 w-full flex flex-col space-y-4 select-none">
       {/* 页面内容 */}
       <div className="p-5 rounded-xl border border-border bg-card text-card-foreground shadow-sm">
-        <h4 className="font-bold text-sm tracking-tight">{t('newTool:title')}</h4>
+        <h4 className="font-bold text-sm tracking-tight">新工具</h4>
       </div>
     </div>
   );
