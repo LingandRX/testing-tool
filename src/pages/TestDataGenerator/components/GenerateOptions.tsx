@@ -3,8 +3,8 @@
  * 配置生成数量、数据格式等选项
  */
 
-import { useI18n } from '@/utils/chromeI18n';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface GenerateOptionsProps {
   count: number;
@@ -26,15 +26,10 @@ export default function GenerateOptions({
   format,
   onFormatChange,
 }: GenerateOptionsProps) {
-  const { t } = useI18n('testDataGenerator');
-
   return (
     <div className="space-y-4">
-      {/* 生成数量 */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
-          {t('testDataGenerator_count')}
-        </label>
+        <Label className="text-sm font-medium text-foreground">生成数量</Label>
         <div className="flex flex-wrap gap-2">
           {COUNT_PRESETS.map((preset) => (
             <button
@@ -65,11 +60,8 @@ export default function GenerateOptions({
         />
       </div>
 
-      {/* 数据格式 */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
-          {t('testDataGenerator_format')}
-        </label>
+        <Label className="text-sm font-medium text-foreground">数据格式</Label>
         <div className="flex gap-2">
           {FORMAT_OPTIONS.map((option) => (
             <button

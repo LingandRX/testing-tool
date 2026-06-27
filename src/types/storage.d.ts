@@ -8,7 +8,7 @@ export type PageType =
   | 'qrCode' // 二维码工具
   | 'textStatistics' // 文本统计工具
   | 'jwt' // JWT 解析工具
-  | 'jsonDiff' // JSON 差异比较工具
+  | 'jsonTools' // JSON 工具
   | 'base64Converter' // Base64 转换器工具
   | 'rightClickRestorer' // 右键菜单恢复工具
   | 'testDataGenerator'; // 测试数据生成器工具
@@ -183,6 +183,8 @@ export type StorageCleanResult =
       success: false;
       /** 错误信息 */
       error: string;
+      /** 部分成功时的已清理数量（如 IndexedDB 多库场景） */
+      count?: number;
     };
 
 /**

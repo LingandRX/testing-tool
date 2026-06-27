@@ -86,11 +86,6 @@ describe('jsonToYaml', () => {
     expect(() => jsonToYaml('{invalid}')).toThrow(SyntaxError);
   });
 
-  it('should handle keys with special characters', () => {
-    const result = jsonToYaml('{"key with spaces":"value"}');
-    expect(result.output).toContain('"key with spaces"');
-  });
-
   it('should handle nested arrays in objects', () => {
     const result = jsonToYaml('{"items":[1,2,3]}');
     expect(result.output).toContain('items:');

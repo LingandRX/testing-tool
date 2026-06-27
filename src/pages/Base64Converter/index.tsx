@@ -1,8 +1,7 @@
-import { useI18n } from '@/utils/chromeI18n';
 import { useStorageState } from '@/utils/useStorageState';
 import type { Base64ConverterPageMode } from '@/types/storage';
-import TextMode from './TextMode';
-import Base64ConverterSection from './Base64ConverterSection';
+import TextMode from './components/TextMode';
+import Base64ConverterSection from './components/Base64ConverterSection';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 
 const VALID_PAGE_MODES: readonly Base64ConverterPageMode[] = ['text', 'file', 'image'];
@@ -12,7 +11,6 @@ const isValidPageMode = (val: unknown): val is Base64ConverterPageMode =>
 type PageMode = Base64ConverterPageMode;
 
 export default function Index() {
-  const { t } = useI18n('base64Converter');
   const [pageMode, setPageMode] = useStorageState(
     'base64Converter/pageMode',
     'text',
@@ -24,9 +22,9 @@ export default function Index() {
       <SwitchButtonGroup
         value={pageMode}
         options={[
-          { value: 'text', label: t('base64Converter:textMode') },
-          { value: 'file', label: t('base64Converter:fileMode') },
-          { value: 'image', label: t('base64Converter:imageMode') },
+          { value: 'text', label: '文本' },
+          { value: 'file', label: '文件' },
+          { value: 'image', label: '图像' },
         ]}
         onChange={(value: PageMode) => setPageMode(value)}
         size="small"

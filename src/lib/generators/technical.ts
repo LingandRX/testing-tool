@@ -1,27 +1,6 @@
-/**
- * 技术数据生成器
- * 包含：UUID、IPv4、URL
- */
-
 import type { GeneratorDefinition } from '@/types/testDataGenerator';
+import { randomInt, randomPick } from './random';
 
-/**
- * 生成随机整数
- */
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * 从数组中随机选择
- */
-function randomPick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-/**
- * UUID 生成器
- */
 export const uuid: GeneratorDefinition = {
   id: 'uuid',
   name: 'UUID',
@@ -78,9 +57,6 @@ export const uuid: GeneratorDefinition = {
   },
 };
 
-/**
- * 生成 UUID v4
- */
 function generateUUIDv4(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -89,9 +65,6 @@ function generateUUIDv4(): string {
   });
 }
 
-/**
- * 生成 UUID v1（简化版本，模拟时间戳）
- */
 function generateUUIDv1(): string {
   const now = Date.now();
   const timeLow = (now & 0xffffffff).toString(16).padStart(8, '0');
@@ -105,9 +78,6 @@ function generateUUIDv1(): string {
   return `${timeLow}-${timeMid}-${timeHi.toString(16)}-${clockSeq.toString(16)}-${node}`;
 }
 
-/**
- * IPv4 生成器
- */
 export const ipv4: GeneratorDefinition = {
   id: 'ipv4',
   name: 'IPv4',
@@ -142,16 +112,10 @@ export const ipv4: GeneratorDefinition = {
   },
 };
 
-/**
- * 生成完全随机 IPv4
- */
 function generateRandomIPv4(): string {
   return Array.from({ length: 4 }, () => randomInt(0, 255)).join('.');
 }
 
-/**
- * 生成内网 IPv4
- */
 function generatePrivateIPv4(): string {
   const ranges = [
     { prefix: '10', second: () => randomInt(0, 255) },
@@ -166,9 +130,6 @@ function generatePrivateIPv4(): string {
   return `${range.prefix}.${range.second()}.${randomInt(1, 254)}.${randomInt(1, 254)}`;
 }
 
-/**
- * 生成公网 IPv4
- */
 function generatePublicIPv4(): string {
   let first: number;
   do {
@@ -178,9 +139,6 @@ function generatePublicIPv4(): string {
   return `${first}.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 254)}`;
 }
 
-/**
- * URL 生成器
- */
 export const url: GeneratorDefinition = {
   id: 'url',
   name: 'URL',
@@ -250,8 +208,6 @@ export const url: GeneratorDefinition = {
         path = `/${randomPick(['about', 'contact', 'products', 'services', 'blog'])}`;
       }
     }
-
-    // 添加查询参数
     let query = '';
     if (Math.random() > 0.5) {
       const params = new URLSearchParams();

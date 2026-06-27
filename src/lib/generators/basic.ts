@@ -1,27 +1,6 @@
-/**
- * 基础类型生成器
- * 包含：随机整数、随机浮点数、随机字符串、从列表选择
- */
-
 import type { GeneratorDefinition } from '@/types/testDataGenerator';
+import { randomInt, randomPick } from './random';
 
-/**
- * 生成随机整数
- */
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * 从数组中随机选择
- */
-function randomPick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-/**
- * 随机整数生成器
- */
 export const randomIntGenerator: GeneratorDefinition = {
   id: 'randomInt',
   name: '随机整数',
@@ -56,9 +35,6 @@ export const randomIntGenerator: GeneratorDefinition = {
   },
 };
 
-/**
- * 随机浮点数生成器
- */
 export const randomFloat: GeneratorDefinition = {
   id: 'randomFloat',
   name: '随机浮点数',
@@ -98,9 +74,6 @@ export const randomFloat: GeneratorDefinition = {
   },
 };
 
-/**
- * 随机字符串生成器
- */
 export const randomString: GeneratorDefinition = {
   id: 'randomString',
   name: '随机字符串',
@@ -179,9 +152,6 @@ export const randomString: GeneratorDefinition = {
   },
 };
 
-/**
- * 从列表选择生成器
- */
 export const fromList: GeneratorDefinition = {
   id: 'fromList',
   name: '从列表选择',

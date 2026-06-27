@@ -1,11 +1,6 @@
-/**
- * 个人信息生成器
- * 包含：中文姓名、邮箱、手机号、身份证号、中文地址、年龄
- */
-
 import type { GeneratorDefinition } from '@/types/testDataGenerator';
+import { randomInt, randomPick } from './random';
 
-// 中文姓氏
 const SURNAMES = [
   '王',
   '李',
@@ -59,7 +54,6 @@ const SURNAMES = [
   '阎',
 ];
 
-// 中文名字常用字
 const NAME_CHARS = [
   '伟',
   '芳',
@@ -113,10 +107,8 @@ const NAME_CHARS = [
   '慧',
 ];
 
-// 邮箱域名
 const EMAIL_DOMAINS = ['qq.com', '163.com', '126.com', 'gmail.com', 'outlook.com', 'hotmail.com'];
 
-// 省份
 const PROVINCES = [
   '北京市',
   '天津市',
@@ -152,7 +144,6 @@ const PROVINCES = [
   '新疆维吾尔自治区',
 ];
 
-// 城市
 const CITIES: Record<string, string[]> = {
   北京市: ['东城区', '西城区', '朝阳区', '海淀区'],
   上海市: ['黄浦区', '徐汇区', '长宁区', '静安区'],
@@ -162,23 +153,6 @@ const CITIES: Record<string, string[]> = {
   四川省: ['成都市', '绵阳市', '德阳市', '宜宾市'],
 };
 
-/**
- * 生成随机整数
- */
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * 从数组中随机选择
- */
-function randomPick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-/**
- * 中文姓名生成器
- */
 export const chineseName: GeneratorDefinition = {
   id: 'chineseName',
   name: '中文姓名',
@@ -192,9 +166,6 @@ export const chineseName: GeneratorDefinition = {
   },
 };
 
-/**
- * 邮箱生成器
- */
 export const email: GeneratorDefinition = {
   id: 'email',
   name: '邮箱',
@@ -221,9 +192,6 @@ export const email: GeneratorDefinition = {
   },
 };
 
-/**
- * 手机号生成器
- */
 export const chinesePhone: GeneratorDefinition = {
   id: 'chinesePhone',
   name: '手机号',
@@ -254,9 +222,6 @@ export const chinesePhone: GeneratorDefinition = {
   },
 };
 
-/**
- * 身份证号生成器
- */
 export const idCard: GeneratorDefinition = {
   id: 'idCard',
   name: '身份证号',
@@ -281,20 +246,12 @@ export const idCard: GeneratorDefinition = {
   generate: (params) => {
     const regions = ['110101', '310101', '440103', '440305', '510104', '330102'];
     const region = params.region === 'random' ? randomPick(regions) : (params.region as string);
-
-    // 出生日期 1960-2005年
     const year = randomInt(1960, 2005);
     const month = String(randomInt(1, 12)).padStart(2, '0');
     const day = String(randomInt(1, 28)).padStart(2, '0');
     const birthday = `${year}${month}${day}`;
-
-    // 顺序码
     const sequence = String(randomInt(1, 999)).padStart(3, '0');
-
-    // 前17位
     const prefix17 = region + birthday + sequence;
-
-    // 校验码
     const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
     const checkCodes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
     let sum = 0;
@@ -330,9 +287,6 @@ export const idCard: GeneratorDefinition = {
   },
 };
 
-/**
- * 中文地址生成器
- */
 export const chineseAddress: GeneratorDefinition = {
   id: 'chineseAddress',
   name: '中文地址',
@@ -361,9 +315,6 @@ export const chineseAddress: GeneratorDefinition = {
   },
 };
 
-/**
- * 年龄生成器
- */
 export const age: GeneratorDefinition = {
   id: 'age',
   name: '年龄',
@@ -415,9 +366,6 @@ export const age: GeneratorDefinition = {
   },
 };
 
-/**
- * 正态分布随机数
- */
 function normalRandom(min: number, max: number): number {
   const mean = (min + max) / 2;
   const stdDev = (max - min) / 6;
@@ -430,9 +378,6 @@ function normalRandom(min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-/**
- * 人口统计分布随机数（模拟真实年龄分布）
- */
 function demographicRandom(): number {
   const ageGroups = [
     { min: 0, max: 14, weight: 0.18 },

@@ -1,10 +1,10 @@
-import { useI18n } from '@/utils/chromeI18n';
-import JsonDiffInput from './JsonDiffInput';
-import DiffResult from './DiffResult';
-import DiffNavigator from './DiffNavigator';
-import JsonFormatSection from './JsonFormatSection';
-import JsonConvertSection from './JsonConvertSection';
+import JsonDiffInput from './components/JsonDiffInput';
+import DiffResult from './components/DiffResult';
+import DiffNavigator from './components/DiffNavigator';
+import JsonFormatSection from './components/JsonFormatSection';
+import JsonConvertSection from './components/JsonConvertSection';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
+import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import { useJsonTools } from './useJsonTools';
 import type { JsonToolsPageMode } from '@/types/storage';
 import type { ViewMode } from './types';
@@ -12,7 +12,6 @@ import type { ViewMode } from './types';
 type PageMode = JsonToolsPageMode;
 
 export default function Index() {
-  const { t } = useI18n(['jsonDiff', 'jsonFormat']);
   const {
     pageMode,
     setPageMode,
@@ -41,11 +40,11 @@ export default function Index() {
         value={pageMode}
         onChange={(v: PageMode) => setPageMode(v)}
         options={[
-          { value: 'diff', label: t('jsonFormat:diffMode') },
-          { value: 'format', label: t('jsonFormat:formatMode') },
-          { value: 'yaml', label: t('jsonFormat:yamlMode') },
-          { value: 'toml', label: t('jsonFormat:tomlMode') },
-          { value: 'minify', label: t('jsonFormat:minifyMode') },
+          { value: 'diff', label: '差异比较' },
+          { value: 'format', label: '格式化' },
+          { value: 'yaml', label: 'YAML' },
+          { value: 'toml', label: 'TOML' },
+          { value: 'minify', label: '压缩' },
         ]}
         size="small"
         className="w-full sm:w-auto"
@@ -58,8 +57,8 @@ export default function Index() {
               value={viewMode}
               onChange={(v: ViewMode) => setViewMode(v)}
               options={[
-                { value: 'sideBySide', label: t('jsonDiff:sideBySideMode') },
-                { value: 'unified', label: t('jsonDiff:unifiedMode') },
+                { value: 'sideBySide', label: '并排' },
+                { value: 'unified', label: '统一' },
               ]}
               size="small"
             />
@@ -67,16 +66,16 @@ export default function Index() {
 
           <div className="flex flex-col md:flex-row gap-4 w-full items-stretch">
             <JsonDiffInput
-              label={t('jsonDiff:leftLabel')}
-              placeholder={t('jsonDiff:leftPlaceholder')}
+              label="原始 JSON"
+              placeholder="输入原始 JSON..."
               value={leftInput}
               onChange={setLeftInput}
               error={leftError}
               minRows={9}
             />
             <JsonDiffInput
-              label={t('jsonDiff:rightLabel')}
-              placeholder={t('jsonDiff:rightPlaceholder')}
+              label="目标 JSON"
+              placeholder="输入目标 JSON..."
               value={rightInput}
               onChange={setRightInput}
               error={rightError}
@@ -97,21 +96,21 @@ export default function Index() {
               <DiffResult result={diffResult} viewMode={viewMode} activePath={activePath} />
             </div>
           ) : (
-            <div className="p-8 rounded-xl bg-muted/30 border border-dashed border-border/80 text-center flex flex-col items-center justify-center min-h-[140px]">
-              <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide max-w-[260px] leading-relaxed">
-                {leftError || rightError ? t('jsonDiff:fixErrorHint') : t('jsonDiff:emptyHint')}
-              </p>
-            </div>
+            <EmptyPlaceholder className="min-h-[140px]" messageClassName="max-w-[260px]">
+              {leftError || rightError
+                ? '请修正上方 JSON 的语法错误以开启实时流式比对'
+                : '输入两侧 JSON 后点击比较'}
+            </EmptyPlaceholder>
           )}
         </div>
       ) : pageMode === 'format' ? (
         <JsonFormatSection />
       ) : pageMode === 'yaml' ? (
-        <JsonConvertSection translationPrefix="yaml" convertFunction={yamlConvert} />
+        <JsonConvertSection mode="yaml" convertFunction={yamlConvert} />
       ) : pageMode === 'toml' ? (
-        <JsonConvertSection translationPrefix="toml" convertFunction={tomlConvert} />
+        <JsonConvertSection mode="toml" convertFunction={tomlConvert} />
       ) : (
-        <JsonConvertSection translationPrefix="minify" convertFunction={minifyConvert} />
+        <JsonConvertSection mode="minify" convertFunction={minifyConvert} />
       )}
     </div>
   );

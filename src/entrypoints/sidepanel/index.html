@@ -4,6 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Testing Tools - Side Panel</title>
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem('snapshot/app/themeMode');
+          var mode = raw ? JSON.parse(raw) : 'system';
+          if (mode !== 'light' && mode !== 'dark' && mode !== 'system') mode = 'system';
+          var isDark =
+            mode === 'dark' ||
+            (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) document.documentElement.classList.add('dark');
+        } catch (_error) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

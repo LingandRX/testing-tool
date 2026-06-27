@@ -166,4 +166,18 @@ describe('useStorageState', () => {
 
     expect(result.current[2]).toBe(false);
   });
+
+  it('加载失败时不应把快照默认值写回 Chrome Storage', async () => {
+    localStorage.setItem('snapshot/app/searchHistory', JSON.stringify([]));
+
+    (storageUtil.get as any).mockRejectedValue(new Error('Storage read failed'));
+
+    renderHook(() =>
+      useStorageState('app/searchHistory', [], (val): val is string[] => Array.isArray(val)),
+    );
+
+    await waitFor(() => {
+      expect(storageUtil.set).not.toHaveBeenCalled();
+    });
+  });
 });

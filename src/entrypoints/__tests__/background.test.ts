@@ -36,7 +36,7 @@ describe('background 菜单注册与分流', () => {
       expect(chrome.contextMenus.create).toHaveBeenCalledWith(
         expect.objectContaining({
           id: 'jwt',
-          title: '🔑 解析 JWT',
+          title: '解析 JWT',
           parentId: 'testing-tools-parent',
         }),
       );
@@ -48,7 +48,7 @@ describe('background 菜单注册与分流', () => {
       expect(chrome.contextMenus.create).toHaveBeenCalledWith(
         expect.objectContaining({
           id: 'qrCode-page',
-          title: '🔗 网页链接转二维码',
+          title: '网页链接转二维码',
           contexts: ['page'],
         }),
       );

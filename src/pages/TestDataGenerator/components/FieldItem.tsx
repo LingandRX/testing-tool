@@ -3,7 +3,6 @@
  * 展示单个字段的基本信息，适配固定高度卡片
  */
 
-import { useI18n } from '@/utils/chromeI18n';
 import { getGeneratorById } from '@/lib/generators';
 import { Badge } from '@/components/ui/badge';
 import type { FieldConfig } from '@/types/testDataGenerator';
@@ -14,7 +13,6 @@ interface FieldItemProps {
 }
 
 export default function FieldItem({ field, onClick }: FieldItemProps) {
-  const { t } = useI18n('testDataGenerator');
   const generator = getGeneratorById(field.generatorId);
 
   return (
@@ -25,7 +23,6 @@ export default function FieldItem({ field, onClick }: FieldItemProps) {
       <div
         className={`h-full ${field.description ? 'flex flex-col justify-center' : 'flex items-center'}`}
       >
-        {/* 第一行：字段名 + 标签 */}
         <div className="flex items-center gap-1.5 overflow-hidden">
           <span className="font-medium text-sm text-foreground truncate shrink-0 max-w-[140px]">
             {field.name}
@@ -43,11 +40,10 @@ export default function FieldItem({ field, onClick }: FieldItemProps) {
           )}
           {field.unique && (
             <Badge variant="outline" className="text-[10px] shrink-0 px-1 py-0 text-blue-500">
-              {t('testDataGenerator_unique')}
+              唯一
             </Badge>
           )}
         </div>
-        {/* 第二行：描述 */}
         {field.description && (
           <p className="text-[11px] text-muted-foreground mt-0.5 truncate leading-tight">
             {field.description}

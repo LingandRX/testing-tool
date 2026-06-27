@@ -2,8 +2,6 @@
  * Base64 转换器工具函数
  */
 
-import { formatBytes } from './format';
-
 /** 最大文件大小限制（10 MB） */
 export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -167,12 +165,12 @@ export function isSupportedImageExtension(fileName: string): boolean {
 export function fileToBase64(file: File): Promise<FileToBase64Result> {
   return new Promise((resolve, reject) => {
     if (!file) {
-      reject(new Error('No file provided'));
+      reject(new Error('未提供文件'));
       return;
     }
 
     if (!isFileSizeValid(file.size)) {
-      reject(new Error(`File size exceeds the limit (${MAX_FILE_SIZE / 1024 / 1024} MB)`));
+      reject(new Error(`文件大小超出限制（最大 ${MAX_FILE_SIZE / 1024 / 1024} MB）`));
       return;
     }
 
@@ -194,7 +192,7 @@ export function fileToBase64(file: File): Promise<FileToBase64Result> {
     };
 
     reader.onerror = () => {
-      reject(new Error('Failed to read file'));
+      reject(new Error('读取文件失败'));
     };
 
     reader.readAsDataURL(file);
@@ -210,17 +208,6 @@ export function fileToBase64(file: File): Promise<FileToBase64Result> {
 export function extractMimeTypeFromDataUri(dataUri: string): string {
   const match = dataUri.match(/^data:([^;,]+)[^,]*;base64,/);
   return match ? match[1] : 'application/octet-stream';
-}
-
-/**
- * 格式化文件大小显示
- *
- * @deprecated 直接使用 {@link formatBytes} 代替
- * @param bytes 字节数
- * @returns 格式化后的字符串
- */
-export function formatFileSize(bytes: number): string {
-  return formatBytes(bytes);
 }
 
 /**
@@ -309,7 +296,7 @@ export function base64ToBlob(input: string): Base64ToBlobResult {
   const cleaned = prefixMatch ? trimmed.slice(prefixMatch[0].length) : trimmed;
 
   if (!isValidBase64(cleaned)) {
-    throw new Error('Invalid Base64 string');
+    throw new Error('无效的 Base64 字符串');
   }
 
   const bytes = base64ToBytes(cleaned);

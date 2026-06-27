@@ -9,27 +9,26 @@ import {
 
 describe('features', () => {
   describe('FEATURES', () => {
-    it('should have 10 features defined', () => {
+    it('应该有10个功能定义', () => {
       expect(FEATURES).toHaveLength(10);
     });
 
-    it('should have all required properties for each feature', () => {
+    it('应该有每个功能的所有必需属性', () => {
       FEATURES.forEach((feature) => {
         expect(feature).toHaveProperty('key');
-        expect(feature).toHaveProperty('labelKey');
-        expect(feature).toHaveProperty('descriptionKey');
+        expect(feature).toHaveProperty('label');
+        expect(feature).toHaveProperty('description');
         expect(feature).toHaveProperty('defaultVisible');
         expect(feature).toHaveProperty('components');
         expect(typeof feature.key).toBe('string');
-        expect(typeof feature.labelKey).toBe('string');
-        expect(typeof feature.descriptionKey).toBe('string');
+        expect(typeof feature.label).toBe('string');
+        expect(typeof feature.description).toBe('string');
         expect(typeof feature.defaultVisible).toBe('boolean');
         expect(typeof feature.components).toBe('object');
         expect(feature.components).toHaveProperty('popup');
         expect(feature.components).toHaveProperty('sidepanel');
         expect(feature.components).toHaveProperty('tab');
 
-        // Optional UI properties for non-hidden features
         if (feature.key !== 'dashboard') {
           expect(feature).toHaveProperty('icon');
           expect(feature).toHaveProperty('themeColorKey');
@@ -38,7 +37,7 @@ describe('features', () => {
       });
     });
 
-    it('should have unique keys for each feature', () => {
+    it('应该有每个功能的唯一key', () => {
       const keys = FEATURES.map((f) => f.key);
       const uniqueKeys = new Set(keys);
       expect(uniqueKeys.size).toBe(keys.length);
@@ -46,36 +45,36 @@ describe('features', () => {
   });
 
   describe('getFeatureByKey', () => {
-    it('should return dashboard feature', () => {
+    it('应该返回dashboard功能', () => {
       const feature = getFeatureByKey('dashboard');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('dashboard');
-      expect(feature?.labelKey).toBe('dashboard_title');
+      expect(feature?.label).toBe('仪表盘');
     });
 
-    it('should return timestamp feature', () => {
+    it('应该返回时间戳功能', () => {
       const feature = getFeatureByKey('timestamp');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('timestamp');
-      expect(feature?.labelKey).toBe('timestamp_title');
+      expect(feature?.label).toBe('时间戳');
       expect(feature?.themeColorKey).toBeDefined();
     });
 
-    it('should return storageCleaner feature', () => {
+    it('应该返回存储清理功能', () => {
       const feature = getFeatureByKey('storageCleaner');
       expect(feature).toBeDefined();
       expect(feature?.key).toBe('storageCleaner');
-      expect(feature?.labelKey).toBe('storageCleaner_title');
+      expect(feature?.label).toBe('存储清理');
     });
 
-    it('should return undefined for invalid key', () => {
+    it('应该返回undefined用于无效的key', () => {
       const feature = getFeatureByKey('invalid' as any);
       expect(feature).toBeUndefined();
     });
   });
 
   describe('getDefaultVisibleFeatureKeys', () => {
-    it('should return only visible features', () => {
+    it('应该返回仅可见的功能', () => {
       const visibleKeys = getDefaultVisibleFeatureKeys();
       visibleKeys.forEach((key) => {
         const feature = getFeatureByKey(key);
@@ -83,7 +82,7 @@ describe('features', () => {
       });
     });
 
-    it('should include dashboard, timestamp, storageCleaner, qrCode', () => {
+    it('应该包含仪表盘、时间戳、存储清理、二维码', () => {
       const visibleKeys = getDefaultVisibleFeatureKeys();
       expect(visibleKeys).toContain('dashboard');
       expect(visibleKeys).toContain('timestamp');
@@ -93,7 +92,7 @@ describe('features', () => {
   });
 
   describe('getAllFeatureKeys', () => {
-    it('should return all feature keys', () => {
+    it('应该返回所有功能key', () => {
       const allKeys = getAllFeatureKeys();
       expect(allKeys).toHaveLength(10);
       expect(allKeys).toContain('dashboard');
@@ -102,7 +101,7 @@ describe('features', () => {
       expect(allKeys).toContain('qrCode');
       expect(allKeys).toContain('textStatistics');
       expect(allKeys).toContain('jwt');
-      expect(allKeys).toContain('jsonDiff');
+      expect(allKeys).toContain('jsonTools');
       expect(allKeys).toContain('base64Converter');
       expect(allKeys).toContain('rightClickRestorer');
       expect(allKeys).toContain('testDataGenerator');
@@ -110,19 +109,19 @@ describe('features', () => {
   });
 
   describe('getDefaultPageOrder', () => {
-    it('should exclude dashboard from page order', () => {
+    it('应该排除仪表盘从页面顺序', () => {
       const pageOrder = getDefaultPageOrder();
       expect(pageOrder).not.toContain('dashboard');
     });
 
-    it('should include timestamp, storageCleaner, qrCode in page order', () => {
+    it('应该包含时间戳、存储清理、二维码在页面顺序', () => {
       const pageOrder = getDefaultPageOrder();
       expect(pageOrder).toContain('timestamp');
       expect(pageOrder).toContain('storageCleaner');
       expect(pageOrder).toContain('qrCode');
     });
 
-    it('should have 9 items in page order', () => {
+    it('应该有9个项目在页面顺序', () => {
       const pageOrder = getDefaultPageOrder();
       expect(pageOrder).toHaveLength(9);
     });

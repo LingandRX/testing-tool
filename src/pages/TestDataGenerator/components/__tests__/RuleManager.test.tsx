@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 // Mock dependencies
 vi.mock('@/utils/ruleStorage', () => ({
+  MAX_RULES: 20,
   getAll: vi.fn(() => []),
   save: vi.fn(),
   deleteRule: vi.fn(),
@@ -87,8 +88,7 @@ describe('RuleManager', () => {
 
     expect(defaultProps.onLoad).toHaveBeenCalledWith(mockFields);
     expect(mockedRuleStorage.recordUse).toHaveBeenCalledWith('rule-1');
-    // Note: t() mock doesn't handle placeholders, so we just check it was called
-    expect(mockedToast.success).toHaveBeenCalled();
+    expect(mockedToast.success).toHaveBeenCalledWith('已加载规则「Test Rule」');
   });
 
   it('should show delete confirmation dialog', async () => {
@@ -100,7 +100,7 @@ describe('RuleManager', () => {
     const deleteButton = screen.getByTitle('删除');
     await user.click(deleteButton);
 
-    expect(screen.getByText(/确定要删除规则/)).toBeInTheDocument();
+    expect(screen.getByText('确定要删除规则「Test Rule」吗？此操作不可撤销。')).toBeInTheDocument();
   });
 
   it('should delete rule after confirmation', async () => {
@@ -176,6 +176,26 @@ describe('RuleManager', () => {
     expect(mockCreateObjectURL).toHaveBeenCalled();
 
     vi.restoreAllMocks();
+  });
+
+  it('should call onEdit when edit button clicked', async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    mockedRuleStorage.getAll.mockReturnValue([mockRule]);
+
+    render(<RuleManager {...defaultProps} onEdit={onEdit} />);
+
+    await user.click(screen.getByTitle('编辑'));
+
+    expect(onEdit).toHaveBeenCalledWith(mockRule);
+  });
+
+  it('should show saved rule count', () => {
+    mockedRuleStorage.getAll.mockReturnValue([mockRule]);
+
+    render(<RuleManager {...defaultProps} />);
+
+    expect(screen.getByText('已保存 1/20 条')).toBeInTheDocument();
   });
 
   it('should show field count for each rule', () => {
