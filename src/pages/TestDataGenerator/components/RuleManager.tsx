@@ -20,7 +20,6 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useI18n } from '@/utils/chromeI18n';
 import * as ruleStorage from '@/utils/ruleStorage';
 import type { DataRule, FieldConfig } from '@/types/testDataGenerator';
 
@@ -31,7 +30,6 @@ interface RuleManagerProps {
 }
 
 export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleManagerProps) {
-  const { t, i18n } = useI18n('testDataGenerator');
   const [rules, setRules] = useState<DataRule[]>(() => ruleStorage.getAll());
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
@@ -64,9 +62,9 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
       onLoad(rule.fields);
       ruleStorage.recordUse(rule.id);
       loadRules();
-      toast.success(t('testDataGenerator_ruleLoaded', { name: rule.name }));
+      toast.success(`已加载规则「${rule.name}」`);
     },
-    [onLoad, loadRules, t],
+    [onLoad, loadRules],
   );
 
   const handleDelete = useCallback(() => {
@@ -74,20 +72,20 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
     ruleStorage.deleteRule(ruleToDelete.id);
     loadRules();
     setRuleToDelete(null);
-    toast.success(t('testDataGenerator_ruleDeleted'));
+    toast.success('规则已删除');
     onRulesChanged?.();
-  }, [ruleToDelete, loadRules, t, onRulesChanged]);
+  }, [ruleToDelete, loadRules, onRulesChanged]);
 
   const handleDuplicate = useCallback(
     (id: string) => {
-      const result = ruleStorage.duplicate(id, t('testDataGenerator_ruleCopySuffix'));
+      const result = ruleStorage.duplicate(id, '（副本）');
       if (result) {
         loadRules();
-        toast.success(t('testDataGenerator_ruleDuplicated'));
+        toast.success('规则已复制');
         onRulesChanged?.();
       }
     },
-    [loadRules, t, onRulesChanged],
+    [loadRules, onRulesChanged],
   );
 
   const handleEdit = useCallback(
@@ -113,14 +111,14 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
       } finally {
         URL.revokeObjectURL(url);
       }
-      toast.success(t('testDataGenerator_exportSuccess'));
+      toast.success('规则已导出');
     } catch (error) {
       console.error('[RuleManager] 导出失败:', error);
-      toast.error(t('testDataGenerator_exportFailed'));
+      toast.error('导出失败');
     } finally {
       setIsExporting(false);
     }
-  }, [t]);
+  }, []);
 
   const handleImport = useCallback(() => {
     const input = document.createElement('input');
@@ -136,11 +134,11 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
         const result = ruleStorage.importRules(text);
 
         if (result.success > 0) {
-          toast.success(t('testDataGenerator_importSuccess', { count: result.success }));
+          toast.success(`成功导入 ${result.success} 条规则`);
         }
 
         if (result.failed > 0) {
-          toast.error(t('testDataGenerator_importFailed', { count: result.failed }));
+          toast.error(`${result.failed} 条规则导入失败`);
           console.warn('[RuleManager] 导入警告:', result.errors);
         }
 
@@ -148,29 +146,25 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
         onRulesChanged?.();
       } catch (error) {
         console.error('[RuleManager] 导入失败:', error);
-        toast.error(t('testDataGenerator_importFailed'));
+        toast.error('规则导入失败');
       } finally {
         setIsImporting(false);
       }
     };
     input.click();
-  }, [loadRules, t, onRulesChanged]);
+  }, [loadRules, onRulesChanged]);
 
-  const formatDate = useCallback(
-    (timestamp: number) => {
-      return new Date(timestamp).toLocaleDateString(i18n.language || 'zh-CN', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    },
-    [i18n.language],
-  );
+  const formatDate = useCallback((timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString('zh-CN', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }, []);
 
   return (
     <div className="space-y-4">
-      {/* 删除确认对话框 */}
       <Dialog open={!!ruleToDelete} onOpenChange={() => setRuleToDelete(null)}>
         <DialogContent
           showCloseButton={false}
@@ -178,21 +172,20 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
         >
           <div className="flex-1 overflow-y-auto px-6 pb-4">
             <p className="text-sm text-muted-foreground">
-              {t('testDataGenerator_confirmDeleteDescription', { name: ruleToDelete?.name ?? '' })}
+              {ruleToDelete && `确定要删除规则「${ruleToDelete.name}」吗？此操作不可撤销。`}
             </p>
           </div>
           <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
             <Button variant="ghost" size="sm" onClick={() => setRuleToDelete(null)}>
-              {t('testDataGenerator_cancel')}
+              取消
             </Button>
             <Button variant="destructive" size="sm" onClick={handleDelete}>
-              {t('testDataGenerator_confirm')}
+              确认
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* 工具栏 */}
       <div className="flex items-center gap-2 flex-wrap">
         <Button
           variant="outline"
@@ -206,7 +199,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
           ) : (
             <Upload className="h-4 w-4" />
           )}
-          {t('testDataGenerator_import')}
+          导入
         </Button>
         <Button
           variant="outline"
@@ -220,34 +213,30 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
           ) : (
             <Download className="h-4 w-4" />
           )}
-          {t('testDataGenerator_export')}
+          导出数据
         </Button>
       </div>
 
-      {/* 搜索框 */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value.slice(0, 20))}
-          placeholder={t('testDataGenerator_searchRules')}
+          placeholder="搜索规则..."
           className="pl-9 pr-24 h-9"
           maxLength={20}
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
-          {t('testDataGenerator_ruleCount', { count: rules.length, max: 20 })}
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none tabular-nums">
+          {`已保存 ${rules.length}/${ruleStorage.MAX_RULES} 条`}
         </span>
       </div>
 
-      {/* 规则列表 */}
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {filteredRules.length === 0 ? (
           <div className="text-center py-6">
             <Tag className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">
-              {debouncedSearchQuery
-                ? t('testDataGenerator_noSearchResults')
-                : t('testDataGenerator_noRules')}
+              {debouncedSearchQuery ? '未找到匹配的规则' : '暂无保存的规则'}
             </p>
           </div>
         ) : (
@@ -259,9 +248,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-sm text-foreground truncate">{rule.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {rule.fields.length} {t('testDataGenerator_fields')}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{rule.fields.length} 字段</span>
                 </div>
                 {rule.description && (
                   <p className="text-xs text-muted-foreground truncate mt-0.5">
@@ -273,7 +260,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                     <Clock className="h-3 w-3" />
                     {formatDate(rule.updatedAt)}
                   </span>
-                  <span>{t('testDataGenerator_usedTimes', { count: rule.useCount })}</span>
+                  <span>{`使用 ${rule.useCount} 次`}</span>
                 </div>
               </div>
 
@@ -283,7 +270,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                   size="icon"
                   className="h-7 w-7"
                   onClick={() => handleLoad(rule)}
-                  title={t('testDataGenerator_load')}
+                  title="加载"
                 >
                   <FolderOpen className="h-3.5 w-3.5" />
                 </Button>
@@ -292,7 +279,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                   size="icon"
                   className="h-7 w-7"
                   onClick={() => handleEdit(rule)}
-                  title={t('testDataGenerator_edit')}
+                  title="编辑"
                 >
                   <Edit className="h-3.5 w-3.5" />
                 </Button>
@@ -301,7 +288,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                   size="icon"
                   className="h-7 w-7"
                   onClick={() => handleDuplicate(rule.id)}
-                  title={t('testDataGenerator_duplicate')}
+                  title="复制"
                 >
                   <Copy className="h-3.5 w-3.5" />
                 </Button>
@@ -310,7 +297,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                   size="icon"
                   className="h-7 w-7 text-destructive hover:text-destructive"
                   onClick={() => setRuleToDelete(rule)}
-                  title={t('testDataGenerator_delete')}
+                  title="删除"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>

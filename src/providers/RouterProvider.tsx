@@ -16,6 +16,7 @@ import {
   getDefaultVisibleFeatureKeys,
 } from '@/config/features';
 import { CONTEXT_MENU_DATA_EXPIRY_MS, saveContextMenuData } from '@/utils/useContextMenuData';
+import { getSyncSnapshot } from '@/utils/syncSnapshot';
 
 const MAX_RECENTLY_USED = 3;
 
@@ -53,7 +54,7 @@ interface RouterContextType {
   recentlyUsedTools: PageType[];
   isLoaded: boolean;
   navigateTo: (page: PageType) => void;
-  goBack: () => void;
+  goHome: () => void;
   setVisiblePages: (pages: PageType[]) => void;
   setPageOrder: (pages: PageType[]) => void;
 }
@@ -68,28 +69,6 @@ interface RouterProviderProps {
   visiblePagesKey?: keyof StorageSchema;
   pageOrderKey?: keyof StorageSchema;
 }
-
-/**
- * 同步从 localStorage 获取存储快照（首屏 0 闪烁核心防线）
- */
-const getSyncSnapshot = <T,>(
-  key: string,
-  defaultValue: T,
-  validator?: (val: unknown) => val is T,
-): T => {
-  try {
-    const val = localStorage.getItem(`snapshot/${key}`);
-    if (!val) return defaultValue;
-    const parsed = JSON.parse(val) as unknown;
-    if (validator) {
-      return validator(parsed) ? parsed : defaultValue;
-    }
-    return (parsed as T) ?? defaultValue;
-  } catch (error) {
-    console.error('[Router Snapshot Error] Failed to read sync cache:', error);
-    return defaultValue;
-  }
-};
 
 export function RouterProvider({
   children,
@@ -125,16 +104,10 @@ export function RouterProvider({
     getSyncSnapshot('app/recentlyUsedTools', [], isValidPageList),
   );
 
-  const [isLoaded, setIsLoaded] = useState(() => {
-    const snapshotKey = localStorage.getItem(`snapshot/${syncKey as string}`);
-    const snapshotVisible = localStorage.getItem(`snapshot/${visiblePagesKey as string}`);
-    const snapshotOrder = localStorage.getItem(`snapshot/${pageOrderKey as string}`);
-    return !!(snapshotKey && snapshotVisible && snapshotOrder);
-  });
+  const [isLoaded, setIsLoaded] = useState(false);
+  const hasUserNavigatedRef = useRef(false);
+  const canPersistRef = useRef(false);
 
-  /**
-   * 从异步存储中安全溯源初始数据
-   */
   const loadInitialData = useCallback(async () => {
     try {
       const savedRoute = await storageUtil.get(syncKey, defaultRoute);
@@ -145,7 +118,7 @@ export function RouterProvider({
       const savedPageOrder = await storageUtil.get(pageOrderKey, getDefaultPageOrder());
       const savedRecentTools = await storageUtil.get('app/recentlyUsedTools', []);
 
-      if (isValidPage(savedRoute) && syncRoute) {
+      if (isValidPage(savedRoute) && syncRoute && !hasUserNavigatedRef.current) {
         setCurrentPage(savedRoute);
       }
       if (isValidPageList(savedVisiblePages)) {
@@ -157,9 +130,11 @@ export function RouterProvider({
       if (isValidPageList(savedRecentTools)) {
         setRecentlyUsedTools(savedRecentTools);
       }
-      setIsLoaded(true);
+      canPersistRef.current = true;
     } catch (error) {
       console.error('[Router Init Error] Core data fetch failed:', error);
+    } finally {
+      setIsLoaded(true);
     }
   }, [defaultRoute, syncKey, syncRoute, visiblePagesKey, pageOrderKey]);
 
@@ -171,7 +146,6 @@ export function RouterProvider({
       .then(() => {
         if (cancelled) return;
 
-        // Check URL params for context menu data
         if (typeof window !== 'undefined') {
           const params = new URLSearchParams(window.location.search);
           const feature = params.get('feature') as PageType | null;
@@ -191,9 +165,8 @@ export function RouterProvider({
           }
         }
 
-        // Check storage for pending context menu data
         storageUtil
-          .get('contextMenu/pendingData', undefined)
+          .get('contextMenu/pendingData')
           .then((pendingData) => {
             if (
               pendingData &&
@@ -213,8 +186,8 @@ export function RouterProvider({
   }, [loadInitialData]);
 
   useEffect(() => {
-    if (isLoaded && syncRoute) {
-      void storageUtil.set(syncKey, currentPage as PageType).catch(console.error);
+    if (isLoaded && canPersistRef.current && syncRoute) {
+      void storageUtil.set(syncKey, currentPage).catch(console.error);
       try {
         localStorage.setItem(`snapshot/${syncKey}`, JSON.stringify(currentPage));
       } catch (err) {
@@ -224,7 +197,7 @@ export function RouterProvider({
   }, [currentPage, isLoaded, syncRoute, syncKey]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && canPersistRef.current) {
       void storageUtil.set(visiblePagesKey, visiblePages).catch(console.error);
       try {
         localStorage.setItem(`snapshot/${visiblePagesKey}`, JSON.stringify(visiblePages));
@@ -235,7 +208,7 @@ export function RouterProvider({
   }, [visiblePages, isLoaded, visiblePagesKey]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && canPersistRef.current) {
       void storageUtil.set(pageOrderKey, pageOrder).catch(console.error);
       try {
         localStorage.setItem(`snapshot/${pageOrderKey}`, JSON.stringify(pageOrder));
@@ -246,7 +219,7 @@ export function RouterProvider({
   }, [pageOrder, isLoaded, pageOrderKey]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && canPersistRef.current) {
       void storageUtil.set('app/recentlyUsedTools', recentlyUsedTools).catch(console.error);
       try {
         localStorage.setItem('snapshot/app/recentlyUsedTools', JSON.stringify(recentlyUsedTools));
@@ -274,13 +247,13 @@ export function RouterProvider({
       if (changes[visiblePagesKey as string]) {
         const newPages = changes[visiblePagesKey as string].newValue;
         if (isValidPageList(newPages)) {
-          setVisiblePages(newPages);
+          setVisiblePages(mergeWithDefaults(newPages, getDefaultVisibleFeatureKeys()));
         }
       }
       if (changes[pageOrderKey as string]) {
         const newOrder = changes[pageOrderKey as string].newValue;
         if (isValidPageList(newOrder)) {
-          setPageOrder(newOrder);
+          setPageOrder(mergeWithDefaults(newOrder, getDefaultPageOrder()));
         }
       }
       if (changes['app/recentlyUsedTools']) {
@@ -309,6 +282,8 @@ export function RouterProvider({
   }, [syncRoute, syncKey, visiblePagesKey, pageOrderKey]);
 
   const navigateTo = (page: PageType) => {
+    hasUserNavigatedRef.current = true;
+    canPersistRef.current = true;
     setCurrentPage(page);
     setRecentlyUsedTools((prev) => {
       const filtered = prev.filter((p) => p !== page);
@@ -316,7 +291,9 @@ export function RouterProvider({
     });
   };
 
-  const goBack = () => {
+  const goHome = () => {
+    hasUserNavigatedRef.current = true;
+    canPersistRef.current = true;
     setCurrentPage('dashboard');
   };
 
@@ -329,7 +306,7 @@ export function RouterProvider({
         recentlyUsedTools,
         isLoaded,
         navigateTo,
-        goBack,
+        goHome,
         setVisiblePages,
         setPageOrder,
       }}
@@ -342,7 +319,7 @@ export function RouterProvider({
 export function useRouter() {
   const context = useContext(RouterContext);
   if (!context) {
-    throw new Error('useRouter must be used within a valid RouterProvider context wrapper');
+    throw new Error('useRouter must be used within RouterProvider');
   }
   return context;
 }

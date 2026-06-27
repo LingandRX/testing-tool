@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { StorageCleanerConfirm } from '@/pages/StorageCleaner/StorageCleanerConfirm';
+import { StorageCleanerConfirm } from '@/pages/StorageCleaner/components/StorageCleanerConfirm';
 import type { StorageCleanerOptions } from '@/types/storage';
 import React from 'react';
 
@@ -94,7 +94,7 @@ describe('StorageCleanerConfirm 组件', () => {
       renderComponent({ options: partialOptions });
 
       expect(screen.getByText(/Local Storage/)).toBeInTheDocument();
-      expect(screen.getByText(/站点存储/)).toBeInTheDocument();
+      expect(screen.getByText(/IndexedDB/)).toBeInTheDocument();
       expect(screen.queryByText(/Session Storage/)).not.toBeInTheDocument();
       expect(screen.queryByText(/Cookies$/)).not.toBeInTheDocument();
     });

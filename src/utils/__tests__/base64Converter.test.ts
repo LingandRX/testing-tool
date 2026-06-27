@@ -7,7 +7,6 @@ import {
   isSupportedImageType,
   isSupportedImageExtension,
   extractMimeTypeFromDataUri,
-  formatFileSize,
   base64ToBytes,
   sniffMimeFromBytes,
   base64ToBlob,
@@ -185,26 +184,6 @@ describe('extractMimeTypeFromDataUri', () => {
   });
 });
 
-describe('formatFileSize', () => {
-  it('应该格式化字节', () => {
-    expect(formatFileSize(0)).toBe('0 B');
-    expect(formatFileSize(512)).toBe('512 B');
-  });
-
-  it('应该格式化 KB', () => {
-    expect(formatFileSize(1024)).toBe('1.0 KB');
-    expect(formatFileSize(1536)).toBe('1.5 KB');
-  });
-
-  it('应该格式化 MB', () => {
-    expect(formatFileSize(1048576)).toBe('1.00 MB');
-  });
-
-  it('应该格式化 GB', () => {
-    expect(formatFileSize(1073741824)).toBe('1.00 GB');
-  });
-});
-
 describe('base64ToBytes', () => {
   it('应该解码标准 ASCII Base64 为字节序列', () => {
     const bytes = base64ToBytes('aGVsbG8=');
@@ -337,7 +316,7 @@ describe('base64ToBlob', () => {
   });
 
   it('应该对非法 Base64 抛出 Invalid Base64 string', () => {
-    expect(() => base64ToBlob('这不是 base64!')).toThrow('Invalid Base64 string');
+    expect(() => base64ToBlob('这不是 base64!')).toThrow('无效的 Base64 字符串');
   });
 
   it('应该返回原始 Base64（已去除 data URI 前缀）', () => {

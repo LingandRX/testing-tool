@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { browser } from 'wxt/browser';
 import { RouterProvider, useRouter } from '@/providers/RouterProvider';
 import { storageUtil } from '@/utils/chromeStorage';
 
@@ -155,7 +156,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
     const oldPageOrder = [
       'timestamp',
@@ -163,7 +164,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
 
     (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) => {
@@ -195,7 +196,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
     const oldPageOrder = [
       'timestamp',
@@ -203,7 +204,7 @@ describe('RouterProvider', () => {
       'qrCode',
       'textStatistics',
       'jwt',
-      'jsonDiff',
+      'jsonTools',
     ];
     localStorage.setItem('snapshot/app/visiblePages', JSON.stringify(oldVisiblePages));
     localStorage.setItem('snapshot/app/pageOrder', JSON.stringify(oldPageOrder));
@@ -222,6 +223,149 @@ describe('RouterProvider', () => {
     const pageOrder = screen.getByTestId('page-order').textContent!;
     expect(visiblePages).toBeDefined();
     expect(pageOrder).toBeDefined();
+  });
+
+  it('storage.onChanged 同步 visiblePages 时应合并缺失的新功能', async () => {
+    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: unknown) =>
+      Promise.resolve(defaultValue),
+    );
+
+    render(
+      <RouterProvider visiblePagesKey="app/popupVisiblePages" pageOrderKey="app/popupPageOrder">
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await waitFor(() => {
+      expect(browser.storage.onChanged.addListener).toHaveBeenCalled();
+    });
+
+    const storageChangeHandler = vi.mocked(browser.storage.onChanged.addListener).mock
+      .calls[0][0] as (changes: Record<string, { newValue?: unknown }>) => void;
+
+    const oldVisiblePages = [
+      'dashboard',
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonTools',
+    ];
+    const oldPageOrder = [
+      'timestamp',
+      'storageCleaner',
+      'qrCode',
+      'textStatistics',
+      'jwt',
+      'jsonTools',
+    ];
+
+    await act(async () => {
+      storageChangeHandler({
+        'app/popupVisiblePages': { newValue: oldVisiblePages },
+        'app/popupPageOrder': { newValue: oldPageOrder },
+      });
+    });
+
+    await waitFor(() => {
+      const visiblePages = screen.getByTestId('visible-pages').textContent!;
+      const pageOrder = screen.getByTestId('page-order').textContent!;
+
+      expect(visiblePages.startsWith('dashboard,timestamp')).toBe(true);
+      expect(pageOrder.startsWith('timestamp,storageCleaner')).toBe(true);
+    });
+  });
+
+  it('localStorage 快照过期时，loadInitialData 完成前不应覆盖 chrome.storage', async () => {
+    const staleRoute = 'timestamp';
+    const correctRoute = 'jsonTools';
+    const defaultVisible = ['dashboard', 'timestamp', 'storageCleaner'];
+    const defaultOrder = ['timestamp', 'storageCleaner'];
+
+    localStorage.setItem('snapshot/app/currentRoute', JSON.stringify(staleRoute));
+    localStorage.setItem('snapshot/app/visiblePages', JSON.stringify(defaultVisible));
+    localStorage.setItem('snapshot/app/pageOrder', JSON.stringify(defaultOrder));
+
+    const storage = new Map<string, unknown>([
+      ['app/currentRoute', correctRoute],
+      ['app/visiblePages', defaultVisible],
+      ['app/pageOrder', defaultOrder],
+      ['app/recentlyUsedTools', []],
+    ]);
+
+    let resolveGet: () => void;
+    const getBlocked = new Promise<void>((resolve) => {
+      resolveGet = resolve;
+    });
+
+    (storageUtil.get as any).mockImplementation(async (key: string, defaultValue: unknown) => {
+      await getBlocked;
+      return storage.get(key) ?? defaultValue;
+    });
+    (storageUtil.set as any).mockImplementation(async (key: string, value: unknown) => {
+      storage.set(key, value);
+    });
+
+    render(
+      <RouterProvider>
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    expect(screen.getByTestId('current-page')).toHaveTextContent(staleRoute);
+    expect(storageUtil.set).not.toHaveBeenCalledWith('app/currentRoute', staleRoute);
+
+    resolveGet!();
+    await waitFor(() => {
+      expect(screen.getByTestId('current-page')).toHaveTextContent(correctRoute);
+      expect(storage.get('app/currentRoute')).toBe(correctRoute);
+    });
+  });
+
+  it('初始化失败时仍应解除加载状态以便渲染页面', async () => {
+    (storageUtil.get as any).mockRejectedValue(new Error('Storage unavailable'));
+
+    render(
+      <RouterProvider>
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
+    });
+    expect(storageUtil.set).not.toHaveBeenCalled();
+  });
+
+  it('用户在 loadInitialData 完成前导航时不应被存储路由覆盖', async () => {
+    let resolveGet: () => void;
+    const getBlocked = new Promise<void>((resolve) => {
+      resolveGet = resolve;
+    });
+
+    (storageUtil.get as any).mockImplementation(async (key: string, defaultValue: unknown) => {
+      await getBlocked;
+      if (key === 'app/currentRoute') return 'dashboard';
+      return defaultValue;
+    });
+
+    render(
+      <RouterProvider>
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('navigate-btn'));
+    });
+    expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
+
+    resolveGet!();
+    await waitFor(() => {
+      expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
+      expect(storageUtil.set).toHaveBeenCalledWith('app/currentRoute', 'timestamp');
+    });
   });
 
   it('组件卸载时不应设置 isLoaded 状态（竞态条件防护）', async () => {

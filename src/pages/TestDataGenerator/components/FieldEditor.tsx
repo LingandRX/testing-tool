@@ -1,11 +1,10 @@
 /**
  * 字段编辑器组件
- * 编辑单个字段的详细配置
  */
 
 import { useState, useCallback } from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { getGeneratorById } from '@/lib/generators';
@@ -16,12 +15,10 @@ import GeneratorConfig from './GeneratorConfig';
 interface FieldEditorProps {
   field: FieldConfig;
   onChange: (field: FieldConfig) => void;
-  /** 所有字段名列表，用于检测重复 */
   allFieldNames?: string[];
 }
 
 export default function FieldEditor({ field, onChange, allFieldNames = [] }: FieldEditorProps) {
-  const { t } = useI18n('testDataGenerator');
   const generator = getGeneratorById(field.generatorId);
   const [nameError, setNameError] = useState<string | null>(null);
 
@@ -29,25 +26,24 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
     (name: string): string | null => {
       const trimmed = name.trim();
       if (!trimmed) {
-        return t('testDataGenerator_fieldNameEmpty');
+        return '字段名称不能为空';
       }
       if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(trimmed)) {
-        return t('testDataGenerator_fieldNameInvalid');
+        return '字段名称只能包含字母、数字和下划线';
       }
       const isDuplicate = allFieldNames.some(
         (n, i) => n === trimmed && i !== allFieldNames.indexOf(field.name),
       );
       if (isDuplicate) {
-        return t('testDataGenerator_fieldNameDuplicate');
+        return '字段名称已存在';
       }
       return null;
     },
-    [allFieldNames, field.name, t],
+    [allFieldNames, field.name],
   );
 
   const handleNameChange = (name: string) => {
     onChange({ ...field, name });
-    // 实时校验
     const error = validateFieldName(name);
     setNameError(error);
   };
@@ -60,15 +56,12 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
     onChange({
       ...field,
       required,
-      // 切换为必填时清零，切换为非必填时默认 100%
       nullRate: required ? 0 : 100,
     });
   };
 
   const handleNullRateChange = (nullRate: number) => {
-    // 限制范围 0-100
     const clampedRate = Math.max(0, Math.min(100, nullRate));
-    // 空值率为 0 时自动设为必填
     if (clampedRate === 0) {
       onChange({ ...field, nullRate: clampedRate, required: true });
     } else {
@@ -106,19 +99,16 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
 
   return (
     <div className="space-y-5">
-      {/* 基础配置 */}
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-foreground">
-              {t('testDataGenerator_fieldName')}
-            </label>
+            <Label className="text-sm font-medium text-foreground">字段名称</Label>
             <span className="text-xs text-muted-foreground">{field.name.length}/20</span>
           </div>
           <Input
             value={field.name}
             onChange={(e) => handleNameChange(e.target.value)}
-            placeholder={t('testDataGenerator_fieldNamePlaceholder')}
+            placeholder="请输入字段名称"
             maxLength={20}
             className={`h-9 ${nameError ? 'border-destructive' : ''}`}
           />
@@ -127,9 +117,7 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-foreground">
-              {t('testDataGenerator_fieldDescription')}
-            </label>
+            <Label className="text-sm font-medium text-foreground">字段描述</Label>
             <span className="text-xs text-muted-foreground">
               {(field.description || '').length}/50
             </span>
@@ -137,28 +125,23 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
           <Input
             value={field.description || ''}
             onChange={(e) => handleDescriptionChange(e.target.value)}
-            placeholder={t('testDataGenerator_fieldDescriptionPlaceholder')}
+            placeholder="可选，添加字段说明"
             maxLength={50}
             className="h-9"
           />
         </div>
       </div>
 
-      {/* 必填/选填配置 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-foreground">
-            {t('testDataGenerator_required')}
-          </label>
+          <Label className="text-sm font-medium text-foreground">必填</Label>
           <Switch checked={field.required} onCheckedChange={handleRequiredChange} />
         </div>
 
         {!field.required && (
           <div className="space-y-2 pl-1">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">
-                {t('testDataGenerator_nullRate')}
-              </span>
+              <span className="text-sm text-muted-foreground">空值率</span>
               <Badge variant="secondary" className="text-xs">
                 {field.nullRate}%
               </Badge>
@@ -196,28 +179,19 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
         )}
       </div>
 
-      {/* 唯一性约束 */}
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-foreground">
-          {t('testDataGenerator_uniqueConstraint')}
-        </label>
+        <Label className="text-sm font-medium text-foreground">唯一性约束</Label>
         <Switch checked={field.unique} onCheckedChange={handleUniqueChange} />
       </div>
 
-      {/* 生成器选择 */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
-          {t('testDataGenerator_generator')}
-        </label>
+        <Label className="text-sm font-medium text-foreground">数据生成器</Label>
         <GeneratorSelector selectedId={field.generatorId} onChange={handleGeneratorChange} />
       </div>
 
-      {/* 生成器参数配置 */}
       {generator && (
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
-            {t('testDataGenerator_generatorParams')}
-          </label>
+          <Label className="text-sm font-medium text-foreground">生成器参数</Label>
           <GeneratorConfig
             generator={generator}
             params={field.params}

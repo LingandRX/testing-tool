@@ -45,12 +45,9 @@ export default defineConfig({
     name: 'Testing Tool',
     description: 'A tool for testing web applications.',
     version_name: undefined,
-    default_locale: 'zh_CN',
     permissions: [
       'storage',
-      'unlimitedStorage',
       'clipboardWrite',
-      'activeTab',
       'scripting',
       'tabs',
       'cookies',
@@ -66,7 +63,7 @@ export default defineConfig({
       '128': 'icon/128.png',
     },
     action: {
-      default_title: '__MSG_appName__',
+      default_title: 'Testing Tool',
       default_icon: {
         '16': 'icon/16.png',
         '32': 'icon/32.png',

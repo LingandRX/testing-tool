@@ -41,14 +41,11 @@ export default defineBackground(() => {
     try {
       await browser.action.openPopup();
     } catch (err) {
-      console.warn(
-        '[Context Menu] 自动打开 popup 失败，请手动点击扩展图标，暂存数据已安全保留:',
-        err,
-      );
+      console.warn('[Context Menu] 自动打开 popup 失败，请手动点击扩展图标，数据已暂存:', err);
     }
   });
 
-  // 监听扩展图标点击事件，安全激活侧边栏
+  // 扩展图标点击时打开侧边栏
   browser.action.onClicked.addListener(async (tab) => {
     if (tab.id) {
       try {
@@ -65,8 +62,8 @@ export default defineBackground(() => {
     const tabId = sender?.tab?.id;
 
     if (!tabId) {
-      console.warn('[RightClickRestorer] Injection request missing tabId');
-      return { success: false, message: 'Missing tabId' };
+      console.warn('[RightClickRestorer] 注入请求缺少 tabId');
+      return { success: false, message: '缺少 tabId' };
     }
 
     try {
@@ -79,7 +76,7 @@ export default defineBackground(() => {
       return { success: true };
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      console.error('[RightClickRestorer] executeScript failed:', errorMsg);
+      console.error('[RightClickRestorer] 执行脚本失败:', errorMsg);
       return { success: false, message: errorMsg };
     }
   });

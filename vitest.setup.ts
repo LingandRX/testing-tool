@@ -1,41 +1,6 @@
 import '@testing-library/jest-dom';
 import { afterEach, beforeEach, vi } from 'vitest';
 import React from 'react';
-import zhMessages from './public/_locales/zh_CN/messages.json';
-
-// Type assertion to allow string indexing
-const zhMessagesMap = zhMessages as Record<string, { message: string }>;
-
-vi.mock('@/utils/chromeI18n', () => ({
-  useI18n: (ns?: string | string[]) => ({
-    t: (key: string) => {
-      let msgId = key;
-      // Handle namespace:key format
-      if (key.includes(':')) {
-        msgId = key.replace(':', '_').replace(/\./g, '_');
-      }
-      // Try direct key first
-      if (zhMessagesMap[msgId]) return zhMessagesMap[msgId].message;
-      // Try namespace prefix (using converted msgId)
-      if (ns) {
-        const namespaces = Array.isArray(ns) ? ns : [ns];
-        for (const n of namespaces) {
-          const candidate = `${n}_${msgId}`;
-          if (zhMessagesMap[candidate]) return zhMessagesMap[candidate].message;
-        }
-      }
-      return msgId;
-    },
-    i18n: {
-      changeLanguage: vi.fn().mockResolvedValue(undefined),
-      language: 'zh',
-    },
-    isLoaded: true,
-  }),
-  getMessage: (msgId: string) => zhMessagesMap[msgId]?.message ?? msgId,
-  getLanguage: () => 'zh',
-  preloadNamespaces: vi.fn().mockResolvedValue(undefined),
-}));
 
 vi.mock('@/components/CopyButton', () => ({
   CopyButton: ({
@@ -125,6 +90,20 @@ const webExtensionMock = {
     sendMessage: vi.fn().mockResolvedValue(undefined),
     create: vi.fn().mockResolvedValue({}),
     reload: vi.fn().mockResolvedValue(undefined),
+    onActivated: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
+    onUpdated: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
+  },
+  windows: {
+    onFocusChanged: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
   },
   runtime: {
     id: 'test-extension-id',

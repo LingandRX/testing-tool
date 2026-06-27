@@ -1,9 +1,9 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { X } from 'lucide-react';
-import { useI18n } from '@/utils/chromeI18n';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner'; // 推荐使用 shadcn 的默认 Toast
+import { toast } from 'sonner';
 import { CopyButton } from '@/components/CopyButton';
+import { Button } from './ui/button';
 
 export type ValidateRule = {
   validator: (value: string) => boolean;
@@ -44,7 +44,6 @@ export interface TextInputAreaProps extends Omit<
   onClear?: () => void;
 }
 
-// 提炼基础的 ActionButton，全面向 shadcn 核心 Button 样式对齐
 function ActionButton({
   action,
   value,
@@ -114,8 +113,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [error, setError] = useState<string>('');
 
-  const { t } = useI18n('common');
-  const placeholder = placeholderProp ?? t('textInputArea.placeholder');
+  const placeholder = placeholderProp ?? '请输入文本';
 
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
@@ -127,7 +125,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     const textArea = internalRef.current;
     if (!textArea) return;
 
-    // 重置高度计算
     textArea.style.height = 'auto';
 
     const computedMin = minRows * 24;
@@ -159,7 +156,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newVal = e.target.value;
     if (maxLength && newVal.length > maxLength) {
-      const msg = t('charCount', { count: maxLength });
+      const msg = `内容不能超过 ${maxLength} 个字符`;
       setError(msg);
       toast.warning(msg);
       return;
@@ -181,9 +178,9 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     onChange?.('');
     setError('');
     internalRef.current?.focus();
-    toast.success(t('textInputArea.cleared'));
+    toast.success('已清空');
     onClear?.();
-  }, [isControlled, onChange, onClear, t]);
+  }, [isControlled, onChange, onClear]);
 
   const handleAction = useCallback(
     (action: ToolbarAction) => {
@@ -256,7 +253,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
 
         {hasBottomBar && (
           <div className="flex h-10 items-center justify-between px-4 bg-muted/30 border-t border-border/50">
-            {/* 左侧自定义动作 */}
             <div className="flex items-center gap-1.5 min-w-0">
               {bottomActions.map((action) => (
                 <ActionButton
@@ -269,32 +265,27 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
               ))}
             </div>
 
-            {/* 右侧系统按钮组 */}
             <div className="flex items-center gap-1.5 ml-auto shrink-0">
               {allowCopy && value && (
-                <CopyButton
-                  text={value}
-                  tooltip={t('textInputArea.copyContent')}
-                  size="sm"
-                  className="h-7 w-7 p-1"
-                />
+                <CopyButton text={value} tooltip="复制内容" size="sm" className="h-7 w-7 p-1" />
               )}
               {showClear && value && !disabled && !readOnly && (
-                <button
+                <Button
                   type="button"
                   onClick={handleClear}
-                  aria-label={t('textInputArea.clear')}
-                  className="p-1 h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  aria-label="清空"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </Button>
               )}
             </div>
           </div>
         )}
       </div>
 
-      {/* 错误提示 */}
       {displayError && (
         <p className="text-xs font-medium text-destructive px-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
           {displayError}

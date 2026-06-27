@@ -137,12 +137,11 @@ function escapeHtml(text: string): string {
 }
 
 function positionPopover(popover: HTMLElement, x: number, y: number): void {
-  // 此时借助 visibility: hidden，元素在隐藏状态下拥有真实的布局高宽
   const rect = popover.getBoundingClientRect();
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
 
-  let left = x + 8; // 微微追加水平偏置，防范直接遮挡用户的鼠标落点
+  let left = x + 8;
   let top = y + 8;
 
   if (left + rect.width > viewportWidth - 16) {
@@ -178,7 +177,7 @@ function showPopover(
 
     const titleSpan = document.createElement('span');
     titleSpan.className = 'popover-title';
-    titleSpan.textContent = title; // ✅ 强安全性护航
+    titleSpan.textContent = title;
 
     const closeBtn = document.createElement('button');
     closeBtn.className = 'popover-close';
@@ -194,10 +193,9 @@ function showPopover(
 
   const contentContainer = document.createElement('div');
   contentContainer.className = 'popover-content';
-  contentContainer.innerHTML = contentHtml; // 内部拼装的方法已提前完成全消毒转义
+  contentContainer.innerHTML = contentHtml;
   popover.appendChild(contentContainer);
 
-  // 提前移除激活类名，使 visibility: hidden 起效以供测量
   popover.classList.remove('visible');
 
   requestAnimationFrame(() => {
@@ -226,7 +224,6 @@ export function hidePopover(): void {
 }
 
 export function showTimestampResult(x: number, y: number, timestamp: string, result: string): void {
-  // 对外部传来的参数先全数塞入 escapeHtml 大闸进行纯氧化清洗
   const cleanTimestamp = escapeHtml(timestamp);
   const cleanResult = escapeHtml(result);
 
@@ -236,7 +233,7 @@ export function showTimestampResult(x: number, y: number, timestamp: string, res
     <div class="popover-label">转换结果</div>
     <div class="popover-value">${cleanResult}</div>
   `;
-  showPopover(x, y, content, '⏰ 时间戳转换');
+  showPopover(x, y, content, '转换结果');
 }
 
 export function showTextStatsResult(
@@ -246,7 +243,6 @@ export function showTextStatsResult(
   stats: { characters: number; words: number; lines: number; bytes: number },
 ): void {
   const truncatedText = text.length > 50 ? text.substring(0, 50) + '...' : text;
-  // 对选中的脏文本先进行严格转义
   const cleanText = escapeHtml(truncatedText);
 
   const content = `
@@ -271,5 +267,5 @@ export function showTextStatsResult(
       </div>
     </div>
   `;
-  showPopover(x, y, content, '📊 文本统计');
+  showPopover(x, y, content, '统计结果');
 }

@@ -1,19 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useI18n } from '@/utils/chromeI18n';
 import { useStorageState } from '@/utils/useStorageState';
-import { diffJson } from './diffEngine';
+import { diffJson } from '@/utils/diffEngine';
 import { jsonToYaml } from '@/utils/jsonToYaml';
 import { jsonToToml } from '@/utils/jsonToToml';
 import { minifyJson } from '@/utils/jsonFormatter';
 import { isValidPageMode, tryParse } from './constants';
 import type { JsonToolsPageMode } from '@/types/storage';
-import type { ConvertFunction } from './JsonConvertSection';
-import type { ViewMode } from './types';
+import type { ConvertFunction, ViewMode } from './types';
 
 export interface UseJsonToolsReturn {
   pageMode: JsonToolsPageMode;
   setPageMode: (mode: JsonToolsPageMode) => void;
-  // Diff mode state
   leftInput: string;
   rightInput: string;
   setLeftInput: (val: string) => void;
@@ -28,23 +25,19 @@ export interface UseJsonToolsReturn {
   handlePrev: () => void;
   handleNext: () => void;
   activePath: string | undefined;
-  // Convert functions
   yamlConvert: ConvertFunction;
   tomlConvert: ConvertFunction;
   minifyConvert: ConvertFunction;
 }
 
 export function useJsonTools(): UseJsonToolsReturn {
-  const { t } = useI18n(['jsonDiff', 'jsonFormat']);
   const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
 
-  // Diff inputs
   const [leftInput, setLeftInput] = useState('');
   const [rightInput, setRightInput] = useState('');
   const [debouncedLeft, setDebouncedLeft] = useState('');
   const [debouncedRight, setDebouncedRight] = useState('');
 
-  // Debounce
   useEffect(() => {
     const handle = setTimeout(() => {
       setDebouncedLeft(leftInput);
@@ -53,14 +46,13 @@ export function useJsonTools(): UseJsonToolsReturn {
     return () => clearTimeout(handle);
   }, [leftInput, rightInput]);
 
-  // Parse debounced inputs
   const parseState = useMemo(() => {
-    const invalidMsg = t('jsonDiff:invalidJson');
+    const invalidMsg = '无效的 JSON 格式';
     return {
       left: tryParse(debouncedLeft, invalidMsg),
       right: tryParse(debouncedRight, invalidMsg),
     };
-  }, [debouncedLeft, debouncedRight, t]);
+  }, [debouncedLeft, debouncedRight]);
 
   const leftError = parseState.left.error;
   const rightError = parseState.right.error;
@@ -68,7 +60,6 @@ export function useJsonTools(): UseJsonToolsReturn {
   const [viewMode, setViewMode] = useState<ViewMode>('sideBySide');
   const [currentDiffIndex, setCurrentDiffIndex] = useState(0);
 
-  // Real-time diff computation
   const diffResult = useMemo(() => {
     const { left, right } = parseState;
     if (left.error || right.error || debouncedLeft.trim() === '' || debouncedRight.trim() === '') {
@@ -91,7 +82,6 @@ export function useJsonTools(): UseJsonToolsReturn {
 
   const activePath = diffResult && total > 0 ? diffResult.diffPaths[currentDiffIndex] : undefined;
 
-  // Convert functions
   const yamlConvert: ConvertFunction = useCallback((text: string) => {
     const r = jsonToYaml(text);
     return { output: r.output, originalBytes: r.originalBytes, outputBytes: r.outputBytes };

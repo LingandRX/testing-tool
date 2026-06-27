@@ -4,6 +4,7 @@
  */
 
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
   Select,
@@ -12,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useI18n } from '@/utils/chromeI18n';
 import type { GeneratorDefinition } from '@/types/testDataGenerator';
 
 interface GeneratorConfigProps {
@@ -22,27 +22,22 @@ interface GeneratorConfigProps {
 }
 
 export default function GeneratorConfig({ generator, params, onChange }: GeneratorConfigProps) {
-  const { t } = useI18n('testDataGenerator');
   const handleParamChange = (key: string, value: unknown) => {
     onChange({ ...params, [key]: value });
   };
 
   if (generator.params.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground py-2">
-        {t('testDataGenerator_noGeneratorParams')}
-      </p>
-    );
+    return <p className="text-sm text-muted-foreground py-2">此生成器无可配置参数</p>;
   }
 
   return (
     <div className="space-y-4 p-3 rounded-lg bg-muted/30">
       {generator.params.map((param) => (
         <div key={param.key} className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
+          <Label className="text-sm font-medium text-foreground">
             {param.label}
             {param.required && <span className="text-destructive ml-1">*</span>}
-          </label>
+          </Label>
           {param.description && (
             <p className="text-xs text-muted-foreground">{param.description}</p>
           )}
@@ -70,9 +65,7 @@ export default function GeneratorConfig({ generator, params, onChange }: Generat
           {param.type === 'boolean' && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">
-                {params[param.key] !== false
-                  ? t('testDataGenerator_enabled')
-                  : t('testDataGenerator_disabled')}
+                {params[param.key] !== false ? '启用' : '禁用'}
               </span>
               <Switch
                 checked={params[param.key] !== false}
@@ -115,7 +108,7 @@ export default function GeneratorConfig({ generator, params, onChange }: Generat
                     .filter(Boolean),
                 )
               }
-              placeholder={t('testDataGenerator_commaSeparated')}
+              placeholder="用逗号分隔多个值"
               className="h-9"
             />
           )}

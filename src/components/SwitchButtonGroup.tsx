@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export interface SwitchOption<T extends string | number = string> {
@@ -17,6 +18,16 @@ export interface SwitchButtonGroupProps<T extends string | number = string> exte
   buttonClassName?: string;
 }
 
+const SIZE_CLASSES = {
+  small: 'text-xs h-8 px-2 py-1 rounded-md',
+  medium: 'text-sm h-9 px-3 py-1.5 rounded-md',
+  large: 'text-base h-11 px-4 py-2 rounded-lg',
+} as const;
+
+const SELECTED_CLASSES =
+  'bg-background text-foreground shadow-sm font-semibold animate-in fade-in-50 zoom-in-95 duration-150';
+const UNSELECTED_CLASSES = 'hover:bg-background/50 hover:text-foreground/80';
+
 export default function SwitchButtonGroup<T extends string | number = string>({
   value,
   options,
@@ -26,12 +37,6 @@ export default function SwitchButtonGroup<T extends string | number = string>({
   buttonClassName,
   ...props
 }: SwitchButtonGroupProps<T>) {
-  const sizeClasses = {
-    small: 'text-xs h-8 px-2 py-1 rounded-md',
-    medium: 'text-sm h-9 px-3 py-1.5 rounded-md',
-    large: 'text-base h-11 px-4 py-2 rounded-lg',
-  };
-
   return (
     <div
       className={cn(
@@ -40,29 +45,22 @@ export default function SwitchButtonGroup<T extends string | number = string>({
       )}
       {...props}
     >
-      {options.map((option) => {
-        const isSelected = value === option.value;
-
-        return (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onChange(option.value)}
-            className={cn(
-              'flex-1 inline-flex items-center justify-center font-medium whitespace-nowrap transition-all',
-              'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2',
-              'disabled:pointer-events-none disabled:opacity-50',
-              sizeClasses[size],
-              isSelected
-                ? 'bg-background text-foreground shadow-sm font-semibold animate-in fade-in-50 zoom-in-95 duration-150'
-                : 'hover:bg-background/50 hover:text-foreground/80',
-              buttonClassName,
-            )}
-          >
-            {option.label}
-          </button>
-        );
-      })}
+      {options.map((option) => (
+        <Button
+          key={option.value}
+          type="button"
+          variant="ghost"
+          onClick={() => onChange(option.value)}
+          className={cn(
+            'flex-1 transition-all',
+            SIZE_CLASSES[size],
+            value === option.value ? SELECTED_CLASSES : UNSELECTED_CLASSES,
+            buttonClassName,
+          )}
+        >
+          {option.label}
+        </Button>
+      ))}
     </div>
   );
 }

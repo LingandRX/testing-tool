@@ -1,84 +1,52 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Shield, ShieldCheck, MousePointerClick, AlertTriangle } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { CARD_CLASS, STATUS_CONFIG } from './constants';
 import { useRightClickRestorer } from './useRightClickRestorer';
-import { useI18n } from '@/utils/chromeI18n';
 
 export default function Index() {
-  const { t } = useI18n('rightClickRestorer');
-  const { domain, isLoading, isUnlocked, isUnsupported, unlock } = useRightClickRestorer();
+  const { domain, isLoading, status, unlock } = useRightClickRestorer();
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full">
+        <Loader2 className="h-6 w-6 text-muted-foreground/80 animate-spin" />
         <span className="text-xs text-muted-foreground mt-2 font-medium tracking-wide">
-          {t('rightClickRestorer:loading')}
+          正在加载...
         </span>
       </div>
     );
   }
 
-  return (
-    <div className="p-4 w-full flex flex-col space-y-4">
-      {/* Current Domain */}
-      <div className="w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
-        <div className="p-4">
-          <Label className="text-sm font-medium">{t('rightClickRestorer:currentDomain')}</Label>
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <code className="text-sm bg-muted px-2 py-1 rounded truncate min-w-0 flex-1">
-              {domain || '—'}
-            </code>
-            {isUnsupported ? (
-              <Badge variant="destructive" className="gap-1 shrink-0">
-                <AlertTriangle className="h-3 w-3" />
-                {t('rightClickRestorer:unsupported')}
-              </Badge>
-            ) : isUnlocked ? (
-              <Badge variant="default" className="gap-1 bg-green-600 hover:bg-green-700 shrink-0">
-                <ShieldCheck className="h-3 w-3" />
-                {t('rightClickRestorer:statusUnlocked')}
-              </Badge>
-            ) : (
-              <Badge variant="secondary" className="gap-1 shrink-0">
-                <Shield className="h-3 w-3" />
-                {t('rightClickRestorer:statusLocked')}
-              </Badge>
-            )}
-          </div>
-        </div>
-      </div>
+  const config = STATUS_CONFIG[status];
+  const BadgeIcon = config.badgeIcon;
+  const ButtonIcon = config.buttonIcon;
 
-      {/* Unlock Action */}
-      <div className="w-full rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
-        <div className="p-4 space-y-3">
-          {isUnsupported ? (
-            <>
-              <p className="text-xs text-muted-foreground">
-                {t('rightClickRestorer:unsupportedDesc')}
-              </p>
-              <Button className="w-full gap-2" disabled variant="secondary">
-                <AlertTriangle className="h-4 w-4" />
-                {t('rightClickRestorer:unsupported')}
-              </Button>
-            </>
-          ) : (
-            <>
-              <p className="text-xs text-muted-foreground">{t('rightClickRestorer:unlockDesc')}</p>
-              <Button
-                className="w-full gap-2"
-                onClick={() => void unlock()}
-                disabled={isUnlocked}
-                variant={isUnlocked ? 'secondary' : 'default'}
-              >
-                <MousePointerClick className="h-4 w-4" />
-                {isUnlocked
-                  ? t('rightClickRestorer:alreadyUnlocked')
-                  : t('rightClickRestorer:unlockBtn')}
-              </Button>
-            </>
-          )}
+  return (
+    <div className="p-4 w-full">
+      <div className={CARD_CLASS}>
+        <Label className="text-sm font-medium">当前域名</Label>
+        <div className="flex items-center justify-between gap-2">
+          <code className="text-sm bg-muted px-2 py-1 rounded truncate min-w-0 flex-1">
+            {domain || '—'}
+          </code>
+          <Badge variant={config.badgeVariant} className={config.badgeClassName}>
+            <BadgeIcon className="h-3 w-3" />
+            {config.badgeLabel}
+          </Badge>
         </div>
+
+        <p className="text-xs text-muted-foreground">{config.description}</p>
+        <Button
+          className="w-full gap-2"
+          disabled={config.buttonDisabled}
+          variant={config.buttonVariant}
+          onClick={() => void unlock()}
+        >
+          <ButtonIcon className="h-4 w-4" />
+          {config.buttonLabel}
+        </Button>
       </div>
     </div>
   );

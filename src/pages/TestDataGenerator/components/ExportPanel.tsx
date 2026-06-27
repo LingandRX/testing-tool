@@ -6,7 +6,6 @@
 import { Copy, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { useI18n } from '@/utils/chromeI18n';
 import { DataExporter } from '@/utils/dataExporter';
 import type { GenerateResult } from '@/types/testDataGenerator';
 
@@ -15,8 +14,6 @@ interface ExportPanelProps {
 }
 
 export default function ExportPanel({ result }: ExportPanelProps) {
-  const { t } = useI18n('testDataGenerator');
-
   if (!result?.data || result.data.length === 0) {
     return null;
   }
@@ -25,9 +22,9 @@ export default function ExportPanel({ result }: ExportPanelProps) {
     const content = DataExporter.toJSON(result.data!);
     const success = await DataExporter.copyToClipboard(content);
     if (success) {
-      toast.success(t('testDataGenerator_copySuccess'));
+      toast.success('已复制到剪贴板');
     } else {
-      toast.error(t('testDataGenerator_copyFailed'));
+      toast.error('复制失败');
     }
   };
 
@@ -35,9 +32,9 @@ export default function ExportPanel({ result }: ExportPanelProps) {
     const content = DataExporter.toCSV(result.data!);
     const success = await DataExporter.copyToClipboard(content);
     if (success) {
-      toast.success(t('testDataGenerator_copySuccess'));
+      toast.success('已复制到剪贴板');
     } else {
-      toast.error(t('testDataGenerator_copyFailed'));
+      toast.error('复制失败');
     }
   };
 
@@ -53,27 +50,27 @@ export default function ExportPanel({ result }: ExportPanelProps) {
 
   return (
     <div className="space-y-2">
-      <h4 className="text-sm font-medium text-foreground">{t('testDataGenerator_export')}</h4>
+      <h4 className="text-sm font-medium text-foreground">导出数据</h4>
 
       <div className="grid grid-cols-2 gap-2">
         <Button variant="outline" size="sm" onClick={handleCopyJSON} className="h-9 gap-1.5">
           <Copy className="h-4 w-4" />
-          {t('testDataGenerator_copyJSON')}
+          复制 JSON
         </Button>
 
         <Button variant="outline" size="sm" onClick={handleCopyCSV} className="h-9 gap-1.5">
           <Copy className="h-4 w-4" />
-          {t('testDataGenerator_copyCSV')}
+          复制 CSV
         </Button>
 
         <Button variant="outline" size="sm" onClick={handleDownloadJSON} className="h-9 gap-1.5">
           <Download className="h-4 w-4" />
-          {t('testDataGenerator_downloadJSON')}
+          下载 JSON
         </Button>
 
         <Button variant="outline" size="sm" onClick={handleDownloadCSV} className="h-9 gap-1.5">
           <Download className="h-4 w-4" />
-          {t('testDataGenerator_downloadCSV')}
+          下载 CSV
         </Button>
       </div>
     </div>

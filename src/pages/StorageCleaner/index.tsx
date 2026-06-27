@@ -1,16 +1,13 @@
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import StorageCleanerConfirm from './StorageCleanerConfirm';
+import StorageCleanerConfirm from './components/StorageCleanerConfirm';
 import { useStorageCleaner } from './useStorageCleaner';
-import StorageOptionsGrid from './StorageOptionsGrid';
-import AutoRefreshToggle from './AutoRefreshToggle';
-import ErrorDisplay from './ErrorDisplay';
-import CleaningResult from './CleaningResult';
-import { useI18n } from '@/utils/chromeI18n';
+import StorageOptionsGrid from './components/StorageOptionsGrid';
+import AutoRefreshToggle from './components/AutoRefreshToggle';
+import ErrorDisplay from './components/ErrorDisplay';
+import CleaningResult from './components/CleaningResult';
 
 export default function Index() {
-  const { t } = useI18n('storageCleaner');
-
   const {
     error,
     isInitializing,
@@ -18,6 +15,7 @@ export default function Index() {
     sizes,
     reloadAfterClean,
     loading,
+    isRefreshingSizes,
     result,
     showConfirm,
     setShowConfirm,
@@ -29,14 +27,14 @@ export default function Index() {
     handleClean,
   } = useStorageCleaner();
 
-  const isButtonDisabled = !(someSelected || allSelected) || loading;
+  const isButtonDisabled = !(someSelected || allSelected) || loading || isRefreshingSizes;
 
   if (isInitializing) {
     return (
       <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full">
         <Loader2 className="h-6 w-6 text-muted-foreground/80" />
         <span className="text-xs text-muted-foreground mt-2 font-medium tracking-wide">
-          {t('storageCleaner:initializing')}
+          正在读取数据...
         </span>
       </div>
     );
@@ -75,10 +73,10 @@ export default function Index() {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t('storageCleaner:cleaning')}
+                正在清理...
               </>
             ) : (
-              t('storageCleaner:cleanNow')
+              '立即清理'
             )}
           </Button>
         </div>

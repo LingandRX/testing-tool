@@ -9,7 +9,7 @@ import type { DataRule, FieldConfig } from '@/types/testDataGenerator';
 const STORAGE_KEY = 'testDataGenerator_rules';
 
 /** 最大规则数量 */
-const MAX_RULES = 20;
+export const MAX_RULES = 20;
 
 /**
  * 获取所有规则
@@ -78,9 +78,7 @@ export function save(
       useCount: 0,
     };
     rules.unshift(newRule);
-    if (!setAll(rules)) {
-      return null;
-    }
+    if (!setAll(rules)) return null;
     return newRule;
   }
 
@@ -97,9 +95,7 @@ export function save(
     updatedAt: now,
   };
   rules[index] = updatedRule;
-  if (!setAll(rules)) {
-    return null;
-  }
+  if (!setAll(rules)) return null;
   return updatedRule;
 }
 
@@ -121,9 +117,7 @@ export function update(id: string, updates: Partial<DataRule>): DataRule | null 
     updatedAt: Date.now(),
   };
   rules[index] = updatedRule;
-  if (!setAll(rules)) {
-    return null;
-  }
+  if (!setAll(rules)) return null;
   return updatedRule;
 }
 
@@ -138,7 +132,8 @@ export function deleteRule(id: string): boolean {
     return false;
   }
   rules.splice(index, 1);
-  return setAll(rules);
+  if (!setAll(rules)) return false;
+  return true;
 }
 
 /**
@@ -170,9 +165,7 @@ export function duplicate(id: string, copySuffix = '（副本）'): DataRule | n
 
   const rules = getAll();
   rules.unshift(newRule);
-  if (!setAll(rules)) {
-    return null;
-  }
+  setAll(rules);
   return newRule;
 }
 

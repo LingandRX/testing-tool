@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, expectTypeOf } from 'vitest';
 import { storageUtil } from '@/utils/chromeStorage';
 
 describe('chromeStorage', () => {
@@ -72,6 +72,20 @@ describe('chromeStorage', () => {
       const result = await storageUtil.get('app/theme', 'light');
 
       expect(result).toBe('light');
+    });
+  });
+
+  describe('get 类型签名', () => {
+    it('无默认值时应推断为可选返回类型', () => {
+      const _getWithoutDefault = () => storageUtil.get('app/theme');
+      expectTypeOf<ReturnType<typeof _getWithoutDefault>>().toEqualTypeOf<
+        Promise<string | undefined>
+      >();
+    });
+
+    it('有默认值时应推断为确定返回类型', () => {
+      const _getWithDefault = () => storageUtil.get('app/theme', 'light');
+      expectTypeOf<ReturnType<typeof _getWithDefault>>().toEqualTypeOf<Promise<string>>();
     });
   });
 

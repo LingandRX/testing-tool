@@ -6,7 +6,6 @@
 import { useState } from 'react';
 import { Search, User, Briefcase, Code, Hash } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useI18n } from '@/utils/chromeI18n';
 import { generatorCategories, getGeneratorsByCategory, searchGenerators } from '@/lib/generators';
 
 interface GeneratorSelectorProps {
@@ -22,7 +21,6 @@ const categoryIcons: Record<string, React.ComponentType<{ className?: string }>>
 };
 
 export default function GeneratorSelector({ selectedId, onChange }: GeneratorSelectorProps) {
-  const { t } = useI18n('testDataGenerator');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>(generatorCategories[0]?.id || '');
 
@@ -32,18 +30,16 @@ export default function GeneratorSelector({ selectedId, onChange }: GeneratorSel
 
   return (
     <div className="space-y-3">
-      {/* 搜索框 */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t('testDataGenerator_searchGenerator')}
+          placeholder="搜索生成器..."
           className="pl-9 h-9"
         />
       </div>
 
-      {/* 分类标签 */}
       {!searchQuery && (
         <div className="flex flex-wrap gap-2">
           {generatorCategories.map((category) => {
@@ -66,7 +62,6 @@ export default function GeneratorSelector({ selectedId, onChange }: GeneratorSel
         </div>
       )}
 
-      {/* 生成器列表 */}
       <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
         {generators.map((generator) => (
           <button

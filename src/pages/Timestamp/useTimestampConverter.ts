@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import dayjs from '@/utils/dayjs';
 import type { UnitType, ZoneType, ModeType } from './constants';
 import { DATE_FORMAT, msToUnit, dayjsFromTimestamp } from './constants';
-import { useI18n } from '@/utils/chromeI18n';
 import { useContextMenuData } from '@/utils/useContextMenuData';
 
 export interface UseTimestampConverterReturn {
@@ -29,7 +28,6 @@ function isTimestampLike(input: string): boolean {
 }
 
 export function useTimestampConverter(): UseTimestampConverterReturn {
-  const { t } = useI18n('timestamp');
   const [mode, setMode] = useState<ModeType>('ts2dt');
   const [unit, setUnit] = useState<UnitType>('ms');
   const [zone, setZone] = useState<ZoneType>('Asia/Shanghai');
@@ -43,22 +41,22 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
     if (mode === 'ts2dt') {
       const num = Number(rawInput);
       if (isNaN(num)) {
-        return { result: '', error: t('timestamp:errors.invalidNumber') };
+        return { result: '', error: '请输入有效数字' };
       }
       const d = dayjsFromTimestamp(num, unit);
       if (!d.isValid()) {
-        return { result: '', error: t('timestamp:errors.invalidTimestamp') };
+        return { result: '', error: '无效时间戳' };
       }
       return { result: d.tz(zone).format(DATE_FORMAT), error: '' };
     } else {
       const d = dayjs.tz(rawInput, DATE_FORMAT, zone);
       if (!d.isValid()) {
-        return { result: '', error: t('timestamp:errors.invalidFormat') };
+        return { result: '', error: '无效的日期格式' };
       }
       const ms = d.valueOf();
       return { result: String(msToUnit(ms, unit)), error: '' };
     }
-  }, [input, mode, unit, zone, t]);
+  }, [input, mode, unit, zone]);
 
   const handleContextMenuData = (payload: string) => {
     const trimmed = payload.trim();

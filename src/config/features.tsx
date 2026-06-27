@@ -29,8 +29,8 @@ const TestDataGeneratorPage = lazy(() => import('@/pages/TestDataGenerator'));
 
 export interface FeatureConfig {
   key: PageType;
-  labelKey: string;
-  descriptionKey: string;
+  label: string;
+  description: string;
   themeColorKey?: PaletteColorKey;
   icon?: ComponentType<LucideProps>;
   defaultVisible: boolean;
@@ -44,8 +44,8 @@ export interface FeatureConfig {
 export const FEATURES: FeatureConfig[] = [
   {
     key: 'dashboard',
-    labelKey: 'dashboard_title',
-    descriptionKey: '',
+    label: '仪表盘',
+    description: '',
     defaultVisible: true,
     components: {
       popup: DashboardPage,
@@ -55,8 +55,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'timestamp',
-    labelKey: 'timestamp_title',
-    descriptionKey: 'timestamp_description',
+    label: '时间戳',
+    description: 'Unix 毫秒数转换与格式化',
     themeColorKey: 'primary',
     icon: Clock,
     defaultVisible: true,
@@ -68,8 +68,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'storageCleaner',
-    labelKey: 'storageCleaner_title',
-    descriptionKey: 'storageCleaner_description',
+    label: '存储清理',
+    description: '清理缓存、Cookies 及本地存储',
     themeColorKey: 'warning',
     icon: Database,
     defaultVisible: true,
@@ -81,8 +81,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'qrCode',
-    labelKey: 'qrCode_title',
-    descriptionKey: 'qrCode_description',
+    label: '二维码工具',
+    description: '生成当前选中的 URL 的二维码',
     themeColorKey: 'success',
     icon: QrCode,
     defaultVisible: true,
@@ -94,8 +94,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'textStatistics',
-    labelKey: 'textStatistics_title',
-    descriptionKey: 'textStatistics_description',
+    label: '文本统计',
+    description: '实时分析文本字符、单词及字节',
     themeColorKey: 'secondary',
     icon: FileText,
     defaultVisible: true,
@@ -107,8 +107,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'jwt',
-    labelKey: 'jwt_title',
-    descriptionKey: 'jwt_description',
+    label: 'JWT 解析',
+    description: 'JSON Web Token 解码与查看',
     themeColorKey: 'info',
     icon: Key,
     defaultVisible: true,
@@ -119,9 +119,9 @@ export const FEATURES: FeatureConfig[] = [
     },
   },
   {
-    key: 'jsonDiff',
-    labelKey: 'jsonDiff_title',
-    descriptionKey: 'jsonDiff_description',
+    key: 'jsonTools',
+    label: 'JSON 工具',
+    description: '差异比较、格式化、YAML/TOML 转换及压缩',
     themeColorKey: 'primary',
     icon: GitCompareArrows,
     defaultVisible: true,
@@ -133,8 +133,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'base64Converter',
-    labelKey: 'base64Converter_title',
-    descriptionKey: 'base64Converter_description',
+    label: 'Base64 转换器',
+    description: '文本、文件与图像的 Base64 编码转换',
     themeColorKey: 'info',
     icon: ArrowLeftRight,
     defaultVisible: true,
@@ -146,8 +146,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'rightClickRestorer',
-    labelKey: 'rightClickRestorer_title',
-    descriptionKey: 'rightClickRestorer_description',
+    label: '右键恢复',
+    description: '检测并恢复被网站禁用的浏览器右键菜单',
     themeColorKey: 'success',
     icon: MousePointerClick,
     defaultVisible: true,
@@ -159,8 +159,8 @@ export const FEATURES: FeatureConfig[] = [
   },
   {
     key: 'testDataGenerator',
-    labelKey: 'testDataGenerator_title',
-    descriptionKey: 'testDataGenerator_description',
+    label: '测试数据生成器',
+    description: '自定义规则批量生成测试数据',
     themeColorKey: 'warning',
     icon: FileSpreadsheet,
     defaultVisible: true,
