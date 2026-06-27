@@ -258,8 +258,8 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     }
 
     const boundTab = boundTabRef.current;
-    if (!boundTab || boundTab.id !== tab.id) {
-      toast.warning('当前标签页已切换，请等待数据刷新后再清理');
+    if (!boundTab || boundTab.id !== tab.id || boundTab.url !== tab.url) {
+      toast.warning('当前页面已变更，请等待数据刷新后再清理');
       setShowConfirm(false);
       return;
     }
