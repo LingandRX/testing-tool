@@ -8,7 +8,8 @@ import type {
   FieldConfig,
   GenerateResult,
   GenerateProgress,
-  WorkerMessage,
+  WorkerRequestMessage,
+  WorkerResponseMessage,
 } from '@/types/testDataGenerator';
 
 export interface UseGeneratorReturn {
@@ -35,6 +36,7 @@ export function useGenerator(): UseGeneratorReturn {
   const [error, setError] = useState<string | null>(null);
 
   const workerRef = useRef<Worker | null>(null);
+  const generationIdRef = useRef(0);
 
   // 清理 Worker
   useEffect(() => {
@@ -58,22 +60,30 @@ export function useGenerator(): UseGeneratorReturn {
       type: 'module',
     });
 
-    worker.onmessage = (e: MessageEvent<WorkerMessage>) => {
+    worker.onmessage = (e: MessageEvent<WorkerResponseMessage>) => {
       const data = e.data;
       const { type } = data;
 
+      if (data.generationId !== generationIdRef.current) {
+        return;
+      }
+
       switch (type) {
         case 'progress':
-          setProgress(data.payload as GenerateProgress);
+          setProgress(data.payload);
           break;
         case 'complete':
           setIsGenerating(false);
-          setResult(data.payload as GenerateResult);
+          if (data.payload.success) {
+            setResult(data.payload);
+          } else if (data.payload.error && data.payload.error !== '生成已取消') {
+            setError(data.payload.error);
+          }
           setProgress(null);
           break;
         case 'error':
           setIsGenerating(false);
-          setError((data.payload as { error: string }).error);
+          setError(data.payload.error);
           setProgress(null);
           break;
       }
@@ -100,15 +110,17 @@ export function useGenerator(): UseGeneratorReturn {
     (fields: FieldConfig[], count: number, csvMode = false) => {
       if (isGenerating) return;
 
+      const generationId = ++generationIdRef.current;
+
       setIsGenerating(true);
       setProgress(null);
       setResult(null);
       setError(null);
 
       const worker = getWorker();
-      const message: WorkerMessage = {
+      const message: WorkerRequestMessage = {
         type: 'start',
-        payload: { fields, count, csvMode },
+        payload: { generationId, fields, count, csvMode },
       };
       worker.postMessage(message);
     },
@@ -120,7 +132,8 @@ export function useGenerator(): UseGeneratorReturn {
    */
   const cancel = useCallback(() => {
     if (workerRef.current && isGenerating) {
-      const message: WorkerMessage = { type: 'cancel' };
+      ++generationIdRef.current;
+      const message: WorkerRequestMessage = { type: 'cancel' };
       workerRef.current.postMessage(message);
       setIsGenerating(false);
       setProgress(null);
