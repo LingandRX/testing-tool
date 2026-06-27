@@ -34,7 +34,7 @@ export default function LiveClock({ unit, onUseNow, className, ...props }: LiveC
       {...props}
     >
       <span className="text-muted-foreground font-bold text-[10px] uppercase tracking-wider whitespace-nowrap shrink-0 selection:bg-transparent select-none">
-        {'当前时间戳'}
+        当前时间戳
       </span>
 
       <span className="flex-1 font-mono font-bold text-foreground text-sm tracking-tight leading-none truncate tabular-nums">
@@ -47,7 +47,7 @@ export default function LiveClock({ unit, onUseNow, className, ...props }: LiveC
           onUseNow(rawTime);
           toast.success('已使用当前时间戳');
         }}
-        title={'填充到下方'}
+        title="填充到下方"
         variant="ghost"
         size="icon"
         className="h-7 w-7 text-muted-foreground hover:text-foreground"
@@ -55,7 +55,7 @@ export default function LiveClock({ unit, onUseNow, className, ...props }: LiveC
         <Clock className="w-3.5 h-3.5" />
       </Button>
 
-      <CopyButton text={text} tooltip={'复制时间戳'} className="h-7 w-7 rounded-md border" />
+      <CopyButton text={text} tooltip="复制时间戳" className="h-7 w-7 rounded-md border" />
     </div>
   );
 }

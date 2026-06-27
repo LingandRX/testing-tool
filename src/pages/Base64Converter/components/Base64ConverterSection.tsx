@@ -40,12 +40,12 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
     decodedFileName,
     setCustomFileName,
     resetAll,
-    safeFileSelect,
+    handleFileSelect,
     maxFileSizeStr,
   } = useBase64Converter({ mode });
 
   const handleDirectionChange = (next: Base64ConvertDirection) => {
-    if (!next || next === direction) return;
+    if (next === direction) return;
     resetAll();
     setDirection(next);
   };
@@ -80,7 +80,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
               e.preventDefault();
               setIsDragging(false);
               const file = e.dataTransfer.files[0];
-              if (file) safeFileSelect(file);
+              if (file) void handleFileSelect(file);
             }}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
@@ -99,7 +99,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
               hidden
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) safeFileSelect(file);
+                if (file) void handleFileSelect(file);
               }}
             />
             {isLoading ? (
@@ -123,7 +123,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   {formatBytes(info.size)} · {info.type}
                 </span>
                 <span className="text-[11px] font-medium text-primary/80 mt-1">
-                  {'点击或拖拽以替换文件'}
+                  点击或拖拽以替换文件
                 </span>
               </div>
             ) : (
@@ -158,17 +158,17 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
             <div className="p-4 rounded-2xl bg-card border border-border shadow-sm flex flex-col space-y-3">
               <div className="flex justify-between items-center select-none">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
-                  {'Base64 编码结果'}
+                  Base64 编码结果
                 </span>
                 <div className="flex gap-2">
                   <CopyButton
                     text={result.rawBase64}
-                    tooltip={'复制纯 Base64'}
+                    tooltip="复制纯 Base64"
                     className="h-6 px-2 rounded-md border text-[10px] font-bold"
                   />
                   <CopyButton
                     text={result.output}
-                    tooltip={'复制 Data URI'}
+                    tooltip="复制 Data URI"
                     className="h-6 px-2 rounded-md border text-[10px] font-bold"
                   />
                 </div>
@@ -186,14 +186,14 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
               <div className="flex items-center justify-between font-mono text-[10px] text-muted-foreground/70 select-none pt-1">
                 <div className="flex gap-4 items-center tabular-nums">
                   <span>
-                    {'原始大小'}:{' '}
+                    原始大小:{' '}
                     <span className="font-semibold text-foreground/80">
                       {formatBytes(result.originalBytes)}
                     </span>
                   </span>
                   <span className="text-border/60">|</span>
                   <span>
-                    {'编码大小'}:{' '}
+                    编码大小:{' '}
                     <span className="font-semibold text-foreground/80">
                       {formatBytes(result.outputBytes)}
                     </span>
@@ -206,7 +206,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   className="h-7 rounded-md text-muted-foreground hover:text-destructive text-[11px] gap-1 px-2"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  {'清空'}
+                  清空
                 </Button>
               </div>
             </div>
@@ -215,7 +215,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
       ) : (
         <div className="flex flex-col space-y-4">
           <TextInputArea
-            placeholder={'输入需要解码的 Base64 或 data URI...'}
+            placeholder="输入需要解码的 Base64 或 data URI..."
             value={decodeInput}
             onChange={setDecodeInput}
             externalError={decodeError || undefined}

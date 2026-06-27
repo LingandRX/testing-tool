@@ -8,18 +8,17 @@ import { useTopBar } from './useTopBar';
 export default function TopBar() {
   const {
     searchQuery,
-    showResults,
     searchResults,
     recentFeatures,
     selectedIndex,
     isDashboard,
     ThemeIcon,
     themeTitle,
+    showDropdown,
     containerRef,
     inputRef,
-    setSearchQuery,
-    setShowResults,
-    setSelectedIndex,
+    handleSearchQueryChange,
+    handleSearchFocus,
     handleSelectFeature,
     handleKeyDown,
     cycleThemeMode,
@@ -39,14 +38,6 @@ export default function TopBar() {
       },
     },
   ];
-
-  const handleSearchQueryChange = (value: string) => {
-    setSearchQuery(value);
-    setShowResults(true);
-    setSelectedIndex(-1);
-  };
-
-  const showDropdown = showResults && (searchQuery.trim() || recentFeatures.length > 0);
 
   return (
     <header className="relative z-50 flex h-14 items-center justify-between border-b border-border bg-background px-4">
@@ -70,7 +61,7 @@ export default function TopBar() {
           inputRef={inputRef}
           searchQuery={searchQuery}
           onSearchQueryChange={handleSearchQueryChange}
-          onFocus={() => setShowResults(true)}
+          onFocus={handleSearchFocus}
           onKeyDown={handleKeyDown}
           onClear={clearSearch}
         />

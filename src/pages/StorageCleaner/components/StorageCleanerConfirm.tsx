@@ -10,7 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
 import type { StorageCleanerOptions } from '@/types/storage';
-import { OPTION_LABELS } from '../constants';
+import { OPTION_LABELS, CLEAN_OPTION_KEYS } from '../constants';
 import { cn } from '@/lib/utils';
 
 export interface StorageCleanerConfirmProps {
@@ -26,11 +26,9 @@ export function StorageCleanerConfirm({
   onConfirm,
   options,
 }: StorageCleanerConfirmProps) {
-  const selectedOptions = Object.entries(options)
-    .filter(([_, value]) => value)
-    .map(([key]) =>
-      key in OPTION_LABELS ? OPTION_LABELS[key as keyof typeof OPTION_LABELS] : key,
-    );
+  const selectedOptions = CLEAN_OPTION_KEYS.filter((key) => options[key]).map(
+    (key) => OPTION_LABELS[key],
+  );
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -42,14 +40,14 @@ export function StorageCleanerConfirm({
         {/* 头部标题区域 */}
         <DialogHeader className="pt-1">
           <DialogTitle className="text-center text-lg font-bold tracking-tight text-foreground">
-            {'确认清理数据？'}
+            确认清理数据？
           </DialogTitle>
         </DialogHeader>
 
         {/* 内容主体：限制最大宽度，防止内部元素在大分辨率下被横向拉得太松散 */}
         <div className="text-center py-4 flex flex-col items-center w-full max-w-[280px] mx-auto">
           <DialogDescription className="mb-4 text-xs font-medium text-muted-foreground/90 leading-relaxed">
-            {'您将永久删除当前页面的以下选定存储项。'}
+            您将永久删除当前页面的以下选定存储项。
           </DialogDescription>
 
           {/* 待清理项目徽章群 */}
@@ -69,7 +67,7 @@ export function StorageCleanerConfirm({
           <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-destructive/5 border border-dashed border-destructive/20 w-full max-w-[240px]">
             <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" />
             <span className="text-[11px] font-bold text-destructive leading-none tracking-tight">
-              {'此操作不可撤销'}
+              此操作不可撤销
             </span>
           </div>
         </div>
@@ -81,7 +79,7 @@ export function StorageCleanerConfirm({
             onClick={onConfirm}
             className="w-full text-xs font-bold shadow-sm h-9"
           >
-            {'确认清理'}
+            确认清理
           </Button>
           <Button
             variant="outline"
@@ -89,7 +87,7 @@ export function StorageCleanerConfirm({
             onClick={onClose}
             className="w-full text-xs font-semibold shadow-sm h-9 text-muted-foreground hover:text-foreground"
           >
-            {'取消'}
+            取消
           </Button>
         </DialogFooter>
       </DialogContent>

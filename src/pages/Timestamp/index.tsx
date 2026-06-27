@@ -1,7 +1,8 @@
+import { cn } from '@/lib/utils';
 import LiveClock from './components/LiveClock';
 import ConverterForm from './components/ConverterForm';
 import ResultView from './components/ResultView';
-import ToolCard from './components/ToolCard';
+import { CARD_CLASS } from './constants';
 import { useTimestampConverter } from './useTimestampConverter';
 
 export default function Index() {
@@ -14,9 +15,9 @@ export default function Index() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
         <ConverterForm {...formProps} />
 
-        <ToolCard className="h-full">
+        <div className={cn(CARD_CLASS, 'h-full')}>
           <ResultView result={result} showEmptyPlaceholder />
-        </ToolCard>
+        </div>
       </div>
     </div>
   );

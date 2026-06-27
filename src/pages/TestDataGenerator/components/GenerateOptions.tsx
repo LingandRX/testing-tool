@@ -28,9 +28,8 @@ export default function GenerateOptions({
 }: GenerateOptionsProps) {
   return (
     <div className="space-y-4">
-      {/* 生成数量 */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground">{'生成数量'}</Label>
+        <Label className="text-sm font-medium text-foreground">生成数量</Label>
         <div className="flex flex-wrap gap-2">
           {COUNT_PRESETS.map((preset) => (
             <button
@@ -61,9 +60,8 @@ export default function GenerateOptions({
         />
       </div>
 
-      {/* 数据格式 */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground">{'数据格式'}</Label>
+        <Label className="text-sm font-medium text-foreground">数据格式</Label>
         <div className="flex gap-2">
           {FORMAT_OPTIONS.map((option) => (
             <button

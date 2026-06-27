@@ -23,7 +23,6 @@ export default function FieldItem({ field, onClick }: FieldItemProps) {
       <div
         className={`h-full ${field.description ? 'flex flex-col justify-center' : 'flex items-center'}`}
       >
-        {/* 第一行：字段名 + 标签 */}
         <div className="flex items-center gap-1.5 overflow-hidden">
           <span className="font-medium text-sm text-foreground truncate shrink-0 max-w-[140px]">
             {field.name}
@@ -41,11 +40,10 @@ export default function FieldItem({ field, onClick }: FieldItemProps) {
           )}
           {field.unique && (
             <Badge variant="outline" className="text-[10px] shrink-0 px-1 py-0 text-blue-500">
-              {'唯一'}
+              唯一
             </Badge>
           )}
         </div>
-        {/* 第二行：描述 */}
         {field.description && (
           <p className="text-[11px] text-muted-foreground mt-0.5 truncate leading-tight">
             {field.description}

@@ -28,7 +28,7 @@ export default function JsonResultPanel({
 
           <div className="hidden sm:flex gap-3 items-center font-mono text-[10px] text-muted-foreground/70 tabular-nums">
             <span>
-              {'原始大小'}:{' '}
+              原始大小:{' '}
               <span className="font-semibold text-foreground/80">{formatBytes(originalBytes)}</span>
             </span>
             <span className="text-border/60">|</span>

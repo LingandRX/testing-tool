@@ -28,12 +28,12 @@ const CONVERT_LABELS: Record<
 };
 
 interface JsonConvertSectionProps extends React.HTMLAttributes<HTMLDivElement> {
-  translationPrefix: string;
+  mode: string;
   convertFunction: ConvertFunction;
 }
 
 export default function JsonConvertSection({
-  translationPrefix,
+  mode,
   convertFunction,
   className,
   ...props
@@ -41,10 +41,8 @@ export default function JsonConvertSection({
   const [input, setInput] = useState('');
   const [debouncedInput, setDebouncedInput] = useState('');
 
-  const pk = translationPrefix;
-  const labels = CONVERT_LABELS[pk] || CONVERT_LABELS.yaml;
+  const labels = CONVERT_LABELS[mode] ?? CONVERT_LABELS.yaml;
 
-  // Debounce input
   useEffect(() => {
     const handle = setTimeout(() => {
       setDebouncedInput(input);
@@ -56,33 +54,25 @@ export default function JsonConvertSection({
     return validateJson(debouncedInput);
   }, [debouncedInput]);
 
-  const conversionPipeline = useMemo(() => {
+  const { result, runtimeError } = useMemo((): {
+    result: ConvertResult | null;
+    runtimeError: string | null;
+  } => {
     const trimmed = debouncedInput.trim();
-    if (!trimmed || error) return null;
+    if (!trimmed || error) return { result: null, runtimeError: null };
 
     try {
-      return convertFunction(debouncedInput);
+      return { result: convertFunction(debouncedInput), runtimeError: null };
     } catch (e) {
-      // 捕获可能从外部转换器（如 YAML.stringify）中抛出的底层异常
       return {
-        isRuntimeError: true,
-        errorMessage: e instanceof Error ? e.message : String(e),
+        result: null,
+        runtimeError: e instanceof Error ? e.message : String(e),
       };
     }
   }, [debouncedInput, error, convertFunction]);
 
-  const runtimeError =
-    conversionPipeline && 'isRuntimeError' in conversionPipeline
-      ? conversionPipeline.errorMessage
-      : null;
-  const result =
-    conversionPipeline && !('isRuntimeError' in conversionPipeline)
-      ? (conversionPipeline as ConvertResult)
-      : null;
-
   return (
     <div className={cn('w-full flex flex-col gap-4', className)} {...props}>
-      {/* 输入区 */}
       <TextInputArea
         placeholder={labels.inputPlaceholder}
         value={input}
@@ -95,8 +85,7 @@ export default function JsonConvertSection({
         onClear={() => setInput('')}
       />
 
-      {/* Result display */}
-      {result && result.output ? (
+      {result?.output ? (
         <JsonResultPanel
           title={labels.outputLabel}
           content={result.output}

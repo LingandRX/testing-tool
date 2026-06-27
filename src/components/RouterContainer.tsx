@@ -41,7 +41,7 @@ export default function RouterContainer() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive mb-4">
                 <AlertTriangle className="h-6 w-6" />
               </div>
-              <h3 className="text-sm font-semibold text-foreground">{'页面未找到'}</h3>
+              <h3 className="text-sm font-semibold text-foreground">页面未找到</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
                 {`该功能在当前运行环境（${entryPointType}）下不可用或已被移除。`}
               </p>

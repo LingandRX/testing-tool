@@ -9,7 +9,7 @@ export default function Index() {
       {showRecent && (
         <div className="flex flex-col gap-2">
           <h3 className="text-xs font-semibold text-muted-foreground/80 uppercase tracking-wider">
-            {'最近使用'}
+            最近使用
           </h3>
           <div className="flex flex-wrap gap-2">
             {recentFeatures.map(({ key, feature }) => {
@@ -37,10 +37,10 @@ export default function Index() {
 
       <div className="flex flex-col gap-2">
         <h3 className="text-xs font-semibold text-muted-foreground/80 uppercase tracking-wider">
-          {'全部工具'}
+          全部工具
         </h3>
         {visibleFeatures.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">{'没有可用的工具'}</p>
+          <p className="text-sm text-muted-foreground py-4 text-center">没有可用的工具</p>
         ) : (
           <div
             className={cn('grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2')}

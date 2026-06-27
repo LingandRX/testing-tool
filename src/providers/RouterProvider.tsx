@@ -108,9 +108,6 @@ export function RouterProvider({
   const hasUserNavigatedRef = useRef(false);
   const canPersistRef = useRef(false);
 
-  /**
-   * 从异步存储中安全溯源初始数据
-   */
   const loadInitialData = useCallback(async () => {
     try {
       const savedRoute = await storageUtil.get(syncKey, defaultRoute);
@@ -149,7 +146,6 @@ export function RouterProvider({
       .then(() => {
         if (cancelled) return;
 
-        // Check URL params for context menu data
         if (typeof window !== 'undefined') {
           const params = new URLSearchParams(window.location.search);
           const feature = params.get('feature') as PageType | null;
@@ -169,7 +165,6 @@ export function RouterProvider({
           }
         }
 
-        // Check storage for pending context menu data
         storageUtil
           .get('contextMenu/pendingData')
           .then((pendingData) => {
@@ -192,7 +187,7 @@ export function RouterProvider({
 
   useEffect(() => {
     if (isLoaded && canPersistRef.current && syncRoute) {
-      void storageUtil.set(syncKey, currentPage as PageType).catch(console.error);
+      void storageUtil.set(syncKey, currentPage).catch(console.error);
       try {
         localStorage.setItem(`snapshot/${syncKey}`, JSON.stringify(currentPage));
       } catch (err) {
@@ -324,7 +319,7 @@ export function RouterProvider({
 export function useRouter() {
   const context = useContext(RouterContext);
   if (!context) {
-    throw new Error('useRouter must be used within a valid RouterProvider context wrapper');
+    throw new Error('useRouter must be used within RouterProvider');
   }
   return context;
 }

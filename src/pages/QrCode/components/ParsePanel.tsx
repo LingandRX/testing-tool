@@ -13,7 +13,6 @@ export default function ParsePanel() {
 
   const hasFile = parserState.selectedFile !== null;
 
-  // 全局粘贴事件监听
   const handlePaste = useCallback(
     async (e: ClipboardEvent) => {
       const items = e.clipboardData?.items;
@@ -56,7 +55,6 @@ export default function ParsePanel() {
     };
   }, [handlePaste]);
 
-  // 未上传图片：只显示上传区域
   if (!hasFile) {
     return (
       <div className="w-full select-none p-0.5">
@@ -72,18 +70,16 @@ export default function ParsePanel() {
     );
   }
 
-  // 已上传图片：显示图片预览 + 解析结果
   return (
     <div className="w-full select-none p-0.5 flex flex-col">
-      {/* 图片预览区域（小图预览） */}
       <div className="border border-border rounded-xl bg-card text-card-foreground shadow-sm p-3 mb-3">
         <div className="flex items-center justify-between mb-1.5">
           <Label className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider select-none pl-0.5">
-            {'已上传图片'}
+            已上传图片
           </Label>
           <Button variant="ghost" size="sm" onClick={handleClearFile} className="h-6 px-2 text-xs">
             <RefreshCw className="w-3 h-3 mr-1" />
-            {'重新上传'}
+            重新上传
           </Button>
         </div>
         <div className="flex items-center gap-3 bg-muted/50 rounded-md p-2">
@@ -95,13 +91,12 @@ export default function ParsePanel() {
           <div className="flex-1 min-w-0">
             <p className="text-sm text-foreground truncate">{parserState.selectedFile?.name}</p>
             {parserState.parsing && (
-              <p className="text-xs text-primary animate-pulse mt-1">{'解析中...'}</p>
+              <p className="text-xs text-primary animate-pulse mt-1">解析中...</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* 解析结果区域 */}
       <div
         className={cn(
           'border border-border rounded-xl bg-card text-card-foreground shadow-sm flex flex-col p-4',
@@ -110,7 +105,7 @@ export default function ParsePanel() {
       >
         <div className="flex flex-col space-y-2.5">
           <Label className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider pl-0.5">
-            {'解析结果'}
+            解析结果
           </Label>
 
           <TextInputArea

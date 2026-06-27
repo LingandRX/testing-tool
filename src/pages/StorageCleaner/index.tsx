@@ -34,7 +34,7 @@ export default function Index() {
       <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full">
         <Loader2 className="h-6 w-6 text-muted-foreground/80" />
         <span className="text-xs text-muted-foreground mt-2 font-medium tracking-wide">
-          {'正在读取数据...'}
+          正在读取数据...
         </span>
       </div>
     );
@@ -73,7 +73,7 @@ export default function Index() {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {'正在清理...'}
+                正在清理...
               </>
             ) : (
               '立即清理'

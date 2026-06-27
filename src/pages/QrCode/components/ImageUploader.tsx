@@ -1,21 +1,14 @@
-import { useCallback, useRef } from 'react';
 import { Image, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
 interface ImageUploaderProps {
-  /** 选中的文件 */
   selectedFile: File | null;
-  /** 文件变更回调 */
   onFileChange: (file: File) => void;
-  /** 清除文件回调 */
   onClearFile: () => void;
-  /** 文件预览 URL */
   previewUrl: string;
-  /** 是否正在拖拽 */
   dragging: boolean;
-  /** 拖拽状态变更回调 */
   onDraggingChange: (dragging: boolean) => void;
 }
 
@@ -27,26 +20,18 @@ const ImageUploader = ({
   dragging,
   onDraggingChange,
 }: ImageUploaderProps) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = useCallback(
-    (file: File) => {
-      onFileChange(file);
-    },
-    [onFileChange],
-  );
-
-  const handleClearFile = useCallback(() => {
+  const handleClearFile = () => {
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
     onClearFile();
     toast.success('图片已清除');
-  }, [previewUrl, onClearFile]);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFileChange(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      onFileChange(file);
     }
   };
 
@@ -64,7 +49,7 @@ const ImageUploader = ({
     onDraggingChange(false);
     const droppedFile = e.dataTransfer.files?.[0];
     if (droppedFile) {
-      handleFileChange(droppedFile);
+      onFileChange(droppedFile);
     }
   };
 
@@ -82,7 +67,6 @@ const ImageUploader = ({
       onDrop={handleDrop}
     >
       <input
-        ref={fileInputRef}
         type="file"
         accept="image/*"
         onChange={handleInputChange}
@@ -113,7 +97,7 @@ const ImageUploader = ({
               </Button>
             </div>
             <span className="block text-sm text-muted-foreground mt-2">{selectedFile.name}</span>
-            <span className="block text-xs text-muted-foreground">{'点击更换图片'}</span>
+            <span className="block text-xs text-muted-foreground">点击更换图片</span>
           </div>
         ) : (
           <>
@@ -122,10 +106,10 @@ const ImageUploader = ({
               className="w-12 h-12 text-muted-foreground mx-auto mb-2"
             />
             <span className="block text-sm text-muted-foreground mb-1">
-              {'点击、拖拽或粘贴上传二维码图片'}
+              点击、拖拽或粘贴上传二维码图片
             </span>
             <span className="block text-xs text-muted-foreground">
-              {'支持 PNG、JPG、WEBP、Base64 格式'}
+              支持 PNG、JPG、WEBP、Base64 格式
             </span>
           </>
         )}

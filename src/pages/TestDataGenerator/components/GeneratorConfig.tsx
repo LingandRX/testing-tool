@@ -27,7 +27,7 @@ export default function GeneratorConfig({ generator, params, onChange }: Generat
   };
 
   if (generator.params.length === 0) {
-    return <p className="text-sm text-muted-foreground py-2">{'此生成器无可配置参数'}</p>;
+    return <p className="text-sm text-muted-foreground py-2">此生成器无可配置参数</p>;
   }
 
   return (
@@ -108,7 +108,7 @@ export default function GeneratorConfig({ generator, params, onChange }: Generat
                     .filter(Boolean),
                 )
               }
-              placeholder={'用逗号分隔多个值'}
+              placeholder="用逗号分隔多个值"
               className="h-9"
             />
           )}

@@ -50,27 +50,27 @@ export default function ExportPanel({ result }: ExportPanelProps) {
 
   return (
     <div className="space-y-2">
-      <h4 className="text-sm font-medium text-foreground">{'导出数据'}</h4>
+      <h4 className="text-sm font-medium text-foreground">导出数据</h4>
 
       <div className="grid grid-cols-2 gap-2">
         <Button variant="outline" size="sm" onClick={handleCopyJSON} className="h-9 gap-1.5">
           <Copy className="h-4 w-4" />
-          {'复制 JSON'}
+          复制 JSON
         </Button>
 
         <Button variant="outline" size="sm" onClick={handleCopyCSV} className="h-9 gap-1.5">
           <Copy className="h-4 w-4" />
-          {'复制 CSV'}
+          复制 CSV
         </Button>
 
         <Button variant="outline" size="sm" onClick={handleDownloadJSON} className="h-9 gap-1.5">
           <Download className="h-4 w-4" />
-          {'下载 JSON'}
+          下载 JSON
         </Button>
 
         <Button variant="outline" size="sm" onClick={handleDownloadCSV} className="h-9 gap-1.5">
           <Download className="h-4 w-4" />
-          {'下载 CSV'}
+          下载 CSV
         </Button>
       </div>
     </div>

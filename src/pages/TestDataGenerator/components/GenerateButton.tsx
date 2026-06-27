@@ -1,6 +1,5 @@
 /**
  * 生成按钮组件
- * 显示生成按钮、加载状态和进度条
  */
 
 import { Play, Square } from 'lucide-react';
@@ -28,14 +27,13 @@ export default function GenerateButton({
         <>
           <Button variant="destructive" onClick={onCancel} className="w-full h-11 gap-2">
             <Square className="h-5 w-5" />
-            {'取消'}
+            取消
           </Button>
 
-          {/* 进度条 */}
           {progress && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{`已生成 ${progress.generated} / ${progress.total} 条`}</span>
+                <span>{`已生成 ${progress.generated.toLocaleString()} / ${progress.total.toLocaleString()} 条`}</span>
                 <span>{progress.progress}%</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -46,7 +44,7 @@ export default function GenerateButton({
               </div>
               {progress.estimatedTimeLeft !== undefined && (
                 <p className="text-xs text-muted-foreground text-center">
-                  {`预计剩余 ${progress.estimatedTimeLeft} 秒`}
+                  {`预计剩余 ${Math.ceil(progress.estimatedTimeLeft / 1000)} 秒`}
                 </p>
               )}
             </div>
@@ -55,7 +53,7 @@ export default function GenerateButton({
       ) : (
         <Button onClick={onClick} disabled={disabled} className="w-full h-11 gap-2">
           <Play className="h-5 w-5" />
-          {'生成数据'}
+          生成数据
         </Button>
       )}
     </div>

@@ -5,7 +5,6 @@ import Index from '../index';
 import { clearStorage, getCookieSize, getCurrentTab } from '@/utils/storageCleaner';
 import { toast } from 'sonner';
 
-// Mock the chrome APIs
 vi.mock('@/utils/chromeStorage', () => ({
   storageUtil: {
     get: vi.fn().mockResolvedValue(null),

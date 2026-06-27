@@ -102,13 +102,13 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-foreground">{'字段名称'}</Label>
+            <Label className="text-sm font-medium text-foreground">字段名称</Label>
             <span className="text-xs text-muted-foreground">{field.name.length}/20</span>
           </div>
           <Input
             value={field.name}
             onChange={(e) => handleNameChange(e.target.value)}
-            placeholder={'请输入字段名称'}
+            placeholder="请输入字段名称"
             maxLength={20}
             className={`h-9 ${nameError ? 'border-destructive' : ''}`}
           />
@@ -117,7 +117,7 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-foreground">{'字段描述'}</Label>
+            <Label className="text-sm font-medium text-foreground">字段描述</Label>
             <span className="text-xs text-muted-foreground">
               {(field.description || '').length}/50
             </span>
@@ -125,7 +125,7 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
           <Input
             value={field.description || ''}
             onChange={(e) => handleDescriptionChange(e.target.value)}
-            placeholder={'可选，添加字段说明'}
+            placeholder="可选，添加字段说明"
             maxLength={50}
             className="h-9"
           />
@@ -134,14 +134,14 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium text-foreground">{'必填'}</Label>
+          <Label className="text-sm font-medium text-foreground">必填</Label>
           <Switch checked={field.required} onCheckedChange={handleRequiredChange} />
         </div>
 
         {!field.required && (
           <div className="space-y-2 pl-1">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{'空值率'}</span>
+              <span className="text-sm text-muted-foreground">空值率</span>
               <Badge variant="secondary" className="text-xs">
                 {field.nullRate}%
               </Badge>
@@ -180,18 +180,18 @@ export default function FieldEditor({ field, onChange, allFieldNames = [] }: Fie
       </div>
 
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium text-foreground">{'唯一性约束'}</Label>
+        <Label className="text-sm font-medium text-foreground">唯一性约束</Label>
         <Switch checked={field.unique} onCheckedChange={handleUniqueChange} />
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground">{'数据生成器'}</Label>
+        <Label className="text-sm font-medium text-foreground">数据生成器</Label>
         <GeneratorSelector selectedId={field.generatorId} onChange={handleGeneratorChange} />
       </div>
 
       {generator && (
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground">{'生成器参数'}</Label>
+          <Label className="text-sm font-medium text-foreground">生成器参数</Label>
           <GeneratorConfig
             generator={generator}
             params={field.params}

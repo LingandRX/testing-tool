@@ -37,7 +37,6 @@ import { cn } from '@/lib/utils';
 | `business.ts`  | 业务数据生成器（订单号、价格、日期、状态等）   |
 | `technical.ts` | 技术数据生成器（UUID、IPv4、URL）              |
 | `basic.ts`     | 基础类型生成器（整数、浮点数、布尔值、字符串） |
-| `types.ts`     | 生成器库内部类型与通用选项                     |
 
 使用示例：
 

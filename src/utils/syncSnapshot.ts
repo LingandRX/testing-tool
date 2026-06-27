@@ -15,7 +15,7 @@ export function getSyncSnapshot<T>(
     }
     return (parsed as T) ?? defaultValue;
   } catch (error) {
-    console.error(`[SyncSnapshot] Failed to read snapshot/${key}:`, error);
+    console.error(`读取快照失败 (${key}):`, error);
     return defaultValue;
   }
 }

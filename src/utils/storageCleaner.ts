@@ -9,8 +9,6 @@ import {
 } from '@/utils/indexedDbCleaner';
 import { browser } from 'wxt/browser';
 
-type CleanScriptResult = IndexedDBCleanResult;
-
 export async function getCurrentTab() {
   // For popup pages, we need to get the active tab from the browser window that triggered the popup.
   // We should ONLY care about the currently active tab in the last focused window.
@@ -220,7 +218,7 @@ export async function clearCookies(url: string): Promise<StorageCleanResult> {
  */
 async function runCleanScript<A extends unknown[] = []>(
   tabId: number,
-  func: (...args: A) => CleanScriptResult | Promise<CleanScriptResult>,
+  func: (...args: A) => IndexedDBCleanResult | Promise<IndexedDBCleanResult>,
   errorLabel: string,
   args?: A,
 ): Promise<StorageCleanResult> {

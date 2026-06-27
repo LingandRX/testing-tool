@@ -8,7 +8,7 @@ interface TextModeProps {
   onSwitchToImageMode?: () => void;
 }
 
-export default function TextMode({ onSwitchToImageMode }: TextModeProps = {}) {
+export default function TextMode({ onSwitchToImageMode }: TextModeProps) {
   const {
     input,
     setInput,
