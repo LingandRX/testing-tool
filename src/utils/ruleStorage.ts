@@ -78,7 +78,7 @@ export function save(
       useCount: 0,
     };
     rules.unshift(newRule);
-    setAll(rules);
+    if (!setAll(rules)) return null;
     return newRule;
   }
 
@@ -95,7 +95,7 @@ export function save(
     updatedAt: now,
   };
   rules[index] = updatedRule;
-  setAll(rules);
+  if (!setAll(rules)) return null;
   return updatedRule;
 }
 
@@ -117,7 +117,7 @@ export function update(id: string, updates: Partial<DataRule>): DataRule | null 
     updatedAt: Date.now(),
   };
   rules[index] = updatedRule;
-  setAll(rules);
+  if (!setAll(rules)) return null;
   return updatedRule;
 }
 
@@ -132,7 +132,7 @@ export function deleteRule(id: string): boolean {
     return false;
   }
   rules.splice(index, 1);
-  setAll(rules);
+  if (!setAll(rules)) return false;
   return true;
 }
 
@@ -267,11 +267,13 @@ export function clear(): void {
 /**
  * 保存所有规则到存储
  */
-function setAll(rules: DataRule[]): void {
+function setAll(rules: DataRule[]): boolean {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
+    return true;
   } catch (error) {
     console.error('[ruleStorage] 保存规则失败:', error);
+    return false;
   }
 }
 

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { copyTextToClipboard } from '@/utils/clipboard';
 import { Button, type ButtonProps } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface CopyButtonProps extends Omit<ButtonProps, 'children' | 'onClick'> {
@@ -53,7 +54,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       aria-label={tooltip ?? '复制'}
       variant={variant}
       size={size}
-      className={className}
+      className={cn(className, copied && 'text-emerald-500')}
       {...props}
     >
       {copied ? (
