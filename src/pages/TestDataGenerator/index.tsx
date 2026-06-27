@@ -118,6 +118,7 @@ export default function TestDataGeneratorPage() {
     [clearResult],
   );
 
+  // 保存规则成功后清除编辑状态
   const handleRuleSaved = useCallback(() => {
     setEditingRule(null);
   }, []);
@@ -128,7 +129,6 @@ export default function TestDataGeneratorPage() {
   }, [fields, count, format, generate]);
 
   const selectedField = selectedIndex !== null && selectedIndex >= 0 ? fields[selectedIndex] : null;
-
   const handleOpenEditor = useCallback((index: number) => {
     setSelectedIndex(index);
     setIsEditorOpen(true);
@@ -137,8 +137,11 @@ export default function TestDataGeneratorPage() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20">
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
+        {/* 主要内容区域 - 左右分栏 */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-start">
+          {/* 左侧面板 - 字段配置 */}
           <div className="lg:col-span-3 space-y-4">
+            {/* 标签页切换 */}
             <div className="flex gap-1 p-1 bg-muted rounded-lg">
               <button
                 onClick={() => setActiveTab('fields')}
@@ -207,7 +210,10 @@ export default function TestDataGeneratorPage() {
             </div>
           </div>
 
+          {/* 右侧面板 - 数据预览和结果 */}
           <div className="lg:col-span-2 space-y-4">
+            {/* 结果状态 */}
+            {/* 仅在失败或有警告时显示结果面板 */}
             {((result && !result.success) ||
               (result?.warnings && result.warnings.length > 0) ||
               error) && (
