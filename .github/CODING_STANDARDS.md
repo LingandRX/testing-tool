@@ -265,12 +265,11 @@ const visibleSet = useMemo(() => new Set<string>(visiblePages), [visiblePages]);
 2. 第三方库（图标、UI 库等）
 3. 业务 Provider / Context
 4. 配置 / 存储
-5. i18n
-6. 本地页面组件
-7. UI 组件
-8. 工具函数 / Hook
-9. 类型
-10. 常量
+5. 本地页面组件
+6. UI 组件
+7. 工具函数 / Hook
+8. 类型
+9. 常量
 
 ```typescript
 // 1. React 核心
@@ -284,18 +283,16 @@ import { useThemeMode } from '@/providers/ThemeModeProvider';
 // 4. 配置 / 存储
 import { FeatureConfig, FEATURES } from '@/config/features';
 import { storageUtil } from '@/utils/chromeStorage';
-// 5. i18n
-import { useI18n } from '@/utils/chromeI18n';
-// 6. 本地组件
+// 5. 本地组件
 import TextMode from './TextMode';
 import { ZONES } from './constants';
-// 7. UI 组件
+// 6. UI 组件
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import { Button } from '@/components/ui/button';
-// 8. 工具函数 / Hook
+// 7. 工具函数 / Hook
 import { cn } from '@/lib/utils';
 import { useStorageState } from '@/utils/useStorageState';
-// 9. 类型
+// 8. 类型
 import type { PageType, StorageSchema } from '@/types/storage';
 ```
 
@@ -559,7 +556,7 @@ describe('SwitchButtonGroup 组件', () => {
 - 使用 `vi.mock()` 进行模块级 Mock
 - 使用 `vi.fn()` 进行函数级 Mock
 - 使用 `vi.useFakeTimers()` 控制时间
-- **避免重复 mock `vitest.setup.ts` 中已有的内容**（chrome API、i18n、matchMedia 等）
+- **避免重复 mock `vitest.setup.ts` 中已有的内容**（chrome API、matchMedia 等）
 
 ```typescript
 // ✅ 模块级 Mock
@@ -657,7 +654,7 @@ export function useTimestampConverter(): UseTimestampConverterReturn { ... }
 
 ```
 src/utils/useStorageState.ts          — Chrome Storage 状态持久化
-src/utils/chromeI18n.ts               — chrome.i18n wrapper 与 useI18n
+src/utils/syncSnapshot.ts             — localStorage 快照读取
 src/utils/useContextMenuData.ts       — 右键菜单数据
 src/utils/useDebounce.ts              — 防抖
 src/pages/Timestamp/useTimestampConverter.ts    — 页面级 Hook
@@ -666,52 +663,50 @@ src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
 
 ---
 
-## 9. 国际化规范
+## 9. UI 文案规范
 
-### 9.1 翻译键格式
+项目已移除 `chrome.i18n`，所有 UI 文案直接在代码中使用中文。
 
-- 使用 Chrome 扩展标准的 `chrome.i18n`，通过 `src/utils/chromeI18n.ts` 暴露 `useI18n`
-- 翻译 key 存放在 `public/_locales/zh_CN/messages.json`
-- 直接 key：`t('dashboard_title')` → 查找 `dashboard_title`
-- 命名空间兼容写法：`t('common:buttons.search')` → 查找 `common_buttons_search`
-- 命名空间参数：`useI18n(['common', 'features'])` 会尝试 `common_key`、`features_key`
+### 9.1 功能元数据
 
-### 9.2 翻译文件结构
-
-```
-public/_locales/zh_CN/messages.json        — Chrome 扩展默认语言包
-wxt.config.ts                              — manifest.default_locale = 'zh_CN'
-```
-
-### 9.3 使用方式
+功能名称与描述在 `config/features.tsx` 的 `FEATURES` 数组中定义：
 
 ```typescript
-// ✅ 页面组件 / 子组件 — 使用 useI18n
-import { useI18n } from '@/utils/chromeI18n';
-
-export default function Index() {
-  const { t } = useI18n('timestamp');
-  return <h1>{t('timestamp_title')}</h1>;
-}
-
-// ✅ 带占位符
-export function NotFoundMessage() {
-  const { t } = useI18n('router');
-  return <p>{t('router_notFoundDescription', { entryPointType: 'popup' })}</p>;
+{
+  key: 'timestamp',
+  label: '时间戳转换',
+  description: '日期与时间戳互转',
+  defaultVisible: true,
+  components: { popup: TimestampPage, sidepanel: TimestampPage, tab: TimestampPage },
 }
 ```
 
-### 9.4 添加新翻译
+Dashboard 卡片、TopBar 搜索等功能从此处读取 `label` / `description`。
 
-1. 在 `public/_locales/zh_CN/messages.json` 添加 Chrome 扩展格式的消息：
-   ```json
-   {
-     "feature_title": { "message": "功能标题" },
-     "feature_description": { "message": "功能描述" }
-   }
-   ```
-2. key 使用下划线分隔，避免点号；`useI18n` 会把 `namespace:key.path` 兼容转换为下划线
-3. `chrome.i18n` 不支持运行时动态切换语言，浏览器语言变化后需要刷新扩展页面
+### 9.2 页面与组件文案
+
+- 页面标题、按钮、提示信息等直接在 JSX 或 `constants.ts` 中写中文
+- 错误消息可在 Hook 中定义，或使用常量映射
+- Toast 通知使用 `sonner` 的 `toast()`，文案写在调用处或常量中
+
+```typescript
+// ✅ 页面组件 — 直接写中文
+export default function Index() {
+  return <h1 className="font-bold text-sm">时间戳转换</h1>;
+}
+
+// ✅ 常量文件 — 可复用文案
+export const ERROR_MESSAGES = {
+  invalidInput: '输入格式无效',
+  conversionFailed: '转换失败',
+} as const;
+```
+
+### 9.3 添加新功能文案
+
+1. 在 `config/features.tsx` 填写 `label` 和 `description`
+2. 在页面组件、`constants.ts` 或 Hook 中编写 UI 文案
+3. 扩展名称与描述在 `wxt.config.ts` 的 `manifest` 中维护
 
 ---
 
@@ -763,6 +758,18 @@ const [themeMode, setThemeMode, isInitialized] = useStorageState(
   isValidMode, // 可选的类型守卫
 );
 ```
+
+### 10.4 首屏快照与初始化防覆盖
+
+Chrome Storage 读取是异步的。项目通过 `localStorage` 快照（键名 `snapshot/{storageKey}`）提供同步初始值，消除首屏闪烁。
+
+| 模块 | 快照工具 | 防覆盖机制 |
+| ---- | -------- | ---------- |
+| `RouterProvider` | `syncSnapshot.ts` | `canPersistRef`（加载成功后才写入）、`hasUserNavigatedRef`（用户导航后不被 storage 覆盖） |
+| `useStorageState` | `syncSnapshot.ts` | `loadSucceededRef` 或 `userModifiedRef` 为 true 时才写入 |
+| `ThemeModeProvider` | `themeSnapshot.ts` | `hasUserSetMode`（用户切换主题后不被 storage 覆盖） |
+
+新增持久化状态时，应遵循相同模式：同步快照作初始 state → 异步加载 storage → 加载成功或用户修改后才允许写入。
 
 ---
 
@@ -846,24 +853,21 @@ export default function DashboardPage() { ... }
 
 #### 组件职责
 
-`index.tsx` 只负责三件事：
+`index.tsx` 只负责两件事：
 
-1. **获取翻译函数**（`useI18n`）
-2. **调用业务 Hook** 获取状态和操作方法
-3. **渲染 UI 布局**（纯展示，无业务逻辑）
+1. **调用业务 Hook** 获取状态和操作方法
+2. **渲染 UI 布局**（纯展示，无业务逻辑）
 
 ```typescript
 // ✅ 标准页面入口模板
-import { useI18n } from '@/utils/chromeI18n';
 import { useFeatureName } from './useFeatureName';
 
 export default function Index() {
-  const { t } = useI18n('featureName');
   const { state, actions } = useFeatureName();
 
   return (
     <div className="p-4 w-full flex flex-col space-y-4 select-none">
-      {/* 纯 UI 渲染 */}
+      {/* 纯 UI 渲染，文案直接写中文 */}
     </div>
   );
 }
@@ -907,25 +911,22 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
 
 ```typescript
 export function useFeatureName(): UseFeatureNameReturn {
-  // 1. i18n
-  const { t } = useI18n('featureName');
-
-  // 2. 基础 state（useState）
+  // 1. 基础 state（useState）
   const [mode, setMode] = useState<Mode>('default');
   const [input, setInput] = useState('');
 
-  // 3. 持久化 state（useStorageState）
+  // 2. 持久化 state（useStorageState）
   const [pageMode, setPageMode] = useStorageState('feature/pageMode', 'default', isValidMode);
 
-  // 4. 衍生数据（useMemo）— 响应式计算管线
+  // 3. 衍生数据（useMemo）— 响应式计算管线
   const result = useMemo(() => {
     // 自动计算，无需手动点击"转换"按钮
   }, [input, mode]);
 
-  // 5. 事件处理（useCallback）
+  // 4. 事件处理（useCallback）
   const handleAction = useCallback(() => { ... }, [deps]);
 
-  // 6. 副作用（useEffect）— 防抖、初始化、清理
+  // 5. 副作用（useEffect）— 防抖、初始化、清理
   useEffect(() => { ... }, [deps]);
 
   // 7. 右键菜单数据（页面需要时）
@@ -995,7 +996,7 @@ interface ResultViewProps extends React.HTMLAttributes<HTMLDivElement> {
 // ✅ 使用 React.memo + displayName
 const ResultView = React.memo(
   ({ result, mode, showEmptyPlaceholder = false, className, ...props }: ResultViewProps) => {
-    const { t } = useI18n('featureName');
+    // 文案直接写中文或使用 constants
     // ...
   },
 );
@@ -1005,7 +1006,7 @@ export default ResultView;
 
 #### 子组件内可以使用 Hook
 
-子组件可以独立调用 `useI18n`、`useSnackbar` 等全局 Hook，**不需要**通过 props 从父组件传递翻译函数或 toast 方法。
+子组件可以独立调用 `useRouter`、`useThemeMode`、`toast` 等全局 Hook/API，**不需要**通过 props 从父组件传递。
 
 ---
 
@@ -1042,7 +1043,6 @@ const isValidMode = (val: unknown): val is PageMode =>
   typeof val === 'string' && (VALID_MODES as readonly string[]).includes(val);
 
 export default function Index() {
-  const { t } = useI18n('featureName');
   const [pageMode, setPageMode] = useStorageState('feature/pageMode', 'modeA', isValidMode);
 
   return (
@@ -1050,8 +1050,8 @@ export default function Index() {
       <SwitchButtonGroup
         value={pageMode}
         options={[
-          { value: 'modeA', label: t('feature:modeA') },
-          { value: 'modeB', label: t('feature:modeB') },
+          { value: 'modeA', label: '模式 A' },
+          { value: 'modeB', label: '模式 B' },
         ]}
         onChange={(v: PageMode) => setPageMode(v)}
         size="small"
@@ -1082,12 +1082,12 @@ export default function Index() {
 新增功能页面时，逐项确认：
 
 1. ✅ 在 `types/storage.d.ts` 添加 `PageType` 联合类型
-2. ✅ 在 `config/features.tsx` 注册 `FEATURES` 配置（key、labelKey、icon、三种渲染模式组件）
+2. ✅ 在 `config/features.tsx` 注册 `FEATURES` 配置（key、label、description、icon、三种渲染模式组件）
 3. ✅ 创建页面目录，使用 `Index` 作为组件名
 4. ✅ 业务逻辑提取到 `useXxx.ts` Hook（index.tsx 不超过 150 行）
 5. ✅ 需要持久化的 UI 状态使用 `useStorageState`
 6. ✅ 常量 ≥3 个时提取到 `constants.ts`
-7. ✅ 在 `public/_locales/zh_CN/messages.json` 添加翻译
+7. ✅ 在页面组件或 `constants.ts` 中编写 UI 文案
 8. ✅ 创建 `__tests__/index.test.tsx` 测试文件
 9. ✅ 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
 10. ✅ 运行 `npm run lint && npm run typecheck && npm run test` 全部通过
@@ -1108,7 +1108,7 @@ export default function Index() {
 | `src/utils/`         | 工具函数与服务抽象                                           |
 | `src/types/`         | TypeScript 类型声明                                          |
 | `src/lib/`           | 通用工具函数与生成器库（cn、utils、generators）              |
-| `public/`            | 静态资源与 Chrome `_locales` 语言包                          |
+| `public/`            | 静态资源（图标等）                                           |
 
 ---
 

@@ -61,7 +61,7 @@ src/                     # 源代码根目录
   lib/                     # 通用工具函数（cn、utils）及数据生成器定义
   workers/                 # Web Worker（数据生成等耗时任务）
 spec/                    # 功能规格、修复方案与验收标准（见 spec/README.md）
-public/                  # 静态资源（图标、_locales 等）
+public/                  # 静态资源（图标等）
 .wxt/                    # wxt prepare 自动生成，含类型声明与扩展 tsconfig（勿手动编辑）
 .output/                 # 生产构建输出目录
 ```
@@ -132,7 +132,8 @@ src/types/
 每种模式有独立的路由和可见页面配置（`app/popupRoute`、`app/sidepanelRoute`、`app/tabRoute` 等）。
 
 **存储**: 所有 Chrome Storage 键必须在 `src/types/storage.d.ts` 的 `StorageSchema` 中定义，键名使用 kebab-case 格式（如 `app/currentRoute`）。
-使用 `src/utils/chromeStorage.ts` 及其 Hook。Router 同时使用 `chrome.storage.local` 和 `localStorage` 做快照以消除首屏闪烁。
+使用 `src/utils/chromeStorage.ts` 及其 Hook。Router 同时使用 `chrome.storage.local` 和 `localStorage` 快照（`snapshot/{key}`）消除首屏闪烁。
+异步加载完成前禁止写入 storage（`RouterProvider` 的 `canPersistRef`、`useStorageState` 的 `loadSucceededRef`），避免默认值覆盖已有数据。
 
 **通信**: 使用 `@webext-core/messaging`，协议定义在 `src/utils/messages.ts`。
 
@@ -146,39 +147,30 @@ src/types/
 - 全局变量: `vitest/globals` (describe, it, expect 等无需导入)
 - Setup 文件: `vitest.setup.ts` 自动 mock:
   - `chrome.*` / `browser.*` API (storage, tabs, runtime, cookies 等)
-  - `@/utils/chromeI18n` (从 `public/_locales/zh_CN/messages.json` 加载真实翻译)
   - `window.matchMedia`
 - 测试文件命名: `__tests__/*.test.{ts,tsx}` 或 `*.test.{ts,tsx}`
 - Mock 模式: 使用 `vi.mock()` 进行模块级 mock，避免在测试文件中重复 mock 代码
 - 测试工具: `@testing-library/react` + `@testing-library/user-event` 进行组件测试
 
-## i18n (chrome.i18n)
+## UI 文案
 
-项目使用 Chrome 扩展标准的 `chrome.i18n` API 进行本地化，通过 `src/utils/chromeI18n.ts` 提供类型安全的 React Hook 包装。
+项目已移除 `chrome.i18n`，UI 文案直接在代码中使用中文。
 
-- **翻译文件**: `public/_locales/zh_CN/messages.json`（Chrome 扩展标准格式）
-- **默认语言**: `zh_CN`（在 `wxt.config.ts` 的 `manifest.default_locale` 中配置）
-- **使用方式**: `import { useI18n } from '@/utils/chromeI18n'`
-- **翻译键格式**:
-  - 直接 key: `t('dashboard_title')` → 查找 `dashboard_title`
-  - 命名空间格式（兼容旧用法）: `t('common:buttons.search')` → 查找 `common_buttons_search`
-  - 带命名空间参数: `useI18n(['common', 'features'])`，会自动尝试 `common_key`、`features_key`
-- **占位符支持**: `t('router_notFoundDescription', { entryPointType: 'popup' })`
-- **Hook 返回值**: `{ t, i18n: { language, changeLanguage }, isLoaded }`
-- **回退策略**: 当翻译 key 未命中时，返回 key 本身（开发模式下在控制台记录 warning）
-- **限制**: `chrome.i18n` 无法动态切换语言，语言跟随浏览器设置，切换后需刷新页面
+- **功能元数据**: `src/config/features.tsx` 的 `FEATURES` 数组定义 `label`、`description`（用于 Dashboard 卡片与搜索）
+- **页面文案**: 在组件 JSX、`constants.ts` 或 Hook 中直接写中文
+- **Manifest 文案**: 扩展名称与描述在 `wxt.config.ts` 的 `manifest` 中维护
+- **Toast / 错误提示**: 在 Hook 或 `constants.ts` 中定义，使用 `sonner` 的 `toast()` 展示
 
 ## 新功能开发清单
 
 1. 在 `src/types/storage.d.ts` 添加 `PageType` 联合类型
-2. 在 `src/config/features.tsx` 的 `FEATURES` 数组添加配置（指定 key、翻译键、图标、三种渲染模式的组件）
+2. 在 `src/config/features.tsx` 的 `FEATURES` 数组添加配置（指定 key、label、description、图标、三种渲染模式的组件）
 3. 在 `src/pages/` 创建页面组件 (懒加载)：
-   - `index.tsx` — UI 组件，使用 `useI18n` 获取翻译
+   - `index.tsx` — UI 组件（纯展示）
    - `useFeatureName.ts` — 业务逻辑 Hook
-   - `constants.ts` — 常量（可选）
-4. 在 `public/_locales/zh_CN/messages.json` 添加翻译
-5. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
-6. 添加对应的单元测试
+   - `constants.ts` — 常量定义（可选，≥3 个常量时创建）
+4. 如需新权限，更新 `wxt.config.ts` 的 `manifest.permissions`
+5. 添加对应的单元测试
 
 ## 代码规范
 
