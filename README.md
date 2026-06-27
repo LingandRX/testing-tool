@@ -81,7 +81,7 @@
 - **UI 组件**: shadcn/ui (基于 Radix UI 的无头组件库)
 - **样式**: Tailwind CSS + class-variance-authority + cn() 工具函数
 - **日期处理**: dayjs (集成 UTC 和 Timezone 插件)
-- **国际化**: Chrome `chrome.i18n` + `public/_locales/zh_CN/messages.json`
+- **UI 文案**: 组件内直接使用中文字符串；功能名称与描述定义在 `src/config/features.tsx`
 - **通信**: @webext-core/messaging
 - **存储**: Chrome Storage API (类型安全封装)
 - **解析引擎**: qr-scanner (二维码解析), qrious (二维码生成)
@@ -108,7 +108,7 @@
 │   ├── utils/             # 工具函数与服务抽象
 │   ├── types/             # TypeScript 类型声明
 │   └── lib/               # 通用工具函数与生成器库 (cn, utils, generators 等)
-├── public/                # 静态资源 (图标、_locales 本地化资源等)
+├── public/                # 静态资源 (图标等)
 ├── wxt.config.ts          # WXT 框架核心配置
 └── package.json           # 项目元数据与依赖管理
 ```
