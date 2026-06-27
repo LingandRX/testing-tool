@@ -3,8 +3,6 @@ import { useRouter } from '@/providers/RouterProvider';
 import type { PageType } from '@/types/storage';
 import { resolveDashboardFeatures, type DashboardFeatureItem } from './dashboardFeatures';
 
-export type { DashboardFeatureItem } from './dashboardFeatures';
-
 export interface UseDashboardReturn {
   visibleFeatures: DashboardFeatureItem[];
   recentFeatures: DashboardFeatureItem[];

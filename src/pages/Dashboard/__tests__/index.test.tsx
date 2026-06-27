@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getFeatureByKey } from '@/config/features';
-import type { DashboardFeatureItem } from '../useDashboard';
+import { resolveDashboardFeatures, type DashboardFeatureItem } from '../dashboardFeatures';
 import Index from '../index';
 
 const mockNavigateTo = vi.fn();
@@ -13,11 +12,7 @@ vi.mock('../useDashboard', () => ({
 }));
 
 function buildFeatureItem(key: 'timestamp' | 'jwt'): DashboardFeatureItem {
-  const feature = getFeatureByKey(key)!;
-  return {
-    key,
-    feature: feature as DashboardFeatureItem['feature'],
-  };
+  return resolveDashboardFeatures([key], [key])[0]!;
 }
 
 describe('Dashboard 页面', () => {

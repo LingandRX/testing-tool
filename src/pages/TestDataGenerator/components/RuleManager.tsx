@@ -165,7 +165,6 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
 
   return (
     <div className="space-y-4">
-      {/* 删除确认对话框 */}
       <Dialog open={!!ruleToDelete} onOpenChange={() => setRuleToDelete(null)}>
         <DialogContent
           showCloseButton={false}
@@ -178,16 +177,15 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
           </div>
           <div className="flex justify-end gap-2 px-6 py-2 border-t shrink-0">
             <Button variant="ghost" size="sm" onClick={() => setRuleToDelete(null)}>
-              {'取消'}
+              取消
             </Button>
             <Button variant="destructive" size="sm" onClick={handleDelete}>
-              {'确认'}
+              确认
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* 工具栏 */}
       <div className="flex items-center gap-2 flex-wrap">
         <Button
           variant="outline"
@@ -201,7 +199,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
           ) : (
             <Upload className="h-4 w-4" />
           )}
-          {'导入'}
+          导入
         </Button>
         <Button
           variant="outline"
@@ -215,17 +213,16 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
           ) : (
             <Download className="h-4 w-4" />
           )}
-          {'导出数据'}
+          导出数据
         </Button>
       </div>
 
-      {/* 搜索框 */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value.slice(0, 20))}
-          placeholder={'搜索规则...'}
+          placeholder="搜索规则..."
           className="pl-9 pr-24 h-9"
           maxLength={20}
         />
@@ -234,7 +231,6 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
         </span>
       </div>
 
-      {/* 规则列表 */}
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {filteredRules.length === 0 ? (
           <div className="text-center py-6">
@@ -252,9 +248,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-sm text-foreground truncate">{rule.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {rule.fields.length} {'字段'}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{rule.fields.length} 字段</span>
                 </div>
                 {rule.description && (
                   <p className="text-xs text-muted-foreground truncate mt-0.5">
@@ -276,7 +270,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                   size="icon"
                   className="h-7 w-7"
                   onClick={() => handleLoad(rule)}
-                  title={'加载'}
+                  title="加载"
                 >
                   <FolderOpen className="h-3.5 w-3.5" />
                 </Button>
@@ -285,7 +279,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                   size="icon"
                   className="h-7 w-7"
                   onClick={() => handleEdit(rule)}
-                  title={'编辑'}
+                  title="编辑"
                 >
                   <Edit className="h-3.5 w-3.5" />
                 </Button>
@@ -294,7 +288,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                   size="icon"
                   className="h-7 w-7"
                   onClick={() => handleDuplicate(rule.id)}
-                  title={'复制'}
+                  title="复制"
                 >
                   <Copy className="h-3.5 w-3.5" />
                 </Button>
@@ -303,7 +297,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                   size="icon"
                   className="h-7 w-7 text-destructive hover:text-destructive"
                   onClick={() => setRuleToDelete(rule)}
-                  title={'删除'}
+                  title="删除"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>

@@ -2,11 +2,11 @@ import React from 'react';
 import { formatBytes } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { StorageSizeInfo } from '../useStorageCleaner';
-import { OPTION_LABELS } from '../constants';
+import { CLEAN_OPTION_KEYS, OPTION_LABELS } from '../constants';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface OptionItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  labelKey: string;
+  labelKey: (typeof CLEAN_OPTION_KEYS)[number];
   checked: boolean;
   sizeInfo?: StorageSizeInfo;
   onChange: () => void;
@@ -22,8 +22,7 @@ export default function OptionItem({
 }: OptionItemProps) {
   const sizeValue = sizeInfo?.value;
   const isCount = sizeInfo?.displayType === 'count';
-  const label =
-    labelKey in OPTION_LABELS ? OPTION_LABELS[labelKey as keyof typeof OPTION_LABELS] : labelKey;
+  const label = OPTION_LABELS[labelKey];
 
   return (
     <div
@@ -58,7 +57,7 @@ export default function OptionItem({
           </span>
         ) : (
           <span className="block text-[10px] font-medium text-muted-foreground/50 mt-0.5 italic">
-            {'无数据'}
+            无数据
           </span>
         )}
       </div>

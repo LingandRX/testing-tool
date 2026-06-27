@@ -23,7 +23,7 @@ export function isUnsupportedPageUrl(url: string | undefined): boolean {
   if (!url) return true;
   const protocol = getUrlProtocol(url);
   if (!protocol) return true;
-  return (RESTRICTED_PROTOCOLS as readonly string[]).includes(protocol);
+  return RESTRICTED_PROTOCOLS.some((p) => p === protocol);
 }
 
 /** 用于 storage cleaner tab 检测（前缀匹配，兼容无 protocol 的场景） */

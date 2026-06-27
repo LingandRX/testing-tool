@@ -28,7 +28,6 @@ export const useStorageState = <K extends keyof StorageSchema>(
     setValueInternal(next);
   }, []);
 
-  // Only load from storage once on mount
   useEffect(() => {
     if (hasLoadedFromStorage.current) return;
 
@@ -64,7 +63,6 @@ export const useStorageState = <K extends keyof StorageSchema>(
     };
   }, [defaultValue, key, validator]);
 
-  // Save to storage and localStorage snapshot when value changes (after initial load)
   useEffect(() => {
     if (!isInitialized) return;
     if (!loadSucceededRef.current && !userModifiedRef.current) return;

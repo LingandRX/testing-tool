@@ -24,7 +24,7 @@ export default function ErrorDisplay({ error, className, ...props }: ErrorDispla
         </p>
 
         <p className="text-xs font-medium leading-relaxed text-muted-foreground/90 px-2">
-          {'存储清理功能仅适用于标准网页'}
+          存储清理功能仅适用于标准网页
         </p>
       </div>
     </div>

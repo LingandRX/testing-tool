@@ -4,18 +4,17 @@ import { getTextStats } from '@/utils/textStatistics';
 import { hidePopover, showTextStatsResult, showTimestampResult } from './uiPopover';
 
 function convertTimestamp(input: string): string {
-  const invalidText = '无效时间戳';
   const num = Number(input.trim());
 
   if (isNaN(num)) {
-    return invalidText;
+    return '无效时间戳';
   }
 
-  // 1e12 判定毫秒级/秒级时间戳兼容
+  // 1e12 区分毫秒/秒级时间戳
   const d = num > 1e12 ? new Date(num) : new Date(num * 1000);
 
   if (isNaN(d.getTime())) {
-    return invalidText;
+    return '无效时间戳';
   }
 
   const year = d.getFullYear();

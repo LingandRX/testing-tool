@@ -70,12 +70,12 @@ export async function clearAllIndexedDBs(
 
       const deleteReq = indexedDB.deleteDatabase(dbName);
       const timeoutId = setTimeout(() => {
-        console.warn('IndexedDB delete timeout:', dbName);
+        console.warn(`IndexedDB 删除超时: ${dbName}`);
         settle('timeout');
       }, timeoutMs);
 
       deleteReq.onblocked = () => {
-        console.warn('IndexedDB delete blocked:', dbName);
+        console.warn(`IndexedDB 删除被阻塞: ${dbName}`);
         settle('blocked');
       };
       deleteReq.onsuccess = () => settle('deleted');
@@ -137,7 +137,7 @@ export async function clearAllIndexedDBs(
       const transaction = db.transaction(storeNames, 'readwrite');
       // 必须在 clear 请求完成前注册 oncomplete，否则事务可能已结束导致永久挂起
       const transactionDone = waitForTransaction(transaction, clearStoreTimeoutMs);
-      void transactionDone.catch(() => undefined);
+      void transactionDone.catch(() => {});
       const errors = (
         await Promise.all(
           storeNames.map((storeName) => clearStore(transaction.objectStore(storeName), storeName)),
@@ -145,23 +145,11 @@ export async function clearAllIndexedDBs(
       ).filter((error): error is string => Boolean(error));
 
       if (errors.length > 0) {
-        try {
-          transaction.abort();
-        } catch {
-          // ignore abort failures on already-finished transactions
-        }
+        transaction.abort();
         return { success: false, errors };
       }
 
-      try {
-        await transactionDone;
-      } catch {
-        return {
-          success: false,
-          errors: [`清空 IndexedDB 失败（${dbName}），请刷新后重试`],
-        };
-      }
-
+      await transactionDone;
       return { success: true, errors: [] };
     } catch {
       return {

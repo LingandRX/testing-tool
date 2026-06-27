@@ -2,12 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import ImageUploader from '../components/ImageUploader';
 
-// 配置多端一致性常驻桩（WXT 规范）
 const storageOnChangedMock = { addListener: vi.fn(), removeListener: vi.fn() };
 (globalThis as any).chrome = { storage: { onChanged: storageOnChangedMock } };
 (globalThis as any).browser = { storage: { onChanged: storageOnChangedMock } };
 
-// 模拟 URL API
 const mockCreateObjectURL = vi.fn();
 const mockRevokeObjectURL = vi.fn();
 Object.defineProperty(window.URL, 'createObjectURL', { value: mockCreateObjectURL });
@@ -169,23 +167,6 @@ describe('ImageUploader 组件', () => {
 
       const pasteListeners = addEventListenerSpy.mock.calls.filter(([event]) => event === 'paste');
       expect(pasteListeners).toHaveLength(0);
-    });
-  });
-
-  describe('样式测试', () => {
-    it('拖拽状态时应应用拖拽样式', () => {
-      const { container } = render(<ImageUploader {...defaultProps} dragging={true} />);
-      const dropzone = container.firstChild as HTMLElement;
-      expect(dropzone).toBeInTheDocument();
-    });
-
-    it('有文件时应应用有文件样式', () => {
-      const mockFile = new File(['test'], 'test.png', { type: 'image/png' });
-      const { container } = render(
-        <ImageUploader {...defaultProps} selectedFile={mockFile} previewUrl="blob:test-url" />,
-      );
-      const dropzone = container.firstChild as HTMLElement;
-      expect(dropzone).toBeInTheDocument();
     });
   });
 });

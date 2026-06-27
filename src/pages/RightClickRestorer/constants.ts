@@ -6,10 +6,6 @@ export type RestorerStatus = 'unsupported' | 'locked' | 'unlocked';
 export const CARD_CLASS =
   'w-full p-4 rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden space-y-3';
 
-export const LOADING_TEXT = '正在加载...';
-
-export const DOMAIN_LABEL = '当前域名';
-
 interface StatusConfig {
   badgeVariant: 'default' | 'secondary' | 'destructive';
   badgeClassName: string;
@@ -50,7 +46,7 @@ export const STATUS_CONFIG: Record<RestorerStatus, StatusConfig> = {
     badgeClassName: 'gap-1 bg-green-600 hover:bg-green-700 shrink-0',
     badgeIcon: ShieldCheck,
     badgeLabel: '已解锁',
-    description: '点击下方按钮，为当前网站临时解锁右键菜单。刷新页面后需要重新解锁。',
+    description: '当前网站右键菜单已临时解锁。刷新页面后需要重新解锁。',
     buttonIcon: MousePointerClick,
     buttonLabel: '右键已解锁',
     buttonDisabled: true,

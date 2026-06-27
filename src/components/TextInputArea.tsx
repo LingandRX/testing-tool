@@ -1,7 +1,7 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner'; // 推荐使用 shadcn 的默认 Toast
+import { toast } from 'sonner';
 import { CopyButton } from '@/components/CopyButton';
 import { Button } from './ui/button';
 
@@ -44,7 +44,6 @@ export interface TextInputAreaProps extends Omit<
   onClear?: () => void;
 }
 
-// 提炼基础的 ActionButton，全面向 shadcn 核心 Button 样式对齐
 function ActionButton({
   action,
   value,
@@ -126,7 +125,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     const textArea = internalRef.current;
     if (!textArea) return;
 
-    // 重置高度计算
     textArea.style.height = 'auto';
 
     const computedMin = minRows * 24;
@@ -255,7 +253,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
 
         {hasBottomBar && (
           <div className="flex h-10 items-center justify-between px-4 bg-muted/30 border-t border-border/50">
-            {/* 左侧自定义动作 */}
             <div className="flex items-center gap-1.5 min-w-0">
               {bottomActions.map((action) => (
                 <ActionButton
@@ -268,16 +265,15 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
               ))}
             </div>
 
-            {/* 右侧系统按钮组 */}
             <div className="flex items-center gap-1.5 ml-auto shrink-0">
               {allowCopy && value && (
-                <CopyButton text={value} tooltip={'复制内容'} size="sm" className="h-7 w-7 p-1" />
+                <CopyButton text={value} tooltip="复制内容" size="sm" className="h-7 w-7 p-1" />
               )}
               {showClear && value && !disabled && !readOnly && (
                 <Button
                   type="button"
                   onClick={handleClear}
-                  aria-label={'清空'}
+                  aria-label="清空"
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
@@ -290,7 +286,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
         )}
       </div>
 
-      {/* 错误提示 */}
       {displayError && (
         <p className="text-xs font-medium text-destructive px-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
           {displayError}
