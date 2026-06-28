@@ -14,9 +14,13 @@ import type {
 /** 每生成 N 行让出一次事件循环，以便处理 cancel 消息 */
 const YIELD_EVERY = 100;
 
-// 生成结果缓存
-let generatedData: Record<string, unknown>[] = [];
+/** 当前活跃生成任务 ID；新 start 会 supersede 旧任务 */
+let activeGenerationId: number | null = null;
 let isCancelled = false;
+
+function shouldAbort(generationId: number): boolean {
+  return isCancelled || generationId !== activeGenerationId;
+}
 
 /**
  * Worker 消息处理器
@@ -27,12 +31,17 @@ self.onmessage = async (e: MessageEvent<WorkerRequestMessage>) => {
 
   switch (type) {
     case 'start':
+      activeGenerationId = data.payload.generationId;
       isCancelled = false;
       await handleStart(data.payload);
       break;
     case 'cancel':
       isCancelled = true;
       break;
+    default: {
+      const _exhaustive: never = type;
+      return _exhaustive;
+    }
   }
 };
 
@@ -46,7 +55,7 @@ async function handleStart(payload: {
   csvMode: boolean;
 }): Promise<void> {
   const { generationId, fields, count } = payload;
-  generatedData = [];
+  const generatedData: Record<string, unknown>[] = [];
 
   try {
     // 验证所有生成器是否存在
@@ -67,15 +76,17 @@ async function handleStart(payload: {
 
     // 生成数据
     for (let i = 0; i < count; i++) {
-      if (isCancelled) {
-        self.postMessage({
-          type: 'complete',
-          generationId,
-          payload: {
-            success: false,
-            error: '生成已取消',
-          },
-        });
+      if (shouldAbort(generationId)) {
+        if (generationId === activeGenerationId) {
+          self.postMessage({
+            type: 'complete',
+            generationId,
+            payload: {
+              success: false,
+              error: '生成已取消',
+            },
+          });
+        }
         return;
       }
 
@@ -148,18 +159,24 @@ async function handleStart(payload: {
       // 定期让出事件循环，使 cancel 消息能被处理
       if ((i + 1) % YIELD_EVERY === 0) {
         await new Promise<void>((resolve) => setTimeout(resolve, 0));
-        if (isCancelled) {
-          self.postMessage({
-            type: 'complete',
-            generationId,
-            payload: {
-              success: false,
-              error: '生成已取消',
-            },
-          });
+        if (shouldAbort(generationId)) {
+          if (generationId === activeGenerationId) {
+            self.postMessage({
+              type: 'complete',
+              generationId,
+              payload: {
+                success: false,
+                error: '生成已取消',
+              },
+            });
+          }
           return;
         }
       }
+    }
+
+    if (shouldAbort(generationId)) {
+      return;
     }
 
     const duration = Date.now() - startTime;
