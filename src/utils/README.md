@@ -24,7 +24,7 @@
 | `textStatistics.ts`      | 文本统计：使用 `Intl.Segmenter` 计算字符数/单词数/行数/字节大小                                     |
 | `format.ts`              | 通用格式化：`formatBytes` 将字节转为可读字符串（B/KB/MB/GB/TB）                                     |
 | `dayjs.ts`               | Day.js 初始化：扩展 UTC、Timezone、RelativeTime 插件，加载中文本地化                                |
-| `ruleStorage.ts`         | 测试数据生成器规则存储：基于 `localStorage` 的 CRUD、搜索、导入/导出和数量限制                      |
+| `ruleStorage.ts`         | 测试数据生成器规则存储：基于 `localStorage` 的 CRUD、搜索、导入/导出和数量限制（见下方说明）        |
 | `dataExporter.ts`        | 测试数据导出：JSON/CSV 转换、文件下载和复制到剪贴板                                                 |
 | `rightClickInjection.ts` | 右键恢复注入脚本：在页面上下文恢复 contextmenu/copy/paste 等事件默认行为                            |
 
@@ -35,6 +35,23 @@
 | `useStorageState.ts`    | Chrome Storage 状态 Hook：类似 `useState`，值自动同步到 `chrome.storage`，使用 `localStorage` 快照消除首屏闪烁 |
 | `useContextMenuData.ts` | 右键菜单数据 Hook：从 storage 读取待处理数据，匹配 featureKey 后消费并触发回调                                 |
 | `useDebounce.ts`        | 防抖 Hook：对值进行延迟更新，避免频繁触发                                                                      |
+
+### ruleStorage 写入失败处理
+
+`ruleStorage.ts` 使用函数式导出（非 class），存储键为 `testDataGenerator_rules`，最多 `MAX_RULES = 20` 条。
+
+写入经内部 `setAll()` 完成；`localStorage.setItem` 抛错（如配额超限）时返回 `false`，并 `console.error`，**不会部分提交**：
+
+| 方法 | 写入失败返回值 | 常见失败原因 |
+| ---- | -------------- | ------------ |
+| `save()` | `null` | 达上限、规则不存在（更新时）、`setItem` 异常 |
+| `update()` | `null` | 规则不存在、`setItem` 异常 |
+| `deleteRule()` | `false` | 规则不存在、`setItem` 异常 |
+| `duplicate()` | 仍可能返回对象但数据未持久化 | 见源码：`duplicate` 未检查 `setAll` 返回值（已知缺口） |
+
+调用方应检查返回值后再展示成功 Toast。页面层参考 `FieldList.tsx`：`save`/`update` 返回非空才提示「规则已保存/已更新」。
+
+规则仅持久化 `name`、`description`、`fields` 及时间戳/使用统计；生成数量与导出格式由页面状态管理，不写入规则。
 
 ### useStorageState 初始化防覆盖
 

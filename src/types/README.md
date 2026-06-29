@@ -39,7 +39,9 @@
 - `FieldConfig` — 字段配置（字段名、生成器、参数、必填、空值率、唯一性）
 - `DataRule` — 可保存/导入/导出的字段规则
 - `GeneratorDefinition` / `GeneratorParam` — 内置生成器定义和参数 Schema
-- `GenerateResult` / `GenerateProgress` / `WorkerMessage` — Worker 生成结果、进度和消息协议
+- `GenerateResult` / `GenerateProgress` — Worker 生成结果与进度
+- `WorkerRequestMessage` / `WorkerResponseMessage` — Worker 消息协议；每条响应携带 `generationId`，用于忽略过期任务（取消或快速重试时）
+- `WorkerMessage` — 已废弃，请使用上述两种消息类型
 - `ExportFile` — JSON/CSV 导出文件描述
 
 ## 修改 StorageSchema 的注意事项

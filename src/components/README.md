@@ -10,7 +10,7 @@
 | `SwitchButtonGroup.tsx` | 通用切换按钮组，支持 `small/medium/large` 三种尺寸，用于页面子模式切换         |
 | `EmptyPlaceholder.tsx`  | 虚线边框空状态占位，统一工具页「暂无结果」提示样式                             |
 | `TextInputArea.tsx`     | 增强文本输入区域，支持校验规则、工具栏操作、字符计数、清空                     |
-| `CopyButton.tsx`        | 一键复制按钮，支持复制成功状态动画，封装 `copyTextToClipboard` 和 `toast` 反馈 |
+| `CopyButton.tsx`        | 一键复制按钮：复制成功后 1.5s 内切换为 Check 图标并应用 `text-emerald-500`；空内容/失败时 `toast` 提示 |
 | `ImageUploader.tsx`     | 图片上传组件，支持拖拽上传、文件选择和预览                                     |
 | `QrCodePreview.tsx`     | 二维码预览组件，展示生成的二维码图片，提供复制和下载操作                       |
 | `DecodeResultPaper.tsx` | Base64 解码结果展示面板，显示 MIME 类型、文件大小、文件名输入和下载按钮        |
