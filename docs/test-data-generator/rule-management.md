@@ -24,25 +24,20 @@
 
 ## 数据结构
 
+> **与源码对齐**：类型定义见 `src/types/testDataGenerator.ts`。规则**不**持久化生成数量与导出格式（由页面 `GenerateOptions` 状态管理）。
+
 ### 规则模板
 
 ```typescript
 interface DataRule {
-  id: string; // 唯一标识
-  name: string; // 规则名称
-  description?: string; // 规则描述
-  fields: FieldConfig[]; // 字段配置
-  options: {
-    total: number; // 生成数量
-    format: 'json' | 'csv';
-    defaultEmptyRate: number; // 默认空值率（0-100）
-  };
-  metadata: {
-    createdAt: number; // 创建时间
-    updatedAt: number; // 更新时间
-    lastUsedAt?: number; // 最后使用时间
-    useCount: number; // 使用次数
-  };
+  id: string;
+  name: string;
+  description?: string;
+  fields: FieldConfig[];
+  createdAt: number;
+  updatedAt: number;
+  lastUsedAt?: number;
+  useCount: number;
 }
 ```
 
@@ -50,13 +45,14 @@ interface DataRule {
 
 ```typescript
 interface FieldConfig {
-  id: string; // 字段唯一标识
-  name: string; // 字段名
-  generator: string; // 生成器名称
-  params: Record<string, any>; // 生成器参数
-  unique: boolean; // 唯一性约束
-  required: boolean; // 是否必填
-  emptyRate?: number; // 选填字段的空值概率（0-100）
+  id: string;
+  name: string;
+  description?: string;
+  generatorId: string; // 生成器 ID，对应 lib/generators 中的 id
+  params: Record<string, unknown>;
+  required: boolean;
+  nullRate: number; // 空值率 0-100，仅 required=false 时生效
+  unique: boolean;
 }
 ```
 
@@ -110,11 +106,9 @@ interface FieldConfig {
 
 1. 验证规则名称不为空
 2. 检查规则数量是否达到上限（20 条）
-3. 如果达到上限，显示提示"已达到最大规则数量"
-4. 生成唯一 ID
-5. 设置创建时间和更新时间
-6. 初始化使用次数为 0
-7. 保存到 localStorage
+3. 若达上限，`save()` 返回 `null`，UI 应阻止或提示
+4. 生成唯一 ID，写入 `createdAt`/`updatedAt`，`useCount` 初始为 0
+5. 调用 `ruleStorage.save()`；仅当返回值非 `null` 时视为成功（`localStorage` 写入失败同样返回 `null`）
 
 ---
 
@@ -167,17 +161,13 @@ interface FieldConfig {
 - 支持按规则描述搜索
 - 搜索为模糊匹配，不区分大小写
 
-**实现方式**:
+**实现方式**（`src/utils/ruleStorage.ts`）:
 
 ```typescript
-search(keyword: string): DataRule[] {
-  const rules = this.getAll();
-  const lowerKeyword = keyword.toLowerCase();
+import * as ruleStorage from '@/utils/ruleStorage';
 
-  return rules.filter(r =>
-    r.name.toLowerCase().includes(lowerKeyword) ||
-    r.description?.toLowerCase().includes(lowerKeyword)
-  );
+function searchRules(query: string): DataRule[] {
+  return ruleStorage.search(query);
 }
 ```
 
@@ -224,9 +214,7 @@ search(keyword: string): DataRule[] {
 
 1. 加载原规则配置到编辑器
 2. 用户修改配置
-3. 点击保存时更新规则
-4. 更新 metadata.updatedAt
-5. 保存到 localStorage
+3. 点击保存时调用 `ruleStorage.update()`；返回非 `null` 才更新 `updatedAt` 并提示成功
 
 ---
 
@@ -269,18 +257,12 @@ search(keyword: string): DataRule[] {
 **实现方式**:
 
 ```typescript
-loadRule(ruleId: string): void {
-  const rule = this.storage.getById(ruleId);
+function loadRule(ruleId: string): void {
+  const rule = ruleStorage.getById(ruleId);
+  if (!rule) return;
 
-  // 应用规则配置
-  this.setFields(rule.fields);
-  this.setOptions(rule.options);
-
-  // 记录使用
-  this.storage.recordUse(ruleId);
-
-  // 更新预览
-  this.updatePreview();
+  setFields(rule.fields);
+  ruleStorage.recordUse(ruleId);
 }
 ```
 
@@ -292,7 +274,7 @@ loadRule(ruleId: string): void {
 
 1. 点击"复制"按钮
 2. 创建规则的副本
-3. 名称添加"(副本)"后缀
+3. 名称添加「（副本）」后缀（默认 `duplicate(id, '（副本）')`）
 4. 生成新的 ID
 5. 保存为新规则
 
@@ -327,23 +309,20 @@ loadRule(ruleId: string): void {
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**导出格式**:
+**导出格式**（`exportRules()` 返回 `DataRule[]` 的 JSON 字符串，无外层包装）:
 
 ```json
-{
-  "version": "1.0",
-  "exportedAt": "2024-01-20T10:15:45.000Z",
-  "rules": [
-    {
-      "id": "rule_123456",
-      "name": "电商用户数据 - 测试用",
-      "description": "用于测试用户注册功能",
-      "fields": [...],
-      "options": {...},
-      "metadata": {...}
-    }
-  ]
-}
+[
+  {
+    "id": "rule_123456",
+    "name": "电商用户数据 - 测试用",
+    "description": "用于测试用户注册功能",
+    "fields": [],
+    "createdAt": 1704067200000,
+    "updatedAt": 1704067200000,
+    "useCount": 0
+  }
+]
 ```
 
 ---
@@ -401,63 +380,25 @@ loadRule(ruleId: string): void {
 
 ### 本地存储
 
-使用 localStorage 存储规则数据:
+使用 `localStorage`，键名 `testDataGenerator_rules`。API 为**命名导出函数**（见 `src/utils/ruleStorage.ts`）：
+
+| 函数 | 说明 |
+| ---- | ---- |
+| `getAll()` / `getById()` / `getByName()` | 读取 |
+| `save()` / `update()` / `deleteRule()` / `duplicate()` | 写入；失败时返回 `null` 或 `false` |
+| `recordUse()` | 递增 `useCount`、更新 `lastUsedAt` |
+| `search()` / `getRecent()` | 搜索与最近使用 |
+| `exportRules()` / `importRules()` | 导入导出 JSON 数组 |
+| `clear()` | 清空全部规则 |
+
+写入失败（如 `QuotaExceededError`）时，内部 `setAll()` 返回 `false`，`save`/`update` 返回 `null`，`deleteRule` 返回 `false`，并在控制台输出 `[ruleStorage] 保存规则失败`。调用方须检查返回值，避免误报成功。
 
 ```typescript
-class RuleStorage {
-  private readonly STORAGE_KEY = 'testDataGenerator_rules';
+import * as ruleStorage from '@/utils/ruleStorage';
 
-  // 获取所有规则
-  getAll(): DataRule[] {
-    const data = localStorage.getItem(this.STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  }
-
-  // 保存规则
-  save(rule: DataRule): { success: boolean; message?: string } {
-    const rules = this.getAll();
-
-    // 规则数量限制：最多 20 条
-    const MAX_RULES = 20;
-    if (rules.length >= MAX_RULES) {
-      return {
-        success: false,
-        message: `已达到最大规则数量（${MAX_RULES}条），请删除一些规则后再保存`,
-      };
-    }
-
-    rules.push(rule);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(rules));
-    return { success: true };
-  }
-
-  // 更新规则
-  update(id: string, updates: Partial<DataRule>): void {
-    const rules = this.getAll();
-    const index = rules.findIndex((r) => r.id === id);
-    if (index !== -1) {
-      rules[index] = { ...rules[index], ...updates };
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(rules));
-    }
-  }
-
-  // 删除规则
-  delete(id: string): void {
-    const rules = this.getAll();
-    const filtered = rules.filter((r) => r.id !== id);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filtered));
-  }
-
-  // 记录使用
-  recordUse(id: string): void {
-    const rules = this.getAll();
-    const rule = rules.find((r) => r.id === id);
-    if (rule) {
-      rule.metadata.lastUsedAt = Date.now();
-      rule.metadata.useCount++;
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(rules));
-    }
-  }
+const saved = ruleStorage.save({ name: '示例', fields });
+if (!saved) {
+  // 达上限或 localStorage 不可用
 }
 ```
 
