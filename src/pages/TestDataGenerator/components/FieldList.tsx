@@ -234,29 +234,38 @@ export default function FieldList({
       if (!ruleName.trim()) return;
 
       const trimmedName = ruleName.trim();
+      const existingRule = ruleStorage.getByName(trimmedName);
 
       // 检查名称是否重复
-      if (!overwrite) {
-        const existingRule = ruleStorage.getByName(trimmedName);
-        if (existingRule) {
-          setShowConfirmOverwrite(true);
-          return;
-        }
+      if (!overwrite && existingRule) {
+        setShowConfirmOverwrite(true);
+        return;
       }
 
-      const newRule = ruleStorage.save({
-        name: trimmedName,
-        description: ruleDescription.trim(),
-        fields: fields,
-      });
+      const savedRule = ruleStorage.save(
+        overwrite && existingRule
+          ? {
+              id: existingRule.id,
+              name: trimmedName,
+              description: ruleDescription.trim(),
+              fields: fields,
+            }
+          : {
+              name: trimmedName,
+              description: ruleDescription.trim(),
+              fields: fields,
+            },
+      );
 
-      if (newRule) {
+      if (savedRule) {
         setShowSaveDialog(false);
         setShowConfirmOverwrite(false);
         setRuleName('');
         setRuleDescription('');
-        toast.success('规则已保存');
+        toast.success(overwrite ? '规则已覆盖' : '规则已保存');
         onRuleSaved?.();
+      } else {
+        toast.error('规则保存失败');
       }
     },
     [ruleName, ruleDescription, fields, onRuleSaved],
