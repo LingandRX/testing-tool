@@ -9,12 +9,13 @@ const mockRouterValue = {
   currentPage: 'dashboard' as PageType,
   visiblePages: ['dashboard', 'timestamp'] as PageType[],
   pageOrder: ['timestamp'] as PageType[],
-  isLoaded: true,
   navigateTo: vi.fn(),
   syncNavigation: vi.fn(),
   goHome: vi.fn(),
   setVisiblePages: vi.fn(),
   setPageOrder: vi.fn(),
+  recentlyUsedTools: [] as PageType[],
+  isLoaded: true,
 };
 
 vi.mock('@/providers/RouterProvider', () => ({
@@ -32,16 +33,7 @@ describe('RouterContainer 组件', () => {
   };
 
   describe('渲染测试', () => {
-    it('isLoaded 为 false 时应渲染骨架屏', () => {
-      mockRouterValue.isLoaded = false;
-      const { container } = renderWithProvider(<RouterContainer />);
-      // 骨架屏使用 animate-pulse 类
-      const skeletons = container.querySelectorAll('.animate-pulse');
-      expect(skeletons.length).toBeGreaterThan(0);
-    });
-
-    it('isLoaded 为 true 时应渲染页面内容', () => {
-      mockRouterValue.isLoaded = true;
+    it('mount 后应直接渲染页面结构（不等待 storage 加载）', () => {
       mockRouterValue.currentPage = 'dashboard';
       const { container } = renderWithProvider(<RouterContainer />);
       expect(container.querySelector('.page-transition-dashboard')).toBeInTheDocument();
@@ -77,8 +69,7 @@ describe('RouterContainer 组件', () => {
   });
 
   describe('页面级错误隔离', () => {
-    it('PageErrorBoundary 应包裹在 Suspense 内层', () => {
-      mockRouterValue.isLoaded = true;
+    it('PageErrorBoundary 应包裹页面内容', () => {
       mockRouterValue.currentPage = 'dashboard';
       const { container } = renderWithProvider(<RouterContainer />);
 

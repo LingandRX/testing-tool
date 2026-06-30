@@ -9,6 +9,15 @@ const VALID_MODES: ThemeMode[] = ['light', 'dark', 'system'];
 export const isValidThemeMode = (value: unknown): value is ThemeMode =>
   VALID_MODES.includes(value as ThemeMode);
 
+/** 检查 localStorage 中是否存在主题快照 */
+export const hasThemeSyncSnapshot = (): boolean => {
+  try {
+    return localStorage.getItem(THEME_MODE_SNAPSHOT_KEY) !== null;
+  } catch {
+    return false;
+  }
+};
+
 /**
  * 同步读取 localStorage 快照（首屏防闪烁）
  */

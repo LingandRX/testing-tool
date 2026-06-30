@@ -110,13 +110,19 @@ export function RouterProvider({
 
   const loadInitialData = useCallback(async () => {
     try {
-      const savedRoute = await storageUtil.get(syncKey, defaultRoute);
-      const savedVisiblePages = await storageUtil.get(
+      const stored = await storageUtil.getMany([
+        syncKey,
         visiblePagesKey,
-        getDefaultVisibleFeatureKeys(),
-      );
-      const savedPageOrder = await storageUtil.get(pageOrderKey, getDefaultPageOrder());
-      const savedRecentTools = await storageUtil.get('app/recentlyUsedTools', []);
+        pageOrderKey,
+        'app/recentlyUsedTools',
+        'contextMenu/pendingData',
+      ]);
+
+      const savedRoute = (stored[syncKey] ?? defaultRoute) as PageType;
+      const savedVisiblePages = (stored[visiblePagesKey] ??
+        getDefaultVisibleFeatureKeys()) as PageType[];
+      const savedPageOrder = (stored[pageOrderKey] ?? getDefaultPageOrder()) as PageType[];
+      const savedRecentTools = (stored['app/recentlyUsedTools'] ?? []) as PageType[];
 
       if (isValidPage(savedRoute) && syncRoute && !hasUserNavigatedRef.current) {
         setCurrentPage(savedRoute);
@@ -131,8 +137,11 @@ export function RouterProvider({
         setRecentlyUsedTools(savedRecentTools);
       }
       canPersistRef.current = true;
+
+      return stored['contextMenu/pendingData'];
     } catch (error) {
       console.error('[Router Init Error] Core data fetch failed:', error);
+      return undefined;
     } finally {
       setIsLoaded(true);
     }
@@ -143,7 +152,7 @@ export function RouterProvider({
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Valid async data loading pattern on mount
     loadInitialData()
-      .then(() => {
+      .then((pendingData) => {
         if (cancelled) return;
 
         if (typeof window !== 'undefined') {
@@ -165,18 +174,13 @@ export function RouterProvider({
           }
         }
 
-        storageUtil
-          .get('contextMenu/pendingData')
-          .then((pendingData) => {
-            if (
-              pendingData &&
-              isValidPage(pendingData.featureKey) &&
-              Date.now() - pendingData.timestamp < CONTEXT_MENU_DATA_EXPIRY_MS
-            ) {
-              setCurrentPage(pendingData.featureKey as PageType);
-            }
-          })
-          .catch(console.error);
+        if (
+          pendingData &&
+          isValidPage(pendingData.featureKey) &&
+          Date.now() - pendingData.timestamp < CONTEXT_MENU_DATA_EXPIRY_MS
+        ) {
+          setCurrentPage(pendingData.featureKey as PageType);
+        }
       })
       .catch(console.error);
 

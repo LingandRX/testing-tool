@@ -114,4 +114,25 @@ describe('useGenerator', () => {
     expect(result.current.isGenerating).toBe(false);
     expect(worker.postedMessages).toEqual(expect.arrayContaining([{ type: 'cancel' }]));
   });
+
+  it('正在生成时不应重复发送 start 消息', () => {
+    const { result } = renderHook(() => useGenerator());
+
+    act(() => {
+      result.current.generate([mockField], 10);
+      result.current.generate([mockField], 20);
+    });
+
+    const worker = MockWorker.instances[0];
+    const startMessages = worker.postedMessages.filter(
+      (message): message is { type: 'start'; payload: { count: number } } =>
+        typeof message === 'object' &&
+        message !== null &&
+        'type' in message &&
+        message.type === 'start',
+    );
+
+    expect(startMessages).toHaveLength(1);
+    expect(startMessages[0]?.payload.count).toBe(10);
+  });
 });

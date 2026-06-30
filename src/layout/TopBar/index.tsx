@@ -33,9 +33,7 @@ export default function TopBar() {
       id: 'open-in-tab',
       icon: ExternalLink,
       title: '在标签页打开',
-      onClick: () => {
-        void handleOpenInTab();
-      },
+      onClick: () => void handleOpenInTab(),
     },
   ];
 

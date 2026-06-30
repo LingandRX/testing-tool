@@ -1,3 +1,5 @@
+@config "../../tailwind.shell.config.js";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -89,4 +91,92 @@
 /* Hide scrollbar for Chrome, Safari and Opera */
 ::-webkit-scrollbar {
   display: none;
+}
+
+@layer components {
+  .page-transition-dashboard {
+    @apply motion-reduce:transition-none;
+  }
+
+  .page-transition-enter {
+    @apply motion-reduce:transition-none;
+    animation: tt-page-enter 200ms ease-out;
+  }
+}
+
+@layer utilities {
+  .fade-in-150 {
+    animation: tt-fade-in 150ms ease-out forwards;
+  }
+
+  .fade-in-200 {
+    animation: tt-fade-in 200ms ease-out forwards;
+  }
+
+  .fade-in-300 {
+    animation: tt-fade-in 300ms ease-out forwards;
+  }
+
+  .fade-in-zoom-95 {
+    animation: tt-fade-in-zoom-95 150ms ease-out forwards;
+  }
+
+  .fade-in-slide-top-1 {
+    animation: tt-fade-in-slide-top-1 150ms ease-out forwards;
+  }
+
+  .fade-in-slide-top-2 {
+    animation: tt-fade-in-slide-top-2 150ms ease-out forwards;
+  }
+}
+
+@keyframes tt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tt-fade-in-zoom-95 {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes tt-fade-in-slide-top-1 {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tt-fade-in-slide-top-2 {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tt-page-enter {
+  from {
+    opacity: 0.92;
+  }
+  to {
+    opacity: 1;
+  }
 }

@@ -37,6 +37,12 @@ export function useGenerator(): UseGeneratorReturn {
 
   const workerRef = useRef<Worker | null>(null);
   const generationIdRef = useRef(0);
+  const isGeneratingRef = useRef(false);
+
+  const finishGenerating = useCallback(() => {
+    isGeneratingRef.current = false;
+    setIsGenerating(false);
+  }, []);
 
   // 清理 Worker
   useEffect(() => {
@@ -73,7 +79,7 @@ export function useGenerator(): UseGeneratorReturn {
           setProgress(data.payload);
           break;
         case 'complete':
-          setIsGenerating(false);
+          finishGenerating();
           if (data.payload.success) {
             setResult(data.payload);
           } else if (data.payload.error && data.payload.error !== '生成已取消') {
@@ -82,7 +88,7 @@ export function useGenerator(): UseGeneratorReturn {
           setProgress(null);
           break;
         case 'error':
-          setIsGenerating(false);
+          finishGenerating();
           setError(data.payload.error);
           setProgress(null);
           break;
@@ -91,7 +97,7 @@ export function useGenerator(): UseGeneratorReturn {
 
     worker.onerror = (err) => {
       console.error('[useGenerator] Worker 错误:', err);
-      setIsGenerating(false);
+      finishGenerating();
       setError(err.message || 'Worker 运行错误');
       setProgress(null);
       // Worker 出错后销毁，下次重新创建
@@ -101,16 +107,17 @@ export function useGenerator(): UseGeneratorReturn {
 
     workerRef.current = worker;
     return worker;
-  }, []);
+  }, [finishGenerating]);
 
   /**
    * 开始生成
    */
   const generate = useCallback(
     (fields: FieldConfig[], count: number, csvMode = false) => {
-      if (isGenerating) return;
+      if (isGeneratingRef.current) return;
 
       const generationId = ++generationIdRef.current;
+      isGeneratingRef.current = true;
 
       setIsGenerating(true);
       setProgress(null);
@@ -124,21 +131,22 @@ export function useGenerator(): UseGeneratorReturn {
       };
       worker.postMessage(message);
     },
-    [isGenerating, getWorker],
+    [getWorker],
   );
 
   /**
    * 取消生成
    */
   const cancel = useCallback(() => {
-    if (workerRef.current && isGenerating) {
+    if (workerRef.current && isGeneratingRef.current) {
       ++generationIdRef.current;
       const message: WorkerRequestMessage = { type: 'cancel' };
       workerRef.current.postMessage(message);
+      isGeneratingRef.current = false;
       setIsGenerating(false);
       setProgress(null);
     }
-  }, [isGenerating]);
+  }, []);
 
   /**
    * 清除结果

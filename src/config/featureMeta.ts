@@ -1,4 +1,4 @@
-import { type ComponentType, lazy } from 'react';
+import type { ComponentType } from 'react';
 import type { LucideProps } from 'lucide-react';
 import type { PageType } from '@/types/storage';
 import {
@@ -15,18 +15,6 @@ import {
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
 
-// 懒加载页面组件
-const DashboardPage = lazy(() => import('@/pages/Dashboard'));
-const TimestampPage = lazy(() => import('@/pages/Timestamp'));
-const StorageCleanerPage = lazy(() => import('@/pages/StorageCleaner'));
-const QrCodePage = lazy(() => import('@/pages/QrCode'));
-const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
-const JwtPage = lazy(() => import('@/pages/Jwt'));
-const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
-const Base64ConverterPage = lazy(() => import('@/pages/Base64Converter'));
-const RightClickRestorerPage = lazy(() => import('@/pages/RightClickRestorer'));
-const TestDataGeneratorPage = lazy(() => import('@/pages/TestDataGenerator'));
-
 export interface FeatureConfig {
   key: PageType;
   label: string;
@@ -34,11 +22,6 @@ export interface FeatureConfig {
   themeColorKey?: PaletteColorKey;
   icon?: ComponentType<LucideProps>;
   defaultVisible: boolean;
-  components: {
-    popup: ComponentType;
-    sidepanel: ComponentType;
-    tab: ComponentType;
-  };
 }
 
 export const FEATURES: FeatureConfig[] = [
@@ -47,11 +30,6 @@ export const FEATURES: FeatureConfig[] = [
     label: '仪表盘',
     description: '',
     defaultVisible: true,
-    components: {
-      popup: DashboardPage,
-      sidepanel: DashboardPage,
-      tab: DashboardPage,
-    },
   },
   {
     key: 'timestamp',
@@ -60,11 +38,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'primary',
     icon: Clock,
     defaultVisible: true,
-    components: {
-      popup: TimestampPage,
-      sidepanel: TimestampPage,
-      tab: TimestampPage,
-    },
   },
   {
     key: 'storageCleaner',
@@ -73,11 +46,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'warning',
     icon: Database,
     defaultVisible: true,
-    components: {
-      popup: StorageCleanerPage,
-      sidepanel: StorageCleanerPage,
-      tab: StorageCleanerPage,
-    },
   },
   {
     key: 'qrCode',
@@ -86,11 +54,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'success',
     icon: QrCode,
     defaultVisible: true,
-    components: {
-      popup: QrCodePage,
-      sidepanel: QrCodePage,
-      tab: QrCodePage,
-    },
   },
   {
     key: 'textStatistics',
@@ -99,11 +62,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'secondary',
     icon: FileText,
     defaultVisible: true,
-    components: {
-      popup: TextStatisticsPage,
-      sidepanel: TextStatisticsPage,
-      tab: TextStatisticsPage,
-    },
   },
   {
     key: 'jwt',
@@ -112,11 +70,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'info',
     icon: Key,
     defaultVisible: true,
-    components: {
-      popup: JwtPage,
-      sidepanel: JwtPage,
-      tab: JwtPage,
-    },
   },
   {
     key: 'jsonTools',
@@ -125,11 +78,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'primary',
     icon: GitCompareArrows,
     defaultVisible: true,
-    components: {
-      popup: JsonToolsPage,
-      sidepanel: JsonToolsPage,
-      tab: JsonToolsPage,
-    },
   },
   {
     key: 'base64Converter',
@@ -138,11 +86,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'info',
     icon: ArrowLeftRight,
     defaultVisible: true,
-    components: {
-      popup: Base64ConverterPage,
-      sidepanel: Base64ConverterPage,
-      tab: Base64ConverterPage,
-    },
   },
   {
     key: 'rightClickRestorer',
@@ -151,11 +94,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'success',
     icon: MousePointerClick,
     defaultVisible: true,
-    components: {
-      popup: RightClickRestorerPage,
-      sidepanel: RightClickRestorerPage,
-      tab: RightClickRestorerPage,
-    },
   },
   {
     key: 'testDataGenerator',
@@ -164,11 +102,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'warning',
     icon: FileSpreadsheet,
     defaultVisible: true,
-    components: {
-      popup: TestDataGeneratorPage,
-      sidepanel: TestDataGeneratorPage,
-      tab: TestDataGeneratorPage,
-    },
   },
 ];
 

@@ -18,11 +18,24 @@ class StorageUtils {
     key: K,
     defaultValue?: StorageSchema[K],
   ): Promise<StorageSchema[K] | undefined> {
-    const result = await chrome.storage.local.get([key]);
+    const result = await this.getMany([key]);
     if (defaultValue !== undefined) {
       return (result[key] ?? defaultValue) as StorageSchema[K];
     }
     return result[key] as StorageSchema[K] | undefined;
+  }
+
+  /**
+   * 批量获取多个键（单次 IPC）
+   */
+  async getMany<K extends keyof StorageSchema>(
+    keys: readonly K[],
+  ): Promise<Partial<Pick<StorageSchema, K>>> {
+    if (keys.length === 0) {
+      return {};
+    }
+    const result = await chrome.storage.local.get([...keys]);
+    return result as Partial<Pick<StorageSchema, K>>;
   }
 
   /**

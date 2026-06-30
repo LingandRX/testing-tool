@@ -1,5 +1,7 @@
 # 技术实现
 
+> **文档同步说明**：本文档含早期设计稿代码示例，部分类型/API 已与实现偏离。开发时请以 `src/types/testDataGenerator.ts`、`src/workers/generator.worker.ts`、`src/pages/TestDataGenerator/hooks/useGenerator.ts`、`src/utils/ruleStorage.ts` 为准。近期变更摘要见 [README § 开发者注意事项](./README.md#开发者注意事项与源码同步)。
+
 ## 技术栈
 
 | 技术         | 用途     | 版本 |
@@ -1498,6 +1500,67 @@ export class DataExporter {
 
 ## Web Worker 使用
 
+### 消息协议
+
+```typescript
+// src/types/testDataGenerator.ts
+
+type WorkerRequestMessage = { type: 'start'; payload: WorkerStartPayload } | { type: 'cancel' };
+
+type WorkerResponseMessage =
+  | { type: 'progress'; generationId: number; payload: GenerateProgress }
+  | { type: 'complete'; generationId: number; payload: GenerateResult }
+  | { type: 'error'; generationId: number; payload: { error: string } };
+
+interface WorkerStartPayload {
+  generationId: number; // 任务 ID，用于忽略过期响应
+  fields: FieldConfig[];
+  count: number;
+  csvMode: boolean;
+}
+```
+
+### useGenerator Hook
+
+`src/pages/TestDataGenerator/hooks/useGenerator.ts` 负责 Worker 生命周期与 `generationId` 管理：
+
+- Worker **复用**：同一 Hook 实例内只创建一次，出错后 `terminate` 并在下次重建
+- **开始生成**：`generate(fields, count, csvMode?)` 递增 `generationId` 并 post `start`
+- **取消**：`cancel()` 递增 ID（使旧响应失效）并 post `cancel`；取消完成的 `complete` 不写入 `error` 状态
+- **响应过滤**：`onmessage` 中若 `data.generationId !== generationIdRef.current` 则忽略
+
+```typescript
+const generate = (fields: FieldConfig[], count: number, csvMode = false) => {
+  if (isGenerating) return;
+  const generationId = ++generationIdRef.current;
+  worker.postMessage({ type: 'start', payload: { generationId, fields, count, csvMode } });
+};
+
+const cancel = () => {
+  if (workerRef.current && isGenerating) {
+    ++generationIdRef.current;
+    worker.postMessage({ type: 'cancel' });
+    setIsGenerating(false);
+  }
+};
+```
+
+### Worker 实现要点
+
+`src/workers/generator.worker.ts`：
+
+- 按 `field.generatorId` 查找生成器；选填字段按 `nullRate` 随机置 `null`
+- 唯一性：≤1000 条随机+重试；>1000 条优先 `generateAtIndex`
+- 每 `YIELD_EVERY`（100）行 `await setTimeout(0)`，以便处理 `cancel`
+- 进度：每 1000 条或最后一行 post `progress`
+
+---
+
+## Web Worker 使用（历史设计稿，仅供参考）
+
+<details>
+<summary>展开查看旧版设计示例（与当前实现不一致）</summary>
+
 ### 创建 Worker
 
 ```typescript
@@ -1593,7 +1656,7 @@ export function useGenerator() {
 }
 ```
 
-### 错误处理
+### 错误处理（设计稿，`useErrorHandler.ts` 未实现）
 
 ```typescript
 // src/pages/TestDataGenerator/hooks/useErrorHandler.ts
@@ -1636,7 +1699,11 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
 
 ---
 
+</details>
+
 ## 错误提示机制
+
+> 当前实现：`TestDataGenerator/index.tsx` 直接使用 `useGenerator` 的 `error`/`result` 与 `ResultPanel` 展示警告；下方示例引用未实现的 `useErrorHandler`，仅供对照。
 
 ### 错误类型分类
 

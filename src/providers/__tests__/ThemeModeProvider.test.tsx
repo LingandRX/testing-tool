@@ -46,6 +46,7 @@ describe('ThemeModeProvider', () => {
     expect(screen.getByTestId('mode')).toHaveTextContent('dark');
     expect(screen.getByTestId('resolved-mode')).toHaveTextContent('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(storageUtil.get).not.toHaveBeenCalled();
   });
 
   it('异步恢复 storage 后应写回 snapshot', async () => {

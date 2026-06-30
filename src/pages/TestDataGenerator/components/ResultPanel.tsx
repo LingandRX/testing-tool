@@ -82,7 +82,7 @@ export default function ResultPanel({ result }: ResultPanelProps) {
             ))}
             {result.warnings.length > 5 && (
               <li className="text-xs text-yellow-500/80">
-                {`... 还有 ${result.warnings.length - 5} 条警告`}
+                ... 还有 {result.warnings.length - 5} 条警告
               </li>
             )}
           </ul>

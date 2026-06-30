@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type RefObject,
+} from 'react';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useRouter } from '@/providers/RouterProvider';
 import { useThemeMode } from '@/providers/ThemeModeProvider';
@@ -21,7 +28,7 @@ export interface UseTopBarReturn {
   handleSearchQueryChange: (value: string) => void;
   handleSearchFocus: () => void;
   handleSelectFeature: (feature: FeatureConfig) => void;
-  handleKeyDown: (e: React.KeyboardEvent) => void;
+  handleKeyDown: (e: ReactKeyboardEvent) => void;
   cycleThemeMode: () => void;
   handleOpenInTab: () => Promise<void>;
   goHome: () => void;
@@ -80,7 +87,7 @@ export function useTopBar(): UseTopBarReturn {
     });
   }, [searchQuery]);
 
-  const displayedHistory = useMemo(() => {
+  const recentFeatures = useMemo(() => {
     if (searchQuery.trim()) return [];
     return searchHistory
       .slice(0, SEARCH_HISTORY_DISPLAY)
@@ -111,8 +118,10 @@ export function useTopBar(): UseTopBarReturn {
   const themeTitle =
     mode === 'light' ? '切换到深色模式' : mode === 'dark' ? '切换到系统模式' : '切换到浅色模式';
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    const totalItems = searchQuery.trim() ? searchResults.length : displayedHistory.length;
+  const handleKeyDown = (e: ReactKeyboardEvent) => {
+    const isSearching = !!searchQuery.trim();
+    const items = isSearching ? searchResults : recentFeatures;
+    const totalItems = items.length;
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -122,13 +131,12 @@ export function useTopBar(): UseTopBarReturn {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      const items = searchQuery.trim() ? searchResults : displayedHistory;
-      const feature =
-        selectedIndex >= 0 && selectedIndex < totalItems
-          ? items[selectedIndex]
-          : searchQuery.trim() && searchResults.length > 0
-            ? searchResults[0]
-            : undefined;
+      let feature: FeatureConfig | undefined;
+      if (selectedIndex >= 0 && selectedIndex < totalItems) {
+        feature = items[selectedIndex];
+      } else if (isSearching && searchResults.length > 0) {
+        feature = searchResults[0];
+      }
       if (feature) handleSelectFeature(feature);
     } else if (e.key === 'Escape') {
       setShowResults(false);
@@ -149,13 +157,12 @@ export function useTopBar(): UseTopBarReturn {
 
   const handleSearchFocus = () => setShowResults(true);
 
-  const showDropdown =
-    showResults && (searchQuery.trim().length > 0 || displayedHistory.length > 0);
+  const showDropdown = showResults && (!!searchQuery.trim() || recentFeatures.length > 0);
 
   return {
     searchQuery,
     searchResults,
-    recentFeatures: displayedHistory,
+    recentFeatures,
     selectedIndex,
     showDropdown,
     isDashboard: currentPage === 'dashboard',

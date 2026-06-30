@@ -1,4 +1,15 @@
 /**
+ * 检查 localStorage 中是否存在指定键的快照
+ */
+export function hasSyncSnapshot(key: string): boolean {
+  try {
+    return localStorage.getItem(`snapshot/${key}`) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * 从 localStorage 获取同步快照（用于消除异步加载产生的首屏闪烁）
  */
 export function getSyncSnapshot<T>(
