@@ -46,7 +46,7 @@ function ToolPageSkeleton() {
         <div className="w-24 h-9 bg-muted rounded-lg animate-pulse" />
         <div className="w-20 h-9 bg-muted rounded-lg animate-pulse" />
         <div className="flex-1" />
-        <div className="w-22 h-9 bg-muted rounded-lg animate-pulse" />
+        <div className="w-24 h-9 bg-muted rounded-lg animate-pulse" />
       </div>
 
       {/* 结果区域 */}

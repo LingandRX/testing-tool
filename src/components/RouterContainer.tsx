@@ -49,7 +49,7 @@ export default function RouterContainer() {
       key={currentPage}
       className={cn(
         'flex-1 flex flex-col overflow-x-hidden overflow-y-auto',
-        'scrollbar-gutter-stable motion-reduce:transition-none',
+        'motion-reduce:transition-none',
         animationClass,
       )}
     >
@@ -57,7 +57,7 @@ export default function RouterContainer() {
         {currentFeature ? (
           <LoadedPage key={currentPage} pageKey={currentPage} />
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in-300">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive mb-4">
               <AlertTriangle className="h-6 w-6" />
             </div>

@@ -24,8 +24,7 @@ const SIZE_CLASSES = {
   large: 'text-base h-11 px-4 py-2 rounded-lg',
 } as const;
 
-const SELECTED_CLASSES =
-  'bg-background text-foreground shadow-sm font-semibold animate-in fade-in-50 zoom-in-95 duration-150';
+const SELECTED_CLASSES = 'bg-background text-foreground shadow-sm font-semibold fade-in-zoom-95';
 const UNSELECTED_CLASSES = 'hover:bg-background/50 hover:text-foreground/80';
 
 export default function SwitchButtonGroup<T extends string | number = string>({

@@ -15,7 +15,7 @@ export default function App() {
 
   return (
     <RouterProvider defaultRoute="dashboard" syncKey="app/sidepanelRoute">
-      <div className="app flex flex-col h-screen w-full overflow-hidden">
+      <div className="flex flex-col h-screen w-full overflow-hidden">
         <TopBar />
         <ErrorBoundary>
           <RouterContainer />
