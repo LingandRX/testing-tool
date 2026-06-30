@@ -44,7 +44,7 @@ const QrCodePreview = ({
           <img
             src={qrCodeDataUrl}
             alt="QR Code Preview"
-            className="w-48 h-48 max-w-full object-contain block animate-in fade-in duration-300"
+            className="w-48 h-48 max-w-full object-contain block fade-in-300"
           />
         </div>
 

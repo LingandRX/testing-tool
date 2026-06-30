@@ -30,9 +30,7 @@ export function ErrorFallback({
     <div
       className={cn(
         'flex flex-col items-center justify-center',
-        isApp
-          ? 'mt-16 mx-auto max-w-md'
-          : 'flex-1 p-6 min-h-[300px] animate-in fade-in zoom-in-95 duration-200',
+        isApp ? 'mt-16 mx-auto max-w-md' : 'flex-1 p-6 min-h-[300px] fade-in-zoom-95',
         className,
       )}
     >
