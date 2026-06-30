@@ -37,14 +37,10 @@ function LoadedPage({ pageKey }: { pageKey: PageType }) {
 }
 
 export default function RouterContainer() {
-  const { currentPage, isLoaded } = useRouter();
+  const { currentPage } = useRouter();
 
   const animationClass =
     currentPage === 'dashboard' ? 'page-transition-dashboard' : 'page-transition-enter';
-
-  if (!isLoaded) {
-    return <PageSkeleton variant={currentPage === 'dashboard' ? 'dashboard' : 'tool'} />;
-  }
 
   const currentFeature = getFeatureByKey(currentPage);
 
