@@ -33,7 +33,10 @@ export default function GenerateButton({
           {progress && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{`已生成 ${progress.generated.toLocaleString()} / ${progress.total.toLocaleString()} 条`}</span>
+                <span>
+                  已生成 {progress.generated.toLocaleString()} / {progress.total.toLocaleString()}{' '}
+                  条
+                </span>
                 <span>{progress.progress}%</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -44,7 +47,7 @@ export default function GenerateButton({
               </div>
               {progress.estimatedTimeLeft !== undefined && (
                 <p className="text-xs text-muted-foreground text-center">
-                  {`预计剩余 ${Math.ceil(progress.estimatedTimeLeft / 1000)} 秒`}
+                  预计剩余 {Math.ceil(progress.estimatedTimeLeft / 1000)} 秒
                 </p>
               )}
             </div>

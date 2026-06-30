@@ -75,6 +75,27 @@ describe('chromeStorage', () => {
     });
   });
 
+  describe('getMany', () => {
+    it('应该一次读取多个键', async () => {
+      (chrome.storage.local.get as any).mockResolvedValue({
+        'app/theme': 'dark',
+        'app/popupRoute': 'timestamp',
+      });
+
+      const result = await storageUtil.getMany(['app/theme', 'app/popupRoute']);
+
+      expect(result).toEqual({ 'app/theme': 'dark', 'app/popupRoute': 'timestamp' });
+      expect(chrome.storage.local.get).toHaveBeenCalledWith(['app/theme', 'app/popupRoute']);
+    });
+
+    it('空键数组应直接返回空对象', async () => {
+      const result = await storageUtil.getMany([]);
+
+      expect(result).toEqual({});
+      expect(chrome.storage.local.get).not.toHaveBeenCalled();
+    });
+  });
+
   describe('get 类型签名', () => {
     it('无默认值时应推断为可选返回类型', () => {
       const _getWithoutDefault = () => storageUtil.get('app/theme');

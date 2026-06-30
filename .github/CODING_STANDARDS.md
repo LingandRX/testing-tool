@@ -669,7 +669,7 @@ src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
 
 ### 9.1 功能元数据
 
-功能名称与描述在 `config/features.tsx` 的 `FEATURES` 数组中定义：
+功能名称与描述在 `config/featureMeta.ts` 的 `FEATURES` 数组中定义：
 
 ```typescript
 {
@@ -677,9 +677,10 @@ src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
   label: '时间戳转换',
   description: '日期与时间戳互转',
   defaultVisible: true,
-  components: { popup: TimestampPage, sidepanel: TimestampPage, tab: TimestampPage },
 }
 ```
+
+页面组件通过 `config/pageLoaders/` 按需加载，不在 `FEATURES` 中引用。
 
 Dashboard 卡片、TopBar 搜索等功能从此处读取 `label` / `description`。
 
@@ -763,11 +764,11 @@ const [themeMode, setThemeMode, isInitialized] = useStorageState(
 
 Chrome Storage 读取是异步的。项目通过 `localStorage` 快照（键名 `snapshot/{storageKey}`）提供同步初始值，消除首屏闪烁。
 
-| 模块 | 快照工具 | 防覆盖机制 |
-| ---- | -------- | ---------- |
-| `RouterProvider` | `syncSnapshot.ts` | `canPersistRef`（加载成功后才写入）、`hasUserNavigatedRef`（用户导航后不被 storage 覆盖） |
-| `useStorageState` | `syncSnapshot.ts` | `loadSucceededRef` 或 `userModifiedRef` 为 true 时才写入 |
-| `ThemeModeProvider` | `themeSnapshot.ts` | `hasUserSetMode`（用户切换主题后不被 storage 覆盖） |
+| 模块                | 快照工具           | 防覆盖机制                                                                                |
+| ------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
+| `RouterProvider`    | `syncSnapshot.ts`  | `canPersistRef`（加载成功后才写入）、`hasUserNavigatedRef`（用户导航后不被 storage 覆盖） |
+| `useStorageState`   | `syncSnapshot.ts`  | `loadSucceededRef` 或 `userModifiedRef` 为 true 时才写入                                  |
+| `ThemeModeProvider` | `themeSnapshot.ts` | `hasUserSetMode`（用户切换主题后不被 storage 覆盖）                                       |
 
 新增持久化状态时，应遵循相同模式：同步快照作初始 state → 异步加载 storage → 加载成功或用户修改后才允许写入。
 

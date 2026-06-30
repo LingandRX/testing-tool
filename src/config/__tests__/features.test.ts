@@ -19,15 +19,11 @@ describe('features', () => {
         expect(feature).toHaveProperty('label');
         expect(feature).toHaveProperty('description');
         expect(feature).toHaveProperty('defaultVisible');
-        expect(feature).toHaveProperty('components');
+        expect(feature).not.toHaveProperty('component');
         expect(typeof feature.key).toBe('string');
         expect(typeof feature.label).toBe('string');
         expect(typeof feature.description).toBe('string');
         expect(typeof feature.defaultVisible).toBe('boolean');
-        expect(typeof feature.components).toBe('object');
-        expect(feature.components).toHaveProperty('popup');
-        expect(feature.components).toHaveProperty('sidepanel');
-        expect(feature.components).toHaveProperty('tab');
 
         if (feature.key !== 'dashboard') {
           expect(feature).toHaveProperty('icon');
