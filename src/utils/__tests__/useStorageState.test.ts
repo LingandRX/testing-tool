@@ -167,6 +167,38 @@ describe('useStorageState', () => {
     expect(result.current[2]).toBe(false);
   });
 
+  it('用户在异步加载完成前修改状态时，不应被存储值覆盖', async () => {
+    let resolveLoad: (value: boolean) => void = () => {};
+    (storageUtil.get as any).mockImplementation(
+      () =>
+        new Promise<boolean>((resolve) => {
+          resolveLoad = resolve;
+        }),
+    );
+
+    const { result } = renderHook(() => useStorageState('qrCode/urlExpanded', true));
+
+    expect(result.current[0]).toBe(true);
+
+    await act(async () => {
+      result.current[1](false);
+    });
+
+    expect(result.current[0]).toBe(false);
+
+    await act(async () => {
+      resolveLoad(true);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(result.current[2]).toBe(true);
+    });
+
+    expect(result.current[0]).toBe(false);
+    expect(storageUtil.set).toHaveBeenCalledWith('qrCode/urlExpanded', false);
+  });
+
   it('加载失败时不应把快照默认值写回 Chrome Storage', async () => {
     localStorage.setItem('snapshot/app/searchHistory', JSON.stringify([]));
 

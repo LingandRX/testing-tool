@@ -38,7 +38,8 @@ export const useStorageState = <K extends keyof StorageSchema>(
         const savedValue = await storageUtil.get(key, defaultValue);
         if (cancelled) return;
         loadSucceededRef.current = true;
-        if (savedValue !== undefined) {
+        // 用户已在异步加载完成前修改过状态时，不要用存储值覆盖（与 ThemeModeProvider 一致）
+        if (savedValue !== undefined && !userModifiedRef.current) {
           if (validator) {
             setValueInternal(validator(savedValue) ? savedValue : defaultValue);
           } else {
