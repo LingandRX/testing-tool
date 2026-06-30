@@ -286,7 +286,7 @@ export default function FieldList({
                 onClick={handleUpdateRule}
                 disabled={fields.length === 0}
                 className="h-8 gap-1.5 px-2.5"
-                title={`编辑中: ${editingRule.name}`}
+                title={editingRule ? `编辑中: ${editingRule.name}` : ''}
               >
                 <Save className="h-3.5 w-3.5" />
                 更新规则

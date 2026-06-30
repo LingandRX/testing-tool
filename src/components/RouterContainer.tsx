@@ -43,7 +43,7 @@ export default function RouterContainer() {
               </div>
               <h3 className="text-sm font-semibold text-foreground">页面未找到</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
-                {`该功能在当前运行环境（${entryPointType}）下不可用或已被移除。`}
+                该功能在当前运行环境（{entryPointType.toUpperCase()}）下不可用或已被移除。
               </p>
             </div>
           )}
