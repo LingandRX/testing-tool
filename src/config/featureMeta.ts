@@ -1,4 +1,4 @@
-import { type ComponentType, lazy } from 'react';
+import type { ComponentType } from 'react';
 import type { LucideProps } from 'lucide-react';
 import type { PageType } from '@/types/storage';
 import {
@@ -15,18 +15,6 @@ import {
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
 
-// 懒加载页面组件
-const DashboardPage = lazy(() => import('@/pages/Dashboard'));
-const TimestampPage = lazy(() => import('@/pages/Timestamp'));
-const StorageCleanerPage = lazy(() => import('@/pages/StorageCleaner'));
-const QrCodePage = lazy(() => import('@/pages/QrCode'));
-const TextStatisticsPage = lazy(() => import('@/pages/TextStatistics'));
-const JwtPage = lazy(() => import('@/pages/Jwt'));
-const JsonToolsPage = lazy(() => import('@/pages/JsonTools'));
-const Base64ConverterPage = lazy(() => import('@/pages/Base64Converter'));
-const RightClickRestorerPage = lazy(() => import('@/pages/RightClickRestorer'));
-const TestDataGeneratorPage = lazy(() => import('@/pages/TestDataGenerator'));
-
 export interface FeatureConfig {
   key: PageType;
   label: string;
@@ -34,7 +22,6 @@ export interface FeatureConfig {
   themeColorKey?: PaletteColorKey;
   icon?: ComponentType<LucideProps>;
   defaultVisible: boolean;
-  component: ComponentType;
 }
 
 export const FEATURES: FeatureConfig[] = [
@@ -43,7 +30,6 @@ export const FEATURES: FeatureConfig[] = [
     label: '仪表盘',
     description: '',
     defaultVisible: true,
-    component: DashboardPage,
   },
   {
     key: 'timestamp',
@@ -52,7 +38,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'primary',
     icon: Clock,
     defaultVisible: true,
-    component: TimestampPage,
   },
   {
     key: 'storageCleaner',
@@ -61,7 +46,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'warning',
     icon: Database,
     defaultVisible: true,
-    component: StorageCleanerPage,
   },
   {
     key: 'qrCode',
@@ -70,7 +54,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'success',
     icon: QrCode,
     defaultVisible: true,
-    component: QrCodePage,
   },
   {
     key: 'textStatistics',
@@ -79,7 +62,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'secondary',
     icon: FileText,
     defaultVisible: true,
-    component: TextStatisticsPage,
   },
   {
     key: 'jwt',
@@ -88,7 +70,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'info',
     icon: Key,
     defaultVisible: true,
-    component: JwtPage,
   },
   {
     key: 'jsonTools',
@@ -97,7 +78,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'primary',
     icon: GitCompareArrows,
     defaultVisible: true,
-    component: JsonToolsPage,
   },
   {
     key: 'base64Converter',
@@ -106,7 +86,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'info',
     icon: ArrowLeftRight,
     defaultVisible: true,
-    component: Base64ConverterPage,
   },
   {
     key: 'rightClickRestorer',
@@ -115,7 +94,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'success',
     icon: MousePointerClick,
     defaultVisible: true,
-    component: RightClickRestorerPage,
   },
   {
     key: 'testDataGenerator',
@@ -124,7 +102,6 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'warning',
     icon: FileSpreadsheet,
     defaultVisible: true,
-    component: TestDataGeneratorPage,
   },
 ];
 

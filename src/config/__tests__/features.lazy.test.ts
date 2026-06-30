@@ -67,19 +67,21 @@ describe('features 懒加载', () => {
     expect(pageLoadTracker.loaded).toEqual([]);
   });
 
-  it('渲染 lazy 组件时才应加载对应页面模块', async () => {
-    const React = await import('react');
-    const { render, waitFor } = await import('@testing-library/react');
-    const { FEATURES } = await import('@/config/features');
+  it('loadPage 应仅加载对应页面模块', async () => {
+    const { loadPage } = await import('@/config/pageLoaders/index');
 
-    const DashboardPage = FEATURES.find((f) => f.key === 'dashboard')!.component;
+    await loadPage('dashboard');
 
-    render(
-      React.createElement(React.Suspense, { fallback: null }, React.createElement(DashboardPage)),
-    );
+    expect(pageLoadTracker.loaded).toEqual(['Dashboard']);
+  });
 
-    await waitFor(() => {
-      expect(pageLoadTracker.loaded).toEqual(['Dashboard']);
-    });
+  it('loadPage 切换页面时不应加载无关页面模块', async () => {
+    const { loadPage } = await import('@/config/pageLoaders/index');
+
+    await loadPage('timestamp');
+
+    expect(pageLoadTracker.loaded).toEqual(['Timestamp']);
+    expect(pageLoadTracker.loaded).not.toContain('QrCode');
+    expect(pageLoadTracker.loaded).not.toContain('TestDataGenerator');
   });
 });
