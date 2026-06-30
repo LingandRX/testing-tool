@@ -40,6 +40,7 @@ describe('useStorageState', () => {
 
     // 初始值应从快照恢复，而非默认值
     expect(result.current[0]).toBe(false);
+    expect(storageUtil.get).not.toHaveBeenCalled();
   });
 
   it('应该从 Chrome Storage 异步加载并覆盖初始值', async () => {
@@ -179,5 +180,6 @@ describe('useStorageState', () => {
     await waitFor(() => {
       expect(storageUtil.set).not.toHaveBeenCalled();
     });
+    expect(storageUtil.get).not.toHaveBeenCalled();
   });
 });
