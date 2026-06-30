@@ -7,9 +7,23 @@ import { storageUtil } from '@/utils/chromeStorage';
 vi.mock('@/utils/chromeStorage', () => ({
   storageUtil: {
     get: vi.fn(),
+    getMany: vi.fn(),
     set: vi.fn(() => Promise.resolve()),
   },
 }));
+
+/** 模拟批量 storage 读取，未指定的键由 Router 侧使用默认值 */
+function mockStorageBatch(map: Record<string, unknown> = {}) {
+  (storageUtil.getMany as ReturnType<typeof vi.fn>).mockImplementation((keys: string[]) => {
+    const result: Record<string, unknown> = {};
+    for (const key of keys) {
+      if (key in map) {
+        result[key] = map[key];
+      }
+    }
+    return Promise.resolve(result);
+  });
+}
 
 const TestComponent = () => {
   const { currentPage, navigateTo, visiblePages, pageOrder } = useRouter();
@@ -46,9 +60,7 @@ describe('RouterProvider', () => {
   });
 
   it('应该使用默认值初始化路由', async () => {
-    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: any) =>
-      Promise.resolve(defaultValue),
-    );
+    mockStorageBatch();
 
     render(
       <RouterProvider defaultRoute="dashboard">
@@ -59,13 +71,18 @@ describe('RouterProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
     });
+
+    expect(storageUtil.getMany).toHaveBeenCalledWith([
+      'app/currentRoute',
+      'app/visiblePages',
+      'app/pageOrder',
+      'app/recentlyUsedTools',
+      'contextMenu/pendingData',
+    ]);
   });
 
   it('应该从指定的 syncKey 加载路由', async () => {
-    (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) => {
-      if (key === 'app/sidepanelRoute') return Promise.resolve('timestamp');
-      return Promise.resolve(defaultValue);
-    });
+    mockStorageBatch({ 'app/sidepanelRoute': 'timestamp' });
 
     render(
       <RouterProvider syncKey="app/sidepanelRoute">
@@ -79,9 +96,7 @@ describe('RouterProvider', () => {
   });
 
   it('导航时应该更新指定的 syncKey', async () => {
-    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: any) =>
-      Promise.resolve(defaultValue),
-    );
+    mockStorageBatch();
 
     render(
       <RouterProvider syncKey="app/popupRoute">
@@ -104,10 +119,7 @@ describe('RouterProvider', () => {
   });
 
   it('应该支持独立的标签页路由同步', async () => {
-    (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) => {
-      if (key === 'app/tabRoute') return Promise.resolve('qrCode');
-      return Promise.resolve(defaultValue);
-    });
+    mockStorageBatch({ 'app/tabRoute': 'qrCode' });
 
     render(
       <RouterProvider syncKey="app/tabRoute">
@@ -121,11 +133,9 @@ describe('RouterProvider', () => {
   });
 
   it('应该独立支持 visiblePagesKey 和 pageOrderKey，并合并缺失的新功能', async () => {
-    (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) => {
-      if (key === 'app/sidepanelVisiblePages')
-        return Promise.resolve(['timestamp', 'storageCleaner']);
-      if (key === 'app/sidepanelPageOrder') return Promise.resolve(['storageCleaner', 'timestamp']);
-      return Promise.resolve(defaultValue);
+    mockStorageBatch({
+      'app/sidepanelVisiblePages': ['timestamp', 'storageCleaner'],
+      'app/sidepanelPageOrder': ['storageCleaner', 'timestamp'],
     });
 
     render(
@@ -167,10 +177,9 @@ describe('RouterProvider', () => {
       'jsonTools',
     ];
 
-    (storageUtil.get as any).mockImplementation((key: string, defaultValue: any) => {
-      if (key === 'app/popupVisiblePages') return Promise.resolve(oldVisiblePages);
-      if (key === 'app/popupPageOrder') return Promise.resolve(oldPageOrder);
-      return Promise.resolve(defaultValue);
+    mockStorageBatch({
+      'app/popupVisiblePages': oldVisiblePages,
+      'app/popupPageOrder': oldPageOrder,
     });
 
     render(
@@ -209,9 +218,7 @@ describe('RouterProvider', () => {
     localStorage.setItem('snapshot/app/visiblePages', JSON.stringify(oldVisiblePages));
     localStorage.setItem('snapshot/app/pageOrder', JSON.stringify(oldPageOrder));
 
-    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: any) =>
-      Promise.resolve(defaultValue),
-    );
+    mockStorageBatch();
 
     render(
       <RouterProvider>
@@ -226,9 +233,7 @@ describe('RouterProvider', () => {
   });
 
   it('storage.onChanged 同步 visiblePages 时应合并缺失的新功能', async () => {
-    (storageUtil.get as any).mockImplementation((_key: string, defaultValue: unknown) =>
-      Promise.resolve(defaultValue),
-    );
+    mockStorageBatch();
 
     render(
       <RouterProvider visiblePagesKey="app/popupVisiblePages" pageOrderKey="app/popupPageOrder">
@@ -299,9 +304,9 @@ describe('RouterProvider', () => {
       resolveGet = resolve;
     });
 
-    (storageUtil.get as any).mockImplementation(async (key: string, defaultValue: unknown) => {
+    (storageUtil.getMany as ReturnType<typeof vi.fn>).mockImplementation(async () => {
       await getBlocked;
-      return storage.get(key) ?? defaultValue;
+      return Object.fromEntries(storage.entries());
     });
     (storageUtil.set as any).mockImplementation(async (key: string, value: unknown) => {
       storage.set(key, value);
@@ -324,7 +329,9 @@ describe('RouterProvider', () => {
   });
 
   it('初始化失败时仍应解除加载状态以便渲染页面', async () => {
-    (storageUtil.get as any).mockRejectedValue(new Error('Storage unavailable'));
+    (storageUtil.getMany as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error('Storage unavailable'),
+    );
 
     render(
       <RouterProvider>
@@ -344,10 +351,9 @@ describe('RouterProvider', () => {
       resolveGet = resolve;
     });
 
-    (storageUtil.get as any).mockImplementation(async (key: string, defaultValue: unknown) => {
+    (storageUtil.getMany as ReturnType<typeof vi.fn>).mockImplementation(async () => {
       await getBlocked;
-      if (key === 'app/currentRoute') return 'dashboard';
-      return defaultValue;
+      return { 'app/currentRoute': 'dashboard' };
     });
 
     render(
@@ -374,7 +380,7 @@ describe('RouterProvider', () => {
       resolveStorage = resolve;
     });
 
-    (storageUtil.get as any).mockImplementation(() => storagePromise);
+    (storageUtil.getMany as ReturnType<typeof vi.fn>).mockImplementation(() => storagePromise);
 
     const { unmount } = render(
       <RouterProvider>
@@ -383,7 +389,7 @@ describe('RouterProvider', () => {
     );
 
     unmount();
-    resolveStorage!('dashboard');
+    resolveStorage!({});
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
