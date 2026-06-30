@@ -57,11 +57,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       className={cn(className, copied && 'text-emerald-500')}
       {...props}
     >
-      {copied ? (
-        <Check className="h-[1.2em] w-[1.2em]" />
-      ) : (
-        <Copy className="h-[1.2em] w-[1.2em]" />
-      )}
+      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
     </Button>
   );
 };

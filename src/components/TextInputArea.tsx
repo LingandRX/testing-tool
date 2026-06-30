@@ -267,7 +267,13 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
 
             <div className="flex items-center gap-1.5 ml-auto shrink-0">
               {allowCopy && value && (
-                <CopyButton text={value} tooltip="复制内容" size="sm" className="h-7 w-7 p-1" />
+                <CopyButton
+                  text={value}
+                  tooltip="复制内容"
+                  variant="ghost"
+                  size="iconSm"
+                  className="text-muted-foreground hover:text-foreground"
+                />
               )}
               {showClear && value && !disabled && !readOnly && (
                 <Button
@@ -275,8 +281,8 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
                   onClick={handleClear}
                   aria-label="清空"
                   variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  size="iconSm"
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -287,7 +293,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
       </div>
 
       {displayError && (
-        <p className="text-xs font-medium text-destructive px-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
+        <p className="text-xs font-medium text-destructive px-0.5 fade-in-slide-top-1">
           {displayError}
         </p>
       )}

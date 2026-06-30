@@ -25,7 +25,7 @@ export default function App() {
       visiblePagesKey={routerConfig.visiblePagesKey}
       pageOrderKey={routerConfig.pageOrderKey}
     >
-      <div className="app flex flex-col w-[400px] max-w-[400px] min-w-[400px] h-[600px] min-h-[600px] overflow-hidden bg-background sm:w-screen sm:max-w-none sm:min-w-0 sm:h-screen sm:min-h-0">
+      <div className="flex flex-col w-[400px] max-w-[400px] min-w-[400px] h-[600px] min-h-[600px] overflow-hidden bg-background sm:w-screen sm:max-w-none sm:min-w-0 sm:h-screen sm:min-h-0">
         <TopBar />
         <ErrorBoundary>
           <RouterContainer />
