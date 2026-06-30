@@ -34,11 +34,7 @@ export interface FeatureConfig {
   themeColorKey?: PaletteColorKey;
   icon?: ComponentType<LucideProps>;
   defaultVisible: boolean;
-  components: {
-    popup: ComponentType;
-    sidepanel: ComponentType;
-    tab: ComponentType;
-  };
+  component: ComponentType;
 }
 
 export const FEATURES: FeatureConfig[] = [
@@ -47,11 +43,7 @@ export const FEATURES: FeatureConfig[] = [
     label: '仪表盘',
     description: '',
     defaultVisible: true,
-    components: {
-      popup: DashboardPage,
-      sidepanel: DashboardPage,
-      tab: DashboardPage,
-    },
+    component: DashboardPage,
   },
   {
     key: 'timestamp',
@@ -60,11 +52,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'primary',
     icon: Clock,
     defaultVisible: true,
-    components: {
-      popup: TimestampPage,
-      sidepanel: TimestampPage,
-      tab: TimestampPage,
-    },
+    component: TimestampPage,
   },
   {
     key: 'storageCleaner',
@@ -73,11 +61,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'warning',
     icon: Database,
     defaultVisible: true,
-    components: {
-      popup: StorageCleanerPage,
-      sidepanel: StorageCleanerPage,
-      tab: StorageCleanerPage,
-    },
+    component: StorageCleanerPage,
   },
   {
     key: 'qrCode',
@@ -86,11 +70,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'success',
     icon: QrCode,
     defaultVisible: true,
-    components: {
-      popup: QrCodePage,
-      sidepanel: QrCodePage,
-      tab: QrCodePage,
-    },
+    component: QrCodePage,
   },
   {
     key: 'textStatistics',
@@ -99,11 +79,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'secondary',
     icon: FileText,
     defaultVisible: true,
-    components: {
-      popup: TextStatisticsPage,
-      sidepanel: TextStatisticsPage,
-      tab: TextStatisticsPage,
-    },
+    component: TextStatisticsPage,
   },
   {
     key: 'jwt',
@@ -112,11 +88,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'info',
     icon: Key,
     defaultVisible: true,
-    components: {
-      popup: JwtPage,
-      sidepanel: JwtPage,
-      tab: JwtPage,
-    },
+    component: JwtPage,
   },
   {
     key: 'jsonTools',
@@ -125,11 +97,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'primary',
     icon: GitCompareArrows,
     defaultVisible: true,
-    components: {
-      popup: JsonToolsPage,
-      sidepanel: JsonToolsPage,
-      tab: JsonToolsPage,
-    },
+    component: JsonToolsPage,
   },
   {
     key: 'base64Converter',
@@ -138,11 +106,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'info',
     icon: ArrowLeftRight,
     defaultVisible: true,
-    components: {
-      popup: Base64ConverterPage,
-      sidepanel: Base64ConverterPage,
-      tab: Base64ConverterPage,
-    },
+    component: Base64ConverterPage,
   },
   {
     key: 'rightClickRestorer',
@@ -151,11 +115,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'success',
     icon: MousePointerClick,
     defaultVisible: true,
-    components: {
-      popup: RightClickRestorerPage,
-      sidepanel: RightClickRestorerPage,
-      tab: RightClickRestorerPage,
-    },
+    component: RightClickRestorerPage,
   },
   {
     key: 'testDataGenerator',
@@ -164,11 +124,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'warning',
     icon: FileSpreadsheet,
     defaultVisible: true,
-    components: {
-      popup: TestDataGeneratorPage,
-      sidepanel: TestDataGeneratorPage,
-      tab: TestDataGeneratorPage,
-    },
+    component: TestDataGeneratorPage,
   },
 ];
 

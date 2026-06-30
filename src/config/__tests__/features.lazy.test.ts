@@ -72,7 +72,7 @@ describe('features 懒加载', () => {
     const { render, waitFor } = await import('@testing-library/react');
     const { FEATURES } = await import('@/config/features');
 
-    const DashboardPage = FEATURES.find((f) => f.key === 'dashboard')!.components.popup;
+    const DashboardPage = FEATURES.find((f) => f.key === 'dashboard')!.component;
 
     render(
       React.createElement(React.Suspense, { fallback: null }, React.createElement(DashboardPage)),

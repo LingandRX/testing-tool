@@ -1,12 +1,10 @@
-import { FEATURES, getEntryPointType } from '@/config/features';
+import { FEATURES } from '@/config/features';
 import { useRouter } from '@/providers/RouterProvider';
 import { Suspense } from 'react';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
 import PageSkeleton from '@/components/PageSkeleton';
 import { cn } from '@/lib/utils';
 import { AlertTriangle } from 'lucide-react';
-
-const entryPointType = getEntryPointType();
 
 export default function RouterContainer() {
   const { currentPage, isLoaded } = useRouter();
@@ -19,7 +17,7 @@ export default function RouterContainer() {
   }
 
   const currentFeature = FEATURES.find((f) => f.key === currentPage);
-  const MatchedComponent = currentFeature?.components?.[entryPointType];
+  const MatchedComponent = currentFeature?.component;
 
   return (
     <div
@@ -43,7 +41,7 @@ export default function RouterContainer() {
               </div>
               <h3 className="text-sm font-semibold text-foreground">页面未找到</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
-                该功能在当前运行环境（{entryPointType.toUpperCase()}）下不可用或已被移除。
+                该功能不存在或已被移除。
               </p>
             </div>
           )}
