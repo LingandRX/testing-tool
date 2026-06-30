@@ -227,7 +227,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
           maxLength={20}
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none tabular-nums">
-          {`已保存 ${rules.length}/${ruleStorage.MAX_RULES} 条`}
+          已保存 {rules.length}/{ruleStorage.MAX_RULES} 条
         </span>
       </div>
 
@@ -260,7 +260,7 @@ export default function RuleManager({ onLoad, onEdit, onRulesChanged }: RuleMana
                     <Clock className="h-3 w-3" />
                     {formatDate(rule.updatedAt)}
                   </span>
-                  <span>{`使用 ${rule.useCount} 次`}</span>
+                  <span>使用 {rule.useCount} 次</span>
                 </div>
               </div>
 

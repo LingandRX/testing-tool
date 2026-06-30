@@ -22,7 +22,9 @@ vi.mock('../components/TextMode', () => ({
 }));
 
 vi.mock('../components/Base64ConverterSection', () => ({
-  default: ({ mode }: { mode: string }) => <div data-testid={`${mode}-mode`}>{mode}</div>,
+  default: ({ mode }: { mode: 'file' | 'image' }) => (
+    <div data-testid={`${mode}-mode`}>{mode.toUpperCase()} Mode</div>
+  ),
 }));
 
 const waitForStorageInit = () =>
