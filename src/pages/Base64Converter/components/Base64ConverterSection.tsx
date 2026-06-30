@@ -50,10 +50,6 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
     setDirection(next);
   };
 
-  const handleDownload = () => {
-    if (decoded) downloadBlob(decoded.blob, decodedFileName);
-  };
-
   return (
     <div className="w-full flex flex-col space-y-4 px-2">
       <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
@@ -115,7 +111,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                     />
                   </div>
                 )}
-                <Upload className={cn('w-8 h-8 text-primary')} />
+                <Upload className="w-8 h-8 text-primary" />
                 <span className="text-sm font-bold text-foreground/90 max-w-[280px] truncate">
                   {info.name}
                 </span>
@@ -137,11 +133,11 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
                   {mode === 'image' ? '点击或拖拽图像到此处' : '点击或拖拽文件到此处'}
                 </span>
                 <span className="text-[10px] font-medium text-muted-foreground/60">
-                  {`最大文件大小：${maxFileSizeStr}`}
+                  最大文件大小：{maxFileSizeStr}
                 </span>
                 {mode === 'image' && (
                   <span className="text-[10px] font-medium text-muted-foreground/50">
-                    {'支持 PNG、JPG、WEBP、GIF、BMP、SVG 等格式'}
+                    支持 PNG、JPG、WEBP、GIF、BMP、SVG 等格式
                   </span>
                 )}
               </div>
@@ -231,7 +227,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
               blobSize={decoded.blob.size}
               fileName={decodedFileName}
               onFileNameChange={setCustomFileName}
-              onDownload={handleDownload}
+              onDownload={() => downloadBlob(decoded.blob, decodedFileName)}
             >
               {mode === 'image' && (
                 <div className="relative p-1.5 border border-border bg-background dark:bg-muted/10 rounded-xl max-w-[220px] mb-3 overflow-hidden shadow-sm">

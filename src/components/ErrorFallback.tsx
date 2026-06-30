@@ -57,7 +57,11 @@ export function ErrorFallback({
           <h3 className="text-base font-semibold text-foreground mb-1.5">{title}</h3>
         )}
 
-        <p className={cn('text-muted-foreground', isApp ? 'text-sm mb-6' : 'text-xs mb-5')}>
+        <p
+          className={
+            isApp ? 'text-sm text-muted-foreground mb-6' : 'text-xs text-muted-foreground mb-5'
+          }
+        >
           {description}
         </p>
 
@@ -83,7 +87,7 @@ export function ErrorFallback({
           variant="destructive"
           size={isApp ? 'default' : 'sm'}
           onClick={onAction}
-          className={cn(isApp ? 'rounded-lg font-bold shadow-sm' : 'font-medium shadow-sm')}
+          className={isApp ? 'rounded-lg font-bold shadow-sm' : 'font-medium shadow-sm'}
         >
           <RefreshCw className={isApp ? 'mr-2 h-4 w-4' : 'mr-1.5 h-3.5 w-3.5'} />
           {actionLabel}
