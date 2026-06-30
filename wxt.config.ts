@@ -22,14 +22,10 @@ function manualChunksForHtmlOnly(): Plugin {
           ) {
             return 'vendor-react';
           }
-          // 二维码活态感知依赖分流
-          if (id.includes('qr-scanner') || id.includes('qrious')) {
-            return 'vendor-qr';
-          }
-          // 拖拽排序高级组件分流
-          if (id.includes('@dnd-kit')) {
-            return 'vendor-dnd';
-          }
+
+          // qrious / qr-scanner / @dnd-kit 不单独拆 vendor chunk：
+          // 独立 vendor 会与 Vite preload 辅助函数共 chunk，被 App Shell 静态拉取。
+          // 这些依赖随各自页面 async chunk 加载即可。
 
           return undefined;
         },
@@ -77,6 +73,7 @@ export default defineConfig({
   vite: () => ({
     plugins: [manualChunksForHtmlOnly()],
     build: {
+      modulePreload: false,
       minify: 'terser',
       terserOptions: {
         format: { ascii_only: true, comments: false },
