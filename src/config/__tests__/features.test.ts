@@ -19,13 +19,11 @@ describe('features', () => {
         expect(feature).toHaveProperty('label');
         expect(feature).toHaveProperty('description');
         expect(feature).toHaveProperty('defaultVisible');
-        expect(feature).toHaveProperty('component');
+        expect(feature).not.toHaveProperty('component');
         expect(typeof feature.key).toBe('string');
         expect(typeof feature.label).toBe('string');
         expect(typeof feature.description).toBe('string');
         expect(typeof feature.defaultVisible).toBe('boolean');
-        expect(feature.component).toBeDefined();
-        expect(['function', 'object']).toContain(typeof feature.component);
 
         if (feature.key !== 'dashboard') {
           expect(feature).toHaveProperty('icon');
