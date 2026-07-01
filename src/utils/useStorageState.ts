@@ -7,7 +7,7 @@ import {
   type SetStateAction,
 } from 'react';
 import { storageUtil } from '@/utils/chromeStorage';
-import { getSyncSnapshot, hasSyncSnapshot } from '@/utils/syncSnapshot';
+import { getSyncSnapshot } from '@/utils/syncSnapshot';
 import type { StorageSchema } from '@/types/storage';
 
 export const useStorageState = <K extends keyof StorageSchema>(
@@ -34,19 +34,11 @@ export const useStorageState = <K extends keyof StorageSchema>(
     let cancelled = false;
 
     const loadState = async () => {
-      if (hasSyncSnapshot(key as string)) {
-        if (!cancelled) {
-          setIsInitialized(true);
-          hasLoadedFromStorage.current = true;
-        }
-        return;
-      }
-
       try {
         const savedValue = await storageUtil.get(key, defaultValue);
         if (cancelled) return;
         loadSucceededRef.current = true;
-        if (savedValue !== undefined) {
+        if (!userModifiedRef.current && savedValue !== undefined) {
           if (validator) {
             setValueInternal(validator(savedValue) ? savedValue : defaultValue);
           } else {

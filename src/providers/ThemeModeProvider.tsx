@@ -13,7 +13,6 @@ import { storageUtil } from '@/utils/chromeStorage';
 import {
   applyResolvedThemeClass,
   getThemeSyncSnapshot,
-  hasThemeSyncSnapshot,
   isValidThemeMode,
   persistThemeModeSnapshot,
   resolveThemeMode,
@@ -69,10 +68,6 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
   );
 
   useEffect(() => {
-    if (hasThemeSyncSnapshot()) {
-      return;
-    }
-
     let cancelled = false;
 
     storageUtil

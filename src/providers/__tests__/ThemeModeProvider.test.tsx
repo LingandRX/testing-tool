@@ -34,7 +34,7 @@ describe('ThemeModeProvider', () => {
     );
   });
 
-  it('应从 localStorage 快照初始化主题', () => {
+  it('应从 localStorage 快照初始化主题', async () => {
     localStorage.setItem(THEME_MODE_SNAPSHOT_KEY, JSON.stringify('dark'));
 
     render(
@@ -46,7 +46,28 @@ describe('ThemeModeProvider', () => {
     expect(screen.getByTestId('mode')).toHaveTextContent('dark');
     expect(screen.getByTestId('resolved-mode')).toHaveTextContent('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(storageUtil.get).not.toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(storageUtil.get).toHaveBeenCalledWith(THEME_MODE_STORAGE_KEY, 'system');
+    });
+  });
+
+  it('快照与 Chrome Storage 不一致时应以 Chrome Storage 为准', async () => {
+    localStorage.setItem(THEME_MODE_SNAPSHOT_KEY, JSON.stringify('light'));
+    (storageUtil.get as ReturnType<typeof vi.fn>).mockResolvedValue('dark');
+
+    render(
+      <ThemeModeProvider>
+        <TestComponent />
+      </ThemeModeProvider>,
+    );
+
+    expect(screen.getByTestId('mode')).toHaveTextContent('light');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('mode')).toHaveTextContent('dark');
+      expect(document.documentElement.classList.contains('dark')).toBe(true);
+    });
   });
 
   it('异步恢复 storage 后应写回 snapshot', async () => {

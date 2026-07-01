@@ -29,7 +29,7 @@ describe('useStorageState', () => {
     expect(result.current[0]).toBe(true);
   });
 
-  it('应该从 localStorage 快照同步恢复初始值', () => {
+  it('应该从 localStorage 快照同步恢复初始值', async () => {
     localStorage.setItem('snapshot/qrCode/urlExpanded', JSON.stringify(false));
 
     (storageUtil.get as any).mockImplementation((_key: string, defaultValue: any) =>
@@ -40,7 +40,53 @@ describe('useStorageState', () => {
 
     // 初始值应从快照恢复，而非默认值
     expect(result.current[0]).toBe(false);
-    expect(storageUtil.get).not.toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(result.current[2]).toBe(true);
+    });
+    expect(storageUtil.get).toHaveBeenCalledWith('qrCode/urlExpanded', true);
+  });
+
+  it('快照与 Chrome Storage 不一致时应以 Chrome Storage 为准', async () => {
+    localStorage.setItem('snapshot/jsonTools/pageMode', JSON.stringify('diff'));
+
+    (storageUtil.get as any).mockResolvedValue('yaml');
+
+    const validator = (val: unknown): val is JsonToolsPageMode =>
+      typeof val === 'string' &&
+      (['diff', 'format', 'yaml', 'toml', 'minify'] as string[]).includes(val);
+
+    const { result } = renderHook(() => useStorageState('jsonTools/pageMode', 'diff', validator));
+
+    expect(result.current[0]).toBe('diff');
+
+    await waitFor(() => {
+      expect(result.current[0]).toBe('yaml');
+    });
+  });
+
+  it('异步加载完成前用户修改不应被 Chrome Storage 覆盖', async () => {
+    let resolveStorage: (value: boolean) => void;
+    const storagePromise = new Promise<boolean>((resolve) => {
+      resolveStorage = resolve;
+    });
+
+    (storageUtil.get as any).mockImplementation(() => storagePromise);
+
+    const { result } = renderHook(() => useStorageState('qrCode/urlExpanded', true));
+
+    await act(async () => {
+      result.current[1](false);
+    });
+
+    expect(result.current[0]).toBe(false);
+
+    await act(async () => {
+      resolveStorage!(true);
+      await storagePromise;
+    });
+
+    expect(result.current[0]).toBe(false);
   });
 
   it('应该从 Chrome Storage 异步加载并覆盖初始值', async () => {
@@ -178,8 +224,8 @@ describe('useStorageState', () => {
     );
 
     await waitFor(() => {
+      expect(storageUtil.get).toHaveBeenCalledWith('app/searchHistory', []);
       expect(storageUtil.set).not.toHaveBeenCalled();
     });
-    expect(storageUtil.get).not.toHaveBeenCalled();
   });
 });
