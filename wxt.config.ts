@@ -41,15 +41,7 @@ export default defineConfig({
     name: 'Testing Tool',
     description: 'A tool for testing web applications.',
     version_name: undefined,
-    permissions: [
-      'storage',
-      'clipboardWrite',
-      'scripting',
-      'tabs',
-      'cookies',
-      'sidePanel',
-      'contextMenus',
-    ],
+    permissions: ['storage', 'clipboardWrite', 'scripting', 'tabs', 'cookies', 'contextMenus'],
     host_permissions: ['<all_urls>'],
     icons: {
       '16': 'icon/16.png',
@@ -65,9 +57,6 @@ export default defineConfig({
         '32': 'icon/32.png',
         '48': 'icon/48.png',
       },
-    },
-    side_panel: {
-      default_path: 'entrypoints/sidepanel/index.html',
     },
   },
   vite: () => ({

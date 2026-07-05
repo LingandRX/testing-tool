@@ -30,7 +30,7 @@ function LoadedPage({ pageKey }: { pageKey: PageType }) {
   }, [pageKey]);
 
   if (!Page) {
-    return <PageSkeleton variant={pageKey === 'dashboard' ? 'dashboard' : 'tool'} />;
+    return <PageSkeleton />;
   }
 
   return <Page />;
@@ -39,9 +39,6 @@ function LoadedPage({ pageKey }: { pageKey: PageType }) {
 export default function RouterContainer() {
   const { currentPage } = useRouter();
 
-  const animationClass =
-    currentPage === 'dashboard' ? 'page-transition-dashboard' : 'page-transition-enter';
-
   const currentFeature = getFeatureByKey(currentPage);
 
   return (
@@ -49,8 +46,7 @@ export default function RouterContainer() {
       key={currentPage}
       className={cn(
         'flex-1 flex flex-col overflow-x-hidden overflow-y-auto',
-        'motion-reduce:transition-none',
-        animationClass,
+        'motion-reduce:transition-none page-transition-enter',
       )}
     >
       <PageErrorBoundary resetKey={currentPage}>

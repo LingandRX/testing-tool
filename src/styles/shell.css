@@ -94,10 +94,6 @@
 }
 
 @layer components {
-  .page-transition-dashboard {
-    @apply motion-reduce:transition-none;
-  }
-
   .page-transition-enter {
     @apply motion-reduce:transition-none;
     animation: tt-page-enter 200ms ease-out;

@@ -4,23 +4,21 @@
 
 ## 组件列表
 
-| 目录      | 用途                                                           |
-| --------- | -------------------------------------------------------------- |
-| `TopBar/` | 顶部导航栏：搜索（含历史记录）、主题切换、返回导航、标签页打开 |
+| 目录          | 用途                                       |
+| ------------- | ------------------------------------------ |
+| `FeatureNav/` | 右侧功能导航栏：工具图标切换、底部主题切换 |
 
 ## 目录结构
 
 遵循与 `pages/` 相同的 UI + Hook 分离模式：
 
 ```
-layout/TopBar/
-├── index.tsx              # 布局入口
-├── useTopBar.ts           # 业务逻辑 Hook
-├── constants.ts           # 常量
-├── SearchInput.tsx        # 搜索输入框
-├── SearchDropdown.tsx     # 搜索结果/历史下拉面板
-├── SearchResultItem.tsx   # 单条搜索结果项
-├── TopBarActions.tsx      # 右侧操作按钮组
+layout/FeatureNav/
+├── index.tsx              # 垂直图标导航 + 底部主题按钮
+├── useFeatureNav.ts       # 读路由状态，暴露 navItems / navigateTo
+├── useThemeToggle.ts      # 主题模式循环切换逻辑
+├── ThemeToggleButton.tsx  # 主题切换按钮
+├── resolveNavFeatures.ts  # 功能列表解析
 └── __tests__/
     └── index.test.tsx
 ```

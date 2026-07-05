@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Testing Tools - 标签页</title>
+    <title>Testing Tools</title>
     <meta name="manifest.type" content="browser_action" />
     <script>
       (function () {
@@ -21,7 +21,7 @@
     <style>
       /* Force initial popup size before React hydration */
       html, body {
-        width: 400px;
+        width: 450px;
         height: 600px;
         margin: 0;
         padding: 0;
@@ -32,13 +32,6 @@
       #root {
         width: 100%;
         height: 100%;
-      }
-      /* If opened in a tab (mode=tab), reset the fixed size */
-      @media screen and (min-width: 600px) {
-        html, body {
-          width: 100%;
-          height: 100%;
-        }
       }
     </style>
   </head>

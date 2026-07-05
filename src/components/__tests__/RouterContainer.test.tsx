@@ -6,12 +6,10 @@ import type { PageType } from '@/types/storage';
 import React from 'react';
 
 const mockRouterValue = {
-  currentPage: 'dashboard' as PageType,
-  visiblePages: ['dashboard', 'timestamp'] as PageType[],
+  currentPage: 'timestamp' as PageType,
+  visiblePages: ['timestamp', 'jwt'] as PageType[],
   pageOrder: ['timestamp'] as PageType[],
   navigateTo: vi.fn(),
-  syncNavigation: vi.fn(),
-  goHome: vi.fn(),
   setVisiblePages: vi.fn(),
   setPageOrder: vi.fn(),
   recentlyUsedTools: [] as PageType[],
@@ -34,21 +32,14 @@ describe('RouterContainer 组件', () => {
 
   describe('渲染测试', () => {
     it('mount 后应直接渲染页面结构（不等待 storage 加载）', () => {
-      mockRouterValue.currentPage = 'dashboard';
+      mockRouterValue.currentPage = 'timestamp';
       const { container } = renderWithProvider(<RouterContainer />);
-      expect(container.querySelector('.page-transition-dashboard')).toBeInTheDocument();
+      expect(container.querySelector('.page-transition-enter')).toBeInTheDocument();
     });
   });
 
   describe('动画类测试', () => {
-    it('在 dashboard 页面应应用 dashboard 动画类', () => {
-      mockRouterValue.currentPage = 'dashboard';
-      renderWithProvider(<RouterContainer />);
-      const box = document.querySelector('.page-transition-dashboard');
-      expect(box).toBeInTheDocument();
-    });
-
-    it('在非 dashboard 页面应应用 enter 动画类', () => {
+    it('应应用 enter 动画类', () => {
       mockRouterValue.currentPage = 'timestamp';
       renderWithProvider(<RouterContainer />);
       const box = document.querySelector('.page-transition-enter');
@@ -60,7 +51,7 @@ describe('RouterContainer 组件', () => {
     it('currentPage 变化时应更新', () => {
       const { rerender } = renderWithProvider(<RouterContainer />);
 
-      mockRouterValue.currentPage = 'timestamp';
+      mockRouterValue.currentPage = 'jwt';
       rerender(<RouterProvider>{<RouterContainer />}</RouterProvider>);
 
       const box = document.querySelector('.page-transition-enter');
@@ -70,11 +61,10 @@ describe('RouterContainer 组件', () => {
 
   describe('页面级错误隔离', () => {
     it('PageErrorBoundary 应包裹页面内容', () => {
-      mockRouterValue.currentPage = 'dashboard';
+      mockRouterValue.currentPage = 'timestamp';
       const { container } = renderWithProvider(<RouterContainer />);
 
-      // 验证 RouterContainer 的 Box 结构存在
-      const routerBox = container.querySelector('.page-transition-dashboard');
+      const routerBox = container.querySelector('.page-transition-enter');
       expect(routerBox).toBeInTheDocument();
     });
   });

@@ -26,12 +26,6 @@ export interface FeatureConfig {
 
 export const FEATURES: FeatureConfig[] = [
   {
-    key: 'dashboard',
-    label: '仪表盘',
-    description: '',
-    defaultVisible: true,
-  },
-  {
     key: 'timestamp',
     label: '时间戳',
     description: 'Unix 毫秒数转换与格式化',
@@ -118,16 +112,5 @@ export function getAllFeatureKeys(): PageType[] {
 }
 
 export function getDefaultPageOrder(): PageType[] {
-  return FEATURES.filter((f) => f.key !== 'dashboard').map((f) => f.key);
-}
-
-export function getEntryPointType(): 'popup' | 'sidepanel' | 'tab' {
-  const pathname = window.location.pathname;
-  if (pathname.includes('sidepanel')) {
-    return 'sidepanel';
-  }
-  if (new URLSearchParams(window.location.search).get('mode') === 'tab') {
-    return 'tab';
-  }
-  return 'popup';
+  return FEATURES.map((f) => f.key);
 }

@@ -44,18 +44,21 @@ describe('messages', () => {
       );
     });
 
-    it('应该支持不带数据的消息发送', async () => {
+    it('应该支持带数据的消息发送', async () => {
       const mockSendMessage = await getMockSendMessage();
       mockSendMessage.mockResolvedValue(undefined);
 
       const mockTab = { id: 456, url: 'https://example.com' };
       (chrome.tabs.query as any).mockResolvedValue([mockTab]);
 
-      await sendMessageToContent(MessageAction.SIDE_PANEL_STATE_CHANGED, { isOpen: true });
+      await sendMessageToContent(MessageAction.CONTEXT_MENU_CLICKED, {
+        featureKey: 'timestamp',
+        payload: '1234567890',
+      });
 
       expect(mockSendMessage).toHaveBeenCalledWith(
-        MessageAction.SIDE_PANEL_STATE_CHANGED,
-        { isOpen: true },
+        MessageAction.CONTEXT_MENU_CLICKED,
+        { featureKey: 'timestamp', payload: '1234567890' },
         456,
       );
     });
