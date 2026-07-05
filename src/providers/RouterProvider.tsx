@@ -28,10 +28,11 @@ const isValidPage = (page: unknown): page is PageType => {
 };
 
 /**
- * 校验页面列表是否合法
+ * 从页面列表中过滤非法项（如已移除的 dashboard），保留合法 PageType
  */
-const isValidPageList = (pages: unknown): pages is PageType[] => {
-  return Array.isArray(pages) && pages.every(isValidPage);
+const sanitizePageList = (pages: unknown): PageType[] | null => {
+  if (!Array.isArray(pages)) return null;
+  return pages.filter(isValidPage);
 };
 
 /**
@@ -45,6 +46,15 @@ const mergeWithDefaults = (saved: PageType[], defaults: PageType[]): PageType[] 
   const newItems = defaults.filter((page) => !savedSet.has(page));
 
   return [...preserved, ...newItems];
+};
+
+/**
+ * 解析并合并页面列表：过滤非法项后与默认列表合并
+ */
+const resolvePageList = (pages: unknown, defaults: PageType[]): PageType[] => {
+  const sanitized = sanitizePageList(pages);
+  if (sanitized === null) return defaults;
+  return mergeWithDefaults(sanitized, defaults);
 };
 
 interface RouterContextType {
@@ -81,26 +91,19 @@ export function RouterProvider({
     getSyncSnapshot(syncKey as string, defaultRoute, isValidPage),
   );
 
-  const [visiblePages, setVisiblePages] = useState<PageType[]>(() => {
-    const snapshot = getSyncSnapshot(
-      visiblePagesKey as string,
+  const [visiblePages, setVisiblePages] = useState<PageType[]>(() =>
+    resolvePageList(
+      getSyncSnapshot(visiblePagesKey as string, null),
       getDefaultVisibleFeatureKeys(),
-      isValidPageList,
-    );
-    return mergeWithDefaults(snapshot, getDefaultVisibleFeatureKeys());
-  });
+    ),
+  );
 
-  const [pageOrder, setPageOrder] = useState<PageType[]>(() => {
-    const snapshot = getSyncSnapshot(
-      pageOrderKey as string,
-      getDefaultPageOrder(),
-      isValidPageList,
-    );
-    return mergeWithDefaults(snapshot, getDefaultPageOrder());
-  });
+  const [pageOrder, setPageOrder] = useState<PageType[]>(() =>
+    resolvePageList(getSyncSnapshot(pageOrderKey as string, null), getDefaultPageOrder()),
+  );
 
-  const [recentlyUsedTools, setRecentlyUsedTools] = useState<PageType[]>(() =>
-    getSyncSnapshot('app/recentlyUsedTools', [], isValidPageList),
+  const [recentlyUsedTools, setRecentlyUsedTools] = useState<PageType[]>(
+    () => sanitizePageList(getSyncSnapshot('app/recentlyUsedTools', null)) ?? [],
   );
 
   const [isLoaded, setIsLoaded] = useState(false);
@@ -126,14 +129,15 @@ export function RouterProvider({
       if (isValidPage(savedRoute) && syncRoute && !hasUserNavigatedRef.current) {
         setCurrentPage(savedRoute);
       }
-      if (isValidPageList(savedVisiblePages)) {
-        setVisiblePages(mergeWithDefaults(savedVisiblePages, getDefaultVisibleFeatureKeys()));
+      if (sanitizePageList(savedVisiblePages) !== null) {
+        setVisiblePages(resolvePageList(savedVisiblePages, getDefaultVisibleFeatureKeys()));
       }
-      if (isValidPageList(savedPageOrder) && savedPageOrder.length > 0) {
-        setPageOrder(mergeWithDefaults(savedPageOrder, getDefaultPageOrder()));
+      if (sanitizePageList(savedPageOrder) !== null) {
+        setPageOrder(resolvePageList(savedPageOrder, getDefaultPageOrder()));
       }
-      if (isValidPageList(savedRecentTools)) {
-        setRecentlyUsedTools(savedRecentTools);
+      const sanitizedRecentTools = sanitizePageList(savedRecentTools);
+      if (sanitizedRecentTools !== null) {
+        setRecentlyUsedTools(sanitizedRecentTools);
       }
       canPersistRef.current = true;
 
@@ -249,20 +253,21 @@ export function RouterProvider({
       }
       if (changes[visiblePagesKey as string]) {
         const newPages = changes[visiblePagesKey as string].newValue;
-        if (isValidPageList(newPages)) {
-          setVisiblePages(mergeWithDefaults(newPages, getDefaultVisibleFeatureKeys()));
+        if (sanitizePageList(newPages) !== null) {
+          setVisiblePages(resolvePageList(newPages, getDefaultVisibleFeatureKeys()));
         }
       }
       if (changes[pageOrderKey as string]) {
         const newOrder = changes[pageOrderKey as string].newValue;
-        if (isValidPageList(newOrder)) {
-          setPageOrder(mergeWithDefaults(newOrder, getDefaultPageOrder()));
+        if (sanitizePageList(newOrder) !== null) {
+          setPageOrder(resolvePageList(newOrder, getDefaultPageOrder()));
         }
       }
       if (changes['app/recentlyUsedTools']) {
         const newRecent = changes['app/recentlyUsedTools'].newValue;
-        if (isValidPageList(newRecent)) {
-          setRecentlyUsedTools(newRecent);
+        const sanitizedRecent = sanitizePageList(newRecent);
+        if (sanitizedRecent !== null) {
+          setRecentlyUsedTools(sanitizedRecent);
         }
       }
       if (changes['contextMenu/pendingData']) {
