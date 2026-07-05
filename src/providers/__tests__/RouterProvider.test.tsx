@@ -193,6 +193,57 @@ describe('RouterProvider', () => {
     });
   });
 
+  it('storage 列表含 dashboard 时应过滤并保留其余自定义配置', async () => {
+    mockStorageBatch({
+      'app/popupVisiblePages': ['dashboard', 'jwt', 'timestamp'],
+      'app/popupPageOrder': ['jwt', 'dashboard', 'timestamp'],
+      'app/recentlyUsedTools': ['dashboard', 'jwt'],
+    });
+
+    render(
+      <RouterProvider visiblePagesKey="app/popupVisiblePages" pageOrderKey="app/popupPageOrder">
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await waitFor(() => {
+      const visiblePages = screen.getByTestId('visible-pages').textContent!;
+      const pageOrder = screen.getByTestId('page-order').textContent!;
+
+      expect(visiblePages.startsWith('jwt,timestamp')).toBe(true);
+      expect(pageOrder.startsWith('jwt,timestamp')).toBe(true);
+      expect(visiblePages).not.toContain('dashboard');
+      expect(pageOrder).not.toContain('dashboard');
+    });
+  });
+
+  it('localStorage 快照含 dashboard 时应过滤并保留其余配置', async () => {
+    localStorage.setItem(
+      'snapshot/app/popupVisiblePages',
+      JSON.stringify(['dashboard', 'jwt', 'timestamp']),
+    );
+    localStorage.setItem(
+      'snapshot/app/popupPageOrder',
+      JSON.stringify(['jwt', 'dashboard', 'timestamp']),
+    );
+
+    mockStorageBatch();
+
+    render(
+      <RouterProvider visiblePagesKey="app/popupVisiblePages" pageOrderKey="app/popupPageOrder">
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    const visiblePages = screen.getByTestId('visible-pages').textContent!;
+    const pageOrder = screen.getByTestId('page-order').textContent!;
+
+    expect(visiblePages.startsWith('jwt,timestamp')).toBe(true);
+    expect(pageOrder.startsWith('jwt,timestamp')).toBe(true);
+    expect(visiblePages).not.toContain('dashboard');
+    expect(pageOrder).not.toContain('dashboard');
+  });
+
   it('应该从 localStorage 快照合并缺失的新功能', async () => {
     const oldVisiblePages = [
       'timestamp',
