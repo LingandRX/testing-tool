@@ -66,14 +66,10 @@ export interface FormMapEntry {
  * 定义了所有持久化在客户端的数据结构
  */
 export interface StorageSchema {
-  /** RouterProvider 的默认路由键，仅当未显式传入 syncKey 时使用（popup/sidepanel/tab 入口已各自覆盖） */
+  /** RouterProvider 的默认路由键，仅当未显式传入 syncKey 时使用（popup 入口已覆盖） */
   'app/currentRoute': PageType;
   /** Popup 窗口的当前路由 */
   'app/popupRoute': PageType;
-  /** 侧边栏的当前路由 */
-  'app/sidepanelRoute': PageType;
-  /** 标签页的当前路由 */
-  'app/tabRoute': PageType;
   /** RouterProvider 的默认可见页面列表键，仅当未显式传入 visiblePagesKey 时使用 */
   'app/visiblePages': PageType[];
   /** RouterProvider 的默认页面排序键，仅当未显式传入 pageOrderKey 时使用 */
@@ -82,14 +78,6 @@ export interface StorageSchema {
   'app/popupVisiblePages': PageType[];
   /** Popup 窗口页面的显示顺序 */
   'app/popupPageOrder': PageType[];
-  /** 侧边栏可见的页面列表 */
-  'app/sidepanelVisiblePages': PageType[];
-  /** 侧边栏页面的显示顺序 */
-  'app/sidepanelPageOrder': PageType[];
-  /** 标签页可见的页面列表 */
-  'app/tabVisiblePages': PageType[];
-  /** 标签页页面的显示顺序 */
-  'app/tabPageOrder': PageType[];
   /** 应用主题配置 */
   'app/theme': string;
   /** 主题模式偏好（light/dark/system） */

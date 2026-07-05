@@ -2,15 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Base64ConverterPage from '../index';
 
-// Mock getEntryPointType
-vi.mock('@/config/features', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/config/features')>();
-  return {
-    ...actual,
-    getEntryPointType: () => 'sidepanel',
-  };
-});
-
 // Mock 子组件
 vi.mock('../components/TextMode', () => ({
   default: ({ onSwitchToImageMode }: { onSwitchToImageMode?: () => void }) => (

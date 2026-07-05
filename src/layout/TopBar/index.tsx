@@ -1,4 +1,4 @@
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SearchDropdown from './SearchDropdown';
 import SearchInput from './SearchInput';
@@ -22,20 +22,11 @@ export default function TopBar() {
     handleSelectFeature,
     handleKeyDown,
     cycleThemeMode,
-    handleOpenInTab,
     goHome,
     clearSearch,
   } = useTopBar();
 
-  const actions = [
-    { id: 'theme', icon: ThemeIcon, title: themeTitle, onClick: cycleThemeMode },
-    {
-      id: 'open-in-tab',
-      icon: ExternalLink,
-      title: '在标签页打开',
-      onClick: () => void handleOpenInTab(),
-    },
-  ];
+  const actions = [{ id: 'theme', icon: ThemeIcon, title: themeTitle, onClick: cycleThemeMode }];
 
   return (
     <header className="relative z-50 flex h-14 items-center justify-between border-b border-border bg-background px-4">

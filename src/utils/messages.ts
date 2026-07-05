@@ -1,7 +1,6 @@
 import { defineExtensionMessaging } from '@webext-core/messaging';
 
 export enum MessageAction {
-  SIDE_PANEL_STATE_CHANGED = 'sidePanelStateChanged',
   CONTEXT_MENU_CLICKED = 'contextMenuClicked',
   RESTORE_RIGHT_CLICK = 'restoreRightClick',
   QUERY_RIGHT_CLICK_STATUS = 'queryRightClickStatus',
@@ -20,7 +19,6 @@ export interface ContextMenuClickedPayload {
 }
 
 export interface ProtocolMap {
-  [MessageAction.SIDE_PANEL_STATE_CHANGED](data: { isOpen: boolean }): void;
   [MessageAction.CONTEXT_MENU_CLICKED](data: ContextMenuClickedPayload): void;
   [MessageAction.RESTORE_RIGHT_CLICK](data: undefined): MessageResponse & { restored: boolean };
   [MessageAction.QUERY_RIGHT_CLICK_STATUS](

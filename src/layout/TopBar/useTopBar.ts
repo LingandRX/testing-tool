@@ -11,7 +11,6 @@ import { useRouter } from '@/providers/RouterProvider';
 import { useThemeMode } from '@/providers/ThemeModeProvider';
 import { type FeatureConfig, FEATURES } from '@/config/features';
 import { useStorageState } from '@/utils/useStorageState';
-import { openExtensionPage } from '@/utils/chromeTabs';
 import { isSearchHistory, SEARCH_HISTORY_DISPLAY, SEARCH_HISTORY_LIMIT } from './constants';
 
 export interface UseTopBarReturn {
@@ -30,7 +29,6 @@ export interface UseTopBarReturn {
   handleSelectFeature: (feature: FeatureConfig) => void;
   handleKeyDown: (e: ReactKeyboardEvent) => void;
   cycleThemeMode: () => void;
-  handleOpenInTab: () => Promise<void>;
   goHome: () => void;
   clearSearch: () => void;
 }
@@ -50,11 +48,6 @@ export function useTopBar(): UseTopBarReturn {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleOpenInTab = async () => {
-    await openExtensionPage('popup.html', { mode: 'tab' });
-    window.close();
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -175,7 +168,6 @@ export function useTopBar(): UseTopBarReturn {
     handleSelectFeature,
     handleKeyDown,
     cycleThemeMode,
-    handleOpenInTab,
     goHome,
     clearSearch,
   };

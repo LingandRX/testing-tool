@@ -4,6 +4,5 @@ export {
   getAllFeatureKeys,
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
-  getEntryPointType,
   getFeatureByKey,
 } from '@/config/featureMeta';

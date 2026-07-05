@@ -82,10 +82,10 @@ describe('RouterProvider', () => {
   });
 
   it('应该从指定的 syncKey 加载路由', async () => {
-    mockStorageBatch({ 'app/sidepanelRoute': 'timestamp' });
+    mockStorageBatch({ 'app/popupRoute': 'timestamp' });
 
     render(
-      <RouterProvider syncKey="app/sidepanelRoute">
+      <RouterProvider syncKey="app/popupRoute">
         <TestComponent />
       </RouterProvider>,
     );
@@ -118,31 +118,14 @@ describe('RouterProvider', () => {
     expect(storageUtil.set).toHaveBeenCalledWith('app/popupRoute', 'timestamp');
   });
 
-  it('应该支持独立的标签页路由同步', async () => {
-    mockStorageBatch({ 'app/tabRoute': 'qrCode' });
-
-    render(
-      <RouterProvider syncKey="app/tabRoute">
-        <TestComponent />
-      </RouterProvider>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('current-page')).toHaveTextContent('qrCode');
-    });
-  });
-
   it('应该独立支持 visiblePagesKey 和 pageOrderKey，并合并缺失的新功能', async () => {
     mockStorageBatch({
-      'app/sidepanelVisiblePages': ['timestamp', 'storageCleaner'],
-      'app/sidepanelPageOrder': ['storageCleaner', 'timestamp'],
+      'app/popupVisiblePages': ['timestamp', 'storageCleaner'],
+      'app/popupPageOrder': ['storageCleaner', 'timestamp'],
     });
 
     render(
-      <RouterProvider
-        visiblePagesKey="app/sidepanelVisiblePages"
-        pageOrderKey="app/sidepanelPageOrder"
-      >
+      <RouterProvider visiblePagesKey="app/popupVisiblePages" pageOrderKey="app/popupPageOrder">
         <TestComponent />
       </RouterProvider>,
     );
