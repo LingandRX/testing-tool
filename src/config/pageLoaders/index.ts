@@ -16,8 +16,6 @@ function ensurePagesStyles(): Promise<unknown> {
 export function loadPage(key: PageType): Promise<PageModule> {
   return ensurePagesStyles().then(() => {
     switch (key) {
-      case 'dashboard':
-        return import('@/config/pageLoaders/dashboard').then((m) => m.default());
       case 'timestamp':
         return import('@/config/pageLoaders/timestamp').then((m) => m.default());
       case 'storageCleaner':

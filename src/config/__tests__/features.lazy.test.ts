@@ -4,10 +4,6 @@ const pageLoadTracker = vi.hoisted(() => ({
   loaded: [] as string[],
 }));
 
-vi.mock('@/pages/Dashboard', () => {
-  pageLoadTracker.loaded.push('Dashboard');
-  return { default: () => null };
-});
 vi.mock('@/pages/Timestamp', () => {
   pageLoadTracker.loaded.push('Timestamp');
   return { default: () => null };
@@ -63,24 +59,24 @@ describe('features 懒加载', () => {
   it('访问 FEATURES 元数据时不应加载任何页面模块', async () => {
     const { FEATURES } = await import('@/config/features');
 
-    expect(FEATURES).toHaveLength(10);
+    expect(FEATURES).toHaveLength(9);
     expect(pageLoadTracker.loaded).toEqual([]);
   });
 
   it('loadPage 应仅加载对应页面模块', async () => {
     const { loadPage } = await import('@/config/pageLoaders/index');
 
-    await loadPage('dashboard');
+    await loadPage('timestamp');
 
-    expect(pageLoadTracker.loaded).toEqual(['Dashboard']);
+    expect(pageLoadTracker.loaded).toEqual(['Timestamp']);
   });
 
   it('loadPage 切换页面时不应加载无关页面模块', async () => {
     const { loadPage } = await import('@/config/pageLoaders/index');
 
-    await loadPage('timestamp');
+    await loadPage('jwt');
 
-    expect(pageLoadTracker.loaded).toEqual(['Timestamp']);
+    expect(pageLoadTracker.loaded).toEqual(['Jwt']);
     expect(pageLoadTracker.loaded).not.toContain('QrCode');
     expect(pageLoadTracker.loaded).not.toContain('TestDataGenerator');
   });

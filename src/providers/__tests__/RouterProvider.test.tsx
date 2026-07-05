@@ -63,13 +63,13 @@ describe('RouterProvider', () => {
     mockStorageBatch();
 
     render(
-      <RouterProvider defaultRoute="dashboard">
+      <RouterProvider defaultRoute="timestamp">
         <TestComponent />
       </RouterProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
+      expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
     });
 
     expect(storageUtil.getMany).toHaveBeenCalledWith([
@@ -82,7 +82,7 @@ describe('RouterProvider', () => {
   });
 
   it('应该从指定的 syncKey 加载路由', async () => {
-    mockStorageBatch({ 'app/popupRoute': 'timestamp' });
+    mockStorageBatch({ 'app/popupRoute': 'jwt' });
 
     render(
       <RouterProvider syncKey="app/popupRoute">
@@ -91,7 +91,7 @@ describe('RouterProvider', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
+      expect(screen.getByTestId('current-page')).toHaveTextContent('jwt');
     });
   });
 
@@ -105,7 +105,7 @@ describe('RouterProvider', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
+      expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
     });
 
     const btn = screen.getByTestId('navigate-btn');
@@ -143,7 +143,6 @@ describe('RouterProvider', () => {
 
   it('应该将旧存储中缺失的新功能自动合并到 visiblePages 和 pageOrder', async () => {
     const oldVisiblePages = [
-      'dashboard',
       'timestamp',
       'storageCleaner',
       'qrCode',
@@ -175,14 +174,27 @@ describe('RouterProvider', () => {
       const visiblePages = screen.getByTestId('visible-pages').textContent!;
       const pageOrder = screen.getByTestId('page-order').textContent!;
 
-      expect(visiblePages.startsWith('dashboard,timestamp')).toBe(true);
+      expect(visiblePages.startsWith('timestamp,storageCleaner')).toBe(true);
       expect(pageOrder.startsWith('timestamp,storageCleaner')).toBe(true);
+    });
+  });
+
+  it('storage 中 dashboard 路由无效时应回退到 timestamp', async () => {
+    mockStorageBatch({ 'app/popupRoute': 'dashboard' });
+
+    render(
+      <RouterProvider syncKey="app/popupRoute" defaultRoute="timestamp">
+        <TestComponent />
+      </RouterProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
     });
   });
 
   it('应该从 localStorage 快照合并缺失的新功能', async () => {
     const oldVisiblePages = [
-      'dashboard',
       'timestamp',
       'storageCleaner',
       'qrCode',
@@ -232,7 +244,6 @@ describe('RouterProvider', () => {
       .calls[0][0] as (changes: Record<string, { newValue?: unknown }>) => void;
 
     const oldVisiblePages = [
-      'dashboard',
       'timestamp',
       'storageCleaner',
       'qrCode',
@@ -260,7 +271,7 @@ describe('RouterProvider', () => {
       const visiblePages = screen.getByTestId('visible-pages').textContent!;
       const pageOrder = screen.getByTestId('page-order').textContent!;
 
-      expect(visiblePages.startsWith('dashboard,timestamp')).toBe(true);
+      expect(visiblePages.startsWith('timestamp,storageCleaner')).toBe(true);
       expect(pageOrder.startsWith('timestamp,storageCleaner')).toBe(true);
     });
   });
@@ -268,7 +279,7 @@ describe('RouterProvider', () => {
   it('localStorage 快照过期时，loadInitialData 完成前不应覆盖 chrome.storage', async () => {
     const staleRoute = 'timestamp';
     const correctRoute = 'jsonTools';
-    const defaultVisible = ['dashboard', 'timestamp', 'storageCleaner'];
+    const defaultVisible = ['timestamp', 'storageCleaner'];
     const defaultOrder = ['timestamp', 'storageCleaner'];
 
     localStorage.setItem('snapshot/app/currentRoute', JSON.stringify(staleRoute));
@@ -323,7 +334,7 @@ describe('RouterProvider', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
+      expect(screen.getByTestId('current-page')).toHaveTextContent('timestamp');
     });
     expect(storageUtil.set).not.toHaveBeenCalled();
   });
@@ -336,7 +347,7 @@ describe('RouterProvider', () => {
 
     (storageUtil.getMany as ReturnType<typeof vi.fn>).mockImplementation(async () => {
       await getBlocked;
-      return { 'app/currentRoute': 'dashboard' };
+      return { 'app/currentRoute': 'jwt' };
     });
 
     render(

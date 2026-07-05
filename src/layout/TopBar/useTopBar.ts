@@ -18,7 +18,6 @@ export interface UseTopBarReturn {
   searchResults: FeatureConfig[];
   recentFeatures: FeatureConfig[];
   selectedIndex: number;
-  isDashboard: boolean;
   ThemeIcon: typeof Sun;
   themeTitle: string;
   showDropdown: boolean;
@@ -29,12 +28,11 @@ export interface UseTopBarReturn {
   handleSelectFeature: (feature: FeatureConfig) => void;
   handleKeyDown: (e: ReactKeyboardEvent) => void;
   cycleThemeMode: () => void;
-  goHome: () => void;
   clearSearch: () => void;
 }
 
 export function useTopBar(): UseTopBarReturn {
-  const { currentPage, goHome, navigateTo } = useRouter();
+  const { navigateTo } = useRouter();
   const { mode, setMode } = useThemeMode();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,7 +73,6 @@ export function useTopBar(): UseTopBarReturn {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return [];
     return FEATURES.filter((f) => {
-      if (f.key === 'dashboard') return false;
       return f.label.toLowerCase().includes(query) || f.description.toLowerCase().includes(query);
     });
   }, [searchQuery]);
@@ -85,7 +82,7 @@ export function useTopBar(): UseTopBarReturn {
     return searchHistory
       .slice(0, SEARCH_HISTORY_DISPLAY)
       .map((key) => FEATURES.find((f) => f.key === key))
-      .filter((feature): feature is FeatureConfig => !!feature && feature.key !== 'dashboard');
+      .filter((feature): feature is FeatureConfig => !!feature);
   }, [searchHistory, searchQuery]);
 
   const saveToHistory = (featureKey: string) => {
@@ -158,7 +155,6 @@ export function useTopBar(): UseTopBarReturn {
     recentFeatures,
     selectedIndex,
     showDropdown,
-    isDashboard: currentPage === 'dashboard',
     ThemeIcon,
     themeTitle,
     containerRef,
@@ -168,7 +164,6 @@ export function useTopBar(): UseTopBarReturn {
     handleSelectFeature,
     handleKeyDown,
     cycleThemeMode,
-    goHome,
     clearSearch,
   };
 }

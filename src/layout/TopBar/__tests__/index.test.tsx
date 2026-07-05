@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import type { PageType } from '@/types/storage';
 import React from 'react';
 import TopBar from '@/layout/TopBar';
@@ -21,13 +21,12 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 const mockRouterValue = {
-  currentPage: 'dashboard' as PageType,
-  visiblePages: ['dashboard', 'timestamp'] as PageType[],
+  currentPage: 'timestamp' as PageType,
+  visiblePages: ['timestamp', 'jwt'] as PageType[],
   pageOrder: ['timestamp'] as PageType[],
+  recentlyUsedTools: [] as PageType[],
   isLoaded: true,
   navigateTo: vi.fn(),
-  syncNavigation: vi.fn(),
-  goHome: vi.fn(),
   setVisiblePages: vi.fn(),
   setPageOrder: vi.fn(),
 };
@@ -51,26 +50,14 @@ describe('TopBar 组件', () => {
   };
 
   describe('渲染测试', () => {
-    it('不在 dashboard 时应渲染返回按钮', () => {
-      mockRouterValue.currentPage = 'timestamp';
-      renderWithProvider(<TopBar />);
-      expect(screen.getByLabelText('返回首页')).toBeInTheDocument();
-    });
-
-    it('在 dashboard 上不应渲染返回按钮', () => {
-      mockRouterValue.currentPage = 'dashboard';
+    it('不应渲染返回首页按钮', () => {
       renderWithProvider(<TopBar />);
       expect(screen.queryByLabelText('返回首页')).not.toBeInTheDocument();
     });
-  });
 
-  describe('交互测试', () => {
-    it('点击返回按钮时应调用 goHome', () => {
-      mockRouterValue.currentPage = 'timestamp';
+    it('应渲染搜索输入框', () => {
       renderWithProvider(<TopBar />);
-
-      fireEvent.click(screen.getByLabelText('返回首页'));
-      expect(mockRouterValue.goHome).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
   });
 });
