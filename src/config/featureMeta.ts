@@ -120,14 +120,3 @@ export function getAllFeatureKeys(): PageType[] {
 export function getDefaultPageOrder(): PageType[] {
   return FEATURES.filter((f) => f.key !== 'dashboard').map((f) => f.key);
 }
-
-export function getEntryPointType(): 'popup' | 'sidepanel' | 'tab' {
-  const pathname = window.location.pathname;
-  if (pathname.includes('sidepanel')) {
-    return 'sidepanel';
-  }
-  if (new URLSearchParams(window.location.search).get('mode') === 'tab') {
-    return 'tab';
-  }
-  return 'popup';
-}

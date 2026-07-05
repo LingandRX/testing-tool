@@ -1,6 +1,6 @@
 import '../../.wxt/types/imports.d.ts';
 import { browser } from 'wxt/browser';
-import { MessageAction, onMessage, sendMessage } from '@/utils/messages';
+import { MessageAction, onMessage } from '@/utils/messages';
 import { createAllContextMenus, parseContextMenuClick } from '@/utils/contextMenu';
 import { saveContextMenuData } from '@/utils/useContextMenuData';
 import { mainWorldInjectionScript } from '@/utils/rightClickInjection';
@@ -24,35 +24,12 @@ export default defineBackground(() => {
 
     const { featureKey, payload } = result.data;
 
-    try {
-      const sidePanelState = await browser.storage.local.get('sidePanelOpen');
-      const isSidePanelOpen = sidePanelState.sidePanelOpen === true;
-
-      if (isSidePanelOpen) {
-        await sendMessage(MessageAction.CONTEXT_MENU_CLICKED, { featureKey, payload });
-        return;
-      }
-    } catch (err) {
-      console.debug('[Context Menu] Side panel pipeline is not available:', err);
-    }
-
     await saveContextMenuData({ featureKey, payload });
 
     try {
       await browser.action.openPopup();
     } catch (err) {
       console.warn('[Context Menu] 自动打开 popup 失败，请手动点击扩展图标，数据已暂存:', err);
-    }
-  });
-
-  // 扩展图标点击时打开侧边栏
-  browser.action.onClicked.addListener(async (tab) => {
-    if (tab.id) {
-      try {
-        await browser.sidePanel.open({ tabId: tab.id });
-      } catch (err) {
-        console.error('Failed to open side panel via extension action clicked:', err);
-      }
     }
   });
 

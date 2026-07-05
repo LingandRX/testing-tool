@@ -18,14 +18,6 @@ vi.mock('@/components/GlobalSnackbar', () => ({
   }),
 }));
 
-vi.mock('@/config/features', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/config/features')>();
-  return {
-    ...actual,
-    getEntryPointType: () => 'sidepanel',
-  };
-});
-
 vi.mock('../components/QrCodePreview', () => ({
   default: () => <div data-testid="qr-code-preview">QrCodePreview</div>,
 }));
