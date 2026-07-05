@@ -9,8 +9,8 @@ import {
 
 describe('features', () => {
   describe('FEATURES', () => {
-    it('应该有10个功能定义', () => {
-      expect(FEATURES).toHaveLength(10);
+    it('应该有9个功能定义', () => {
+      expect(FEATURES).toHaveLength(9);
     });
 
     it('应该有每个功能的所有必需属性', () => {
@@ -24,12 +24,9 @@ describe('features', () => {
         expect(typeof feature.label).toBe('string');
         expect(typeof feature.description).toBe('string');
         expect(typeof feature.defaultVisible).toBe('boolean');
-
-        if (feature.key !== 'dashboard') {
-          expect(feature).toHaveProperty('icon');
-          expect(feature).toHaveProperty('themeColorKey');
-          expect(typeof feature.themeColorKey).toBe('string');
-        }
+        expect(feature).toHaveProperty('icon');
+        expect(feature).toHaveProperty('themeColorKey');
+        expect(typeof feature.themeColorKey).toBe('string');
       });
     });
 
@@ -41,13 +38,6 @@ describe('features', () => {
   });
 
   describe('getFeatureByKey', () => {
-    it('应该返回dashboard功能', () => {
-      const feature = getFeatureByKey('dashboard');
-      expect(feature).toBeDefined();
-      expect(feature?.key).toBe('dashboard');
-      expect(feature?.label).toBe('仪表盘');
-    });
-
     it('应该返回时间戳功能', () => {
       const feature = getFeatureByKey('timestamp');
       expect(feature).toBeDefined();
@@ -78,9 +68,8 @@ describe('features', () => {
       });
     });
 
-    it('应该包含仪表盘、时间戳、存储清理、二维码', () => {
+    it('应该包含时间戳、存储清理、二维码', () => {
       const visibleKeys = getDefaultVisibleFeatureKeys();
-      expect(visibleKeys).toContain('dashboard');
       expect(visibleKeys).toContain('timestamp');
       expect(visibleKeys).toContain('storageCleaner');
       expect(visibleKeys).toContain('qrCode');
@@ -90,8 +79,7 @@ describe('features', () => {
   describe('getAllFeatureKeys', () => {
     it('应该返回所有功能key', () => {
       const allKeys = getAllFeatureKeys();
-      expect(allKeys).toHaveLength(10);
-      expect(allKeys).toContain('dashboard');
+      expect(allKeys).toHaveLength(9);
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
       expect(allKeys).toContain('qrCode');
@@ -105,9 +93,9 @@ describe('features', () => {
   });
 
   describe('getDefaultPageOrder', () => {
-    it('应该排除仪表盘从页面顺序', () => {
+    it('应该包含所有工具页面', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).not.toContain('dashboard');
+      expect(pageOrder).toHaveLength(9);
     });
 
     it('应该包含时间戳、存储清理、二维码在页面顺序', () => {
@@ -115,11 +103,6 @@ describe('features', () => {
       expect(pageOrder).toContain('timestamp');
       expect(pageOrder).toContain('storageCleaner');
       expect(pageOrder).toContain('qrCode');
-    });
-
-    it('应该有9个项目在页面顺序', () => {
-      const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(9);
     });
   });
 });

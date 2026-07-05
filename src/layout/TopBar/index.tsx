@@ -1,5 +1,3 @@
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import SearchDropdown from './SearchDropdown';
 import SearchInput from './SearchInput';
 import TopBarActions from './TopBarActions';
@@ -11,7 +9,6 @@ export default function TopBar() {
     searchResults,
     recentFeatures,
     selectedIndex,
-    isDashboard,
     ThemeIcon,
     themeTitle,
     showDropdown,
@@ -22,7 +19,6 @@ export default function TopBar() {
     handleSelectFeature,
     handleKeyDown,
     cycleThemeMode,
-    goHome,
     clearSearch,
   } = useTopBar();
 
@@ -30,21 +26,6 @@ export default function TopBar() {
 
   return (
     <header className="relative z-50 flex h-14 items-center justify-between border-b border-border bg-background px-4">
-      <div className="flex w-10 items-center justify-start">
-        {!isDashboard && (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={goHome}
-            aria-label="返回首页"
-            className="h-8 w-8 shadow-sm text-muted-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
       <div ref={containerRef} className="relative mx-4 max-w-md flex-1">
         <SearchInput
           inputRef={inputRef}

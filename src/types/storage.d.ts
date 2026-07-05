@@ -2,7 +2,6 @@
  * 应用页面类型定义
  */
 export type PageType =
-  | 'dashboard' // 仪表盘/首页
   | 'timestamp' // 时间戳转换工具
   | 'storageCleaner' // 存储清理工具
   | 'qrCode' // 二维码工具

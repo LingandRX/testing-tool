@@ -54,7 +54,6 @@ interface RouterContextType {
   recentlyUsedTools: PageType[];
   isLoaded: boolean;
   navigateTo: (page: PageType) => void;
-  goHome: () => void;
   setVisiblePages: (pages: PageType[]) => void;
   setPageOrder: (pages: PageType[]) => void;
 }
@@ -72,7 +71,7 @@ interface RouterProviderProps {
 
 export function RouterProvider({
   children,
-  defaultRoute = 'dashboard',
+  defaultRoute = 'timestamp',
   syncRoute = true,
   syncKey = 'app/currentRoute',
   visiblePagesKey = 'app/visiblePages',
@@ -295,12 +294,6 @@ export function RouterProvider({
     });
   };
 
-  const goHome = () => {
-    hasUserNavigatedRef.current = true;
-    canPersistRef.current = true;
-    setCurrentPage('dashboard');
-  };
-
   return (
     <RouterContext.Provider
       value={{
@@ -310,7 +303,6 @@ export function RouterProvider({
         recentlyUsedTools,
         isLoaded,
         navigateTo,
-        goHome,
         setVisiblePages,
         setPageOrder,
       }}

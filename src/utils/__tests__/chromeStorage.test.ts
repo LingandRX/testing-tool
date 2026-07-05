@@ -37,7 +37,7 @@ describe('chromeStorage', () => {
     });
 
     it('应该支持数组类型值', async () => {
-      const pages = ['dashboard', 'timestamp'] as const;
+      const pages = ['timestamp', 'jwt'] as const;
       (chrome.storage.local.get as any).mockResolvedValue({ 'app/visiblePages': pages });
 
       const result = await storageUtil.get('app/visiblePages');
@@ -126,7 +126,7 @@ describe('chromeStorage', () => {
     });
 
     it('应该成功设置数组值', async () => {
-      const pages: Array<'dashboard' | 'timestamp'> = ['dashboard', 'timestamp'];
+      const pages: Array<'timestamp' | 'jwt'> = ['timestamp', 'jwt'];
       await storageUtil.set('app/visiblePages', pages);
 
       expect(chrome.storage.local.set).toHaveBeenCalledWith({ 'app/visiblePages': pages });
