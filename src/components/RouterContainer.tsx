@@ -4,7 +4,6 @@ import { useRouter } from '@/providers/RouterProvider';
 import type { PageType } from '@/types/storage';
 import { type ComponentType, useEffect, useState } from 'react';
 import PageErrorBoundary from '@/components/PageErrorBoundary';
-import PageSkeleton from '@/components/PageSkeleton';
 import { cn } from '@/lib/utils';
 import { AlertTriangle } from 'lucide-react';
 
@@ -30,7 +29,7 @@ function LoadedPage({ pageKey }: { pageKey: PageType }) {
   }, [pageKey]);
 
   if (!Page) {
-    return <PageSkeleton />;
+    return <div className="flex-1" aria-hidden="true" />;
   }
 
   return <Page />;

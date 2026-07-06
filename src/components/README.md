@@ -6,7 +6,7 @@
 
 | 组件                    | 用途                                                                                                   |
 | ----------------------- | ------------------------------------------------------------------------------------------------------ |
-| `RouterContainer.tsx`   | 路由容器，根据当前路由动态渲染对应页面组件，集成错误边界和骨架屏                                       |
+| `RouterContainer.tsx`   | 路由容器，根据当前路由动态渲染对应页面组件，集成错误边界                                               |
 | `SwitchButtonGroup.tsx` | 通用切换按钮组，支持 `small/medium/large` 三种尺寸，用于页面子模式切换                                 |
 | `EmptyPlaceholder.tsx`  | 虚线边框空状态占位，统一工具页「暂无结果」提示样式                                                     |
 | `TextInputArea.tsx`     | 增强文本输入区域，支持校验规则、工具栏操作、字符计数、清空                                             |
@@ -17,7 +17,6 @@
 | `GlobalSnackbar.tsx`    | 全局消息提示组件 + Context Provider，支持受控/Hook/全局单例三种使用方式                                |
 | `ErrorBoundary.tsx`     | 全局错误边界（类组件），捕获子组件树 JS 错误并展示友好错误页面                                         |
 | `PageErrorBoundary.tsx` | 页面级错误边界，适配 shadcn 暗黑模式，支持 `resetKey` 自动恢复                                         |
-| `PageSkeleton.tsx`      | 页面骨架屏，提供 `dashboard` 和 `tool` 两种变体，用于 Suspense fallback                                |
 
 ## 使用约定
 
