@@ -11,7 +11,6 @@ export default {
     './src/components/ErrorBoundary.tsx',
     './src/components/ErrorFallback.tsx',
     './src/components/PageErrorBoundary.tsx',
-    './src/components/PageSkeleton.tsx',
     './src/components/ui/button.tsx',
     './src/components/ui/input.tsx',
     './src/components/ui/sonner.tsx',
