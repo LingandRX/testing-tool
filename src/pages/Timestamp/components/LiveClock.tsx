@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { CopyButton } from '@/components/CopyButton';
@@ -7,7 +8,7 @@ import { msToUnit } from '../constants';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-interface LiveClockProps extends React.HTMLAttributes<HTMLDivElement> {
+interface LiveClockProps extends HTMLAttributes<HTMLDivElement> {
   unit: UnitType;
   onUseNow: (val: number) => void;
 }
@@ -28,18 +29,14 @@ export default function LiveClock({ unit, onUseNow, className, ...props }: LiveC
   return (
     <div
       className={cn(
-        'flex items-center gap-3 px-3 h-10 rounded-lg border border-border/80 bg-secondary/50',
+        'flex items-center gap-3 px-3 h-10 rounded-lg font-bold text-[12px] border px-[20px]',
         className,
       )}
       {...props}
     >
-      <span className="text-muted-foreground font-bold text-[10px] uppercase tracking-wider whitespace-nowrap shrink-0 selection:bg-transparent select-none">
-        当前时间戳
-      </span>
+      <span>当前时间戳</span>
 
-      <span className="flex-1 font-mono font-bold text-foreground text-sm tracking-tight leading-none truncate tabular-nums">
-        {text}
-      </span>
+      <span className="flex-1 text-sm ">{text}</span>
 
       <Button
         type="button"
@@ -50,12 +47,12 @@ export default function LiveClock({ unit, onUseNow, className, ...props }: LiveC
         title="填充到下方"
         variant="ghost"
         size="icon"
-        className="h-7 w-7 text-muted-foreground hover:text-foreground"
+        className="h-7 w-7"
       >
         <Clock className="w-3.5 h-3.5" />
       </Button>
 
-      <CopyButton text={text} tooltip="复制时间戳" className="h-7 w-7 rounded-md border" />
+      <CopyButton text={text} tooltip="复制时间戳" className="h-7 w-7" />
     </div>
   );
 }

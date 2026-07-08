@@ -34,16 +34,15 @@ export default function ResultView({
         转换结果
       </span>
 
-      <div className="bg-card text-card-foreground border border-border p-4 sm:p-5 rounded-xl relative shadow-sm flex justify-between items-center gap-4 focus-within:ring-1 focus-within:ring-ring">
-        <span className="font-mono font-extrabold text-foreground break-all text-xl sm:text-2xl tracking-tight leading-tight select-all tabular-nums">
-          {result}
-        </span>
+      <div className="bg-card border p-4 rounded-lg flex items-center gap-3 justify-between">
+        <span className="break-all text-lg select-all flex-1">{result}</span>
+
         <CopyButton
           text={result}
           tooltip="复制结果"
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          className="h-7 w-7"
         />
       </div>
     </div>
