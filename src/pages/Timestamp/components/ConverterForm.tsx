@@ -41,10 +41,7 @@ export default function ConverterForm({
           placeholder={INPUT_PLACEHOLDERS[mode]}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className={cn(
-            'font-mono font-semibold h-10 shadow-sm placeholder:text-muted-foreground/60 focus:bg-background',
-            error && 'border-destructive focus-visible:ring-destructive',
-          )}
+          className={cn('h-10', error && 'border-destructive')}
         />
 
         {error && <p className="text-destructive text-xs font-medium px-0.5">{error}</p>}
@@ -60,16 +57,13 @@ export default function ConverterForm({
         />
 
         <Select value={zone} onValueChange={(v: string) => setZone(v as ZoneType)}>
-          <SelectTrigger className="flex-1 font-mono font-semibold h-9 shadow-sm bg-background">
+          <SelectTrigger>
             <SelectValue placeholder="选择时区" />
           </SelectTrigger>
-          <SelectContent className="max-h-64 font-mono">
+
+          <SelectContent className="max-h-64">
             {ZONES.map((z) => (
-              <SelectItem
-                key={z}
-                value={z}
-                className="text-xs font-semibold focus:bg-accent cursor-pointer"
-              >
+              <SelectItem key={z} value={z} className="cursor-pointer">
                 {z}
               </SelectItem>
             ))}
