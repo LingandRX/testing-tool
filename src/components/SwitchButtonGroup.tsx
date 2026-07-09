@@ -15,7 +15,6 @@ export interface SwitchButtonGroupProps<T extends string | number = string> exte
   options: SwitchOption<T>[];
   onChange: (value: T) => void;
   size?: 'small' | 'medium' | 'large';
-  buttonClassName?: string;
 }
 
 const SIZE_CLASSES = {
@@ -24,8 +23,10 @@ const SIZE_CLASSES = {
   large: 'text-base h-11 px-4 py-2 rounded-lg',
 } as const;
 
-const SELECTED_CLASSES = 'bg-background text-foreground shadow-sm font-semibold fade-in-zoom-95';
-const UNSELECTED_CLASSES = 'hover:bg-background/50 hover:text-foreground/80';
+const SELECTED_CLASSES =
+  'bg-background text-foreground shadow-sm font-semibold fade-in-zoom-95 hover:shadow-md active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-muted';
+const UNSELECTED_CLASSES =
+  'hover:bg-background/50 hover:text-foreground/80 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-muted';
 
 export default function SwitchButtonGroup<T extends string | number = string>({
   value,
@@ -33,7 +34,6 @@ export default function SwitchButtonGroup<T extends string | number = string>({
   onChange,
   size = 'medium',
   className,
-  buttonClassName,
   ...props
 }: SwitchButtonGroupProps<T>) {
   return (
@@ -54,7 +54,6 @@ export default function SwitchButtonGroup<T extends string | number = string>({
             'flex-1 transition-all',
             SIZE_CLASSES[size],
             value === option.value ? SELECTED_CLASSES : UNSELECTED_CLASSES,
-            buttonClassName,
           )}
         >
           {option.label}
