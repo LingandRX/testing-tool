@@ -84,7 +84,11 @@ export default function GeneratorConfig({ generator, params, onChange }: Generat
               </SelectTrigger>
               <SelectContent>
                 {param.options?.map((option) => (
-                  <SelectItem key={String(option.value)} value={String(option.value)}>
+                  <SelectItem
+                    key={String(option.value)}
+                    value={String(option.value)}
+                    className="cursor-pointer"
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
