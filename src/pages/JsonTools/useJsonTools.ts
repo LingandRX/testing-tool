@@ -5,10 +5,14 @@ import { jsonToYaml } from '@/utils/jsonToYaml';
 import { jsonToToml } from '@/utils/jsonToToml';
 import { minifyJson } from '@/utils/jsonFormatter';
 import { isValidPageMode, tryParse } from './constants';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import type { JsonToolsPageMode } from '@/types/storage';
 import type { ConvertFunction, ViewMode } from './types';
 
+type DiffResultValue = ReturnType<typeof diffJson>;
+
 export interface UseJsonToolsReturn {
+  isWide: boolean;
   pageMode: JsonToolsPageMode;
   setPageMode: (mode: JsonToolsPageMode) => void;
   leftInput: string;
@@ -19,22 +23,44 @@ export interface UseJsonToolsReturn {
   rightError: string | null;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
-  diffResult: ReturnType<typeof diffJson> | null;
+  /** 当前生效的差异结果：宽屏为实时计算，窄屏为手动 Compare 后的结果 */
+  activeResult: DiffResultValue | null;
   total: number;
   currentDiffIndex: number;
   handlePrev: () => void;
   handleNext: () => void;
   activePath: string | undefined;
+  /** 窄屏：是否已点击 Compare 生成结果 */
+  hasCompared: boolean;
+  /** 窄屏：左右面板是否折叠 */
+  collapsedA: boolean;
+  collapsedB: boolean;
+  toggleCollapseA: () => void;
+  toggleCollapseB: () => void;
+  /** 窄屏：两侧均有合法非空输入时可触发比对 */
+  canCompare: boolean;
+  handleCompare: () => void;
+  /** 窄屏：折叠态单行预览文本 */
+  previewA: string;
+  previewB: string;
   yamlConvert: ConvertFunction;
   tomlConvert: ConvertFunction;
   minifyConvert: ConvertFunction;
 }
 
+const buildPreview = (raw: string): string => {
+  const single = raw.replace(/\s+/g, ' ').trim();
+  const truncated = single.length > 80 ? `${single.slice(0, 80)}…` : single;
+  return truncated ? `${truncated}（点击展开）` : '（点击展开）';
+};
+
 export function useJsonTools(): UseJsonToolsReturn {
+  const isWide = useMediaQuery('(min-width: 768px)');
+
   const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
 
-  const [leftInput, setLeftInput] = useState('');
-  const [rightInput, setRightInput] = useState('');
+  const [leftInput, setLeftInputState] = useState('');
+  const [rightInput, setRightInputState] = useState('');
   const [debouncedLeft, setDebouncedLeft] = useState('');
   const [debouncedRight, setDebouncedRight] = useState('');
 
@@ -58,9 +84,17 @@ export function useJsonTools(): UseJsonToolsReturn {
   const rightError = parseState.right.error;
 
   const [viewMode, setViewMode] = useState<ViewMode>('sideBySide');
+  const activeViewMode = isWide ? viewMode : 'unified';
   const [currentDiffIndex, setCurrentDiffIndex] = useState(0);
 
-  const diffResult = useMemo(() => {
+  // 窄屏手动比对状态
+  const [hasCompared, setHasCompared] = useState(false);
+  const [manualResult, setManualResult] = useState<DiffResultValue | null>(null);
+  const [collapsedA, setCollapsedA] = useState(false);
+  const [collapsedB, setCollapsedB] = useState(false);
+
+  // 宽屏：实时流式比对（保持原行为）
+  const liveResult = useMemo<DiffResultValue | null>(() => {
     const { left, right } = parseState;
     if (left.error || right.error || debouncedLeft.trim() === '' || debouncedRight.trim() === '') {
       return null;
@@ -68,7 +102,70 @@ export function useJsonTools(): UseJsonToolsReturn {
     return diffJson(left.value, right.value);
   }, [parseState, debouncedLeft, debouncedRight]);
 
-  const total = diffResult?.diffPaths.length ?? 0;
+  const activeResult = isWide ? liveResult : manualResult;
+
+  // 即时解析（用于比对按钮可用态与折叠预览，避免 250ms 延迟）
+  const immediateParse = useMemo(() => {
+    const invalidMsg = '无效的 JSON 格式';
+    return {
+      left: tryParse(leftInput, invalidMsg),
+      right: tryParse(rightInput, invalidMsg),
+    };
+  }, [leftInput, rightInput]);
+
+  const canCompare =
+    leftInput.trim() !== '' &&
+    rightInput.trim() !== '' &&
+    !immediateParse.left.error &&
+    !immediateParse.right.error;
+
+  const previewA = useMemo(() => buildPreview(leftInput), [leftInput]);
+  const previewB = useMemo(() => buildPreview(rightInput), [rightInput]);
+
+  const setLeftInput = useCallback(
+    (val: string) => {
+      setLeftInputState(val);
+      if (hasCompared) {
+        setHasCompared(false);
+        setManualResult(null);
+        setCurrentDiffIndex(0);
+      } else {
+        setCurrentDiffIndex(0);
+      }
+    },
+    [hasCompared],
+  );
+
+  const setRightInput = useCallback(
+    (val: string) => {
+      setRightInputState(val);
+      if (hasCompared) {
+        setHasCompared(false);
+        setManualResult(null);
+        setCurrentDiffIndex(0);
+      } else {
+        setCurrentDiffIndex(0);
+      }
+    },
+    [hasCompared],
+  );
+
+  const handleCompare = useCallback(() => {
+    if (!canCompare) return;
+    const left = immediateParse.left.value;
+    const right = immediateParse.right.value;
+    const result = diffJson(left, right);
+    setManualResult(result);
+    setHasCompared(true);
+    setCollapsedA(true);
+    setCollapsedB(true);
+    setCurrentDiffIndex(0);
+  }, [canCompare, immediateParse]);
+
+  const toggleCollapseA = useCallback(() => setCollapsedA((v) => !v), []);
+  const toggleCollapseB = useCallback(() => setCollapsedB((v) => !v), []);
+
+  const total = activeResult?.diffPaths.length ?? 0;
 
   const handlePrev = useCallback(() => {
     if (total === 0) return;
@@ -80,7 +177,10 @@ export function useJsonTools(): UseJsonToolsReturn {
     setCurrentDiffIndex((idx) => (idx + 1) % total);
   }, [total]);
 
-  const activePath = diffResult && total > 0 ? diffResult.diffPaths[currentDiffIndex] : undefined;
+  const activePath =
+    activeResult && total > 0 && currentDiffIndex < total
+      ? activeResult.diffPaths[currentDiffIndex]
+      : undefined;
 
   const yamlConvert: ConvertFunction = useCallback((text: string) => {
     const r = jsonToYaml(text);
@@ -98,28 +198,32 @@ export function useJsonTools(): UseJsonToolsReturn {
   }, []);
 
   return {
+    isWide,
     pageMode,
     setPageMode,
     leftInput,
     rightInput,
-    setLeftInput: (val: string) => {
-      setLeftInput(val);
-      setCurrentDiffIndex(0);
-    },
-    setRightInput: (val: string) => {
-      setRightInput(val);
-      setCurrentDiffIndex(0);
-    },
+    setLeftInput,
+    setRightInput,
     leftError,
     rightError,
-    viewMode,
+    viewMode: activeViewMode,
     setViewMode,
-    diffResult,
+    activeResult,
     total,
     currentDiffIndex,
     handlePrev,
     handleNext,
     activePath,
+    hasCompared,
+    collapsedA,
+    collapsedB,
+    toggleCollapseA,
+    toggleCollapseB,
+    canCompare,
+    handleCompare,
+    previewA,
+    previewB,
     yamlConvert,
     tomlConvert,
     minifyConvert,
