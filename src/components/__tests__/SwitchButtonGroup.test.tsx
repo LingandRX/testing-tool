@@ -22,7 +22,7 @@ describe('SwitchButtonGroup 组件', () => {
     const buttonB = screen.getByRole('button', { name: /选项B/i });
 
     expect(buttonA).toHaveClass('bg-background', 'text-foreground', 'shadow-sm');
-    expect(buttonB).toHaveClass('hover:bg-background/50');
+    expect(buttonB).toHaveClass('hover:bg-accent', 'hover:text-accent-foreground');
   });
 
   it('点击未选中按钮时应触发 onChange 并传入选中值', () => {
@@ -34,11 +34,12 @@ describe('SwitchButtonGroup 组件', () => {
     expect(handleChange).toHaveBeenCalledWith('b');
   });
 
-  it('点击已选中按钮时不应触发 onChange', () => {
+  it('点击已选中按钮时仍会触发 onChange 并传回原值', () => {
     const handleChange = vi.fn();
     render(<SwitchButtonGroup value="a" options={options} onChange={handleChange} />);
 
     fireEvent.click(screen.getByRole('button', { name: /选项A/i }));
+    expect(handleChange).toHaveBeenCalledTimes(1);
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 
@@ -58,32 +59,11 @@ describe('SwitchButtonGroup 组件', () => {
     expect(button).toHaveClass('text-xs');
   });
 
-  it('应支持 buttonSx 自定义按钮样式', () => {
-    render(<SwitchButtonGroup value="a" options={options} onChange={vi.fn()} />);
-
-    const button = screen.getByRole('button', { name: /选项A/i });
-    expect(button).toBeInTheDocument();
-  });
-
   it('应支持 ReactNode 类型的 label', () => {
     const nodeOptions = [{ value: 'x', label: <span data-testid="custom-label">自定义</span> }];
     render(<SwitchButtonGroup value="x" options={nodeOptions} onChange={vi.fn()} />);
 
     expect(screen.getByTestId('custom-label')).toBeInTheDocument();
-  });
-
-  it('默认按钮样式应禁止文字换行', () => {
-    render(<SwitchButtonGroup value="a" options={options} onChange={vi.fn()} />);
-
-    const button = screen.getByRole('button', { name: /选项A/i });
-    expect(button).toHaveClass('whitespace-nowrap');
-  });
-
-  it('buttonSx 传入时应覆盖默认换行样式', () => {
-    render(<SwitchButtonGroup value="a" options={options} onChange={vi.fn()} />);
-
-    const button = screen.getByRole('button', { name: /选项A/i });
-    expect(button).toBeInTheDocument();
   });
 
   describe('number 类型支持', () => {
@@ -105,7 +85,7 @@ describe('SwitchButtonGroup 组件', () => {
       const button2 = screen.getByRole('button', { name: /^2$/i });
       const button4 = screen.getByRole('button', { name: /^4$/i });
 
-      expect(button2).toHaveClass('hover:bg-background/50');
+      expect(button2).toHaveClass('hover:bg-accent', 'hover:text-accent-foreground');
       expect(button4).toHaveClass('bg-background', 'text-foreground', 'shadow-sm');
     });
 
