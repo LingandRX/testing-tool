@@ -10,6 +10,9 @@ export interface JsonTreeProps extends React.HTMLAttributes<HTMLDivElement> {
   side: TreeSide;
   defaultExpandDepth?: number;
   activePath?: string;
+  fill?: boolean;
+  expandedPaths?: Record<string, 'open' | 'closed'>;
+  onTogglePath?: (path: string, currentExpanded: boolean) => void;
 }
 
 interface NodeRowProps {
@@ -19,6 +22,8 @@ interface NodeRowProps {
   defaultExpandDepth: number;
   activePath?: string;
   isLastChild: boolean;
+  expandedPaths?: Record<string, 'open' | 'closed'>;
+  onTogglePath?: (path: string, currentExpanded: boolean) => void;
 }
 
 const formatPrimitive = (v: unknown): string => {
@@ -62,8 +67,17 @@ const isContainerValue = (v: unknown): boolean => {
 };
 
 const NodeRow = React.memo(
-  ({ node, side, depth, defaultExpandDepth, activePath, isLastChild }: NodeRowProps) => {
-    const [override, setOverride] = useState<'auto' | 'open' | 'closed'>('auto');
+  ({
+    node,
+    side,
+    depth,
+    defaultExpandDepth,
+    activePath,
+    isLastChild,
+    expandedPaths = {},
+    onTogglePath,
+  }: NodeRowProps) => {
+    const override = expandedPaths[node.path] || 'auto';
     const rowRef = useRef<HTMLDivElement | null>(null);
 
     const onActivePath = useMemo(() => {
@@ -123,7 +137,7 @@ const NodeRow = React.memo(
       return (
         <div ref={rowRef} className="w-full flex flex-col">
           <div
-            onClick={() => setOverride(expanded ? 'closed' : 'open')}
+            onClick={() => onTogglePath?.(node.path, expanded)}
             className={cn(
               'group flex items-center gap-1 py-0.5 pr-2 text-xs font-mono select-none cursor-pointer rounded-sm w-full h-[22px] leading-relaxed',
               theme.bg,
@@ -171,6 +185,8 @@ const NodeRow = React.memo(
                   defaultExpandDepth={defaultExpandDepth}
                   activePath={activePath}
                   isLastChild={idx === node.children!.length - 1}
+                  expandedPaths={expandedPaths}
+                  onTogglePath={onTogglePath}
                 />
               ))}
             </div>
@@ -204,7 +220,7 @@ const NodeRow = React.memo(
         {!isRoot && (
           <span className="text-foreground/90 font-bold tracking-tight">{node.key}:</span>
         )}
-        <span className={cn('font-medium tracking-tight truncate flex-1', theme.text)}>
+        <span className={cn('font-medium tracking-tight whitespace-nowrap', theme.text)}>
           {formatPrimitive(value)}
           <span className="text-foreground/60 font-sans">{isLastChild ? '' : ','}</span>
         </span>
@@ -215,33 +231,51 @@ const NodeRow = React.memo(
 
 NodeRow.displayName = 'NodeRow';
 
-export default function JsonTree({
-  node,
-  side,
-  defaultExpandDepth = 2,
-  activePath,
-  className,
-  ...props
-}: JsonTreeProps) {
-  return (
-    <div
-      className={cn(
-        'rounded-xl border border-border bg-card text-card-foreground font-mono text-xs shadow-sm overflow-x-auto min-h-[200px] max-h-[520px] overflow-y-auto p-2.5 tabular-nums select-text',
-        className,
-      )}
-      {...props}
-    >
-      <NodeRow
-        node={node}
-        side={side}
-        depth={0}
-        defaultExpandDepth={defaultExpandDepth}
-        activePath={activePath}
-        isLastChild
-      />
-    </div>
-  );
-}
+const JsonTree = React.forwardRef<HTMLDivElement, JsonTreeProps>(
+  (
+    {
+      node,
+      side,
+      defaultExpandDepth = 2,
+      activePath,
+      fill = false,
+      expandedPaths,
+      onTogglePath,
+      className,
+      ...props
+    },
+    ref,
+  ) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'rounded-xl border border-border bg-card text-card-foreground font-mono text-xs shadow-sm overflow-x-auto overflow-y-auto p-2.5 tabular-nums select-text',
+          fill ? 'min-h-0 flex-1' : 'min-h-[200px] max-h-[520px]',
+          className,
+        )}
+        {...props}
+      >
+        <div className="min-w-full w-fit">
+          <NodeRow
+            node={node}
+            side={side}
+            depth={0}
+            defaultExpandDepth={defaultExpandDepth}
+            activePath={activePath}
+            isLastChild
+            expandedPaths={expandedPaths}
+            onTogglePath={onTogglePath}
+          />
+        </div>
+      </div>
+    );
+  },
+);
+
+JsonTree.displayName = 'JsonTree';
+
+export default JsonTree;
 
 const summarize = (v: unknown): string => {
   if (Array.isArray(v)) return `${v.length} ${v.length === 1 ? 'item' : 'items'}`;

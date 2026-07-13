@@ -7,28 +7,99 @@ export interface DiffResultProps extends React.HTMLAttributes<HTMLDivElement> {
   result: DiffResultType;
   viewMode: ViewMode;
   activePath?: string;
+  /** 窄屏填充模式：撑满父容器可用高度并内部滚动，而非使用固定最小/最大高度 */
+  fill?: boolean;
 }
 
 export default function DiffResult({
   result,
   viewMode,
   activePath,
+  fill = false,
   className,
   ...props
 }: DiffResultProps) {
+  const [expandedPaths, setExpandedPaths] = React.useState<Record<string, 'open' | 'closed'>>({});
+  const togglePath = React.useCallback((path: string, currentExpanded: boolean) => {
+    setExpandedPaths((prev) => ({
+      ...prev,
+      [path]: currentExpanded ? 'closed' : 'open',
+    }));
+  }, []);
+
+  const leftRef = React.useRef<HTMLDivElement | null>(null);
+  const rightRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const leftEl = leftRef.current;
+    const rightEl = rightRef.current;
+    if (!leftEl || !rightEl) return;
+
+    let isSyncingLeftScroll = false;
+    let isSyncingRightScroll = false;
+
+    const handleLeftScroll = () => {
+      if (isSyncingLeftScroll) {
+        isSyncingLeftScroll = false;
+        return;
+      }
+      isSyncingRightScroll = true;
+      rightEl.scrollTop = leftEl.scrollTop;
+      rightEl.scrollLeft = leftEl.scrollLeft;
+    };
+
+    const handleRightScroll = () => {
+      if (isSyncingRightScroll) {
+        isSyncingRightScroll = false;
+        return;
+      }
+      isSyncingLeftScroll = true;
+      leftEl.scrollTop = rightEl.scrollTop;
+      leftEl.scrollLeft = rightEl.scrollLeft;
+    };
+
+    leftEl.addEventListener('scroll', handleLeftScroll);
+    rightEl.addEventListener('scroll', handleRightScroll);
+
+    return () => {
+      leftEl.removeEventListener('scroll', handleLeftScroll);
+      rightEl.removeEventListener('scroll', handleRightScroll);
+    };
+  }, [viewMode]);
+
   if (viewMode === 'sideBySide') {
     return (
       <div
-        className={cn('flex flex-col md:flex-row gap-4 items-stretch w-full', className)}
+        className={cn(
+          'flex flex-col md:flex-row gap-4 items-stretch rounded-xl border border-border bg-muted/30 p-1.5 w-full',
+          fill ? 'min-h-0 flex-1' : '',
+          className,
+        )}
         {...props}
       >
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col">
           <SectionLabel text="原始 JSON" />
-          <JsonTree node={result.root} side="left" activePath={activePath} />
+          <JsonTree
+            ref={leftRef}
+            node={result.root}
+            side="left"
+            activePath={activePath}
+            fill={fill}
+            expandedPaths={expandedPaths}
+            onTogglePath={togglePath}
+          />
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col">
           <SectionLabel text="目标 JSON" />
-          <JsonTree node={result.root} side="right" activePath={activePath} />
+          <JsonTree
+            ref={rightRef}
+            node={result.root}
+            side="right"
+            activePath={activePath}
+            fill={fill}
+            expandedPaths={expandedPaths}
+            onTogglePath={togglePath}
+          />
         </div>
       </div>
     );
@@ -37,12 +108,15 @@ export default function DiffResult({
   return (
     <div
       className={cn(
-        'rounded-xl border border-border bg-card font-mono text-xs shadow-sm overflow-x-auto min-h-[200px] max-h-[520px] overflow-y-auto p-1.5',
+        'flex flex-col rounded-xl border border-border bg-muted/30 font-mono text-xs shadow-sm overflow-x-auto overflow-y-auto p-1.5',
+        fill ? 'min-h-0 flex-1' : 'min-h-[200px] max-h-[520px]',
         className,
       )}
       {...props}
     >
-      <UnifiedView node={result.root} depth={0} activePath={activePath} />
+      <div className="min-w-full w-fit">
+        <UnifiedView node={result.root} depth={0} activePath={activePath} />
+      </div>
     </div>
   );
 }
@@ -189,7 +263,7 @@ const UnifiedRow = ({ depth, type, text, active, multiline }: UnifiedRowProps) =
         currentTheme.bg,
         currentTheme.text,
         active &&
-          'bg-primary/10 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-500',
+          'bg-primary/10 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-500 before:content-[""]',
       )}
       style={{
         paddingLeft: `${Math.max(0.5, depth * 1.25)}rem`,

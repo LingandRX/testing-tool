@@ -42,6 +42,12 @@ export interface TextInputAreaProps extends Omit<
   title?: string;
   externalError?: string;
   onClear?: () => void;
+
+  /**
+   * 撑满父容器高度并启用内部滚动（而非按 minRows/maxRows 自动撑高）。
+   * 用于需要固定高度 + 内部滚动的卡片面板。
+   */
+  fill?: boolean;
 }
 
 function ActionButton({
@@ -106,6 +112,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     title,
     externalError,
     onClear,
+    fill = false,
     ...restProps
   } = props;
 
@@ -122,6 +129,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement);
 
   const adjustHeight = useCallback(() => {
+    if (fill) return;
     const textArea = internalRef.current;
     if (!textArea) return;
 
@@ -132,7 +140,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     const nextHeight = Math.max(textArea.scrollHeight, computedMin);
 
     textArea.style.height = `${Math.min(nextHeight, computedMax)}px`;
-  }, [minRows, maxRows]);
+  }, [minRows, maxRows, fill]);
 
   React.useEffect(() => {
     adjustHeight();
@@ -204,7 +212,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
   const hasBottomBar = allowCopy || showClear || bottomActions.length > 0;
 
   return (
-    <div className={cn('w-full flex flex-col gap-1.5', className)}>
+    <div className={cn('w-full flex flex-col gap-1.5', fill && 'flex-1 min-h-0', className)}>
       {hasTopBar && (
         <div className="flex items-center justify-between px-0.5">
           <div className="flex items-center gap-2">
@@ -234,6 +242,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
       <div
         className={cn(
           'rounded-md border border-input bg-background shadow-sm transition-all focus-within:ring-1 focus-within:ring-ring focus-within:border-input overflow-hidden',
+          fill && 'flex-1 min-h-0 flex flex-col',
           displayError &&
             'border-destructive focus-within:ring-destructive focus-within:border-destructive',
         )}
@@ -247,7 +256,10 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
           autoFocus={autoFocus}
           readOnly={readOnly}
           placeholder={placeholder}
-          className="w-full bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none resize-none border-0 block"
+          className={cn(
+            'w-full bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none resize-none border-0 block',
+            fill && 'flex-1 h-full overflow-auto diff-scroll',
+          )}
           {...restProps}
         />
 

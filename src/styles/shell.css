@@ -93,6 +93,27 @@
   display: none;
 }
 
+/* 细滚动条：仅作用于需要内部滚动的面板/结果区（覆盖上方的全局隐藏） */
+.diff-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+.diff-scroll::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+  height: 6px;
+}
+.diff-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.diff-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+.dark .diff-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 @layer components {
   .page-transition-enter {
     @apply motion-reduce:transition-none;
