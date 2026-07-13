@@ -33,7 +33,8 @@ describe('JsonDiffPanel', () => {
       />,
     );
     expect(screen.getByText('abc（点击展开）')).toBeInTheDocument();
-    expect(screen.queryByPlaceholderText('x')).not.toBeInTheDocument();
+    const input = screen.getByPlaceholderText('x');
+    expect(input.closest('.opacity-0')).toBeInTheDocument();
   });
 
   it('点击标题可切换折叠', async () => {

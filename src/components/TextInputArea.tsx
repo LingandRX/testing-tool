@@ -48,6 +48,9 @@ export interface TextInputAreaProps extends Omit<
    * 用于需要固定高度 + 内部滚动的卡片面板。
    */
   fill?: boolean;
+
+  /** 是否无边框、无阴影、无圆角（适用于嵌套在其他有边框的容器中） */
+  borderless?: boolean;
 }
 
 function ActionButton({
@@ -113,6 +116,7 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     externalError,
     onClear,
     fill = false,
+    borderless = false,
     ...restProps
   } = props;
 
@@ -241,9 +245,12 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
 
       <div
         className={cn(
-          'rounded-md border border-input bg-background shadow-sm transition-all focus-within:ring-1 focus-within:ring-ring focus-within:border-input overflow-hidden',
+          borderless
+            ? 'bg-transparent overflow-hidden'
+            : 'rounded-md border border-input bg-background shadow-sm transition-all focus-within:ring-1 focus-within:ring-ring focus-within:border-input overflow-hidden',
           fill && 'flex-1 min-h-0 flex flex-col',
-          displayError &&
+          !borderless &&
+            displayError &&
             'border-destructive focus-within:ring-destructive focus-within:border-destructive',
         )}
       >
