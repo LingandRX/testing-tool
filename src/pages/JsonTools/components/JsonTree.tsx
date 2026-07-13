@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { DiffNode, DiffType } from '../types';
 import { cn } from '@/lib/utils';
