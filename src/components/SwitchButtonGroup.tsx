@@ -23,10 +23,12 @@ const SIZE_CLASSES = {
   large: 'text-base h-11 px-4 py-2 rounded-lg',
 } as const;
 
+const INTERACTIVE_CLASSES =
+  'active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-muted';
+
 const SELECTED_CLASSES =
-  'bg-background text-foreground shadow-sm font-semibold fade-in-zoom-95 hover:shadow-md active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-muted';
-const UNSELECTED_CLASSES =
-  'hover:bg-background/50 hover:text-foreground/80 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-muted';
+  'bg-background text-foreground shadow-sm font-semibold hover:bg-background hover:text-foreground';
+const UNSELECTED_CLASSES = 'text-muted-foreground hover:bg-accent hover:text-accent-foreground';
 
 export default function SwitchButtonGroup<T extends string | number = string>({
   value,
@@ -39,7 +41,7 @@ export default function SwitchButtonGroup<T extends string | number = string>({
   return (
     <div
       className={cn(
-        'inline-flex w-full items-center justify-center rounded-lg bg-muted text-muted-foreground p-1',
+        'inline-flex w-full items-center justify-center rounded-lg bg-muted p-1',
         className,
       )}
       {...props}
@@ -53,6 +55,7 @@ export default function SwitchButtonGroup<T extends string | number = string>({
           className={cn(
             'flex-1 transition-all',
             SIZE_CLASSES[size],
+            INTERACTIVE_CLASSES,
             value === option.value ? SELECTED_CLASSES : UNSELECTED_CLASSES,
           )}
         >
