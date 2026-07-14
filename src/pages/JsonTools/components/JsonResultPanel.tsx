@@ -1,5 +1,6 @@
 import { formatBytes } from '@/utils/format';
 import { CopyButton } from '@/components/CopyButton';
+import { cn } from '@/lib/utils';
 
 export interface JsonResultPanelProps {
   title: string;
@@ -8,6 +9,11 @@ export interface JsonResultPanelProps {
   outputBytes: number;
   outputSizeLabel?: string;
   maxHeight?: string;
+  /**
+   * 撑满父容器剩余高度并启用内部滚动（而非按 maxHeight 截断）。
+   * 用于 popup / sidepanel 等固定高度场景下与折叠输入面板共享垂直空间。
+   */
+  fill?: boolean;
 }
 
 export default function JsonResultPanel({
@@ -17,9 +23,15 @@ export default function JsonResultPanel({
   outputBytes,
   outputSizeLabel = '格式化后大小',
   maxHeight = '420px',
+  fill = false,
 }: JsonResultPanelProps) {
   return (
-    <div className="relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
+    <div
+      className={cn(
+        'relative rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden',
+        fill ? 'flex flex-col flex-1 min-h-0' : 'flex flex-col',
+      )}
+    >
       <div className="flex h-9 items-center justify-between px-4 border-b border-border bg-muted/50 select-none">
         <div className="flex gap-4 items-center">
           <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
@@ -43,8 +55,11 @@ export default function JsonResultPanel({
       </div>
 
       <div
-        className="p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all overflow-y-auto leading-relaxed select-text"
-        style={{ maxHeight }}
+        className={cn(
+          'p-4 font-mono text-xs text-foreground/90 whitespace-pre-wrap break-all overflow-y-auto leading-relaxed select-text',
+          fill && 'flex-1 min-h-0',
+        )}
+        style={fill ? undefined : { maxHeight }}
       >
         {content}
       </div>
