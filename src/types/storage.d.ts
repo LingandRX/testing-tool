@@ -89,6 +89,12 @@ export interface StorageSchema {
   'qrCode/urlExpanded': boolean;
   /** JSON 工具页面当前子模式 */
   'jsonTools/pageMode': JsonToolsPageMode;
+  /** JSON 工具：format/yaml/toml/minify 共享的输入内容 */
+  'jsonTools/input': string;
+  /** JSON 工具：diff 模式左侧输入内容 */
+  'jsonTools/diffLeft': string;
+  /** JSON 工具：diff 模式右侧输入内容 */
+  'jsonTools/diffRight': string;
   /** Base64 转换器页面当前子模式 */
   'base64Converter/pageMode': Base64ConverterPageMode;
   /** Base64 转换器「文件」子模式当前方向 */

@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import TextInputArea from '@/components/TextInputArea';
 import JsonResultPanel from './JsonResultPanel';
 import CollapsiblePanel from './CollapsiblePanel';
 import { validateJson } from '@/utils/jsonFormatter';
 import { cn } from '@/lib/utils';
-import { buildPreview } from '../useJsonTools';
+import { buildPreview, type UseJsonToolsReturn } from '../useJsonTools';
 import type { ConvertFunction, ConvertResult } from '../types';
 
 const CONVERT_LABELS: Record<string, { inputPlaceholder: string; outputLabel: string }> = {
@@ -23,28 +23,22 @@ const CONVERT_LABELS: Record<string, { inputPlaceholder: string; outputLabel: st
 };
 
 interface JsonConvertSectionProps extends React.HTMLAttributes<HTMLDivElement> {
+  tools: UseJsonToolsReturn;
   mode: string;
   convertFunction: ConvertFunction;
 }
 
 export default function JsonConvertSection({
+  tools,
   mode,
   convertFunction,
   className,
   ...props
 }: JsonConvertSectionProps) {
-  const [input, setInput] = useState('');
-  const [debouncedInput, setDebouncedInput] = useState('');
+  const { input, setInput, debouncedInput } = tools;
   const [inputCollapsed, setInputCollapsed] = useState(false);
 
   const labels = CONVERT_LABELS[mode] ?? CONVERT_LABELS.yaml;
-
-  useEffect(() => {
-    const handle = setTimeout(() => {
-      setDebouncedInput(input);
-    }, 250);
-    return () => clearTimeout(handle);
-  }, [input]);
 
   const error = useMemo(() => {
     return validateJson(debouncedInput);

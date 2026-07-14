@@ -21,6 +21,11 @@ export interface UseJsonToolsReturn {
   setRightInput: (val: string) => void;
   leftError: string | null;
   rightError: string | null;
+  /** format/yaml/toml/minify 共享的输入内容（已持久化） */
+  input: string;
+  setInput: (val: string) => void;
+  /** input 防抖后的快照，用于格式化/转换计算与持久化 */
+  debouncedInput: string;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   /** 当前生效的差异结果：宽屏为实时计算，窄屏为手动 Compare 后的结果 */
@@ -59,18 +64,34 @@ export function useJsonTools(): UseJsonToolsReturn {
 
   const [pageMode, setPageMode] = useStorageState('jsonTools/pageMode', 'diff', isValidPageMode);
 
-  const [leftInput, setLeftInputState] = useState('');
-  const [rightInput, setRightInputState] = useState('');
-  const [debouncedLeft, setDebouncedLeft] = useState('');
-  const [debouncedRight, setDebouncedRight] = useState('');
+  const [persistedLeft, setPersistedLeft] = useStorageState('jsonTools/diffLeft', '');
+  const [persistedRight, setPersistedRight] = useStorageState('jsonTools/diffRight', '');
+  const [persistedInput, setPersistedInput] = useStorageState('jsonTools/input', '');
+
+  const [leftInput, setLeftInputState] = useState<string>(persistedLeft);
+  const [rightInput, setRightInputState] = useState<string>(persistedRight);
+  const [input, setInput] = useState<string>(persistedInput);
+  const [debouncedLeft, setDebouncedLeft] = useState<string>(persistedLeft);
+  const [debouncedRight, setDebouncedRight] = useState<string>(persistedRight);
+  const [debouncedInput, setDebouncedInput] = useState<string>(persistedInput);
 
   useEffect(() => {
     const handle = setTimeout(() => {
       setDebouncedLeft(leftInput);
       setDebouncedRight(rightInput);
+      setPersistedLeft(leftInput);
+      setPersistedRight(rightInput);
     }, 250);
     return () => clearTimeout(handle);
-  }, [leftInput, rightInput]);
+  }, [leftInput, rightInput, setPersistedLeft, setPersistedRight]);
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDebouncedInput(input);
+      setPersistedInput(input);
+    }, 250);
+    return () => clearTimeout(handle);
+  }, [input, setPersistedInput]);
 
   const parseState = useMemo(() => {
     const invalidMsg = '无效的 JSON 格式';
@@ -207,6 +228,9 @@ export function useJsonTools(): UseJsonToolsReturn {
     setRightInput,
     leftError,
     rightError,
+    input,
+    setInput,
+    debouncedInput,
     viewMode: activeViewMode,
     setViewMode,
     activeResult,
