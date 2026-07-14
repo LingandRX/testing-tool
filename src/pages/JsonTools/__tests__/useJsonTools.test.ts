@@ -64,4 +64,15 @@ describe('useJsonTools 窄屏手动比对', () => {
     act(() => result.current.toggleCollapseA());
     expect(result.current.collapsedA).toBe(false);
   });
+
+  it('单输入经防抖后持久化，重挂载可恢复', async () => {
+    localStorage.clear();
+    const { result, unmount } = renderHook(() => useJsonTools());
+    act(() => result.current.setInput('{"x":1}'));
+    await new Promise((r) => setTimeout(r, 300));
+    unmount();
+
+    const { result: result2 } = renderHook(() => useJsonTools());
+    expect(result2.current.input).toBe('{"x":1}');
+  });
 });

@@ -30,13 +30,13 @@ export default function Index() {
       {pageMode === 'diff' ? (
         <DiffWorkspace tools={tools} />
       ) : pageMode === 'format' ? (
-        <JsonFormatSection />
+        <JsonFormatSection tools={tools} />
       ) : pageMode === 'yaml' ? (
-        <JsonConvertSection mode="yaml" convertFunction={yamlConvert} />
+        <JsonConvertSection tools={tools} mode="yaml" convertFunction={yamlConvert} />
       ) : pageMode === 'toml' ? (
-        <JsonConvertSection mode="toml" convertFunction={tomlConvert} />
+        <JsonConvertSection tools={tools} mode="toml" convertFunction={tomlConvert} />
       ) : (
-        <JsonConvertSection mode="minify" convertFunction={minifyConvert} />
+        <JsonConvertSection tools={tools} mode="minify" convertFunction={minifyConvert} />
       )}
     </div>
   );

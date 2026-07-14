@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   formatJson,
   type JsonFormatOptions,
@@ -11,21 +11,17 @@ import CollapsiblePanel from './CollapsiblePanel';
 import JsonResultPanel from './JsonResultPanel';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { buildPreview } from '../useJsonTools';
+import { buildPreview, type UseJsonToolsReturn } from '../useJsonTools';
 
-export default function JsonFormatSection() {
-  const [input, setInput] = useState('');
-  const [debouncedInput, setDebouncedInput] = useState('');
+interface JsonFormatSectionProps {
+  tools: UseJsonToolsReturn;
+}
+
+export default function JsonFormatSection({ tools }: JsonFormatSectionProps) {
+  const { input, setInput, debouncedInput } = tools;
   const [indentSize, setIndentSize] = useState<number>(2);
   const [sortKeys, setSortKeys] = useState(false);
   const [inputCollapsed, setInputCollapsed] = useState(false);
-
-  useEffect(() => {
-    const handle = setTimeout(() => {
-      setDebouncedInput(input);
-    }, 250);
-    return () => clearTimeout(handle);
-  }, [input]);
 
   const error = useMemo(() => {
     return validateJson(debouncedInput);
