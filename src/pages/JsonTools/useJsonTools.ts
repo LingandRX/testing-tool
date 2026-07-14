@@ -48,7 +48,7 @@ export interface UseJsonToolsReturn {
   minifyConvert: ConvertFunction;
 }
 
-const buildPreview = (raw: string): string => {
+export const buildPreview = (raw: string): string => {
   const single = raw.replace(/\s+/g, ' ').trim();
   const truncated = single.length > 80 ? `${single.slice(0, 80)}…` : single;
   return truncated ? `${truncated}（点击展开）` : '（点击展开）';
