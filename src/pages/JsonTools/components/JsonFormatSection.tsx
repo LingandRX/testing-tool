@@ -1,29 +1,27 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   formatJson,
   type JsonFormatOptions,
   type JsonFormatResult,
   validateJson,
 } from '@/utils/jsonFormatter';
-import EmptyPlaceholder from '@/components/EmptyPlaceholder';
 import SwitchButtonGroup from '@/components/SwitchButtonGroup';
 import TextInputArea from '@/components/TextInputArea';
+import CollapsiblePanel from './CollapsiblePanel';
 import JsonResultPanel from './JsonResultPanel';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { buildPreview, type UseJsonToolsReturn } from '../useJsonTools';
 
-export default function JsonFormatSection() {
-  const [input, setInput] = useState('');
-  const [debouncedInput, setDebouncedInput] = useState('');
+interface JsonFormatSectionProps {
+  tools: UseJsonToolsReturn;
+}
+
+export default function JsonFormatSection({ tools }: JsonFormatSectionProps) {
+  const { input, setInput, debouncedInput } = tools;
   const [indentSize, setIndentSize] = useState<number>(2);
   const [sortKeys, setSortKeys] = useState(false);
-
-  useEffect(() => {
-    const handle = setTimeout(() => {
-      setDebouncedInput(input);
-    }, 250);
-    return () => clearTimeout(handle);
-  }, [input]);
+  const [inputCollapsed, setInputCollapsed] = useState(false);
 
   const error = useMemo(() => {
     return validateJson(debouncedInput);
@@ -47,9 +45,11 @@ export default function JsonFormatSection() {
     }
   }, [debouncedInput, error, indentSize, sortKeys]);
 
+  const preview = useMemo(() => buildPreview(input), [input]);
+
   return (
-    <div className="w-full flex flex-col gap-4">
-      <div className="flex h-10 items-center justify-between px-1.5 bg-secondary/40 rounded-xl border border-border/60">
+    <div className="w-full flex flex-1 min-h-0 flex-col gap-3">
+      <div className="flex h-10 items-center justify-between px-1.5 bg-secondary/40 rounded-xl border border-border/60 shrink-0">
         <div className="flex gap-4 items-center w-full">
           <div className="flex gap-2 items-center shrink-0 select-none">
             <span className="text-[10px] font-bold text-muted-foreground/90 uppercase tracking-wider">
@@ -57,7 +57,7 @@ export default function JsonFormatSection() {
             </span>
             <SwitchButtonGroup
               value={indentSize}
-              onChange={(v) => setIndentSize(Number(v))}
+              onChange={(v: number) => setIndentSize(Number(v))}
               options={[2, 4, 6, 8].map((size) => ({ value: size, label: String(size) }))}
               size="small"
             />
@@ -86,29 +86,36 @@ export default function JsonFormatSection() {
         </div>
       </div>
 
-      <TextInputArea
-        placeholder="输入需要格式化的 JSON..."
-        value={input}
-        onChange={setInput}
-        externalError={error || runtimeError || undefined}
-        showClear={true}
-        allowCopy={true}
-        minRows={8}
-        maxRows={15}
-        onClear={() => setInput('')}
-      />
-
-      {result?.formatted ? (
-        <JsonResultPanel
-          title="格式化结果"
-          content={result.formatted}
-          originalBytes={result.originalBytes}
-          outputBytes={result.formattedBytes}
+      <CollapsiblePanel
+        title="JSON 输入"
+        collapsed={inputCollapsed}
+        onToggleCollapse={() => setInputCollapsed((v) => !v)}
+        preview={preview}
+      >
+        <TextInputArea
+          fill
+          borderless
+          placeholder="输入需要格式化的 JSON..."
+          value={input}
+          onChange={setInput}
+          externalError={error || runtimeError || undefined}
+          showClear={true}
+          allowCopy={true}
+          className="min-h-0 flex-1"
+          onClear={() => setInput('')}
         />
-      ) : (
-        <EmptyPlaceholder>
-          {error ? '请修正上方 JSON 的语法错误以开启实时流式格式化' : '输入 JSON 后点击格式化'}
-        </EmptyPlaceholder>
+      </CollapsiblePanel>
+
+      {result?.formatted && (
+        <div className="flex min-h-0 flex-1">
+          <JsonResultPanel
+            fill
+            title="格式化结果"
+            content={result.formatted}
+            originalBytes={result.originalBytes}
+            outputBytes={result.formattedBytes}
+          />
+        </div>
       )}
     </div>
   );
