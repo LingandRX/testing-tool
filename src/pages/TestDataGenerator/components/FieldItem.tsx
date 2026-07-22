@@ -39,7 +39,7 @@ export default function FieldItem({ field, onClick }: FieldItemProps) {
             </Badge>
           )}
           {field.unique && (
-            <Badge variant="outline" className="text-[10px] shrink-0 px-1 py-0 text-blue-500">
+            <Badge variant="outline" className="text-[10px] shrink-0 px-1 py-0 text-info">
               唯一
             </Badge>
           )}

@@ -57,10 +57,10 @@ const ImageUploader = ({
     <div
       className={`flex flex-col items-center justify-center h-[250px] border-2 border-dashed rounded-xl p-4 cursor-pointer transition-all duration-200 ${
         dragging
-          ? 'border-green-600 bg-green-50'
+          ? 'border-success bg-success/15'
           : selectedFile
-            ? 'border-green-600 bg-green-50/50'
-            : 'border-input bg-muted hover:border-green-600 hover:bg-green-500/10'
+            ? 'border-success bg-success/10'
+            : 'border-input bg-muted hover:border-success hover:bg-success/10'
       }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}

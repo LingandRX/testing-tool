@@ -66,13 +66,13 @@ export function ErrorFallback({
         {errorText && (
           <div
             className={cn(
-              'rounded-lg bg-zinc-950 dark:bg-zinc-900 text-left border border-border/40',
+              'rounded-lg bg-muted text-left border border-border',
               isApp ? 'mb-6 p-4 max-h-[200px] overflow-auto' : 'mb-5 p-3 max-h-40 overflow-y-auto',
             )}
           >
             <pre
               className={cn(
-                'font-mono whitespace-pre-wrap break-all text-zinc-200 selection:bg-zinc-700',
+                'font-mono whitespace-pre-wrap break-all text-muted-foreground',
                 isApp ? 'text-xs' : 'text-[11px] leading-relaxed',
               )}
             >

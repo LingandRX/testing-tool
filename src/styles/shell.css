@@ -31,6 +31,24 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    --diff-add: 142 76% 36%;
+    --diff-add-foreground: 142 70% 95%;
+
+    --diff-remove: 0 84.2% 60.2%;
+    --diff-remove-foreground: 0 85% 97%;
+
+    --diff-modify: 38 92% 50%;
+    --diff-modify-foreground: 48 96% 95%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
@@ -63,6 +81,24 @@
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 144 100% 97%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 12%;
+
+    --info: 199 89% 58%;
+    --info-foreground: 200 100% 97%;
+
+    --diff-add: 142 70% 45%;
+    --diff-add-foreground: 144 100% 97%;
+
+    --diff-remove: 0 62.8% 50.6%;
+    --diff-remove-foreground: 0 85% 97%;
+
+    --diff-modify: 38 92% 58%;
+    --diff-modify-foreground: 48 96% 97%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;

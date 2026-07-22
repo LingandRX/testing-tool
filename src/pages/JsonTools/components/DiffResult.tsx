@@ -147,16 +147,16 @@ const prefixForType = (type: DiffType): string => {
 
 const typeThemeMap = {
   added: {
-    text: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-500/5 dark:bg-emerald-500/10',
+    text: 'text-diff-add',
+    bg: 'bg-diff-add/10',
   },
   removed: {
-    text: 'text-destructive',
-    bg: 'bg-destructive/5 dark:bg-destructive/10',
+    text: 'text-diff-remove',
+    bg: 'bg-diff-remove/10',
   },
   modified: {
-    text: 'text-amber-600 dark:text-amber-400',
-    bg: 'bg-amber-500/5 dark:bg-amber-500/10',
+    text: 'text-diff-modify',
+    bg: 'bg-diff-modify/10',
   },
   unchanged: {
     text: 'text-foreground/80',

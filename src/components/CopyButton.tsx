@@ -54,7 +54,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       aria-label={tooltip ?? '复制'}
       variant={variant}
       size={size}
-      className={cn(className, copied && 'text-emerald-500')}
+      className={cn(className, copied && 'text-success')}
       {...props}
     >
       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
