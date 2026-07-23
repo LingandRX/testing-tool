@@ -1067,9 +1067,11 @@ export default function Index() {
 ### 11.8 页面布局约定
 
 - 所有页面根元素使用统一的外层容器：
+
   ```
   <div className="p-4 w-full flex flex-col space-y-4 select-none">
   ```
+
 - 不需要 `<div className="min-h-screen bg-background ...">` — 该样式已由 `AppRoot` 提供
 - 不需要 `min-h-[500px]` 或固定高度（除非确有必要）
 - 卡片容器：`rounded-xl border border-border bg-card text-card-foreground shadow-sm`
