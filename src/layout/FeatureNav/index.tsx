@@ -21,8 +21,8 @@ export default function FeatureNav() {
               aria-current={isActive ? 'page' : undefined}
               onClick={() => navigateTo(key)}
               className={cn(
-                'flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
-                isActive && 'border-l-2 border-primary bg-muted text-foreground',
+                'flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-all duration-150 active:scale-90 hover:bg-muted hover:text-foreground',
+                isActive && 'border-l-2 border-primary bg-muted text-foreground font-medium',
               )}
             >
               <Icon className="h-4 w-4" aria-hidden="true" />

@@ -15,10 +15,10 @@ export default function ResultPanel({ result }: ResultPanelProps) {
 
   const getStatusIcon = () => {
     if (result.success && (!result.warnings || result.warnings.length === 0)) {
-      return <CheckCircle className="h-5 w-5 text-green-500" />;
+      return <CheckCircle className="h-5 w-5 text-success" />;
     }
     if (result.success && result.warnings && result.warnings.length > 0) {
-      return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+      return <AlertTriangle className="h-5 w-5 text-warning" />;
     }
     return <XCircle className="h-5 w-5 text-destructive" />;
   };
@@ -51,8 +51,8 @@ export default function ResultPanel({ result }: ResultPanelProps) {
           </div>
 
           <div className="flex flex-col items-center p-2 rounded-lg bg-muted/30">
-            <CheckCircle className="h-4 w-4 text-green-500 mb-1" />
-            <span className="text-lg font-semibold text-green-500">
+            <CheckCircle className="h-4 w-4 text-success mb-1" />
+            <span className="text-lg font-semibold text-success">
               {result.stats.success.toLocaleString()}
             </span>
             <span className="text-xs text-muted-foreground">成功</span>
@@ -69,19 +69,19 @@ export default function ResultPanel({ result }: ResultPanelProps) {
       )}
 
       {result.warnings && result.warnings.length > 0 && (
-        <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+        <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
-            <span className="text-sm font-medium text-yellow-500">警告</span>
+            <AlertTriangle className="h-4 w-4 text-warning" />
+            <span className="text-sm font-medium text-warning">警告</span>
           </div>
           <ul className="list-disc list-inside space-y-1">
             {result.warnings.slice(0, 5).map((warning, index) => (
-              <li key={index} className="text-xs text-yellow-500/80">
+              <li key={index} className="text-xs text-warning/80">
                 {warning}
               </li>
             ))}
             {result.warnings.length > 5 && (
-              <li className="text-xs text-yellow-500/80">
+              <li className="text-xs text-warning/80">
                 ... 还有 {result.warnings.length - 5} 条警告
               </li>
             )}

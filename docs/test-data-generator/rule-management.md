@@ -382,14 +382,14 @@ function loadRule(ruleId: string): void {
 
 使用 `localStorage`，键名 `testDataGenerator_rules`。API 为**命名导出函数**（见 `src/utils/ruleStorage.ts`）：
 
-| 函数                                                   | 说明                               |
-| ------------------------------------------------------ | ---------------------------------- |
-| `getAll()` / `getById()` / `getByName()`               | 读取                               |
+| 函数 | 说明 |
+| ---- | ---- |
+| `getAll()` / `getById()` / `getByName()` | 读取 |
 | `save()` / `update()` / `deleteRule()` / `duplicate()` | 写入；失败时返回 `null` 或 `false` |
-| `recordUse()`                                          | 递增 `useCount`、更新 `lastUsedAt` |
-| `search()` / `getRecent()`                             | 搜索与最近使用                     |
-| `exportRules()` / `importRules()`                      | 导入导出 JSON 数组                 |
-| `clear()`                                              | 清空全部规则                       |
+| `recordUse()` | 递增 `useCount`、更新 `lastUsedAt` |
+| `search()` / `getRecent()` | 搜索与最近使用 |
+| `exportRules()` / `importRules()` | 导入导出 JSON 数组 |
+| `clear()` | 清空全部规则 |
 
 写入失败（如 `QuotaExceededError`）时，内部 `setAll()` 返回 `false`，`save`/`update` 返回 `null`，`deleteRule` 返回 `false`，并在控制台输出 `[ruleStorage] 保存规则失败`。调用方须检查返回值，避免误报成功。
 

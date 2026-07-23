@@ -31,6 +31,24 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    --diff-add: 142 76% 36%;
+    --diff-add-foreground: 142 70% 95%;
+
+    --diff-remove: 0 84.2% 60.2%;
+    --diff-remove-foreground: 0 85% 97%;
+
+    --diff-modify: 38 92% 50%;
+    --diff-modify-foreground: 48 96% 95%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
@@ -64,6 +82,24 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 144 100% 97%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 12%;
+
+    --info: 199 89% 58%;
+    --info-foreground: 200 100% 97%;
+
+    --diff-add: 142 70% 45%;
+    --diff-add-foreground: 144 100% 97%;
+
+    --diff-remove: 0 62.8% 50.6%;
+    --diff-remove-foreground: 0 85% 97%;
+
+    --diff-modify: 38 92% 58%;
+    --diff-modify-foreground: 48 96% 97%;
+
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
@@ -94,24 +130,29 @@
 }
 
 /* 细滚动条：仅作用于需要内部滚动的面板/结果区（覆盖上方的全局隐藏） */
-.diff-scroll {
+.diff-scroll,
+.custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.25) transparent;
 }
-.diff-scroll::-webkit-scrollbar {
+.diff-scroll::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
   display: block;
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
-.diff-scroll::-webkit-scrollbar-track {
+.diff-scroll::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
-.diff-scroll::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
+.diff-scroll::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.25);
+  border-radius: 4px;
 }
-.dark .diff-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.25);
+.diff-scroll::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
 }
 
 @layer components {
@@ -122,6 +163,22 @@
 }
 
 @layer utilities {
+  .glass-effect {
+    background-color: hsl(var(--background) / 0.85);
+    backdrop-filter: blur(8px);
+  }
+
+  .card-hover-effect {
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-hover-effect:hover {
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+  }
+  .dark .card-hover-effect:hover {
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+    border-color: hsl(var(--border) / 0.8);
+  }
+
   .fade-in-150 {
     animation: tt-fade-in 150ms ease-out forwards;
   }

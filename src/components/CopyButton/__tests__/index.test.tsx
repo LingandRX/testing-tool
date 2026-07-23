@@ -51,11 +51,11 @@ describe('CopyButton', () => {
 
     render(<CopyButton text="test" />);
 
-    // 点击后复制成功，按钮获得 emerald 样式（说明切到了 Check 状态）
+    // 点击后复制成功，按钮获得 success 样式（说明切到了 Check 状态）
     await user.click(screen.getByRole('button'));
 
     await waitFor(() => {
-      expect(screen.getByRole('button').className).toContain('text-emerald');
+      expect(screen.getByRole('button').className).toContain('text-success');
     });
 
     // 1.5 秒后样式恢复
@@ -64,7 +64,7 @@ describe('CopyButton', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole('button').className).not.toContain('text-emerald');
+      expect(screen.getByRole('button').className).not.toContain('text-success');
     });
   });
 
@@ -93,11 +93,11 @@ describe('CopyButton', () => {
 
   // ==================== 新增测试 ====================
 
-  it('初始渲染时显示 Copy 图标且无 emerald 样式', () => {
+  it('初始渲染时显示 Copy 图标且无 success 样式', () => {
     render(<CopyButton text="initial" />);
 
     const button = screen.getByRole('button');
-    expect(button.className).not.toContain('text-emerald');
+    expect(button.className).not.toContain('text-success');
     // 通过 aria-label 确认按钮存在，图标由 lucide 渲染为 svg
     expect(button).toHaveAttribute('aria-label');
   });
@@ -179,7 +179,7 @@ describe('CopyButton', () => {
     });
 
     await waitFor(() => {
-      expect(button.className).not.toContain('text-emerald');
+      expect(button.className).not.toContain('text-success');
     });
   });
 

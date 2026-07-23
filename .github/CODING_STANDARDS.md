@@ -669,7 +669,7 @@ src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
 
 ### 9.1 功能元数据
 
-功能名称与描述在 `config/featureMeta.ts` 的 `FEATURES` 数组中定义：
+功能名称与描述在 `config/features.tsx` 的 `FEATURES` 数组中定义：
 
 ```typescript
 {
@@ -677,10 +677,9 @@ src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
   label: '时间戳转换',
   description: '日期与时间戳互转',
   defaultVisible: true,
+  component: TimestampPage,
 }
 ```
-
-页面组件通过 `config/pageLoaders/` 按需加载，不在 `FEATURES` 中引用。
 
 Dashboard 卡片、TopBar 搜索等功能从此处读取 `label` / `description`。
 
@@ -1068,9 +1067,11 @@ export default function Index() {
 ### 11.8 页面布局约定
 
 - 所有页面根元素使用统一的外层容器：
+
   ```
   <div className="p-4 w-full flex flex-col space-y-4 select-none">
   ```
+
 - 不需要 `<div className="min-h-screen bg-background ...">` — 该样式已由 `AppRoot` 提供
 - 不需要 `min-h-[500px]` 或固定高度（除非确有必要）
 - 卡片容器：`rounded-xl border border-border bg-card text-card-foreground shadow-sm`

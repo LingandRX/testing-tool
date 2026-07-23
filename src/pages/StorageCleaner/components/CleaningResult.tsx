@@ -19,12 +19,12 @@ export default function CleaningResult({ result, className, ...props }: Cleaning
         className={cn(
           'flex items-start gap-3 rounded-xl py-2.5 px-3.5 border shadow-sm',
           isSuccess
-            ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+            ? 'bg-success/10 border-success/20 text-success'
             : 'bg-destructive/5 border-destructive/20 text-destructive',
         )}
       >
         {isSuccess ? (
-          <CheckCircle className="h-4 w-4 shrink-0 mt-0.5 text-emerald-500" />
+          <CheckCircle className="h-4 w-4 shrink-0 mt-0.5 text-success" />
         ) : (
           <XCircle className="h-4 w-4 shrink-0 mt-0.5 text-destructive" />
         )}

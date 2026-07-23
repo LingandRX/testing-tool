@@ -1505,7 +1505,9 @@ export class DataExporter {
 ```typescript
 // src/types/testDataGenerator.ts
 
-type WorkerRequestMessage = { type: 'start'; payload: WorkerStartPayload } | { type: 'cancel' };
+type WorkerRequestMessage =
+  | { type: 'start'; payload: WorkerStartPayload }
+  | { type: 'cancel' };
 
 type WorkerResponseMessage =
   | { type: 'progress'; generationId: number; payload: GenerateProgress }

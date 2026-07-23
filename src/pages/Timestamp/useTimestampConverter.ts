@@ -43,18 +43,29 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
       if (isNaN(num)) {
         return { result: '', error: '请输入有效数字' };
       }
-      const d = dayjsFromTimestamp(num, unit);
-      if (!d.isValid()) {
+      try {
+        const d = dayjsFromTimestamp(num, unit);
+        if (!d.isValid() || d.year() < 0 || d.year() > 9999) {
+          return { result: '', error: '无效时间戳' };
+        }
+        return { result: d.tz(zone).format(DATE_FORMAT), error: '' };
+      } catch {
         return { result: '', error: '无效时间戳' };
       }
-      return { result: d.tz(zone).format(DATE_FORMAT), error: '' };
     } else {
-      const d = dayjs.tz(rawInput, DATE_FORMAT, zone);
-      if (!d.isValid()) {
+      try {
+        const d = dayjs.tz(rawInput, DATE_FORMAT, zone);
+        if (!d.isValid() || d.year() < 0 || d.year() > 9999) {
+          return { result: '', error: '无效的日期格式' };
+        }
+        const ms = d.valueOf();
+        if (isNaN(ms)) {
+          return { result: '', error: '无效的日期格式' };
+        }
+        return { result: String(msToUnit(ms, unit)), error: '' };
+      } catch {
         return { result: '', error: '无效的日期格式' };
       }
-      const ms = d.valueOf();
-      return { result: String(msToUnit(ms, unit)), error: '' };
     }
   }, [input, mode, unit, zone]);
 
@@ -87,6 +98,7 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
   };
 
   const handleSetMode = (newMode: ModeType) => {
+    if (newMode === mode) return;
     setMode(newMode);
     if (result && !error) {
       setInput(result);
