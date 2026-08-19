@@ -30,6 +30,7 @@ const DEFAULT_OPTIONS: StorageCleanerOptions = {
 
 const DEFAULT_PREFERENCES: StorageCleanerPreferences = {
   reloadAfterClean: true,
+  skipConfirm: false,
   selectedTypes: DEFAULT_OPTIONS,
 };
 
@@ -74,19 +75,26 @@ export interface UseStorageCleanerReturn {
   options: StorageCleanerOptions;
   sizes: Record<string, StorageSizeInfo>;
   reloadAfterClean: boolean;
+  skipConfirm: boolean;
   loading: boolean;
+  cleaningKey: keyof StorageCleanerOptions | null;
   isRefreshingSizes: boolean;
   result: CleaningResult | null;
   showConfirm: boolean;
   setShowConfirm: (show: boolean) => void;
   totalBytes: number;
+  hasDataCount: number;
   allSelected: boolean;
   someSelected: boolean;
 
   handleReloadAfterCleanChange: (checked: boolean) => void;
+  handleSkipConfirmChange: (checked: boolean) => void;
   handleOptionChange: (key: keyof StorageCleanerOptions) => void;
   handleSelectAll: (checked: boolean) => void;
+  handleSelectOnlyWithData: () => void;
   handleClean: () => Promise<void>;
+  handleCleanSingle: (key: keyof StorageCleanerOptions) => Promise<void>;
+  triggerClean: () => void;
 }
 
 export function useStorageCleaner(): UseStorageCleanerReturn {
@@ -95,7 +103,9 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
   const [options, setOptions] = useState<StorageCleanerOptions>(DEFAULT_OPTIONS);
   const [sizes, setSizes] = useState<Record<string, StorageSizeInfo>>({});
   const [reloadAfterClean, setReloadAfterClean] = useState<boolean>(true);
+  const [skipConfirm, setSkipConfirm] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [cleaningKey, setCleaningKey] = useState<keyof StorageCleanerOptions | null>(null);
   const [isRefreshingSizes, setIsRefreshingSizes] = useState<boolean>(false);
   const [result, setResult] = useState<CleaningResult | null>(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -151,6 +161,7 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
 
       if (savedPrefs) {
         setReloadAfterClean(savedPrefs.reloadAfterClean ?? DEFAULT_PREFERENCES.reloadAfterClean);
+        setSkipConfirm(savedPrefs.skipConfirm ?? DEFAULT_PREFERENCES.skipConfirm ?? false);
         setOptions(savedPrefs.selectedTypes ?? DEFAULT_PREFERENCES.selectedTypes);
       }
 
@@ -217,14 +228,19 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
       await storageUtil
         .set('storageCleaner/preferences', {
           reloadAfterClean,
+          skipConfirm,
           selectedTypes: options,
         })
         .catch(console.error);
     }, 500);
-  }, [options, reloadAfterClean, isInitializing]);
+  }, [options, reloadAfterClean, skipConfirm, isInitializing]);
 
   const handleReloadAfterCleanChange = useCallback((checked: boolean) => {
     setReloadAfterClean(checked);
+  }, []);
+
+  const handleSkipConfirmChange = useCallback((checked: boolean) => {
+    setSkipConfirm(checked);
   }, []);
 
   const handleOptionChange = useCallback((key: keyof StorageCleanerOptions) => {
@@ -242,52 +258,103 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     });
   }, []);
 
-  const handleClean = useCallback(async () => {
-    if (loadingRef.current) return;
+  const handleSelectOnlyWithData = useCallback(() => {
+    const newOptions: StorageCleanerOptions = {
+      localStorage: Boolean(sizes.localStorage?.value && sizes.localStorage.value > 0),
+      sessionStorage: Boolean(sizes.sessionStorage?.value && sizes.sessionStorage.value > 0),
+      indexedDB: Boolean(sizes.indexedDB?.value && sizes.indexedDB.value > 0),
+      cookies: Boolean(sizes.cookies?.value && sizes.cookies.value > 0),
+      cacheStorage: Boolean(sizes.cacheStorage?.value && sizes.cacheStorage.value > 0),
+      serviceWorkers: Boolean(sizes.serviceWorkers?.value && sizes.serviceWorkers.value > 0),
+    };
+    setOptions(newOptions);
+  }, [sizes]);
 
-    const tab = await getCurrentTab();
-    if (!tab || !tab.id || !tab.url) {
-      toast.warning('无法获取当前标签页');
-      return;
-    }
+  const executeClean = useCallback(
+    async (targetOptions: StorageCleanerOptions, singleKey?: keyof StorageCleanerOptions) => {
+      if (loadingRef.current) return;
 
-    if (isRestrictedUrl(tab.url)) {
-      toast.warning('存储清理功能不支持此页面');
-      setShowConfirm(false);
-      return;
-    }
-
-    const boundTab = boundTabRef.current;
-    if (!boundTab || boundTab.id !== tab.id || boundTab.url !== tab.url) {
-      toast.warning('当前页面已变更，请等待数据刷新后再清理');
-      setShowConfirm(false);
-      return;
-    }
-
-    setLoading(true);
-    setShowConfirm(false);
-    try {
-      const cleaningResult = await clearStorage(tab.id, tab.url, options);
-      setResult(cleaningResult);
-
-      if (reloadAfterClean && cleaningResult.overallSuccess) {
-        toast.success('清理成功，即将刷新页面');
-        await reloadTabAndWaitForComplete(tab.id);
-        await loadInfo();
-      } else {
-        await loadInfo();
+      const tab = await getCurrentTab();
+      if (!tab || !tab.id || !tab.url) {
+        toast.warning('无法获取当前标签页');
+        return;
       }
-    } catch (err) {
-      toast.error(`清理失败: ${String(err)}`);
-    } finally {
-      setLoading(false);
+
+      if (isRestrictedUrl(tab.url)) {
+        toast.warning('存储清理功能不支持此页面');
+        setShowConfirm(false);
+        return;
+      }
+
+      const boundTab = boundTabRef.current;
+      if (!boundTab || boundTab.id !== tab.id || boundTab.url !== tab.url) {
+        toast.warning('当前页面已变更，请等待数据刷新后再清理');
+        setShowConfirm(false);
+        return;
+      }
+
+      setLoading(true);
+      if (singleKey) {
+        setCleaningKey(singleKey);
+      }
+      setShowConfirm(false);
+      try {
+        const cleaningResult = await clearStorage(tab.id, tab.url, targetOptions);
+        setResult(cleaningResult);
+
+        if (reloadAfterClean && cleaningResult.overallSuccess) {
+          toast.success('清理成功，即将刷新页面');
+          await reloadTabAndWaitForComplete(tab.id);
+          await loadInfo();
+        } else {
+          await loadInfo();
+        }
+      } catch (err) {
+        toast.error(`清理失败: ${String(err)}`);
+      } finally {
+        setLoading(false);
+        setCleaningKey(null);
+      }
+    },
+    [loadInfo, reloadAfterClean],
+  );
+
+  const handleClean = useCallback(async () => {
+    await executeClean(options);
+  }, [executeClean, options]);
+
+  const handleCleanSingle = useCallback(
+    async (key: keyof StorageCleanerOptions) => {
+      const singleOptions: StorageCleanerOptions = {
+        localStorage: false,
+        sessionStorage: false,
+        indexedDB: false,
+        cookies: false,
+        cacheStorage: false,
+        serviceWorkers: false,
+        [key]: true,
+      };
+      await executeClean(singleOptions, key);
+    },
+    [executeClean],
+  );
+
+  const triggerClean = useCallback(() => {
+    if (skipConfirm) {
+      handleClean().catch(console.error);
+    } else {
+      setShowConfirm(true);
     }
-  }, [options, reloadAfterClean, loadInfo]);
+  }, [skipConfirm, handleClean]);
 
   const totalBytes = useMemo(() => {
     return Object.values(sizes).reduce((acc, s) => {
       return s.displayType === 'bytes' ? acc + (s.value || 0) : acc;
     }, 0);
+  }, [sizes]);
+
+  const hasDataCount = useMemo(() => {
+    return Object.values(sizes).filter((s) => (s?.value || 0) > 0).length;
   }, [sizes]);
 
   const selectionMetrics = useMemo(() => {
@@ -303,17 +370,24 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
     options,
     sizes,
     reloadAfterClean,
+    skipConfirm,
     loading,
+    cleaningKey,
     isRefreshingSizes,
     result,
     showConfirm,
     setShowConfirm,
     totalBytes,
+    hasDataCount,
     allSelected: selectionMetrics.all,
     someSelected: selectionMetrics.some,
     handleReloadAfterCleanChange,
+    handleSkipConfirmChange,
     handleOptionChange,
     handleSelectAll,
+    handleSelectOnlyWithData,
     handleClean,
+    handleCleanSingle,
+    triggerClean,
   };
 }
