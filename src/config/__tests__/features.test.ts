@@ -5,6 +5,7 @@ import {
   getDefaultPageOrder,
   getDefaultVisibleFeatureKeys,
   getFeatureByKey,
+  getPopupHeight,
 } from '@/config/features';
 
 describe('features', () => {
@@ -103,6 +104,24 @@ describe('features', () => {
       expect(pageOrder).toContain('timestamp');
       expect(pageOrder).toContain('storageCleaner');
       expect(pageOrder).toContain('qrCode');
+    });
+  });
+
+  describe('getPopupHeight', () => {
+    it('应该返回时间戳页面的配置高度', () => {
+      expect(getPopupHeight('timestamp')).toBe(480);
+    });
+
+    it('应该返回右键恢复页面的配置高度', () => {
+      expect(getPopupHeight('rightClickRestorer')).toBe(420);
+    });
+
+    it('应该返回JSON工具页面的配置高度', () => {
+      expect(getPopupHeight('jsonTools')).toBe(600);
+    });
+
+    it('应该针对未知页面返回默认高度600且不超出边界', () => {
+      expect(getPopupHeight('unknown' as any)).toBe(600);
     });
   });
 });
