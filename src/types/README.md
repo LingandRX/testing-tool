@@ -23,7 +23,6 @@
 
 **其他类型：**
 
-- `FormMapEntry` — 表单映射条目定义
 - `ContextMenuPendingData` — 右键菜单待处理数据
 - `StorageCleanerPreferences` / `StorageCleanerOptions` — 存储清理偏好
 - `CleaningResult` / `StorageCleanResult` — 清理结果类型

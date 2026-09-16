@@ -33,7 +33,7 @@ vi.mock('sonner', () => ({
   },
 }));
 
-import TestDataGeneratorPage from '../index';
+import Index from '../index';
 import * as ruleStorage from '@/utils/ruleStorage';
 import { toast } from 'sonner';
 import type { DataRule, FieldConfig } from '@/types/testDataGenerator';
@@ -63,7 +63,7 @@ const mockRule: DataRule = {
   useCount: 0,
 };
 
-describe('TestDataGeneratorPage', () => {
+describe('TestDataGenerator Index', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedRuleStorage.getAll.mockReturnValue([mockRule]);
@@ -71,7 +71,7 @@ describe('TestDataGeneratorPage', () => {
 
   it('编辑规则时应显示包含规则名的 toast', async () => {
     const user = userEvent.setup();
-    render(<TestDataGeneratorPage />);
+    render(<Index />);
 
     await user.click(screen.getByText('规则管理'));
     await user.click(screen.getByTitle('编辑'));

@@ -48,9 +48,9 @@ npx wxt prepare          # 重新生成 .wxt/ 类型声明（npm install 时 pos
 
 ```
 src/                     # 源代码根目录
-  config/features.tsx      # 功能定义（路由 + 元数据的单一事实来源）
+  config/                  # 功能配置（features.ts 导出、featureMeta.ts 元数据定义、pageLoaders/ 懒加载）
   entrypoints/             # 扩展入口点 (popup/, sidepanel/, background.ts, content.ts)
-  layout/                  # 应用壳层布局（TopBar 导航、搜索、主题切换）
+  layout/                  # 应用壳层布局（FeatureNav 侧边栏导航、主题切换）
   pages/                   # 功能页面组件 (懒加载)
   components/              # 可复用 UI 组件
   components/ui/           # shadcn/ui 基础组件 (button, dialog, select 等)
@@ -68,7 +68,7 @@ public/                  # 静态资源（图标等）
 
 ### layout/
 
-应用壳层，与 popup / sidepanel / tab 入口绑定。当前含 `TopBar/`（搜索、主题切换、返回导航、「在标签页打开」），遵循与 `pages/` 相同的 UI + Hook 模式。详见 [layout/README.md](./src/layout/README.md)。
+应用壳层，与 popup / sidepanel / tab 入口绑定。当前含 `FeatureNav/`（右侧功能导航栏：工具图标切换、底部主题切换），遵循与 `pages/` 相同的 UI + Hook 模式。详见 [layout/README.md](./src/layout/README.md)。
 
 ### spec/
 
@@ -127,9 +127,8 @@ src/types/
 
 ## 关键架构决策
 
-**路由**: 不使用 React Router。通过 `src/config/features.tsx` 的 `FEATURES` 数组管理，`RouterProvider` 根据 `PageType`
-渲染对应组件。支持三种渲染模式：popup（弹窗）、sidepanel（侧边栏）和 tab（浏览器新标签页，TopBar「在标签页打开」调用 `openExtensionPage('popup.html', { mode: 'tab' })`，由 `getEntryPointType()` 根据 URL 参数 `mode=tab` 识别）。
-每种模式有独立的路由和可见页面配置（`app/popupRoute`、`app/sidepanelRoute`、`app/tabRoute` 等）。
+**路由**: 不使用 React Router。通过 `src/config/features.ts`（元数据定义于 `src/config/featureMeta.ts`）的 `FEATURES` 数组管理，`RouterProvider` 根据 `PageType`
+渲染对应组件。页面右侧通过 `FeatureNav` 侧边栏进行垂直图标导航切换工具及底部主题切换。支持独立的路由和可见页面配置（`app/popupRoute`、`app/popupVisiblePages`、`app/popupPageOrder` 等）。
 
 **存储**: 所有 Chrome Storage 键必须在 `src/types/storage.d.ts` 的 `StorageSchema` 中定义，键名使用 kebab-case 格式（如 `app/currentRoute`）。
 使用 `src/utils/chromeStorage.ts` 及其 Hook。Router 同时使用 `chrome.storage.local` 和 `localStorage` 快照（`snapshot/{key}`）消除首屏闪烁。
@@ -156,7 +155,7 @@ src/types/
 
 项目已移除 `chrome.i18n`，UI 文案直接在代码中使用中文。
 
-- **功能元数据**: `src/config/features.tsx` 的 `FEATURES` 数组定义 `label`、`description`（用于 Dashboard 卡片与搜索）
+- **功能元数据**: `src/config/featureMeta.ts`（通过 `src/config/features.ts` 导出）的 `FEATURES` 数组定义 `label`、`description`（用于导航 Tooltip 与元数据）
 - **页面文案**: 在组件 JSX、`constants.ts` 或 Hook 中直接写中文
 - **Manifest 文案**: 扩展名称与描述在 `wxt.config.ts` 的 `manifest` 中维护
 - **Toast / 错误提示**: 在 Hook 或 `constants.ts` 中定义，使用 `sonner` 的 `toast()` 展示
@@ -164,7 +163,7 @@ src/types/
 ## 新功能开发清单
 
 1. 在 `src/types/storage.d.ts` 添加 `PageType` 联合类型
-2. 在 `src/config/features.tsx` 的 `FEATURES` 数组添加配置（指定 key、label、description、图标、三种渲染模式的组件）
+2. 在 `src/config/featureMeta.ts` 的 `FEATURES` 数组添加配置（指定 key、label、description、图标、popupHeight 等），并在 `src/config/pageLoaders/` 中添加对应的动态加载器
 3. 在 `src/pages/` 创建页面组件 (懒加载)：
    - `index.tsx` — UI 组件（纯展示）
    - `useFeatureName.ts` — 业务逻辑 Hook
