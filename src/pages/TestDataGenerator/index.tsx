@@ -45,26 +45,28 @@ export default function Index() {
             ))}
           </div>
 
-          {vm.activeTab === 'fields' && (
-            <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
-              <FieldList
-                fields={vm.fields}
-                onUpdate={vm.handleUpdateField}
-                onRemove={vm.handleRemoveField}
-                onAdd={vm.handleAddField}
-                onEdit={vm.handleOpenEditor}
-                onReorder={vm.handleReorder}
-                editingRule={vm.editingRule}
-                onRuleSaved={vm.handleRuleSaved}
-              />
-            </div>
-          )}
+          <div key={vm.activeTab} className="page-transition-enter">
+            {vm.activeTab === 'fields' && (
+              <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
+                <FieldList
+                  fields={vm.fields}
+                  onUpdate={vm.handleUpdateField}
+                  onRemove={vm.handleRemoveField}
+                  onAdd={vm.handleAddField}
+                  onEdit={vm.handleOpenEditor}
+                  onReorder={vm.handleReorder}
+                  editingRule={vm.editingRule}
+                  onRuleSaved={vm.handleRuleSaved}
+                />
+              </div>
+            )}
 
-          {vm.activeTab === 'rules' && (
-            <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
-              <RuleManager onLoad={vm.handleLoadRule} onEdit={vm.handleEditRule} />
-            </div>
-          )}
+            {vm.activeTab === 'rules' && (
+              <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
+                <RuleManager onLoad={vm.handleLoadRule} onEdit={vm.handleEditRule} />
+              </div>
+            )}
+          </div>
 
           <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
             <GenerateOptions

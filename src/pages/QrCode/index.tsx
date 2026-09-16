@@ -26,7 +26,7 @@ export default function Index() {
           />
         </div>
 
-        <div className="w-full pt-1.5">
+        <div key={qrCode.mode} className="w-full pt-1.5 page-transition-enter">
           {qrCode.mode === 'generate' ? (
             <div>
               <GeneratePanel />
