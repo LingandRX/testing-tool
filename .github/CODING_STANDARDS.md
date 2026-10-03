@@ -11,11 +11,13 @@
 
 ```typescript
 // ✅ interface — 组件 Props / 对象结构
-export interface GlobalSnackbarProps {
-  message: string;
-  open: boolean;
-  onClose: () => void;
-  severity?: SnackbarSeverity;
+export interface ErrorFallbackProps {
+  title: string;
+  description: string;
+  error: Error | null;
+  actionLabel: string;
+  onAction: () => void;
+  variant?: 'app' | 'page';
 }
 
 // ✅ interface — 继承 HTML 属性
@@ -26,7 +28,7 @@ interface LiveClockProps extends React.HTMLAttributes<HTMLDivElement> {
 
 // ✅ type — 联合类型
 export type ThemeMode = 'light' | 'dark' | 'system';
-export type PageType = 'dashboard' | 'timestamp' | 'storageCleaner' | ...;
+export type PageType = 'timestamp' | 'storageCleaner' | 'qrCode' | ...;
 
 // ✅ type — 工具类型
 export type ResolvedThemeMode = 'light' | 'dark';
@@ -383,7 +385,7 @@ className={cn(
 // ✅ Grid 自适应布局
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
 
-// ✅ Dashboard 自动填充网格
+// ✅ 自动填充网格（auto-fill）
 <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(290px,1fr))] auto-rows-auto gap-3.5 p-3.5 w-full h-auto">
 
 // ✅ 弹性方向切换
@@ -488,18 +490,18 @@ export function textToBase64(text: string): TextToBase64Result { ... }
 
 // ✅ PascalCase — 组件、类型、接口
 const LiveClock = React.memo(...);
-export interface GlobalSnackbarProps { ... }
+export interface ErrorFallbackProps { ... }
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 // ✅ SCREAMING_SNAKE_CASE — 常量
-const SEARCH_HISTORY_LIMIT = 10;
-const THEME_MODE_KEY = 'app/themeMode' as const;
+const MAX_RECENTLY_USED = 3;
+const THEME_MODE_STORAGE_KEY = 'app/themeMode' as const;
 export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 export const SUPPORTED_IMAGE_TYPES = [...] as const;
 
 // ✅ 布尔值 — is/has/should 前缀
 const isControlled = controlledValue !== undefined;
-const isDashboard = currentPage === 'dashboard';
+const isTimestampPage = currentPage === 'timestamp';
 const hasError = true;
 ```
 
@@ -656,7 +658,7 @@ export function useTimestampConverter(): UseTimestampConverterReturn { ... }
 src/utils/useStorageState.ts          — Chrome Storage 状态持久化
 src/utils/syncSnapshot.ts             — localStorage 快照读取
 src/utils/useContextMenuData.ts       — 右键菜单数据
-src/utils/useDebounce.ts              — 防抖
+src/utils/themeSnapshot.ts            — 主题快照读写
 src/pages/Timestamp/useTimestampConverter.ts    — 页面级 Hook
 src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
 ```
@@ -669,19 +671,21 @@ src/pages/StorageCleaner/useStorageCleaner.ts  — 页面级 Hook
 
 ### 9.1 功能元数据
 
-功能名称与描述在 `config/features.tsx` 的 `FEATURES` 数组中定义：
+功能名称与描述在 `config/featureMeta.ts`（经 `config/features.ts` 导出）的 `FEATURES` 数组中定义：
 
 ```typescript
 {
   key: 'timestamp',
-  label: '时间戳转换',
-  description: '日期与时间戳互转',
+  label: '时间戳',
+  description: 'Unix 毫秒数转换与格式化',
+  themeColorKey: 'primary',
+  icon: Clock,
   defaultVisible: true,
-  component: TimestampPage,
+  popupHeight: 480,
 }
 ```
 
-Dashboard 卡片、TopBar 搜索等功能从此处读取 `label` / `description`。
+FeatureNav 导航（Tooltip）从此处读取 `label` / `description`；页面组件通过 `src/config/pageLoaders/` 懒加载，不在此处注册。
 
 ### 9.2 页面与组件文案
 
@@ -704,7 +708,7 @@ export const ERROR_MESSAGES = {
 
 ### 9.3 添加新功能文案
 
-1. 在 `config/features.tsx` 填写 `label` 和 `description`
+1. 在 `config/featureMeta.ts` 填写 `label` 和 `description`
 2. 在页面组件、`constants.ts` 或 Hook 中编写 UI 文案
 3. 扩展名称与描述在 `wxt.config.ts` 的 `manifest` 中维护
 
@@ -830,7 +834,7 @@ src/pages/FeatureName/
 
 #### 特殊情况（单个文件即可）
 
-功能极简的页面（如 Dashboard），仅需 `index.tsx` 一个文件。当 `index.tsx` 超过 **150 行**时，应拆分为 UI + Hook 模式。
+功能极简的页面（如 RightClickRestorer），仅需 `index.tsx` 一个文件。当 `index.tsx` 超过 **150 行**时，应拆分为 UI + Hook 模式。
 
 ---
 
@@ -840,15 +844,14 @@ src/pages/FeatureName/
 
 - 页面入口组件**统一使用 `Index` 作为函数名**，通过 `export default` 导出
 - 使用 `export default function Index()` 而非匿名默认导出
-- **禁止**混用 `XxxPage` 命名（当前 `RightClickRestorerPage`、`DashboardPage` 不合规范，应统一为 `Index`）
+- **禁止**混用 `XxxPage` 命名，应统一为 `Index`
 
 ```typescript
 // ✅ 正确
 export default function Index() { ... }
 
 // ❌ 错误 — 命名不一致
-export default function RightClickRestorerPage() { ... }
-export default function DashboardPage() { ... }
+export default function MyToolPage() { ... }
 ```
 
 #### 组件职责
@@ -1084,7 +1087,7 @@ export default function Index() {
 新增功能页面时，逐项确认：
 
 1. ✅ 在 `types/storage.d.ts` 添加 `PageType` 联合类型
-2. ✅ 在 `config/features.tsx` 注册 `FEATURES` 配置（key、label、description、icon、三种渲染模式组件）
+2. ✅ 在 `config/featureMeta.ts` 注册 `FEATURES` 配置（key、label、description、icon、popupHeight 等），并在 `src/config/pageLoaders/` 添加对应的动态加载器
 3. ✅ 创建页面目录，使用 `Index` 作为组件名
 4. ✅ 业务逻辑提取到 `useXxx.ts` Hook（index.tsx 不超过 150 行）
 5. ✅ 需要持久化的 UI 状态使用 `useStorageState`
@@ -1098,19 +1101,19 @@ export default function Index() {
 
 ### 11.10 目录职责总览
 
-| 目录                 | 职责                                                         |
-| -------------------- | ------------------------------------------------------------ |
-| `src/config/`        | 应用配置（功能定义、路由映射）                               |
-| `src/entrypoints/`   | 扩展入口点（popup、options、sidepanel、background、content） |
-| `src/pages/`         | 功能页面组件（懒加载）                                       |
-| `src/components/`    | 可复用 UI 组件                                               |
-| `src/components/ui/` | shadcn/ui 基础组件（button、dialog、select 等）              |
-| `src/providers/`     | React Context（Router、Theme 等）                            |
-| `src/hooks/`         | 自定义 React Hooks                                           |
-| `src/utils/`         | 工具函数与服务抽象                                           |
-| `src/types/`         | TypeScript 类型声明                                          |
-| `src/lib/`           | 通用工具函数与生成器库（cn、utils、generators）              |
-| `public/`            | 静态资源（图标等）                                           |
+| 目录                 | 职责                                                |
+| -------------------- | --------------------------------------------------- |
+| `src/config/`        | 应用配置（功能定义、路由映射）                      |
+| `src/entrypoints/`   | 扩展入口点（popup、background、content 及内容脚本） |
+| `src/pages/`         | 功能页面组件（懒加载）                              |
+| `src/components/`    | 可复用 UI 组件                                      |
+| `src/components/ui/` | shadcn/ui 基础组件（button、dialog、select 等）     |
+| `src/providers/`     | React Context（Router、Theme 等）                   |
+| `src/hooks/`         | 自定义 React Hooks                                  |
+| `src/utils/`         | 工具函数与服务抽象                                  |
+| `src/types/`         | TypeScript 类型声明                                 |
+| `src/lib/`           | 通用工具函数（cn 等）                               |
+| `public/`            | 静态资源（图标等）                                  |
 
 ---
 
@@ -1133,7 +1136,7 @@ export default function Index() {
 
 ### 12.3 注释规范
 
-- **文件级注释**：使用 JSDoc `@module` 格式（如 `GlobalSnackbar.tsx`）
+- **文件级注释**：使用 JSDoc `@module` 格式（如 `TextInputArea.tsx`）
 - **函数注释**：使用 JSDoc，包含 `@param`、`@returns`、`@example`
 - **行内注释**：仅在需要澄清复杂逻辑时使用
 - **禁止注释显而易见的代码**

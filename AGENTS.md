@@ -49,7 +49,7 @@ npx wxt prepare          # 重新生成 .wxt/ 类型声明（npm install 时 pos
 ```
 src/                     # 源代码根目录
   config/                  # 功能配置（features.ts 导出、featureMeta.ts 元数据定义、pageLoaders/ 懒加载）
-  entrypoints/             # 扩展入口点 (popup/, sidepanel/, background.ts, content.ts)
+  entrypoints/             # 扩展入口点 (popup/, background.ts, content.ts, rightClickRestorer.content.ts)
   layout/                  # 应用壳层布局（FeatureNav 侧边栏导航、主题切换）
   pages/                   # 功能页面组件 (懒加载)
   components/              # 可复用 UI 组件
@@ -59,7 +59,7 @@ src/                     # 源代码根目录
   utils/                   # 工具函数与服务抽象
   types/                   # TypeScript 类型声明
   lib/                     # 通用工具函数（cn、utils）
-spec/                    # 功能规格、修复方案与验收标准（见 spec/README.md）
+docs/                    # 文档（docs/spec/ 功能规格与验收标准、docs/VISUAL_STYLE_GUIDE.md 视觉规范）
 public/                  # 静态资源（图标等）
 .wxt/                    # wxt prepare 自动生成，含类型声明与扩展 tsconfig（勿手动编辑）
 .output/                 # 生产构建输出目录
@@ -67,11 +67,11 @@ public/                  # 静态资源（图标等）
 
 ### layout/
 
-应用壳层，与 popup / sidepanel / tab 入口绑定。当前含 `FeatureNav/`（右侧功能导航栏：工具图标切换、底部主题切换），遵循与 `pages/` 相同的 UI + Hook 模式。详见 [layout/README.md](./src/layout/README.md)。
+应用壳层，与 popup 入口绑定。当前含 `FeatureNav/`（右侧功能导航栏：工具图标切换、底部主题切换），遵循与 `pages/` 相同的 UI + Hook 模式。详见 [layout/README.md](./src/layout/README.md)。
 
-### spec/
+### docs/spec/
 
-功能规格与验收标准文档，重大改动前优先查阅。索引见 [spec/README.md](./spec/README.md)。
+功能规格与验收标准文档，重大改动前优先查阅。索引见 [docs/spec/README.md](./docs/spec/README.md)。
 
 ### 页面组件模式
 

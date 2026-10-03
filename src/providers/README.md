@@ -28,14 +28,14 @@ React.StrictMode
 - **当前页面**：`currentPage`（`PageType`）
 - **可见页面列表**：`visiblePages`
 - **页面排序**：`pageOrder`
-- **最近使用工具**：`recentlyUsedTools`（最多 3 项，供 TopBar 搜索历史使用）
+- **最近使用工具**：`recentlyUsedTools`（最多 3 项，由 RouterProvider 持久化，当前暂无 UI 消费方）
 - **加载状态**：`isLoaded`
 
 核心特性：
 
 - 通过 `chrome.storage` 持久化路由状态
 - 使用 `localStorage` 快照（`snapshot/{key}`）实现首屏 0 闪烁
-- 支持 popup/sidepanel/tab 三种入口的独立路由同步（通过 `syncKey`、`visiblePagesKey`、`pageOrderKey` 配置）
+- 支持独立路由同步（通过 `syncKey`、`visiblePagesKey`、`pageOrderKey` 配置，当前仅 popup 入口）
 - 处理右键菜单待处理数据的路由跳转
 - 监听 `chrome.storage.onChanged` 实现跨端同步
 
@@ -44,13 +44,13 @@ React.StrictMode
 异步加载 storage 期间，快照值会作为首屏初始 state。加载完成后：
 
 1. **`canPersistRef`**：仅在 `loadInitialData` 成功后才设为 `true`，在此之前不会向 storage 写入，避免默认值覆盖已有路由
-2. **`hasUserNavigatedRef`**：用户调用 `navigateTo` / `goHome` 后设为 `true`，异步加载结果不会覆盖用户已选页面
+2. **`hasUserNavigatedRef`**：用户调用 `navigateTo` 后设为 `true`，异步加载结果不会覆盖用户已选页面
 3. **`mergeWithDefaults`**：将已保存的页面列表与默认列表合并，新增功能会自动出现在列表末尾
 
 导出：
 
 - `RouterProvider` 组件
-- `useRouter()` Hook — 获取 `currentPage`、`visiblePages`、`pageOrder`、`recentlyUsedTools`、`navigateTo`、`goHome` 等
+- `useRouter()` Hook — 获取 `currentPage`、`visiblePages`、`pageOrder`、`recentlyUsedTools`、`navigateTo` 等
 
 ## ThemeModeProvider.tsx
 

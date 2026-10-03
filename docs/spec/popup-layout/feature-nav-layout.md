@@ -1,9 +1,15 @@
 # Popup 布局重构 — 功能导航与 Dashboard 移除
 
 > 创建时间: 2026-07-05
-> 状态: 待实施
+> 状态: ✅ 已实施
 > 关联模块: `src/entrypoints/popup/`、`src/layout/FeatureNav/`、`src/providers/RouterProvider.tsx`
 > 影响范围: 仅 popup 入口（tab / sidepanel 不在本次布局范围）
+
+> **实施回填（2026-10-03）**：本方案已落地——FeatureNav 右侧常驻导航、450px 宽度、默认 `timestamp`、Dashboard 移除均已实现。与原方案的三处偏差：
+>
+> 1. TopBar 最终**整体移除**（原方案计划保留搜索的精简版 TopBar）；
+> 2. popup 高度未保持 600px 固定，改为**按页面动态 400~600px**（`src/config/featureMeta.ts` 的 `popupHeight`）；
+> 3. sidepanel / tab 入口现已从代码库删除，文中相关内容不再适用。
 
 ## 背景与目标
 

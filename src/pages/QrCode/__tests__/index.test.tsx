@@ -12,12 +12,6 @@ vi.mock('lucide-react', async (importOriginal) => {
   };
 });
 
-vi.mock('@/components/GlobalSnackbar', () => ({
-  useSnackbar: () => ({
-    showMessage: vi.fn(),
-  }),
-}));
-
 vi.mock('../components/QrCodePreview', () => ({
   default: () => <div data-testid="qr-code-preview">QrCodePreview</div>,
 }));

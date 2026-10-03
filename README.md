@@ -8,12 +8,6 @@
 
 ## 功能特性
 
-### Dashboard 首页
-
-- **工具导航**: 快速访问所有可用工具.
-- **个性化定制**: 支持自定义工具的排序和可见性.
-- **实时预览**: 在卡片上直接查看实时数据（如当前时间戳）.
-
 ### 时间戳转换工具
 
 - **实时显示**: 毫秒级精度显示当前系统时间.
@@ -70,7 +64,7 @@
 - **UI 组件**: shadcn/ui (基于 Radix UI 的无头组件库)
 - **样式**: Tailwind CSS + class-variance-authority + cn() 工具函数
 - **日期处理**: dayjs (集成 UTC 和 Timezone 插件)
-- **UI 文案**: 组件内直接使用中文字符串；功能名称与描述定义在 `src/config/features.tsx`
+- **UI 文案**: 组件内直接使用中文字符串；功能名称与描述定义在 `src/config/features.ts`
 - **通信**: @webext-core/messaging
 - **存储**: Chrome Storage API (类型安全封装)
 - **解析引擎**: qr-scanner (二维码解析), qrious (二维码生成)
@@ -82,12 +76,12 @@
 ├── src/                   # 源代码根目录
 │   ├── components/        # 可复用 React 组件
 │   ├── config/            # 应用配置
-│   │   └── features.tsx   # 功能定义与路由映射
+│   │   └── features.ts    # 功能定义与路由映射
 │   ├── entrypoints/       # 扩展程序入口点
 │   │   ├── popup/         # 点击图标弹出的主界面
-│   │   ├── sidepanel/     # 浏览器侧边栏集成
 │   │   ├── background.ts  # 后台 Service Worker
-│   │   └── content.ts     # 网页注入脚本
+│   │   ├── content.ts     # 网页注入脚本
+│   │   └── rightClickRestorer.content.ts  # 右键恢复内容脚本
 │   ├── pages/             # 各功能模块的页面组件
 │   ├── providers/         # 全局状态提供者 (Router, Theme 等)
 │   ├── hooks/             # 自定义 React Hooks
@@ -134,13 +128,14 @@
 
 本扩展根据功能需要申请了以下权限：
 
-- `storage` & `unlimitedStorage`: 存储用户设置、工具配置及大量数据.
-- `activeTab` & `tabs`: 获取当前页面 URL 及其元数据.
+- `storage`: 存储用户设置与工具配置.
+- `tabs`: 获取当前页面 URL 及其元数据.
 - `scripting`: 在网页中执行清理和右键恢复脚本.
 - `cookies`: 管理和清理网站 Cookie.
-- `sidePanel`: 支持在浏览器侧边栏中运行.
 - `clipboardWrite`: 提供一键复制功能.
 - `contextMenus`: 注册右键菜单，支持快捷操作.
+
+另声明了主机权限 `<all_urls>`，用于在用户主动触发时于任意页面执行脚本与读取标签页信息.
 
 ## 浏览器支持
 

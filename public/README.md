@@ -17,4 +17,4 @@
 
 - 修改图标后需同步更新 `wxt.config.ts` 中的 manifest 配置
 - 图标格式推荐使用 PNG，确保透明背景
-- UI 文案不在此目录维护，见 `src/config/features.tsx` 与各页面组件
+- UI 文案不在此目录维护，见 `src/config/featureMeta.ts` 与各页面组件

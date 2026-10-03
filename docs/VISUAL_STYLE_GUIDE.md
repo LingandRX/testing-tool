@@ -1,7 +1,7 @@
 # Testing Tools — 视觉规范文档
 
-> **版本**: 1.0.0  
-> **日期**: 2026-05-29  
+> **版本**: 1.1.0  
+> **日期**: 2026-10-03  
 > **适用范围**: 所有新页面、新组件、UI 修改  
 > **设计系统**: 基于 [shadcn/ui](https://ui.shadcn.com/) + Tailwind CSS
 
@@ -30,7 +30,7 @@
 Testing Tools 是一款**浏览器扩展开发者工具集**，视觉风格遵循：
 
 - **专业克制** — 低饱和度色彩，避免视觉噪音
-- **信息密度优先** — 紧凑布局，在 400×600px 的 popup 空间内高效展示
+- **信息密度优先** — 紧凑布局，在 450px 宽、高度按页面动态（400~600px）的 popup 空间内高效展示
 - **开发者友好** — 等宽字体用于代码/数据，清晰的信息层级
 - **一致性至上** — 所有页面、组件遵循同一套视觉语言
 
@@ -50,7 +50,7 @@ Testing Tools 是一款**浏览器扩展开发者工具集**，视觉风格遵�
 
 ### 2.1 CSS 变量定义
 
-所有色彩通过 CSS 自定义属性（HSL 格式）管理，定义于 `src/index.css`：
+所有色彩通过 CSS 自定义属性（HSL 格式）管理，定义于 `src/styles/shell.css`：
 
 #### 亮色模式 (`:root`)
 
@@ -198,11 +198,8 @@ font-family:
 ### 4.1 容器尺寸
 
 ```tsx
-// Popup 模式（默认）
-<div className="w-[400px] max-w-[400px] min-w-[400px] h-[600px] min-h-[600px]">
-
-// Tab 模式（全屏自适应）
-<div className="sm:w-screen sm:max-w-none sm:min-w-0 sm:h-screen sm:min-h-0">
+// Popup 模式（唯一入口）：宽度固定 450px，高度按页面动态 400~600px
+<div className="w-[450px] max-w-[450px] min-w-[450px] max-h-[600px] min-h-[400px]">
 ```
 
 ### 4.2 间距节奏
@@ -245,13 +242,6 @@ font-family:
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
 ```
 
-#### 工具卡片网格（Dashboard）
-
-```tsx
-// Dashboard 紧凑网格
-<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
-```
-
 ---
 
 ## 5. 圆角与阴影
@@ -268,20 +258,15 @@ font-family:
 
 ### 5.2 阴影体系
 
-| 级别 | 类名                  | 用途                   |
-| ---- | --------------------- | ---------------------- |
-| 无   | —                     | 静态元素               |
-| 低   | `shadow-sm`           | 卡片、输入框、按钮     |
-| 中   | `shadow-lg`           | 下拉菜单、浮层、Dialog |
-| 动态 | 自定义 `shadow-[...]` | 卡片悬停时的彩色阴影   |
+| 级别 | 类名        | 用途                   |
+| ---- | ----------- | ---------------------- |
+| 无   | —           | 静态元素               |
+| 低   | `shadow-sm` | 卡片、输入框、按钮     |
+| 中   | `shadow-lg` | 下拉菜单、浮层、Dialog |
 
-### 5.3 彩色阴影规范（工具卡片专用）
+### 5.3 彩色阴影（已废弃）
 
-```tsx
-// 工具卡片悬停阴影 — 必须使用 rgba 格式配合 CSS 变量
-className="hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
-           dark:hover:shadow-[0_8px_30px_-10px_rgba(var(--tool-color),0.25)]"
-```
+> Dashboard 工具卡片移除后，原先基于 `rgba(var(--tool-color), ...)` 的彩色悬停阴影已无使用场景，见 §9。
 
 ---
 
@@ -351,7 +336,7 @@ className="hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
 
 ### 6.3 SwitchButtonGroup
 
-来源：`src/components/ui/switch.tsx`
+来源：`src/components/SwitchButtonGroup.tsx`
 
 ```tsx
 // 分段控制器
@@ -373,34 +358,7 @@ className="hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
 - 未选中项：`hover:bg-background/50 hover:text-foreground/80`
 - 尺寸：`small`（32px）用于工具页，`medium`（36px）标准
 
-### 6.4 Card（工具卡片）
-
-来源：`src/pages/Dashboard/ToolCard.tsx`
-
-```tsx
-// 标准工具卡片结构
-<div className="group relative rounded-xl border border-border/70 bg-card p-4 h-auto flex flex-col gap-3 shadow-sm">
-  {/* 上半部分：图标 + 标题 + 箭头 */}
-  <div className="flex items-center justify-between">
-    <div className="flex gap-3 items-center">
-      {/* 图标容器 */}
-      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[rgba(var(--tool-color),0.08)] text-[rgb(var(--tool-color))]">
-        <Icon className="h-5 w-5" />
-      </div>
-      {/* 文字 */}
-      <div>
-        <h4 className="font-bold text-sm">标题</h4>
-        <p className="text-[11px] text-muted-foreground/90">描述</p>
-      </div>
-    </div>
-    <ChevronRight className="h-4 w-4" />
-  </div>
-  {/* 下半部分：预览区（可选） */}
-  <div className="mt-1 pt-3 border-t border-dashed border-border/80">{snapshot}</div>
-</div>
-```
-
-### 6.5 TextInputArea
+### 6.4 TextInputArea
 
 来源：`src/components/TextInputArea.tsx`
 
@@ -426,7 +384,7 @@ className="hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
 - 底部工具栏：`h-10 bg-muted/30 border-t border-border/50`
 - 字体：`font-mono text-sm`
 
-### 6.6 Dialog
+### 6.5 Dialog
 
 来源：`src/components/ui/dialog.tsx`
 
@@ -445,7 +403,7 @@ className="hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
 </DialogContent>
 ```
 
-### 6.7 Select
+### 6.6 Select
 
 来源：`src/components/ui/select.tsx`
 
@@ -460,7 +418,7 @@ className="hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
 </Select>
 ```
 
-### 6.8 Checkbox
+### 6.7 Checkbox
 
 来源：`src/components/ui/checkbox.tsx`
 
@@ -472,7 +430,7 @@ className="hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
 <Checkbox className="h-3.5 w-3.5 rounded border-input data-[state=checked]:bg-primary shadow-sm" />
 ```
 
-### 6.9 Badge
+### 6.8 Badge
 
 来源：`src/components/ui/badge.tsx`
 
@@ -483,7 +441,7 @@ className="hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
 | `destructive` | 错误标签           |
 | `outline`     | 可点击标签、筛选器 |
 
-### 6.10 CopyButton
+### 6.9 CopyButton
 
 来源：`src/components/CopyButton.tsx`
 
@@ -535,7 +493,7 @@ focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-vi
 hover:bg-accent hover:text-accent-foreground
 
 // 卡片悬停
-hover:bg-muted/30 hover:border-[rgba(var(--tool-color),0.45)]
+hover:bg-muted/30
 
 // 链接/文字悬停
 hover:text-foreground hover:underline
@@ -585,83 +543,36 @@ document.documentElement.classList.toggle('dark', resolvedMode === 'dark');
 ### 8.2 暗色模式下的特殊处理
 
 ```tsx
-// 彩色阴影增强（暗色模式下阴影需要更高透明度）
-shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
-dark:shadow-[0_8px_30px_-10px_rgba(var(--tool-color),0.25)]
-
-// 图标容器背景增强
-bg-[rgba(var(--tool-color),0.08)]
-dark:bg-[rgba(var(--tool-color),0.12)]
-
 // 成功状态文字调整
 text-emerald-600 dark:text-emerald-400
 ```
 
 ### 8.3 暗色模式色彩映射原则
 
-| 亮色             | 暗色             | 说明                            |
-| ---------------- | ---------------- | ------------------------------- |
-| 纯白背景         | 深蓝黑背景       | 避免纯黑 `#000`，使用 `#020617` |
-| 浅灰背景         | 深灰背景         | 保持层次关系                    |
-| 深文字           | 浅文字           | 反转对比度                      |
-| 彩色阴影低透明度 | 彩色阴影高透明度 | 暗色需要更强视觉反馈            |
+| 亮色     | 暗色       | 说明                            |
+| -------- | ---------- | ------------------------------- |
+| 纯白背景 | 深蓝黑背景 | 避免纯黑 `#000`，使用 `#020617` |
+| 浅灰背景 | 深灰背景   | 保持层次关系                    |
+| 深文字   | 浅文字     | 反转对比度                      |
 
 ---
 
 ## 9. 工具色彩标识
 
-### 9.1 色板定义
+> **已废弃**：Dashboard 移除后，原先基于 `PALETTE_COLORS` + `--tool-color` CSS 变量的工具主题色机制（图标着色、彩色阴影、悬停边框等）已从代码中删除。`src/config/featureMeta.ts` 中的 `themeColorKey` 字段仅作为元数据保留，当前无任何 UI 消费；新增工具无需实现色彩标识。
 
-每个工具分配一个主题色，定义于 `src/config/features.tsx`：
+### 9.1 themeColorKey 元数据分配（仅供历史参考）
 
-```ts
-const PALETTE_COLORS: Record<PaletteColorKey, string> = {
-  primary: '13, 148, 136', // teal (#0d9488)
-  success: '22, 163, 74', // green (#16a34a)
-  warning: '217, 119, 6', // amber (#d97706)
-  error: '220, 38, 38', // red (#dc2626)
-  secondary: '147, 51, 232', // purple (#9333e8)
-  info: '37, 99, 235', // blue (#2563eb)
-};
-```
-
-### 9.2 工具色彩分配
-
-| 工具        | 色彩键      | 色值   |
-| ----------- | ----------- | ------ |
-| 时间戳转换  | `primary`   | Teal   |
-| 存储清理    | `warning`   | Amber  |
-| 二维码工具  | `success`   | Green  |
-| 文本统计    | `secondary` | Purple |
-| JWT 解析    | `info`      | Blue   |
-| JSON 对比   | `primary`   | Teal   |
-| Base64 转换 | `info`      | Blue   |
-| 右键还原    | `success`   | Green  |
-
-### 9.3 工具色彩使用规范
-
-```tsx
-// 1. 通过 style 注入 CSS 变量
-<div style={{ ['--tool-color' as string]: rgbValues }}>
-
-// 2. 图标容器背景（低透明度）
-bg-[rgba(var(--tool-color),0.08)]
-dark:bg-[rgba(var(--tool-color),0.12)]
-
-// 3. 图标颜色
- text-[rgb(var(--tool-color))]
-
-// 4. 悬停边框
-hover:border-[rgba(var(--tool-color),0.45)]
-
-// 5. 悬停阴影
-hover:shadow-[0_8px_24px_-8px_rgba(var(--tool-color),0.14)]
-
-// 6. 箭头悬停色
-group-hover:text-[rgb(var(--tool-color))]
-```
-
-**注意**：工具色彩仅用于**标识和装饰**，不得用于功能性色彩（如成功/错误状态）。
+| 工具        | themeColorKey |
+| ----------- | ------------- |
+| 时间戳转换  | `primary`     |
+| 存储清理    | `warning`     |
+| 二维码工具  | `success`     |
+| 文本统计    | `secondary`   |
+| JWT 解析    | `info`        |
+| JSON 工具   | `primary`     |
+| Base64 转换 | `info`        |
+| 右键恢复    | `success`     |
 
 ---
 
@@ -698,7 +609,6 @@ className={cn(
 - [ ] 边框使用 `border-border` 及其透明度变体
 - [ ] 文字层级使用 `foreground` → `muted-foreground` → `muted-foreground/60`
 - [ ] 错误状态使用 `destructive` 系列
-- [ ] 工具色彩仅用于装饰性元素
 
 ### 10.3 组件文件组织
 
@@ -784,7 +694,7 @@ export default function Index() {
 // ❌ 修改 shadcn/ui 基础组件样式
 // 如需修改，通过 className 覆盖或创建包装组件
 
-// ❌ 内联样式用于颜色（工具色彩除外）
+// ❌ 内联样式用于颜色
 <div style={{ backgroundColor: '#f1f5f9' }}>
 
 // ❌ 混合使用不同圆角体系
@@ -847,14 +757,15 @@ focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-vi
 
 ### 12.2 相关文件
 
-| 文件                                  | 说明                    |
-| ------------------------------------- | ----------------------- |
-| `src/index.css`                       | CSS 变量定义、全局样式  |
-| `tailwind.config.js`                  | Tailwind 配置、色彩映射 |
-| `src/lib/utils.ts`                    | `cn()` 工具函数         |
-| `src/components/ui/*.tsx`             | shadcn/ui 基础组件      |
-| `src/config/features.tsx`             | 工具配置、色彩分配      |
-| `src/providers/ThemeModeProvider.tsx` | 主题模式管理            |
+| 文件                                                            | 说明                                                 |
+| --------------------------------------------------------------- | ---------------------------------------------------- |
+| `src/styles/shell.css`                                          | CSS 变量定义、壳层全局样式                           |
+| `src/styles/pages.css`                                          | 功能页面样式                                         |
+| `tailwind.shell.config.js` / `tailwind.pages.config.js`         | Tailwind 拆分配置（`tailwind.shared.js` 存放共享项） |
+| `src/lib/utils.ts`                                              | `cn()` 工具函数                                      |
+| `src/components/ui/*.tsx`                                       | shadcn/ui 基础组件                                   |
+| `src/config/featureMeta.ts`（经 `src/config/features.ts` 导出） | 功能元数据定义                                       |
+| `src/providers/ThemeModeProvider.tsx`                           | 主题模式管理                                         |
 
 ### 12.3 参考资源
 

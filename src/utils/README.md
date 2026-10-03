@@ -10,7 +10,6 @@
 | `syncSnapshot.ts`        | 通用 `localStorage` 快照读取（`snapshot/{key}`），用于 Router 与 `useStorageState` 首屏防闪烁       |
 | `themeSnapshot.ts`       | 主题专用快照读写与 `document.documentElement` class 切换                                            |
 | `restrictedUrls.ts`      | 受限 URL 检测（`chrome://`、`about:` 等），供 Storage Cleaner 等模块复用                            |
-| `chromeTabs.ts`          | Chrome Tabs API 封装：获取活动标签页、获取域名、在新标签页打开扩展页面                              |
 | `clipboard.ts`           | 剪贴板操作：`copyTextToClipboard`（文本）、`copyImageToClipboard`（图片）                           |
 | `messages.ts`            | 扩展消息通信：基于 `@webext-core/messaging`，定义 `MessageAction` 枚举和 `ProtocolMap` 类型安全映射 |
 | `contextMenu.ts`         | 右键菜单配置与操作：定义菜单项、创建菜单、解析点击事件、ID→PageType 映射                            |
@@ -19,8 +18,10 @@
 | `jsonFormatter.ts`       | JSON 格式化/压缩：支持缩进、按键排序、minify                                                        |
 | `jsonToYaml.ts`          | JSON→YAML 转换                                                                                      |
 | `jsonToToml.ts`          | JSON→TOML 转换                                                                                      |
+| `diffEngine.ts`          | JSON 差异比较：`diffJson` 深比较两段 JSON 并输出差异结果（供 JSON 工具的差异对比）                  |
 | `qrCodeParser.ts`        | 二维码解析：基于 `qr-scanner` 库从文件中解析二维码                                                  |
 | `storageCleaner.ts`      | 存储清理：获取当前标签页、计算 Cookie/Storage 大小、清理操作                                        |
+| `indexedDbCleaner.ts`    | IndexedDB 清理：枚举并删除数据库/清空 store，带超时与竞态保护（方案见 docs/spec/storage-cleaner/）  |
 | `textStatistics.ts`      | 文本统计：使用 `Intl.Segmenter` 计算字符数/单词数/行数/字节大小                                     |
 | `format.ts`              | 通用格式化：`formatBytes` 将字节转为可读字符串（B/KB/MB/GB/TB）                                     |
 | `dayjs.ts`               | Day.js 初始化：扩展 UTC、Timezone、RelativeTime 插件，加载中文本地化                                |
@@ -32,7 +33,6 @@
 | ----------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `useStorageState.ts`    | Chrome Storage 状态 Hook：类似 `useState`，值自动同步到 `chrome.storage`，使用 `localStorage` 快照消除首屏闪烁 |
 | `useContextMenuData.ts` | 右键菜单数据 Hook：从 storage 读取待处理数据，匹配 featureKey 后消费并触发回调                                 |
-| `useDebounce.ts`        | 防抖 Hook：对值进行延迟更新，避免频繁触发                                                                      |
 
 ### useStorageState 初始化防覆盖
 
