@@ -9,8 +9,7 @@ export type PageType =
   | 'jwt' // JWT 解析工具
   | 'jsonTools' // JSON 工具
   | 'base64Converter' // Base64 转换器工具
-  | 'rightClickRestorer' // 右键菜单恢复工具
-  | 'testDataGenerator'; // 测试数据生成器工具
+  | 'rightClickRestorer'; // 右键菜单恢复工具
 
 /**
  * JSON 工具页面子模式类型定义

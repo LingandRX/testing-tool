@@ -36,10 +36,6 @@ vi.mock('@/pages/RightClickRestorer', () => {
   pageLoadTracker.loaded.push('RightClickRestorer');
   return { default: () => null };
 });
-vi.mock('@/pages/TestDataGenerator', () => {
-  pageLoadTracker.loaded.push('TestDataGenerator');
-  return { default: () => null };
-});
 
 describe('features 懒加载', () => {
   beforeEach(() => {
@@ -59,7 +55,7 @@ describe('features 懒加载', () => {
   it('访问 FEATURES 元数据时不应加载任何页面模块', async () => {
     const { FEATURES } = await import('@/config/features');
 
-    expect(FEATURES).toHaveLength(9);
+    expect(FEATURES).toHaveLength(8);
     expect(pageLoadTracker.loaded).toEqual([]);
   });
 
@@ -78,6 +74,5 @@ describe('features 懒加载', () => {
 
     expect(pageLoadTracker.loaded).toEqual(['Jwt']);
     expect(pageLoadTracker.loaded).not.toContain('QrCode');
-    expect(pageLoadTracker.loaded).not.toContain('TestDataGenerator');
   });
 });

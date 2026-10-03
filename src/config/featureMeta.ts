@@ -10,7 +10,6 @@ import {
   GitCompareArrows,
   ArrowLeftRight,
   MousePointerClick,
-  FileSpreadsheet,
 } from 'lucide-react';
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
@@ -101,15 +100,6 @@ export const FEATURES: FeatureConfig[] = [
     icon: MousePointerClick,
     defaultVisible: true,
     popupHeight: 420,
-  },
-  {
-    key: 'testDataGenerator',
-    label: '测试数据生成器',
-    description: '自定义规则批量生成测试数据',
-    themeColorKey: 'warning',
-    icon: FileSpreadsheet,
-    defaultVisible: true,
-    popupHeight: 600,
   },
 ];
 

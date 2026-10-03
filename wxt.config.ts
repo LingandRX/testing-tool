@@ -23,7 +23,7 @@ function manualChunksForHtmlOnly(): Plugin {
             return 'vendor-react';
           }
 
-          // qrious / qr-scanner / @dnd-kit 不单独拆 vendor chunk：
+          // qrious / qr-scanner 不单独拆 vendor chunk：
           // 独立 vendor 会与 Vite preload 辅助函数共 chunk，被 App Shell 静态拉取。
           // 这些依赖随各自页面 async chunk 加载即可。
 

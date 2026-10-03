@@ -10,8 +10,8 @@ import {
 
 describe('features', () => {
   describe('FEATURES', () => {
-    it('应该有9个功能定义', () => {
-      expect(FEATURES).toHaveLength(9);
+    it('应该有8个功能定义', () => {
+      expect(FEATURES).toHaveLength(8);
     });
 
     it('应该有每个功能的所有必需属性', () => {
@@ -80,7 +80,7 @@ describe('features', () => {
   describe('getAllFeatureKeys', () => {
     it('应该返回所有功能key', () => {
       const allKeys = getAllFeatureKeys();
-      expect(allKeys).toHaveLength(9);
+      expect(allKeys).toHaveLength(8);
       expect(allKeys).toContain('timestamp');
       expect(allKeys).toContain('storageCleaner');
       expect(allKeys).toContain('qrCode');
@@ -89,14 +89,13 @@ describe('features', () => {
       expect(allKeys).toContain('jsonTools');
       expect(allKeys).toContain('base64Converter');
       expect(allKeys).toContain('rightClickRestorer');
-      expect(allKeys).toContain('testDataGenerator');
     });
   });
 
   describe('getDefaultPageOrder', () => {
     it('应该包含所有工具页面', () => {
       const pageOrder = getDefaultPageOrder();
-      expect(pageOrder).toHaveLength(9);
+      expect(pageOrder).toHaveLength(8);
     });
 
     it('应该包含时间戳、存储清理、二维码在页面顺序', () => {

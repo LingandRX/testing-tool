@@ -32,8 +32,6 @@ export function loadPage(key: PageType): Promise<PageModule> {
         return import('@/config/pageLoaders/base64Converter').then((m) => m.default());
       case 'rightClickRestorer':
         return import('@/config/pageLoaders/rightClickRestorer').then((m) => m.default());
-      case 'testDataGenerator':
-        return import('@/config/pageLoaders/testDataGenerator').then((m) => m.default());
       default: {
         const _exhaustive: never = key;
         return Promise.reject(new Error(`Unknown page: ${String(_exhaustive)}`));

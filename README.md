@@ -63,17 +63,6 @@
 - **文件转换**: 支持文件与 Base64 字符串互转.
 - **图像预览**: 支持图片 Base64 编码与实时预览.
 
-### 测试数据生成器
-
-- **可视化字段配置**: 通过 UI 界面定义数据字段，支持拖拽排序、最多 40 个字段.
-- **丰富的内置生成器**: 涵盖个人信息（姓名、手机、邮箱）、企业数据（公司名、职位）、技术数据（IP、MAC 地址、UUID）、基础类型（数字、日期、枚举）等多个分类.
-- **灵活的参数配置**: 每个生成器支持自定义参数（如数字范围、日期格式、枚举值列表等）.
-- **空值率与唯一性**: 可为非必填字段设置空值率，支持字段唯一性约束.
-- **规则管理**: 保存、加载、编辑、复制、导入/导出字段配置规则，方便复用.
-- **批量生成**: 支持 1 ~ 100,000 条数据生成，通过 Web Worker 异步处理避免阻塞 UI.
-- **实时预览**: 配置字段后即时预览示例数据结构.
-- **多格式导出**: 支持 JSON 和 CSV 格式，提供复制到剪贴板和下载文件两种导出方式.
-
 ## 技术栈
 
 - **框架**: [WXT (Web Extension Toolkit)](https://wxt.dev/)
@@ -86,8 +75,6 @@
 - **存储**: Chrome Storage API (类型安全封装)
 - **解析引擎**: qr-scanner (二维码解析), qrious (二维码生成)
 - **测试**: Vitest + Testing Library
-- **拖拽排序**: @dnd-kit/core + @dnd-kit/sortable
-- **异步生成**: Web Worker (批量数据生成)
 
 ## 项目结构
 
@@ -102,12 +89,11 @@
 │   │   ├── background.ts  # 后台 Service Worker
 │   │   └── content.ts     # 网页注入脚本
 │   ├── pages/             # 各功能模块的页面组件
-│   ├── workers/           # Web Worker (数据生成等耗时任务)
 │   ├── providers/         # 全局状态提供者 (Router, Theme 等)
 │   ├── hooks/             # 自定义 React Hooks
 │   ├── utils/             # 工具函数与服务抽象
 │   ├── types/             # TypeScript 类型声明
-│   └── lib/               # 通用工具函数与生成器库 (cn, utils, generators 等)
+│   └── lib/               # 通用工具函数 (cn, utils 等)
 ├── public/                # 静态资源 (图标等)
 ├── wxt.config.ts          # WXT 框架核心配置
 └── package.json           # 项目元数据与依赖管理
