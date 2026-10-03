@@ -27,17 +27,19 @@ export default function Index() {
         className="w-full shrink-0 sm:w-auto"
       />
 
-      {pageMode === 'diff' ? (
-        <DiffWorkspace tools={tools} />
-      ) : pageMode === 'format' ? (
-        <JsonFormatSection tools={tools} />
-      ) : pageMode === 'yaml' ? (
-        <JsonConvertSection tools={tools} mode="yaml" convertFunction={yamlConvert} />
-      ) : pageMode === 'toml' ? (
-        <JsonConvertSection tools={tools} mode="toml" convertFunction={tomlConvert} />
-      ) : (
-        <JsonConvertSection tools={tools} mode="minify" convertFunction={minifyConvert} />
-      )}
+      <div key={pageMode} className="flex-1 flex flex-col min-h-0 page-transition-enter">
+        {pageMode === 'diff' ? (
+          <DiffWorkspace tools={tools} />
+        ) : pageMode === 'format' ? (
+          <JsonFormatSection tools={tools} />
+        ) : pageMode === 'yaml' ? (
+          <JsonConvertSection tools={tools} mode="yaml" convertFunction={yamlConvert} />
+        ) : pageMode === 'toml' ? (
+          <JsonConvertSection tools={tools} mode="toml" convertFunction={tomlConvert} />
+        ) : (
+          <JsonConvertSection tools={tools} mode="minify" convertFunction={minifyConvert} />
+        )}
+      </div>
     </div>
   );
 }

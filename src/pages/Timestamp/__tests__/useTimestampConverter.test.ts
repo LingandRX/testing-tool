@@ -44,4 +44,61 @@ describe('useTimestampConverter Hook', () => {
 
     expect(result.current.error).toBe('无效的日期格式');
   });
+
+  it('在 ts2dt 模式下从 ms 切换到 s 时，如果是 13 位毫秒应自动换算为 10 位秒，不报错', () => {
+    const { result } = renderHook(() => useTimestampConverter());
+
+    act(() => {
+      result.current.setInput('1700000000000');
+      result.current.setUnit('ms');
+    });
+
+    expect(result.current.error).toBe('');
+    expect(result.current.result).not.toBe('');
+
+    // 切换到秒
+    act(() => {
+      result.current.setUnit('s');
+    });
+
+    expect(result.current.unit).toBe('s');
+    expect(result.current.input).toBe('1700000000');
+    expect(result.current.error).toBe('');
+  });
+
+  it('在 ts2dt 模式下用户手动输入 10 位秒级时间戳但单位误选为 ms 时，切换到 s 保持原数值并正确解析', () => {
+    const { result } = renderHook(() => useTimestampConverter());
+
+    act(() => {
+      // 用户误在 ms 下输入了 10 位时间戳
+      result.current.setInput('1700000000');
+    });
+
+    // 切换到秒纠正单位
+    act(() => {
+      result.current.setUnit('s');
+    });
+
+    // 保持 1700000000 不变，而不是除以 1000
+    expect(result.current.input).toBe('1700000000');
+    expect(result.current.error).toBe('');
+    expect(result.current.result).toContain('2023');
+  });
+
+  it('在 ts2dt 模式下从 s 切换到 ms 时，如果是 10 位秒应自动换算为 13 位毫秒', () => {
+    const { result } = renderHook(() => useTimestampConverter());
+
+    act(() => {
+      result.current.setUnit('s');
+      result.current.setInput('1700000000');
+    });
+
+    // 切换回毫秒
+    act(() => {
+      result.current.setUnit('ms');
+    });
+
+    expect(result.current.input).toBe('1700000000000');
+    expect(result.current.error).toBe('');
+  });
 });

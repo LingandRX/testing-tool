@@ -6,7 +6,15 @@ import globals from 'globals';
 
 export default tseslint.config(
   {
-    ignores: ['dist', '.output', '.wxt', 'node_modules', 'eslint.config.ts', 'eslint.config.js'],
+    ignores: [
+      'dist',
+      '.output',
+      '.wxt',
+      'node_modules',
+      'eslint.config.ts',
+      'eslint.config.js',
+      '.kilo',
+    ],
   },
 
   js.configs.recommended,

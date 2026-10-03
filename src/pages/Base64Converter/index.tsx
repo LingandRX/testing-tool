@@ -31,7 +31,7 @@ export default function Index() {
         className="w-full sm:w-auto"
       />
 
-      <div className="w-full pt-1">
+      <div key={pageMode} className="w-full pt-1 page-transition-enter">
         {pageMode === 'text' && <TextMode onSwitchToImageMode={() => setPageMode('image')} />}
         {pageMode === 'file' && <Base64ConverterSection mode="file" />}
         {pageMode === 'image' && <Base64ConverterSection mode="image" />}

@@ -105,6 +105,29 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
     }
   };
 
+  const handleSetUnit = (newUnit: UnitType) => {
+    if (newUnit === unit) return;
+
+    if (mode === 'ts2dt') {
+      const trimmed = input.trim();
+      if (TIMESTAMP_REGEX.test(trimmed)) {
+        const num = Number(trimmed);
+        if (!isNaN(num)) {
+          // ms -> s: 仅当长度 >= 13 位（毫秒级）时自动换算除以 1000
+          if (unit === 'ms' && newUnit === 's' && trimmed.length >= MS_TIMESTAMP_MIN_LENGTH) {
+            setInput(String(Math.floor(num / 1000)));
+          }
+          // s -> ms: 仅当长度 <= 10 位（秒级）时自动换算乘以 1000
+          else if (unit === 's' && newUnit === 'ms' && trimmed.length <= 10) {
+            setInput(String(num * 1000));
+          }
+        }
+      }
+    }
+
+    setUnit(newUnit);
+  };
+
   return {
     mode,
     input,
@@ -114,7 +137,7 @@ export function useTimestampConverter(): UseTimestampConverterReturn {
     error,
     setMode: handleSetMode,
     setInput,
-    setUnit,
+    setUnit: handleSetUnit,
     setZone,
     handleUseNow,
   };

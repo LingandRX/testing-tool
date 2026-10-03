@@ -15,6 +15,10 @@ import {
 
 export type PaletteColorKey = 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info';
 
+export const MIN_POPUP_HEIGHT = 400;
+export const MAX_POPUP_HEIGHT = 600;
+export const DEFAULT_POPUP_HEIGHT = 600;
+
 export interface FeatureConfig {
   key: PageType;
   label: string;
@@ -22,6 +26,7 @@ export interface FeatureConfig {
   themeColorKey?: PaletteColorKey;
   icon?: ComponentType<LucideProps>;
   defaultVisible: boolean;
+  popupHeight?: number;
 }
 
 export const FEATURES: FeatureConfig[] = [
@@ -32,6 +37,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'primary',
     icon: Clock,
     defaultVisible: true,
+    popupHeight: 480,
   },
   {
     key: 'storageCleaner',
@@ -40,6 +46,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'warning',
     icon: Database,
     defaultVisible: true,
+    popupHeight: 500,
   },
   {
     key: 'qrCode',
@@ -48,6 +55,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'success',
     icon: QrCode,
     defaultVisible: true,
+    popupHeight: 520,
   },
   {
     key: 'textStatistics',
@@ -56,6 +64,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'secondary',
     icon: FileText,
     defaultVisible: true,
+    popupHeight: 520,
   },
   {
     key: 'jwt',
@@ -64,6 +73,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'info',
     icon: Key,
     defaultVisible: true,
+    popupHeight: 560,
   },
   {
     key: 'jsonTools',
@@ -72,6 +82,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'primary',
     icon: GitCompareArrows,
     defaultVisible: true,
+    popupHeight: 600,
   },
   {
     key: 'base64Converter',
@@ -80,6 +91,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'info',
     icon: ArrowLeftRight,
     defaultVisible: true,
+    popupHeight: 560,
   },
   {
     key: 'rightClickRestorer',
@@ -88,6 +100,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'success',
     icon: MousePointerClick,
     defaultVisible: true,
+    popupHeight: 420,
   },
   {
     key: 'testDataGenerator',
@@ -96,6 +109,7 @@ export const FEATURES: FeatureConfig[] = [
     themeColorKey: 'warning',
     icon: FileSpreadsheet,
     defaultVisible: true,
+    popupHeight: 600,
   },
 ];
 
@@ -113,4 +127,10 @@ export function getAllFeatureKeys(): PageType[] {
 
 export function getDefaultPageOrder(): PageType[] {
   return FEATURES.map((f) => f.key);
+}
+
+export function getPopupHeight(key: PageType): number {
+  const feature = getFeatureByKey(key);
+  const height = feature?.popupHeight ?? DEFAULT_POPUP_HEIGHT;
+  return Math.min(Math.max(height, MIN_POPUP_HEIGHT), MAX_POPUP_HEIGHT);
 }

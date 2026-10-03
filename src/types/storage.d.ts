@@ -28,39 +28,6 @@ export type Base64ConverterPageMode = 'text' | 'file' | 'image';
 export type Base64ConvertDirection = 'encode' | 'decode';
 
 /**
- * 表单映射条目定义
- */
-export interface FormMapEntry {
-  /** 条目唯一 ID */
-  id: string;
-  /** 在 UI 中显示的名称 */
-  label_display: string;
-  /** 字段特征，用于在页面中定位字段 */
-  fingerprint: {
-    /** CSS 选择器 */
-    selector: string;
-    /** name 属性 */
-    name_attr: string;
-    /** 占位符文本 */
-    placeholder: string;
-  };
-  /** 填充逻辑配置 */
-  action_logic: {
-    /** 字段类型 */
-    type: 'text' | 'select' | 'checkbox';
-    /** 填充策略：固定值、随机值或序列值 */
-    strategy: 'fixed' | 'random' | 'sequence';
-    /** 填充的具体值或配置 */
-    value: string;
-  };
-  /** UI 状态 */
-  ui_state: {
-    /** 是否被选中 */
-    is_selected: boolean;
-  };
-}
-
-/**
  * Chrome Storage 存储模式定义
  * 定义了所有持久化在客户端的数据结构
  */
@@ -101,8 +68,6 @@ export interface StorageSchema {
   'base64Converter/fileMode/direction': Base64ConvertDirection;
   /** Base64 转换器「图像」子模式当前方向 */
   'base64Converter/imageMode/direction': Base64ConvertDirection;
-  /** 语言偏好设置 */
-  'app/language': string;
   /** 右键菜单待处理数据 */
   'contextMenu/pendingData': ContextMenuPendingData;
   /** 最近使用的工具列表（最多保留 3 个） */
@@ -122,21 +87,13 @@ export interface ContextMenuPendingData {
 }
 
 /**
- * 字段类型偏好定义
- * 结构：{ [域名]: { [字段标识符]: 类型名称 } }
- */
-export interface FieldTypePreferences {
-  [domain: string]: {
-    [fieldIdentifier: string]: string;
-  };
-}
-
-/**
  * 存储清理工具偏好设置
  */
 export interface StorageCleanerPreferences {
   /** 是否在清理后自动刷新页面 */
   reloadAfterClean: boolean;
+  /** 是否跳过二次确认直接清理 */
+  skipConfirm?: boolean;
   /** 默认勾选的清理类型 */
   selectedTypes: StorageCleanerOptions;
 }

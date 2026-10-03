@@ -15,6 +15,23 @@
             mode === 'dark' ||
             (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
           if (isDark) document.documentElement.classList.add('dark');
+
+          var routeRaw = localStorage.getItem('snapshot/app/popupRoute');
+          var route = routeRaw ? JSON.parse(routeRaw) : 'timestamp';
+          var heightMap = {
+            timestamp: 480,
+            storageCleaner: 500,
+            qrCode: 520,
+            textStatistics: 520,
+            jwt: 560,
+            jsonTools: 600,
+            base64Converter: 560,
+            rightClickRestorer: 420,
+            testDataGenerator: 600,
+          };
+          var targetHeight = heightMap[route] || 600;
+          document.documentElement.style.height = targetHeight + 'px';
+          document.body.style.height = targetHeight + 'px';
         } catch (_error) {}
       })();
     </script>
@@ -22,7 +39,8 @@
       /* Force initial popup size before React hydration */
       html, body {
         width: 450px;
-        height: 600px;
+        min-height: 400px;
+        max-height: 600px;
         margin: 0;
         padding: 0;
         overflow: hidden;
@@ -31,7 +49,7 @@
       /* Ensure full size for the root container */
       #root {
         width: 100%;
-        height: 100%;
+        height: auto;
       }
     </style>
   </head>

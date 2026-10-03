@@ -7,21 +7,41 @@ import PageErrorBoundary from '@/components/PageErrorBoundary';
 import { cn } from '@/lib/utils';
 import { AlertTriangle } from 'lucide-react';
 
+const pageComponentCache = new Map<PageType, ComponentType>();
+
+/**
+ * 预加载指定页面组件，提升切换页面时的流畅度
+ */
+export function preloadPage(key: PageType): void {
+  if (!pageComponentCache.has(key)) {
+    loadPage(key)
+      .then((mod) => {
+        pageComponentCache.set(key, mod.default);
+      })
+      .catch(() => {});
+  }
+}
+
 function LoadedPage({ pageKey }: { pageKey: PageType }) {
-  const [Page, setPage] = useState<ComponentType | null>(null);
+  const cached = pageComponentCache.get(pageKey) ?? null;
+  const [Page, setPage] = useState<ComponentType | null>(() => cached);
+  const [wasCached] = useState<boolean>(() => Boolean(cached));
 
   useEffect(() => {
     let cancelled = false;
 
-    loadPage(pageKey)
-      .then((mod) => {
-        if (!cancelled) {
-          setPage(() => mod.default);
-        }
-      })
-      .catch((err) => {
-        console.error('[Router Page Load Error]', err);
-      });
+    if (!pageComponentCache.has(pageKey)) {
+      loadPage(pageKey)
+        .then((mod) => {
+          pageComponentCache.set(pageKey, mod.default);
+          if (!cancelled) {
+            setPage(() => mod.default);
+          }
+        })
+        .catch((err) => {
+          console.error('[Router Page Load Error]', err);
+        });
+    }
 
     return () => {
       cancelled = true;
@@ -30,6 +50,14 @@ function LoadedPage({ pageKey }: { pageKey: PageType }) {
 
   if (!Page) {
     return <div className="flex-1" aria-hidden="true" />;
+  }
+
+  if (!wasCached) {
+    return (
+      <div className="flex-1 flex flex-col min-w-0 page-transition-enter">
+        <Page />
+      </div>
+    );
   }
 
   return <Page />;

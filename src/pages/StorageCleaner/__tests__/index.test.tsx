@@ -2,7 +2,12 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { browser } from 'wxt/browser';
 import Index from '../index';
-import { clearStorage, getCookieSize, getCurrentTab } from '@/utils/storageCleaner';
+import {
+  clearStorage,
+  getCookieSize,
+  getCurrentTab,
+  getLocalStorageSize,
+} from '@/utils/storageCleaner';
 import { toast } from 'sonner';
 
 vi.mock('@/utils/chromeStorage', () => ({
@@ -41,7 +46,7 @@ describe('StorageCleaner 页面', () => {
 
   it('应该渲染初始化加载状态', () => {
     render(<Index />);
-    expect(screen.getByText(/正在读取数据/)).toBeInTheDocument();
+    expect(screen.getByTestId('storage-cleaner-skeleton')).toBeInTheDocument();
   });
 
   it('读取当前标签页失败时应显示错误提示', async () => {
@@ -154,6 +159,44 @@ describe('StorageCleaner 页面', () => {
     await waitFor(() => {
       expect(clearStorage).not.toHaveBeenCalled();
       expect(toast.warning).toHaveBeenCalledWith('当前页面已变更，请等待数据刷新后再清理');
+    });
+  });
+
+  it('开启快捷清理（跳过确认）后点击立即清理应直接执行清理', async () => {
+    render(<Index />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /立即清理/ })).not.toBeDisabled();
+    });
+
+    const skipSwitch = screen.getByLabelText(/快捷清理/);
+    fireEvent.click(skipSwitch);
+
+    const cleanButton = screen.getByRole('button', { name: /立即清理/ });
+    fireEvent.click(cleanButton);
+
+    await waitFor(() => {
+      expect(clearStorage).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('点击单项清理小图标应只清理该指定项', async () => {
+    vi.mocked(getLocalStorageSize).mockResolvedValue(1024);
+
+    render(<Index />);
+
+    const singleCleanBtn = await screen.findByTitle('单独清理 Local Storage');
+    fireEvent.click(singleCleanBtn);
+
+    await waitFor(() => {
+      expect(clearStorage).toHaveBeenCalledWith(1, 'https://example.com', {
+        localStorage: true,
+        sessionStorage: false,
+        indexedDB: false,
+        cookies: false,
+        cacheStorage: false,
+        serviceWorkers: false,
+      });
     });
   });
 });
