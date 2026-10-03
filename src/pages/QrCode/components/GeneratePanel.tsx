@@ -1,4 +1,4 @@
-import { Loader2, Pencil, QrCode } from 'lucide-react';
+import { Pencil, QrCode } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
 import QrCodePreview from './QrCodePreview';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
@@ -56,13 +56,11 @@ export default function GeneratePanel() {
             <Button
               onClick={confirmGenerate}
               disabled={!hasText || generatorState.generating}
+              loading={generatorState.generating}
               className="w-full"
             >
               {generatorState.generating ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  生成中...
-                </>
+                '生成中...'
               ) : (
                 <>
                   <QrCode className="w-4 h-4 mr-2" />

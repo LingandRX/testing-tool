@@ -8,6 +8,7 @@ export default {
     './src/layout/**/*.{js,ts,jsx,tsx}',
     './src/providers/**/*.{js,ts,jsx,tsx}',
     './src/components/RouterContainer.tsx',
+    './src/components/loading/*.tsx',
     './src/components/ErrorBoundary.tsx',
     './src/components/ErrorFallback.tsx',
     './src/components/PageErrorBoundary.tsx',

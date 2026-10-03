@@ -9,6 +9,7 @@ export default {
     './src/components/TextInputArea.tsx',
     './src/components/SwitchButtonGroup.tsx',
     './src/components/EmptyPlaceholder.tsx',
+    './src/components/loading/*.tsx',
     './src/components/ui/*.tsx',
     './src/styles/pages.css',
   ],

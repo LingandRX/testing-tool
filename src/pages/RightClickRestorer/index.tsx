@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import LoadingPlaceholder from '@/components/loading/LoadingPlaceholder';
 import { CARD_CLASS, STATUS_CONFIG } from './constants';
 import { useRightClickRestorer } from './useRightClickRestorer';
 
@@ -9,14 +9,7 @@ export default function Index() {
   const { domain, isLoading, status, unlock } = useRightClickRestorer();
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 min-h-[280px] w-full">
-        <Loader2 className="h-6 w-6 text-muted-foreground/80 animate-spin" />
-        <span className="text-xs text-muted-foreground mt-2 font-medium tracking-wide">
-          正在加载...
-        </span>
-      </div>
-    );
+    return <LoadingPlaceholder className="min-h-[280px] w-full" />;
   }
 
   const config = STATUS_CONFIG[status];

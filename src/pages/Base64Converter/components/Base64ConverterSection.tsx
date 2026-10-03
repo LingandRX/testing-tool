@@ -1,6 +1,7 @@
 import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
 import TextInputArea from '@/components/TextInputArea';
 import { CopyButton } from '@/components/CopyButton';
+import { Spinner } from '@/components/loading/Spinner';
 import DecodeResultPaper from './DecodeResultPaper';
 import { Button } from '@/components/ui/button';
 import { downloadBlob } from '@/utils/base64Converter';
@@ -99,7 +100,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
               }}
             />
             {isLoading ? (
-              <div className="w-9 h-9 border-3 border-primary/20 border-t-primary rounded-full animate-spin" />
+              <Spinner size="lg" className="text-primary" />
             ) : info ? (
               <div className="flex flex-col items-center gap-1.5 text-center w-full">
                 {mode === 'image' && result && (

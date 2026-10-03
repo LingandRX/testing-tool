@@ -3,6 +3,7 @@ import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import TextInputArea from '@/components/TextInputArea';
 import ImageUploader from './ImageUploader';
+import { Spinner } from '@/components/loading/Spinner';
 import { useQrCodeContext } from '../contexts/QrCodeContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -91,7 +92,10 @@ export default function ParsePanel() {
           <div className="flex-1 min-w-0">
             <p className="text-sm text-foreground truncate">{parserState.selectedFile?.name}</p>
             {parserState.parsing && (
-              <p className="text-xs text-primary animate-pulse mt-1">解析中...</p>
+              <p className="text-xs text-primary mt-1 fade-in-150 inline-flex items-center gap-1">
+                <Spinner size="xs" className="text-primary" />
+                解析中...
+              </p>
             )}
           </div>
         </div>

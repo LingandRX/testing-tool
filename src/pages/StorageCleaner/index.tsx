@@ -1,6 +1,5 @@
-import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import PageSkeleton from '@/components/loading/PageSkeleton';
 import StorageCleanerConfirm from './components/StorageCleanerConfirm';
 import { useStorageCleaner } from './useStorageCleaner';
 import StorageOptionsGrid from './components/StorageOptionsGrid';
@@ -44,21 +43,9 @@ export default function Index() {
         data-testid="storage-cleaner-skeleton"
         aria-busy="true"
         aria-label="正在读取数据..."
-        className="p-4 w-full flex flex-col space-y-4 select-none"
+        className="p-4 w-full select-none"
       >
-        <div className="w-full rounded-xl border border-border bg-card p-4 space-y-3 shadow-xs">
-          <div className="flex justify-between items-center pb-2 border-b border-border/50">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-14 rounded-lg w-full" />
-            ))}
-          </div>
-          <Skeleton className="h-9 w-full rounded-lg" />
-          <Skeleton className="h-10 w-full rounded-lg mt-2" />
-        </div>
+        <PageSkeleton />
       </div>
     );
   }
@@ -98,17 +85,11 @@ export default function Index() {
             variant="destructive"
             size="default"
             onClick={triggerClean}
+            loading={loading && !cleaningKey}
             disabled={isButtonDisabled}
             className="w-full h-10 font-bold shadow-sm text-sm tracking-wide transition-all"
           >
-            {loading && !cleaningKey ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                正在清理...
-              </>
-            ) : (
-              '立即清理'
-            )}
+            {loading && !cleaningKey ? '正在清理...' : '立即清理'}
           </Button>
         </div>
       </div>

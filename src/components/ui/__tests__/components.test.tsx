@@ -39,11 +39,48 @@ describe('UI Components Completion', () => {
   });
 
   describe('Skeleton component', () => {
-    it('renders Skeleton div with animate-pulse class', () => {
+    it('renders Skeleton div with shimmer class', () => {
       render(<Skeleton data-testid="skeleton" className="w-20 h-4" />);
       const sk = screen.getByTestId('skeleton');
-      expect(sk.className).toContain('animate-pulse');
+      expect(sk.className).toContain('skeleton-shimmer');
       expect(sk.className).toContain('w-20');
+    });
+  });
+
+  describe('Button loading state', () => {
+    it('loading 时禁用按钮并展示指示器', () => {
+      render(<Button loading>保存</Button>);
+      const btn = screen.getByRole('button', { name: '保存' });
+      expect(btn).toBeDisabled();
+      expect(btn).toHaveAttribute('aria-busy', 'true');
+      expect(btn.querySelector('.animate-spin')).toBeInTheDocument();
+    });
+
+    it('非 loading 时不禁用且无指示器', () => {
+      render(<Button>保存</Button>);
+      const btn = screen.getByRole('button', { name: '保存' });
+      expect(btn).not.toBeDisabled();
+      expect(btn).not.toHaveAttribute('aria-busy');
+      expect(btn.querySelector('.animate-spin')).not.toBeInTheDocument();
+    });
+
+    it('外部 disabled 与 loading 叠加时保持禁用', () => {
+      render(
+        <Button loading disabled={false}>
+          保存
+        </Button>,
+      );
+      expect(screen.getByRole('button', { name: '保存' })).toBeDisabled();
+    });
+
+    it('xs 尺寸按钮使用 xs 指示器', () => {
+      render(
+        <Button size="xs" loading>
+          删除
+        </Button>,
+      );
+      const spinner = screen.getByRole('button', { name: '删除' }).querySelector('.animate-spin');
+      expect(spinner?.classList.contains('h-3.5')).toBe(true);
     });
   });
 

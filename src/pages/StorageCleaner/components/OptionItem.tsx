@@ -5,7 +5,8 @@ import type { StorageSizeInfo } from '../useStorageCleaner';
 import type { StorageCleanerOptions } from '@/types/storage';
 import { CLEAN_OPTION_KEYS, OPTION_LABELS } from '../constants';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Trash2, Loader2 } from 'lucide-react';
+import { Spinner } from '@/components/loading/Spinner';
+import { Trash2 } from 'lucide-react';
 
 interface OptionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   labelKey: (typeof CLEAN_OPTION_KEYS)[number];
@@ -96,7 +97,7 @@ export default function OptionItem({
             )}
           >
             {isCleaningSingle ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Spinner size="xs" className="text-destructive" />
             ) : (
               <Trash2 className="h-3.5 w-3.5" />
             )}
