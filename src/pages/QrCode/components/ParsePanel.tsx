@@ -25,7 +25,6 @@ export default function ParsePanel() {
           const file = items[i].getAsFile();
           if (file) {
             handleFileChange(file);
-            toast.success('图片粘贴成功，正在解析...');
           }
           return;
         }
@@ -39,7 +38,6 @@ export default function ParsePanel() {
           const blob = await response.blob();
           const file = new File([blob], 'pasted-image.png', { type: blob.type });
           handleFileChange(file);
-          toast.success('图片粘贴成功，正在解析...');
         } catch (error) {
           console.error('处理 Base64 图片失败:', error);
           toast.error('粘贴图片失败，请重试');

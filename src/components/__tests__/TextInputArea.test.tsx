@@ -1,7 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import TextInputArea from '@/components/TextInputArea';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+  },
+}));
 
 describe('TextInputArea 组件', () => {
   describe('基础渲染', () => {
@@ -167,6 +176,17 @@ describe('TextInputArea 组件', () => {
       fireEvent.change(textarea, { target: { value: '123' } });
 
       expect(handleChange).toHaveBeenCalledWith('123');
+    });
+
+    it('超出 maxLength 时只显示行内错误、不触发 toast.warning', () => {
+      const handleChange = vi.fn();
+      render(<TextInputArea value="" onChange={handleChange} maxLength={5} />);
+
+      const textarea = screen.getByRole('textbox');
+      fireEvent.change(textarea, { target: { value: '123456' } });
+
+      expect(screen.getByText('内容不能超过 5 个字符')).toBeInTheDocument();
+      expect(toast.warning).not.toHaveBeenCalled();
     });
   });
 

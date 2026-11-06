@@ -302,15 +302,17 @@ export function useStorageCleaner(): UseStorageCleanerReturn {
         const cleaningResult = await clearStorage(tab.id, tab.url, targetOptions);
         setResult(cleaningResult);
 
+        if (cleaningResult.overallSuccess) {
+          toast.success('清理成功');
+        }
         if (reloadAfterClean && cleaningResult.overallSuccess) {
-          toast.success('清理成功，即将刷新页面');
           await reloadTabAndWaitForComplete(tab.id);
           await loadInfo();
         } else {
           await loadInfo();
         }
-      } catch (err) {
-        toast.error(`清理失败: ${String(err)}`);
+      } catch {
+        toast.error('清理失败，请重试');
       } finally {
         setLoading(false);
         setCleaningKey(null);

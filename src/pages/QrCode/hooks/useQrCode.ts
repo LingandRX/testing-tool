@@ -143,7 +143,6 @@ export function useQrCode(): QrCodeContextValue {
 
     if (!text) {
       setGeneratorState((prev) => ({ ...prev, inputError: '请输入内容' }));
-      toast.error('请输入内容');
       return;
     }
 
@@ -158,7 +157,6 @@ export function useQrCode(): QrCodeContextValue {
           generating: false,
           inputError: '生成二维码失败，请重试',
         }));
-        toast.error('生成二维码失败，请重试');
         return;
       }
 
@@ -210,13 +208,11 @@ export function useQrCode(): QrCodeContextValue {
       } else {
         const errorMsg = result.error || '未检测到二维码，请确保图片清晰且包含二维码';
         setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-        toast.error(errorMsg);
       }
     } catch (error) {
       console.error('解析图片二维码失败:', error);
       const errorMsg = error instanceof Error ? error.message : '解析二维码失败，请重试';
       setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-      toast.error(errorMsg);
     } finally {
       setParserState((prev) => ({ ...prev, parsing: false }));
     }
@@ -273,13 +269,11 @@ export function useQrCode(): QrCodeContextValue {
       } else {
         const errorMsg = result.error || '未检测到二维码，请确保图片清晰且包含二维码';
         setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-        toast.error(errorMsg);
       }
     } catch (error) {
       console.error('解析二维码失败:', error);
       const errorMsg = error instanceof Error ? error.message : '解析二维码失败，请重试';
       setParserState((prev) => ({ ...prev, parseError: errorMsg }));
-      toast.error(errorMsg);
     } finally {
       setParserState((prev) => ({ ...prev, parsing: false }));
     }
@@ -292,7 +286,7 @@ export function useQrCode(): QrCodeContextValue {
     link.href = generatorState.qrCodeDataUrl;
     link.download = 'qrcode.png';
     link.click();
-    toast.success('二维码下载成功');
+    toast.success('已开始下载二维码');
   }, [generatorState.qrCodeDataUrl]);
 
   const copyQrCode = useCallback(async () => {
