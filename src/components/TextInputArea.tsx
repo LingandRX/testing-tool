@@ -170,7 +170,6 @@ const TextInputArea = forwardRef<HTMLTextAreaElement, TextInputAreaProps>((props
     if (maxLength && newVal.length > maxLength) {
       const msg = `内容不能超过 ${maxLength} 个字符`;
       setError(msg);
-      toast.warning(msg);
       return;
     }
 

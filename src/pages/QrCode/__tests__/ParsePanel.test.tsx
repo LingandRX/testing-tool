@@ -90,8 +90,8 @@ describe('ParsePanel 组件', () => {
 
       expect(mockHandleFileChange).toHaveBeenCalledTimes(1);
       expect(mockHandleFileChange).toHaveBeenCalledWith(mockFile);
-      expect(toast.success).toHaveBeenCalledTimes(1);
-      expect(toast.success).toHaveBeenCalledWith('图片粘贴成功，正在解析...');
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.success).not.toHaveBeenCalledWith('图片粘贴成功，正在解析...');
     });
 
     it('与 ImageUploader 同时挂载时 document 上只应有一个 paste 监听', () => {
@@ -123,7 +123,7 @@ describe('ParsePanel 组件', () => {
       expect(mockHandleFileChange).toHaveBeenCalledWith(
         expect.objectContaining({ name: 'pasted-image.png', type: 'image/png' }),
       );
-      expect(toast.success).toHaveBeenCalledTimes(1);
+      expect(toast.success).not.toHaveBeenCalled();
     });
 
     it('已上传图片时粘贴仍应只处理一次', async () => {

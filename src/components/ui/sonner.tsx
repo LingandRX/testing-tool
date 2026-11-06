@@ -11,6 +11,7 @@ export function Toaster(props: ToasterProps) {
       theme={resolvedMode}
       className="toaster group"
       position="bottom-center"
+      richColors
       toastOptions={{
         classNames: {
           toast:
