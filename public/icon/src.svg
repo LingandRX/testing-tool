@@ -1,23 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
-  <!-- Master: open toolbox, lid lifted, round Q-cute line art -->
-  <g id="icon-main" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Handle on the lid -->
-    <path d="M50 34V20a6 6 0 0 1 6-6h16a6 6 0 0 1 6 6v14" stroke="#0d9488" stroke-width="7"/>
-    <!-- Trapezoid lid (lifted) -->
-    <path d="M30 34h68l12 22H18Z" stroke="#0f172a" stroke-width="6"/>
-    <!-- Body -->
-    <rect x="18" y="64" width="92" height="46" rx="16" stroke="#0f172a" stroke-width="6"/>
-    <!-- Latch on the front -->
-    <rect x="53" y="72" width="22" height="16" rx="5" fill="#0d9488" stroke="#0f172a" stroke-width="3.5"/>
-    <path d="M59 80h10" stroke="#0f172a" stroke-width="2.8"/>
-    <!-- One screw -->
-    <circle cx="36" cy="92" r="5" fill="#0d9488"/>
-    <path d="M36 89.4v5.2M33.4 92h5.2" stroke="#0f172a" stroke-width="1.8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <g id="icon-main">
+    <rect x="4" y="4" width="120" height="120" rx="26" fill="#f9f4ee"/>
+    <!-- Single organic enso ribbon: thick lower-left → taper, gap upper-right -->
+    <!-- Outer rim of brush stroke (clockwise from near gap) -->
+    <path fill="#7a6657" d="
+      M 88 34
+      C 96 42, 102 52, 102 64
+      C 102 86, 86 102, 64 102
+      C 42 102, 26 86, 26 64
+      C 26 46, 36 32, 52 26
+      C 56 24.5, 58 28.5, 55.5 30.5
+      C 43 37, 36 48, 36 64
+      C 36 80, 48 92, 64 92
+      C 80 92, 92 80, 92 64
+      C 92 54, 87 46, 80 40
+      C 76 37, 78 31, 83 32
+      C 84.5 32.5, 86.2 33.2, 88 34
+      Z"/>
+    <!-- Softer mid wash along inner edge -->
+    <path fill="#8f7d6d" fill-opacity="0.7" d="
+      M 82 42
+      C 88 48, 92 55, 92 64
+      C 92 78, 80 90, 64 90
+      C 50 90, 38 80, 36.5 66
+      C 36.2 62, 40.5 61, 41.5 64.5
+      C 43.5 75, 52 82, 64 82
+      C 76 82, 84 74, 84 64
+      C 84 56, 80 50, 75 46
+      C 72 44, 74 39.5, 78.5 40.5
+      C 79.8 41, 81 41.5, 82 42
+      Z"/>
+    <!-- Dry tip near opening (flying white light) -->
+    <path fill="#9e8d7e" fill-opacity="0.85" d="
+      M 86 35.5
+      C 90 39, 93 44, 94.5 50
+      C 95.2 52.5, 92 53.5, 91 51.2
+      C 89.5 46.5, 86.5 42.5, 82.5 39.5
+      C 80.5 38, 82.5 34.5, 86 35.5
+      Z"/>
+    <!-- Thick start accent lower-left -->
+    <path fill="#7a6657" d="
+      M 34 70
+      C 32 58, 36 46, 46 38
+      C 48.5 36, 50.5 39, 48.5 41
+      C 41 47.5, 37.5 56, 38.5 66
+      C 39 70.5, 35.5 73, 34 70
+      Z"/>
   </g>
-  <!-- 16px simplified: thick strokes, box + handle + latch -->
-  <g id="icon-16" display="none" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="40" y="14" width="48" height="22" rx="10" fill="#0d9488"/>
-    <rect x="16" y="36" width="96" height="76" rx="18" stroke="#0f172a" stroke-width="12"/>
-    <rect x="48" y="64" width="32" height="18" rx="6" fill="#0d9488"/>
+  <g id="icon-16" display="none">
+    <rect x="4" y="4" width="120" height="120" rx="24" fill="#f9f4ee"/>
+    <!-- Wide-gap thick ring for 16px readability -->
+    <path fill="#6f5c4e" d="
+      M 86 30
+      C 100 40, 108 52, 108 66
+      C 108 92, 88 112, 62 112
+      C 36 112, 16 92, 16 66
+      C 16 44, 28 26, 48 18
+      C 52 16.5, 54.5 21, 51.5 23.5
+      C 36 32, 28 46, 28 66
+      C 28 84, 42 98, 62 98
+      C 82 98, 96 84, 96 66
+      C 96 56, 91 46, 82 38
+      C 78 34.5, 81 28.5, 86 30
+      Z"/>
   </g>
 </svg>
