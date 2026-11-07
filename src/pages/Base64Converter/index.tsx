@@ -18,7 +18,7 @@ export default function Index() {
   );
 
   return (
-    <div className="p-4 w-full flex flex-col space-y-4 min-h-[520px] select-none">
+    <div className="flex h-full min-h-0 w-full max-w-[420px] flex-1 flex-col gap-2 overflow-hidden p-3 select-none">
       <SwitchButtonGroup
         value={pageMode}
         options={[
@@ -28,10 +28,10 @@ export default function Index() {
         ]}
         onChange={(value: PageMode) => setPageMode(value)}
         size="small"
-        className="w-full sm:w-auto"
+        className="w-full shrink-0"
       />
 
-      <div key={pageMode} className="w-full pt-1 page-transition-enter">
+      <div key={pageMode} className="flex min-h-0 w-full flex-1 flex-col page-transition-enter">
         {pageMode === 'text' && <TextMode onSwitchToImageMode={() => setPageMode('image')} />}
         {pageMode === 'file' && <Base64ConverterSection mode="file" />}
         {pageMode === 'image' && <Base64ConverterSection mode="image" />}

@@ -23,68 +23,76 @@ export default function TextMode({ onSwitchToImageMode }: TextModeProps) {
   } = useTextMode();
 
   return (
-    <div className="w-full flex flex-col space-y-4 px-2">
-      <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
-        <SwitchButtonGroup
-          value={direction}
-          options={[
-            { value: 'encode', label: '编码' },
-            { value: 'decode', label: '解码' },
-          ]}
-          onChange={handleDirectionChange}
-          size="small"
-        />
-      </div>
-
-      <TextInputArea
-        placeholder={placeholder}
-        value={input}
-        onChange={setInput}
-        externalError={error || undefined}
-        showClear={true}
-        allowCopy={true}
-        minRows={5}
-        maxRows={10}
-        onClear={handleClear}
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col gap-1">
+      <SwitchButtonGroup
+        value={direction}
+        options={[
+          { value: 'encode', label: '编码' },
+          { value: 'decode', label: '解码' },
+        ]}
+        onChange={handleDirectionChange}
+        size="small"
+        className="w-full shrink-0"
       />
 
-      {showImageHint && (
-        <div className="flex items-center justify-between p-3.5 rounded-xl bg-primary/10 border border-primary/20">
-          <span className="text-xs font-semibold text-primary tracking-tight">
-            检测到图片的 data URI，请使用「图像」选项卡进行解码。
-          </span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onSwitchToImageMode}
-            className="h-7 rounded-md text-xs font-bold text-primary hover:text-primary hover:bg-primary/20 dark:hover:bg-primary/10 px-2.5"
-          >
-            切换到图像模式
-          </Button>
-        </div>
-      )}
+      <div className="flex min-h-0 flex-1 flex-col gap-2">
+        <TextInputArea
+          placeholder={placeholder}
+          value={input}
+          onChange={setInput}
+          externalError={error || undefined}
+          showClear={true}
+          allowCopy={true}
+          fill
+          minRows={4}
+          onClear={handleClear}
+          className="min-h-0 flex-1"
+        />
 
-      {output && (
-        <div className="p-4 rounded-2xl bg-card border border-border shadow-sm flex flex-col space-y-3">
-          <div className="flex justify-between items-center select-none">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
-              {outputLabel}
+        {showImageHint && (
+          <div className="flex shrink-0 items-center justify-between gap-2 rounded-xl border border-primary/20 bg-primary/10 p-2.5">
+            <span className="text-xs font-semibold tracking-tight text-primary">
+              检测到图片的 data URI，请使用「图像」选项卡进行解码。
             </span>
-            <CopyButton
-              text={output}
-              className="h-6 px-2 rounded-md border text-[10px] font-bold"
-            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onSwitchToImageMode}
+              className="h-7 shrink-0 rounded-md px-2.5 text-xs font-bold text-primary hover:bg-primary/20 hover:text-primary dark:hover:bg-primary/10"
+            >
+              切换到图像模式
+            </Button>
           </div>
+        )}
 
-          <TextInputArea
-            readOnly
-            value={output.length > 2000 ? `${output.substring(0, 2000)}...` : output}
-            showClear={false}
-            minRows={4}
-          />
-        </div>
-      )}
+        {output && (
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-input bg-background shadow-sm">
+            <div className="flex h-8 shrink-0 items-center px-4">
+              <span className="select-none text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
+                {outputLabel}
+              </span>
+            </div>
+            <TextInputArea
+              readOnly
+              borderless
+              fill
+              showClear={false}
+              value={output}
+              className="min-h-0 flex-1"
+            />
+            <div className="flex h-10 shrink-0 items-center justify-end gap-1.5 border-t border-border/50 bg-muted/30 px-4">
+              <CopyButton
+                text={output}
+                tooltip="复制结果"
+                variant="ghost"
+                size="iconSm"
+                className="text-muted-foreground hover:text-foreground"
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

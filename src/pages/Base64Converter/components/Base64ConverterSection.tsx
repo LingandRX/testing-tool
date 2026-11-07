@@ -52,21 +52,20 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
   };
 
   return (
-    <div className="w-full flex flex-col space-y-4 px-2">
-      <div className="flex h-11 items-center px-1.5 bg-secondary/40 rounded-xl border border-border/60 w-fit">
-        <SwitchButtonGroup
-          value={direction}
-          options={[
-            { value: 'encode', label: '编码' },
-            { value: 'decode', label: '解码' },
-          ]}
-          onChange={handleDirectionChange}
-          size="small"
-        />
-      </div>
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col gap-1">
+      <SwitchButtonGroup
+        value={direction}
+        options={[
+          { value: 'encode', label: '编码' },
+          { value: 'decode', label: '解码' },
+        ]}
+        onChange={handleDirectionChange}
+        size="small"
+        className="w-full shrink-0"
+      />
 
       {direction === 'encode' ? (
-        <div className="flex flex-col space-y-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-2">
           <div
             onDragOver={(e) => {
               e.preventDefault();
@@ -81,7 +80,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
             }}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              'flex flex-col items-center justify-center min-h-[190px] border-2 border-dashed rounded-2xl p-8 cursor-pointer',
+              'flex min-h-0 flex-1 cursor-pointer flex-col items-center justify-center overflow-y-auto rounded-2xl border-2 border-dashed p-4',
               isDragging
                 ? 'border-primary bg-primary/10'
                 : info
@@ -152,65 +151,69 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
           )}
 
           {result && (
-            <div className="p-4 rounded-2xl bg-card border border-border shadow-sm flex flex-col space-y-3">
-              <div className="flex justify-between items-center select-none">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
-                  Base64 编码结果
-                </span>
-                <div className="flex gap-2">
-                  <CopyButton
-                    text={result.rawBase64}
-                    tooltip="复制纯 Base64"
-                    className="h-6 px-2 rounded-md border text-[10px] font-bold"
-                  />
-                  <CopyButton
-                    text={result.output}
-                    tooltip="复制 Data URI"
-                    className="h-6 px-2 rounded-md border text-[10px] font-bold"
-                  />
-                </div>
-              </div>
+            <div className="flex min-h-0 flex-1 flex-col gap-2 rounded-xl border border-border bg-card p-3 shadow-sm">
+              <span className="shrink-0 select-none text-[10px] font-bold uppercase tracking-wider text-muted-foreground/90">
+                Base64 编码结果
+              </span>
               <TextInputArea
                 readOnly
+                fill
                 value={
                   result.output.length > 2000
                     ? `${result.output.substring(0, 2000)}...`
                     : result.output
                 }
                 showClear={false}
-                minRows={4}
+                className="min-h-0 flex-1"
               />
-              <div className="flex items-center justify-between font-mono text-[10px] text-muted-foreground/70 select-none pt-1">
-                <div className="flex gap-4 items-center tabular-nums">
-                  <span>
+              <div className="flex h-10 items-center justify-between gap-2 border-t border-border/50 px-1 font-mono text-[10px] text-muted-foreground/70 select-none">
+                <div className="flex min-w-0 items-center gap-3 tabular-nums">
+                  <span className="truncate">
                     原始大小:{' '}
                     <span className="font-semibold text-foreground/80">
                       {formatBytes(result.originalBytes)}
                     </span>
                   </span>
                   <span className="text-border/60">|</span>
-                  <span>
+                  <span className="truncate">
                     编码大小:{' '}
                     <span className="font-semibold text-foreground/80">
                       {formatBytes(result.outputBytes)}
                     </span>
                   </span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={resetAll}
-                  className="h-7 rounded-md text-muted-foreground hover:text-destructive text-[11px] gap-1 px-2"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  清空
-                </Button>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <CopyButton
+                    text={result.rawBase64}
+                    tooltip="复制纯 Base64"
+                    variant="ghost"
+                    size="iconSm"
+                    className="text-muted-foreground hover:text-foreground"
+                  />
+                  <CopyButton
+                    text={result.output}
+                    tooltip="复制 Data URI"
+                    variant="ghost"
+                    size="iconSm"
+                    className="text-muted-foreground hover:text-foreground"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetAll}
+                    aria-label="清空"
+                    className="h-7 gap-1 rounded-md px-2 text-[11px] text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    清空
+                  </Button>
+                </div>
               </div>
             </div>
           )}
         </div>
       ) : (
-        <div className="flex flex-col space-y-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
           <TextInputArea
             placeholder="输入需要解码的 Base64 或 data URI..."
             value={decodeInput}
@@ -218,7 +221,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
             externalError={decodeError || undefined}
             showClear={true}
             allowCopy={true}
-            minRows={6}
+            minRows={4}
             onClear={resetAll}
           />
           {decoded && (
