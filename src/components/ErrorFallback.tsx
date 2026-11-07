@@ -85,7 +85,7 @@ export function ErrorFallback({
           variant="destructive"
           size={isApp ? 'default' : 'sm'}
           onClick={onAction}
-          className={isApp ? 'rounded-lg font-bold shadow-sm' : 'font-medium shadow-sm'}
+          className={isApp ? 'font-bold shadow-sm' : 'font-medium shadow-sm'}
         >
           <RefreshCw className={isApp ? 'mr-2 h-4 w-4' : 'mr-1.5 h-3.5 w-3.5'} />
           {actionLabel}

@@ -59,6 +59,21 @@ describe('SwitchButtonGroup 组件', () => {
     expect(button).toHaveClass('text-xs');
   });
 
+  it.each(['small', 'medium', 'large'] as const)(
+    'size %s segment uses rounded-md, duration-150, and active:scale-[0.98]',
+    (size) => {
+      render(<SwitchButtonGroup value="a" options={options} onChange={vi.fn()} size={size} />);
+
+      const selected = screen.getByRole('button', { name: /选项A/i });
+      expect(selected.className).toContain('rounded-md');
+      expect(selected.className).toContain('duration-150');
+      expect(selected.className).toContain('active:scale-[0.98]');
+      expect(selected.className).not.toContain('rounded-lg');
+      expect(selected.className).not.toContain('rounded-xl');
+      expect(selected.className).not.toContain('rounded-2xl');
+    },
+  );
+
   it('应支持 ReactNode 类型的 label', () => {
     const nodeOptions = [{ value: 'x', label: <span data-testid="custom-label">自定义</span> }];
     render(<SwitchButtonGroup value="x" options={nodeOptions} onChange={vi.fn()} />);

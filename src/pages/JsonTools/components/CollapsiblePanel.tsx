@@ -38,7 +38,7 @@ export default function CollapsiblePanel({
         type="button"
         onClick={onToggleCollapse}
         className={cn(
-          'flex h-[36px] w-full cursor-pointer select-none items-center justify-between bg-muted/20 hover:bg-muted/30 transition-colors px-3 shrink-0 text-left focus:outline-none focus:bg-muted/40',
+          'flex h-[36px] w-full cursor-pointer select-none items-center justify-between rounded-md bg-muted/20 hover:bg-muted/30 transition-all duration-150 active:scale-[0.98] px-3 shrink-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
           !collapsed && 'border-b border-border/60',
         )}
       >

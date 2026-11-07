@@ -90,8 +90,10 @@ export default function OptionItem({
             onClick={handleSingleCleanClick}
             disabled={isGlobalLoading}
             className={cn(
-              'h-6 w-6 rounded flex items-center justify-center text-muted-foreground transition-all',
-              'hover:bg-destructive/10 hover:text-destructive active:scale-95',
+              'h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground transition-all duration-150',
+              'hover:bg-destructive/10 hover:text-destructive active:scale-[0.98]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              'disabled:pointer-events-none disabled:opacity-50',
               'opacity-0 group-hover:opacity-100 focus:opacity-100',
               isCleaningSingle && 'opacity-100 text-destructive',
             )}

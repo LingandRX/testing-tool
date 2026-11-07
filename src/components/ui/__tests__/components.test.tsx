@@ -15,6 +15,17 @@ describe('UI Components Completion', () => {
       expect(btn.className).toContain('text-xs');
     });
 
+    it('uses rounded-md, duration-150, and active:scale-[0.98]', () => {
+      render(<Button>确认</Button>);
+      const btn = screen.getByRole('button', { name: '确认' });
+      expect(btn.className).toContain('rounded-md');
+      expect(btn.className).toContain('duration-150');
+      expect(btn.className).toContain('active:scale-[0.98]');
+      expect(btn.className).not.toContain('rounded-lg');
+      expect(btn.className).not.toContain('rounded-xl');
+      expect(btn.className).not.toContain('rounded-2xl');
+    });
+
     it('renders Button with size="iconXs"', () => {
       render(<Button size="iconXs">Icon</Button>);
       const btn = screen.getByRole('button');
@@ -132,6 +143,23 @@ describe('UI Components Completion', () => {
 
       expect(screen.queryByText('Content 1')).toBeNull();
       expect(screen.getByText('Content 2')).toBeInTheDocument();
+    });
+
+    it('trigger uses rounded-md, duration-150, and active:scale-[0.98]', () => {
+      render(
+        <Tabs defaultValue="tab1">
+          <TabsList>
+            <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          </TabsList>
+        </Tabs>,
+      );
+      const tab = screen.getByRole('tab', { name: 'Tab 1' });
+      expect(tab.className).toContain('rounded-md');
+      expect(tab.className).toContain('duration-150');
+      expect(tab.className).toContain('active:scale-[0.98]');
+      expect(tab.className).not.toContain('rounded-lg');
+      expect(tab.className).not.toContain('rounded-xl');
+      expect(tab.className).not.toContain('rounded-2xl');
     });
   });
 });

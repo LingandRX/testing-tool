@@ -20,11 +20,11 @@ export interface SwitchButtonGroupProps<T extends string | number = string> exte
 const SIZE_CLASSES = {
   small: 'text-xs h-8 px-2 py-1 rounded-md',
   medium: 'text-sm h-9 px-3 py-1.5 rounded-md',
-  large: 'text-base h-11 px-4 py-2 rounded-lg',
+  large: 'text-base h-11 px-4 py-2 rounded-md',
 } as const;
 
 const INTERACTIVE_CLASSES =
-  'active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-muted';
+  'transition-all duration-150 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-muted disabled:opacity-50';
 
 const SELECTED_CLASSES =
   'bg-background text-foreground shadow-sm font-semibold hover:bg-background hover:text-foreground';

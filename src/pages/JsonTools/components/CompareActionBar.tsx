@@ -43,7 +43,7 @@ export default function CompareActionBar({
             type="button"
             onClick={onShowResults}
             className={cn(
-              'inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90',
+              'inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90',
             )}
           >
             <ArrowLeftRight className="h-3.5 w-3.5" />
@@ -56,8 +56,9 @@ export default function CompareActionBar({
           disabled={!canCompare}
           onClick={onCompare}
           className={cn(
-            'inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-colors',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-muted',
+            'inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-all duration-150 active:scale-[0.98]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'disabled:pointer-events-none disabled:opacity-50',
             canCompare
               ? 'bg-primary text-primary-foreground hover:bg-primary/90'
               : 'cursor-not-allowed bg-muted text-muted-foreground',

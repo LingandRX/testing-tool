@@ -24,7 +24,7 @@ export default function FeatureNav() {
               onMouseEnter={() => preloadPage(key)}
               onFocus={() => preloadPage(key)}
               className={cn(
-                'flex h-9 w-9 items-center justify-center rounded-md border-l-2 border-transparent text-muted-foreground transition-colors duration-150 active:scale-90 hover:bg-muted hover:text-foreground',
+                'flex h-9 w-9 items-center justify-center rounded-md border-l-2 border-transparent text-muted-foreground transition-all duration-150 active:scale-[0.98] hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
                 isActive && 'border-primary bg-muted text-foreground font-medium',
               )}
             >

@@ -80,7 +80,7 @@ export default function Base64ConverterSection({ mode }: Base64ConverterSectionP
             }}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              'flex min-h-0 flex-1 cursor-pointer flex-col items-center justify-center overflow-y-auto rounded-2xl border-2 border-dashed p-4',
+              'flex min-h-0 flex-1 cursor-pointer flex-col items-center justify-center overflow-y-auto rounded-xl border-2 border-dashed p-4',
               isDragging
                 ? 'border-primary bg-primary/10'
                 : info

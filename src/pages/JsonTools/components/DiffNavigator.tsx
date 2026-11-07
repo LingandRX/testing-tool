@@ -50,8 +50,9 @@ export default function DiffNavigator({
         onClick={onPrev}
         className={cn(
           'p-1 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground',
-          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-          'disabled:pointer-events-none disabled:opacity-30',
+          'transition-all duration-150 active:scale-[0.98]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'disabled:pointer-events-none disabled:opacity-50',
         )}
       >
         <ChevronLeft className="h-4 w-4" />
@@ -69,8 +70,9 @@ export default function DiffNavigator({
         onClick={onNext}
         className={cn(
           'p-1 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground',
-          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-          'disabled:pointer-events-none disabled:opacity-30',
+          'transition-all duration-150 active:scale-[0.98]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'disabled:pointer-events-none disabled:opacity-50',
         )}
       >
         <ChevronRight className="h-4 w-4" />

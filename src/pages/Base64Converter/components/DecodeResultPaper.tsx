@@ -43,7 +43,7 @@ export default function DecodeResultPaper({
         variant="default"
         onClick={onDownload}
         disabled={!fileName.trim()}
-        className="w-full rounded-lg font-bold"
+        className="w-full font-bold"
       >
         <Download className="mr-2 h-4 w-4" />
         下载

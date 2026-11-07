@@ -45,6 +45,12 @@ describe('RouterContainer 组件', () => {
       const box = document.querySelector('.page-transition-enter');
       expect(box).toBeInTheDocument();
     });
+
+    it('routed page content receives page-transition-enter', () => {
+      mockRouterValue.currentPage = 'timestamp';
+      const { container } = renderWithProvider(<RouterContainer />);
+      expect(container.querySelector('.page-transition-enter')).toBeInTheDocument();
+    });
   });
 
   describe('路由处理测试', () => {

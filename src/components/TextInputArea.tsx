@@ -80,7 +80,7 @@ function ActionButton({
       onClick={() => onAction(action)}
       disabled={isBtnDisabled || globalDisabled}
       className={cn(
-        'inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-7 px-2.5',
+        'inline-flex items-center justify-center rounded-md text-xs font-medium transition-all duration-150 active:scale-[0.98] h-7 px-2.5',
         'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
         'disabled:pointer-events-none disabled:opacity-50',
         variantClasses[action.type || 'default'],

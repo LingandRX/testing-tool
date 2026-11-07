@@ -34,7 +34,7 @@ export function StorageCleanerConfirm({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
         className={cn(
-          'w-[90%] max-w-[340px] p-6 gap-0 rounded-2xl overflow-hidden shadow-xl border border-border bg-card text-card-foreground',
+          'w-[90%] max-w-[340px] p-6 gap-0 rounded-xl overflow-hidden shadow-xl border border-border bg-card text-card-foreground',
         )}
       >
         {/* 头部标题区域 */}
